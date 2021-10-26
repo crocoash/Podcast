@@ -10,12 +10,14 @@ import UIKit
 class TabBarViewController: UITabBarController {
 
     override func viewWillAppear(_ animated: Bool) {
-        createPlayer()
+        //createPlayer()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        
+        tabBarController?.viewControllers = []
         
     }
     func createPlayer() {

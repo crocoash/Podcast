@@ -14,6 +14,8 @@
 		049D47E52726E05F00B6DA3C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 049D47E42726E05F00B6DA3C /* Assets.xcassets */; };
 		049D47E82726E05F00B6DA3C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 049D47E62726E05F00B6DA3C /* LaunchScreen.storyboard */; };
 		049D47F02726EAE600B6DA3C /* TabBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049D47EF2726EAE600B6DA3C /* TabBarViewController.swift */; };
+		049D47FC27280A2E00B6DA3C /* SmallPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049D47FB27280A2E00B6DA3C /* SmallPlayerView.swift */; };
+		049D47FE27280A6600B6DA3C /* SmallPlayerView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 049D47FD27280A6500B6DA3C /* SmallPlayerView.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +28,8 @@
 		049D47E72726E05F00B6DA3C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		049D47E92726E05F00B6DA3C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		049D47EF2726EAE600B6DA3C /* TabBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarViewController.swift; sourceTree = "<group>"; };
+		049D47FB27280A2E00B6DA3C /* SmallPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmallPlayerView.swift; sourceTree = "<group>"; };
+		049D47FD27280A6500B6DA3C /* SmallPlayerView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SmallPlayerView.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,6 +70,8 @@
 				049D47E62726E05F00B6DA3C /* LaunchScreen.storyboard */,
 				049D47E92726E05F00B6DA3C /* Info.plist */,
 				049D47EF2726EAE600B6DA3C /* TabBarViewController.swift */,
+				049D47FB27280A2E00B6DA3C /* SmallPlayerView.swift */,
+				049D47FD27280A6500B6DA3C /* SmallPlayerView.xib */,
 			);
 			path = Podcasts;
 			sourceTree = "<group>";
@@ -128,6 +134,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				049D47E82726E05F00B6DA3C /* LaunchScreen.storyboard in Resources */,
+				049D47FE27280A6600B6DA3C /* SmallPlayerView.xib in Resources */,
 				049D47E52726E05F00B6DA3C /* Assets.xcassets in Resources */,
 				049D47E32726E05B00B6DA3C /* Main.storyboard in Resources */,
 			);
@@ -143,6 +150,7 @@
 				049D47F02726EAE600B6DA3C /* TabBarViewController.swift in Sources */,
 				049D47E02726E05B00B6DA3C /* ViewController.swift in Sources */,
 				049D47DC2726E05B00B6DA3C /* AppDelegate.swift in Sources */,
+				049D47FC27280A2E00B6DA3C /* SmallPlayerView.swift in Sources */,
 				049D47DE2726E05B00B6DA3C /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
