@@ -11,7 +11,7 @@
         <!--Playlist Table View Controller-->
         <scene sceneID="E2s-Cm-ivu">
             <objects>
-                <tableViewController id="KR2-di-pFg" customClass="PlaylistTableViewController" customModule="Podcasts" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="PlaylistTableViewControllerID" id="KR2-di-pFg" customClass="PlaylistTableViewController" customModule="Podcasts" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="grN-UZ-lbi">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -39,12 +39,12 @@
         <!--Search View Controller-->
         <scene sceneID="Ybt-eR-hL1">
             <objects>
-                <viewController id="6ES-0M-x1B" customClass="SearchViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="SearchViewControllerID" id="6ES-0M-x1B" customClass="SearchViewController" customModule="Podcasts" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="mL1-vA-az2">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <searchBar contentMode="redraw" translatesAutoresizingMaskIntoConstraints="NO" id="gel-su-3Px">
+                            <searchBar contentMode="redraw" placeholder="search" translatesAutoresizingMaskIntoConstraints="NO" id="gel-su-3Px">
                                 <rect key="frame" x="0.0" y="44" width="414" height="51"/>
                                 <textInputTraits key="textInputTraits"/>
                             </searchBar>
