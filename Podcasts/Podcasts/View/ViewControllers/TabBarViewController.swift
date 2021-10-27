@@ -21,6 +21,7 @@ extension TabBarViewController {
         playerView.heightAnchor.constraint(equalTo: tabBar.heightAnchor).isActive = true
         playerView.bottomAnchor.constraint(equalTo: tabBar.topAnchor, constant: -5).isActive = true
     }
+    
 }
 
 extension TabBarViewController {
@@ -30,8 +31,9 @@ extension TabBarViewController {
         let searchItem = UITabBarItem(title: "Search", image: nil, selectedImage: nil)
         searchVC.tabBarItem = searchItem
         let playListVC = main.instantiateViewController(identifier: "PlaylistTableViewControllerID") as PlaylistTableViewController
-        let playList = UITabBarItem(title: "PlayList", image: nil, selectedImage: nil)
-        playListVC.tabBarItem = playList
+        let playListItem = UITabBarItem(title: "PlayList", image: nil, selectedImage: nil)
+        playListVC.tabBarItem = playListItem
         self.viewControllers = [searchVC,playListVC]
     }
+    
 }
