@@ -24,6 +24,7 @@ class SmallPlayerView: UIView {
         if player?.rate == 0
         {
             player!.play()
+            
             //playButton!.setImage(UIImage(named: "player_control_pause_50px.png"), forState: UIControlState.Normal)
             
         } else {
