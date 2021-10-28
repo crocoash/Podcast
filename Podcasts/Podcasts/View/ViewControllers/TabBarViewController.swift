@@ -2,19 +2,20 @@
 import UIKit
 
 class TabBarViewController: UITabBarController {
-    
+    private var playerView = SmallPlayerView()
     override func viewDidLoad() {
         super.viewDidLoad()
         configureTabBar()
         createSmallPlayer()
+        playerView.delegate = self
     }
     
 }
 
 extension TabBarViewController {
     private func createSmallPlayer() {
-        let playerView = UINib(nibName: "SmallPlayerView", bundle: .main).instantiate(withOwner: nil, options: nil).first as! SmallPlayerView
-        playerView.configurPlayer()
+        playerView = UINib(nibName: "SmallPlayerView", bundle: .main).instantiate(withOwner: nil, options: nil).first as! SmallPlayerView
+        playerView.configurPlayerView()
         view.addSubview(playerView)
         playerView.translatesAutoresizingMaskIntoConstraints = false
         playerView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
@@ -35,5 +36,13 @@ extension TabBarViewController {
         playListVC.tabBarItem = playListItem
         self.viewControllers = [searchVC,playListVC]
     }
+    
+}
+
+extension TabBarViewController: SmallPlayerViewDelegate {
+    func rollUpPlayer() {
+        playerView.bottomAnchor.constraint(equalTo: tabBar.topAnchor, constant: -25).isActive = true
+    }
+    
     
 }
