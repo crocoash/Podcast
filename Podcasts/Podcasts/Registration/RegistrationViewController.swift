@@ -25,9 +25,7 @@ class RegistrationViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         createGestureRecognizers()
-        secureShowButton.setImage(imageLockSecurePassword, for: .normal)
-        [emailTextField,passwordTextField].forEach { $0.attributedPlaceholder = nSAttributedString(message: placeHolderEmailMessage, color: colorOk ) }
-        alert.delegate = self
+        configureView()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -36,7 +34,7 @@ class RegistrationViewController: UIViewController {
         emailTextField.becomeFirstResponder()
     }
     
-    let alert = MyAlert()
+    private let alert = MyAlert()
     
     //MARK: - Settings
     private var email: String = ""
@@ -121,12 +119,18 @@ extension RegistrationViewController {
 //MARK: - Private methods
 extension RegistrationViewController {
     
+    private func configureView() {
+        secureShowButton.setImage(imageLockSecurePassword, for: .normal)
+        emailTextField.attributedPlaceholder = nSAttributedString(message: placeHolderEmailMessage, color: colorOk)
+        passwordTextField.attributedPlaceholder = nSAttributedString(message: placeHolderPasswordMessage, color: colorOk)
+        alert.delegate = self
+    }
+    
     private func isSecureTextEntry() {
         secureShowButton.setImage(!passwordTextField.isSecureTextEntry ? imageLockSecurePassword : imageUnLockSecurePassword, for: .normal)
         passwordTextField.isSecureTextEntry.toggle()
     }
     
-    //UISegmentedControl
     private func selectedValue() {
         signButton.setTitle(segmentalControl.selectedSegmentIndex == 0 ? signIn : signUp, for: .normal)
     }
@@ -143,7 +147,6 @@ extension RegistrationViewController {
     }
     
     private func buttonSender(sender: UIButton) {
-        //        view.endEditing(true)
         
         if email.isEmpty { emailTextField.attributedPlaceholder = nSAttributedString(message: placeHolderEmailMessage, color: colorFails) }
         if password.isEmpty { passwordTextField.attributedPlaceholder = nSAttributedString(message: placeHolderPasswordMessage, color: colorFails) }
@@ -186,7 +189,7 @@ extension RegistrationViewController {
             }
         } else {
             view.backgroundColor = .red
-            //delegate?.setAuthorization(value: result)
+            //delegate setAuthorization(value: result)
             alert.create(title: "Success", withTimeIntervalToDismiss: timeInterval)
         }
     }
@@ -292,6 +295,7 @@ extension RegistrationViewController {
     }
 }
 
+//MARK: - AlertDelegate
 extension RegistrationViewController: AlertDelegate {
     func alertEndShow(_ alert: MyAlert) {
         dismiss(animated: true)
