@@ -1,23 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<<<<<<< HEAD
 
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BnO-Jz-9Kk">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
-=======
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
->>>>>>> Features/Registration
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-<<<<<<< HEAD
         <!--Table View Controller-->
         <scene sceneID="E2s-Cm-ivu">
             <objects>
@@ -76,7 +72,6 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="TTQ-sd-hom"/>
-=======
         <!--Registration View Controller-->
         <scene sceneID="tne-QT-ifu">
             <objects>
@@ -217,7 +212,6 @@
                         <outlet property="segmentalControl" destination="Hib-dU-K1a" id="JXR-IA-fjw"/>
                         <outlet property="signButton" destination="RUc-GO-zd8" id="PYn-ul-oLY"/>
                     </connections>
->>>>>>> Features/Registration
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="PBN-GM-Lop" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -235,7 +229,6 @@
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="9cE-fd-3hY" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-<<<<<<< HEAD
             <point key="canvasLocation" x="1065" y="178"/>
         </scene>
     </scenes>
@@ -244,11 +237,9 @@
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
 =======
-            <point key="canvasLocation" x="-671.01449275362324" y="-311.38392857142856"/>
         </scene>
     </scenes>
     <resources>
         <image name="images" width="184" height="68.5"/>
->>>>>>> Features/Registration
     </resources>
 </document>
