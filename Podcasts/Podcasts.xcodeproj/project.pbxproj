@@ -55,7 +55,7 @@
 		18478127272C8B460036B89E /* MyActionSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyActionSheet.swift; sourceTree = "<group>"; };
 		1847812C272C8F390036B89E /* MyAddGestureRecognizer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyAddGestureRecognizer.swift; sourceTree = "<group>"; };
 		1847812D272C8F390036B89E /* MyLongPressGestureRecognizer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyLongPressGestureRecognizer.swift; sourceTree = "<group>"; };
-		18478130272C8F930036B89E /* Podfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Podfile; path = ../../Podcasts/Podfile; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		18478130272C8F930036B89E /* Podfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Podfile; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		184CE18827270C8D0088044C /* ApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiService.swift; sourceTree = "<group>"; };
 		184CE18A272717680088044C /* PodcastModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastModel.swift; sourceTree = "<group>"; };
 		184CE18C272717B20088044C /* PodacstData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodacstData.swift; sourceTree = "<group>"; };

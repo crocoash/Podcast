@@ -8,7 +8,6 @@
 import UIKit
 import FirebaseAuth
 
-
 class RegistrationViewController: UIViewController {
     
     @IBOutlet private weak var iconImageView: UIImageView!
@@ -68,7 +67,6 @@ class RegistrationViewController: UIViewController {
     @IBAction func segmentedControlValueChange(_ sender: UISegmentedControl) {
         selectedValue()
     }
-    
 }
 
 //MARK: - objc Methods
