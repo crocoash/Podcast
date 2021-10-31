@@ -8,13 +8,13 @@
 import Foundation
 
 struct Author: Codable {
-    let wrapperType: String?
-    let artistType: String?
-    let artistName: String?
-    let artistLinkURL: String?
-    let artistID: Int?
-    let primaryGenreName: String?
-    let primaryGenreID: Int?
+    let wrapperType: String? // artist
+    let artistType: String? // Podcast Artist
+    let artistName: String? // David Gann
+    let artistLinkURL: String? // open in podcast app
+    let artistID: Int? // 1214081373
+    let primaryGenreName: String? // Podcasts
+    let primaryGenreID: Int? //26
 
     enum CodingKeys: String, CodingKey {
         case wrapperType, artistType, artistName
