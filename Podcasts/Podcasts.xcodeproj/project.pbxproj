@@ -49,13 +49,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		00F531523154C13479CB9139 /* Pods-Podcasts.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Podcasts.release.xcconfig"; path = "Target Support Files/Pods-Podcasts/Pods-Podcasts.release.xcconfig"; sourceTree = "<group>"; };
 		0457FB12272F1DFB00D57280 /* BigPlayerView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = BigPlayerView.xib; sourceTree = "<group>"; };
 		0457FB13272F1DFC00D57280 /* SmallPlayerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SmallPlayerView.swift; sourceTree = "<group>"; };
 		0457FB14272F1DFC00D57280 /* SmallPlayerView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SmallPlayerView.xib; sourceTree = "<group>"; };
 		0457FB15272F1DFC00D57280 /* BigPlayerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BigPlayerView.swift; sourceTree = "<group>"; };
 		0457FB1A272F1ECA00D57280 /* PlayerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerViewController.swift; sourceTree = "<group>"; };
 		0457FB1B272F1ECB00D57280 /* PlayerViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PlayerViewController.xib; sourceTree = "<group>"; };
-		00F531523154C13479CB9139 /* Pods-Podcasts.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Podcasts.release.xcconfig"; path = "Target Support Files/Pods-Podcasts/Pods-Podcasts.release.xcconfig"; sourceTree = "<group>"; };
 		049D47D82726E05B00B6DA3C /* Podcasts.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Podcasts.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		049D47DB2726E05B00B6DA3C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		049D47DD2726E05B00B6DA3C /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -311,7 +311,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1250;
-				LastUpgradeCheck = 1250;
+				LastUpgradeCheck = 1310;
 				TargetAttributes = {
 					049D47D72726E05B00B6DA3C = {
 						CreatedOnToolsVersion = 12.5.1;
@@ -423,18 +423,14 @@
 				0457FB1C272F1ECC00D57280 /* PlayerViewController.swift in Sources */,
 				049D480627296ABD00B6DA3C /* AudioPlayer.swift in Sources */,
 				1847812F272C8F390036B89E /* MyLongPressGestureRecognizer.swift in Sources */,
-				049D47FC27280A2E00B6DA3C /* SmallPlayerView.swift in Sources */,
 				1847812E272C8F390036B89E /* MyAddGestureRecognizer.swift in Sources */,
 				18478128272C8B460036B89E /* Alert.swift in Sources */,
 				189C1FAD272D496F00A8480E /* UIViewController + identifier.swift in Sources */,
-				184CE18B272717680088044C /* PodcastModel.swift in Sources */,
 				18A500612727FA3800CD3F0C /* RegistrationViewController.swift in Sources */,
 				189C1FAA272D336500A8480E /* UITableView + register.swift in Sources */,
 				189C1FB2272D876B00A8480E /* Collection.swift in Sources */,
-				049D47DC2726E05B00B6DA3C /* AppDelegate.swift in Sources */,
 				049D47DE2726E05B00B6DA3C /* SceneDelegate.swift in Sources */,
 				18478129272C8B460036B89E /* MyActionSheet.swift in Sources */,
-
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -31,6 +31,7 @@ class TabBarViewController: UITabBarController {
         searchVC.tabBarItem = searchItem
         let playListVC = main.instantiateViewController(identifier: "PlaylistTableViewControllerID") as PlaylistTableViewController
         let playListItem = UITabBarItem(title: "PlayList", image: nil, selectedImage: nil)
+        
         playListVC.tabBarItem = playListItem
         self.viewControllers = [searchVC,playListVC]
     }
