@@ -9,7 +9,7 @@ import UIKit
 
 class PodcastCell: UITableViewCell {
     
-    private(set) var indexPath: IndexPath! = nil
+    var indexPath: IndexPath! = nil
     
     @IBOutlet private  weak var label: UILabel!
     var topInset: CGFloat = 0
@@ -24,6 +24,8 @@ class PodcastCell: UITableViewCell {
 }
 
 extension PodcastCell: CustomTableViewCell {
+
+    
    
     func layoutMargins(inset: UIEdgeInsets) {
         topInset = inset.top
@@ -36,7 +38,7 @@ extension PodcastCell: CustomTableViewCell {
         guard let podcast = type as? Podcast else { return }
         self.indexPath = indexPath
         backgroundColor = .white
-        label.text = "\(podcast.artistIds)" + " " + "\(podcast.isAddToPlaylist)"
+        label.text = "\(podcast.artistIds)" + " " + "\(podcast.isAddToPlaylist)" + "\(indexPath.row)"
         if podcast.isAddToPlaylist { backgroundColor = .yellow }
     }
 }
