@@ -33,7 +33,7 @@ class RegistrationViewController: UIViewController {
         emailTextField.becomeFirstResponder()
     }
     
-    private let alert = MyAlert()
+    private let alert = Alert()
     
     //MARK: - Settings
     private var email: String = ""
@@ -295,11 +295,11 @@ extension RegistrationViewController {
 
 //MARK: - AlertDelegate
 extension RegistrationViewController: AlertDelegate {
-    func alertEndShow(_ alert: MyAlert) {
+    func alertEndShow(_ alert: Alert) {
         dismiss(animated: true)
     }
     
-    func alertShouldShow(_ alert: MyAlert, alertController: UIAlertController) {
+    func alertShouldShow(_ alert: Alert, alertController: UIAlertController) {
         present(alertController, animated: true)
     }
 }

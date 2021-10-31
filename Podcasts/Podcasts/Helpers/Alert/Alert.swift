@@ -8,11 +8,11 @@
 import UIKit
 
 protocol AlertDelegate: AnyObject {
-    func alertEndShow(_ alert: MyAlert)
-    func alertShouldShow(_ alert: MyAlert, alertController: UIAlertController)
+    func alertEndShow(_ alert: Alert)
+    func alertShouldShow(_ alert: Alert, alertController: UIAlertController)
 }
 
-class MyAlert {
+class Alert {
     
     weak var delegate: AlertDelegate?
     

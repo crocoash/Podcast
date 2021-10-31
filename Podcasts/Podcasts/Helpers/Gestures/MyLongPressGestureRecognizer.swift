@@ -40,13 +40,6 @@ struct MyLongPressGestureRecognizer {
         }
     }
     
-    static func createSelector(for longPressGR: UILongPressGestureRecognizer, completion: () -> ())   {
-        if longPressGR.state == .began {
-            completion()
-            feedbackGenerator(for: longPressGR)
-        }
-    }
-    
     private static func feedbackGenerator(for longPressGR: UILongPressGestureRecognizer) {
         let feedbackGenerator = UIImpactFeedbackGenerator()
         feedbackGenerator.prepare()

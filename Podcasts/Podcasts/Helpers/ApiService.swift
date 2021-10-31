@@ -16,31 +16,20 @@ class ApiService {
         uniqueInstance ?? ApiService()
     }
     
-    func getData<T: Codable>(for string: String, completion: @escaping (T?) -> ()) {
-        getData(for: string) { (result: Result<T?,Error>) in
-            switch result {
-            case .success(let result): completion(result)
-            case .failure(let error): print("print Error processing json data: \(error)")
-            }
-        }
-    }
-    
-    private func getData<T: Decodable>(for request: String, completion: @escaping (Result<T?,Error>) -> Void) {
+    func getData<T: Decodable>(for request: String, completion: @escaping (T?) -> Void) {
         
-        let stringUrl = "https://itunes.apple.com/search?term=\(request)&entity=podcastEpisode"
-        
-        guard let url = URL(string: stringUrl) else { print("invalid url"); return }
+        guard let url = URL(string: request) else { print("invalid url"); return }
         
         URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
-            guard let data = data, response != nil, error == nil else { completion(.failure(error!)); return }
+            guard let data = data, response != nil, error == nil else { print(error!.localizedDescription); return }
             
             do {
                 let decoder = JSONDecoder()
-                decoder.keyDecodingStrategy = .convertFromSnakeCase
+//                decoder.keyDecodingStrategy = .convertFromSnakeCase
                 let model = try decoder.decode(T?.self, from: data)
                 
                 DispatchQueue.main.async {
-                    completion(.success(model))
+                    completion(model)
                 }
                 
             } catch let error {

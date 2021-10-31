@@ -12,10 +12,15 @@ class TabBarViewController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        tabBarController?.viewControllers = []
-        tabBar.bounds.height
+        let searchVC = storyboard?.instantiateViewController(withIdentifier: SearchViewController.identifier) as! SearchViewController
+        let playListVc =  storyboard?.instantiateViewController(withIdentifier: PlaylistTableViewController.identifier) as! PlaylistTableViewController
+        searchVC.tabBarItem.title = "Search"
+        playListVc.tabBarItem.title = "My PlayList"
+
+        viewControllers = [searchVC, playListVc]
+//        tabBar.bounds.height
         
-        showPlayer()
+//        showPlayer()
     }
     
 }
@@ -27,3 +32,4 @@ extension TabBarViewController {
         view.addSubview(playerView)
     }
 }
+
