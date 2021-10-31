@@ -38,11 +38,23 @@ class TabBarViewController: UITabBarController {
     private func addPlayer() {
         self.addChild(newPlayerVC)
         
+
         view.addSubview(newPlayerVC.view)
         newPlayerVC.didMove(toParent: self)
         newPlayerVC.view.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate(constraintsSmallPlayer)
         createAndAddGestures(to: newPlayerVC)
+
+        let searchVC = storyboard?.instantiateViewController(withIdentifier: SearchViewController.identifier) as! SearchViewController
+        let playListVc =  storyboard?.instantiateViewController(withIdentifier: PlaylistTableViewController.identifier) as! PlaylistTableViewController
+        searchVC.tabBarItem.title = "Search"
+        playListVc.tabBarItem.title = "My PlayList"
+
+        viewControllers = [searchVC, playListVc]
+//        tabBar.bounds.height
+        
+//        showPlayer()
+
     }
     
     private func updatePlayerConstraints() {
@@ -77,3 +89,4 @@ class TabBarViewController: UITabBarController {
             }
     }
 }
+
