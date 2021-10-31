@@ -38,6 +38,9 @@
 		189C1FB2272D876B00A8480E /* Collection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189C1FB1272D876B00A8480E /* Collection.swift */; };
 		189C1FB4272DF67A00A8480E /* AuthorData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189C1FB3272DF67900A8480E /* AuthorData.swift */; };
 		189C1FB6272DF68600A8480E /* AuthorModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189C1FB5272DF68600A8480E /* AuthorModel.swift */; };
+		189C1FB8272ED56F00A8480E /* TestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189C1FB7272ED56E00A8480E /* TestView.swift */; };
+		189C1FBA272ED58000A8480E /* TestView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 189C1FB9272ED58000A8480E /* TestView.xib */; };
+		189C1FBC272EE6F100A8480E /* UIView + loadFromNib.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189C1FBB272EE6F100A8480E /* UIView + loadFromNib.swift */; };
 		18A500612727FA3800CD3F0C /* RegistrationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A5005E2727FA3800CD3F0C /* RegistrationViewController.swift */; };
 		18A5006C2728490E00CD3F0C /* (null) in Resources */ = {isa = PBXBuildFile; };
 		18A5006E27284BA100CD3F0C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 18A5006D27284BA100CD3F0C /* GoogleService-Info.plist */; };
@@ -83,6 +86,9 @@
 		189C1FB1272D876B00A8480E /* Collection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Collection.swift; sourceTree = "<group>"; };
 		189C1FB3272DF67900A8480E /* AuthorData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorData.swift; sourceTree = "<group>"; };
 		189C1FB5272DF68600A8480E /* AuthorModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorModel.swift; sourceTree = "<group>"; };
+		189C1FB7272ED56E00A8480E /* TestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestView.swift; sourceTree = "<group>"; };
+		189C1FB9272ED58000A8480E /* TestView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TestView.xib; sourceTree = "<group>"; };
+		189C1FBB272EE6F100A8480E /* UIView + loadFromNib.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView + loadFromNib.swift"; sourceTree = "<group>"; };
 		18A5005E2727FA3800CD3F0C /* RegistrationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegistrationViewController.swift; sourceTree = "<group>"; };
 		18A5006D27284BA100CD3F0C /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../GoogleService-Info.plist"; sourceTree = "<group>"; };
 		3FBCF1C0272847F100B70522 /* PodcastCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastCell.swift; sourceTree = "<group>"; };
@@ -133,6 +139,8 @@
 				189C1FB0272D84B100A8480E /* ViewModel */,
 				184CE18F27271D8D0088044C /* View */,
 				049D47E12726E05B00B6DA3C /* Main.storyboard */,
+				189C1FB7272ED56E00A8480E /* TestView.swift */,
+				189C1FB9272ED58000A8480E /* TestView.xib */,
 				049D47E92726E05F00B6DA3C /* Info.plist */,
 				049D480527296ABD00B6DA3C /* AudioPlayer.swift */,
 			);
@@ -231,6 +239,7 @@
 			children = (
 				189C1FA7272D333A00A8480E /* UITableViewCell + identifier.swift */,
 				189C1FAC272D496F00A8480E /* UIViewController + identifier.swift */,
+				189C1FBB272EE6F100A8480E /* UIView + loadFromNib.swift */,
 				189C1FA9272D336500A8480E /* UITableView + register.swift */,
 				189C1FB1272D876B00A8480E /* Collection.swift */,
 			);
@@ -351,6 +360,7 @@
 				3FBCF1C3272847F100B70522 /* PodcastCell.xib in Resources */,
 				18478131272C8F930036B89E /* Podfile in Resources */,
 				049D47E32726E05B00B6DA3C /* Main.storyboard in Resources */,
+				189C1FBA272ED58000A8480E /* TestView.xib in Resources */,
 				18A5006E27284BA100CD3F0C /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -412,6 +422,7 @@
 				3FBCF1C72728482A00B70522 /* PodcastByAuthorCell.swift in Sources */,
 				3FBCF1C2272847F100B70522 /* PodcastCell.swift in Sources */,
 				049D47E02726E05B00B6DA3C /* SearchViewController.swift in Sources */,
+				189C1FBC272EE6F100A8480E /* UIView + loadFromNib.swift in Sources */,
 				184CE18D272717B20088044C /* PodacstData.swift in Sources */,
 				0457FB19272F1DFC00D57280 /* BigPlayerView.swift in Sources */,
 				189C1FA8272D333A00A8480E /* UITableViewCell + identifier.swift in Sources */,
@@ -430,6 +441,7 @@
 				189C1FAA272D336500A8480E /* UITableView + register.swift in Sources */,
 				189C1FB2272D876B00A8480E /* Collection.swift in Sources */,
 				049D47DE2726E05B00B6DA3C /* SceneDelegate.swift in Sources */,
+				189C1FB8272ED56F00A8480E /* TestView.swift in Sources */,
 				18478129272C8B460036B89E /* MyActionSheet.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

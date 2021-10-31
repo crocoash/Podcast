@@ -146,8 +146,8 @@ extension SearchViewController {
     
     @objc func handlerLongPs(sender: UILongPressGestureRecognizer) {
         MyLongPressGestureRecognizer.createSelector(for: sender) { (cell: PodcastCell) in
-            guard let view = sender.view else { return }
-            let podcast = podcasts[view.tag]
+            guard let view = sender.view as? PodcastCell else { return }
+            let podcast = podcasts[view.indexPath.row]
 
             if podcast.isAddToPlaylist {
                 MyPlaylistDocument.shared.removeFromPlayList(podcast)
@@ -159,9 +159,11 @@ extension SearchViewController {
     }
     
     @objc func handelerTapCell(sender: UITapGestureRecognizer) {
-        guard let view = sender.view, let request = authors[view.tag].artistName else { return }
+        guard let view = sender.view as? CustomTableViewCell, let request = authors[view.indexPath.row].artistName else { return }
+        
         searchSegmentalControl.selectedSegmentIndex = 0
         searchText = request
+        podcastTableView.deselectRow(at: view.indexPath, animated: true)
     }
 }
 
@@ -183,10 +185,9 @@ extension SearchViewController: UITableViewDataSource {
         let podcast = podcasts[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: PodcastCell.identifier) as! PodcastCell
         
-        cell.tag = indexPath.row
         cell.layoutMargins(inset: UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10))
         cell.configureCell(with: podcast, indexPath)
-        cell.addMyGestureRecognizer(self, type: .longPressGesture(minimumPressDuration: 2), selector: #selector(handlerLongPs))
+        cell.addMyGestureRecognizer(self, type: .longPressGesture(minimumPressDuration: 1), selector: #selector(handlerLongPs))
         
         return cell
     }
@@ -195,7 +196,6 @@ extension SearchViewController: UITableViewDataSource {
         let authors = authors[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: PodcastByAuthorCell.identifier) as! PodcastByAuthorCell
         
-        cell.tag = indexPath.row
         cell.configureCell(with: authors, indexPath)
         cell.addMyGestureRecognizer(self, type: .tap(), selector: #selector(handelerTapCell))
         
@@ -268,6 +268,7 @@ enum UrlRequest {
 protocol CustomTableViewCell: UITableViewCell {
     func configureCell<T>(with type: T,_ indexPath: IndexPath)
     func layoutMargins(inset: UIEdgeInsets)
+    var indexPath: IndexPath! { get set }
 }
 
 extension String {

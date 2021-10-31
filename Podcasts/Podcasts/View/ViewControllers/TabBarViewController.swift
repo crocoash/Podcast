@@ -47,12 +47,19 @@ class TabBarViewController: UITabBarController {
         createAndAddGestures(to: newPlayerVC)
 
         let searchVC = storyboard?.instantiateViewController(withIdentifier: SearchViewController.identifier) as! SearchViewController
-        let playListVc =  storyboard?.instantiateViewController(withIdentifier: PlaylistTableViewController.identifier) as! PlaylistTableViewController
+        
         searchVC.tabBarItem.title = "Search"
-        playListVc.tabBarItem.title = "My PlayList"
+        searchVC.tabBarItem.image = UIImage(systemName: "magnifyingglass")
 
-        viewControllers = [searchVC, playListVc]
-//        tabBar.bounds.height
+        let playListVc =  storyboard?.instantiateViewController(withIdentifier: PlaylistTableViewController.identifier) as! PlaylistTableViewController
+
+        playListVc.navigationItem.title = "Playlist"
+        
+        let navigationVC = UINavigationController(rootViewController: playListVc)
+        navigationVC.tabBarItem.title = "Playlist"
+        navigationVC.tabBarItem.image = UIImage(systemName: "book")
+        
+        viewControllers = [searchVC, navigationVC]
         
 //        showPlayer()
 
@@ -90,4 +97,3 @@ class TabBarViewController: UITabBarController {
             }
     }
 }
-

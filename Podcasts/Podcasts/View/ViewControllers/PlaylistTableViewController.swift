@@ -8,38 +8,42 @@
 import UIKit
 
 class PlaylistTableViewController: UITableViewController {
-
+     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        tableView.reloadData()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
+        print("print playlist \(MyPlaylistDocument.shared.playList.count)")
+        tableView.register(PodcastCell.self)
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(trash))
     }
+    
 
-    // MARK: - Table view data source
+    
+}
 
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        // #warning Incomplete implementation, return the number of sections
-        return 0
+// MARK: - Table view data source
+extension PlaylistTableViewController {
+    @objc func trash(sender: UIBarButtonItem) {
+        MyPlaylistDocument.shared.removeAllFromPlaylist()
     }
+}
+
+extension PlaylistTableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
-        return 0
+        return MyPlaylistDocument.shared.playList.count
     }
-
-    /*
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
-
-        // Configure the cell...
-
+        let podcast = MyPlaylistDocument.shared.playList[indexPath.row]
+        let cell = tableView.dequeueReusableCell(withIdentifier: PodcastCell.identifier, for: indexPath) as! PodcastCell
+        cell.configureCell(with: podcast, indexPath)
         return cell
     }
-    */
 
     /*
     // Override to support conditional editing of the table view.
@@ -49,24 +53,24 @@ class PlaylistTableViewController: UITableViewController {
     }
     */
 
-    /*
     // Override to support editing the table view.
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
+            let podcast = MyPlaylistDocument.shared.playList[indexPath.row]
+            MyPlaylistDocument.shared.removeFromPlayList(podcast)
+            tableView.reloadData()
+
         } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
+           print("print ++++ \(indexPath)")
         }    
     }
-    */
 
-    /*
+
+   
     // Override to support rearranging the table view.
     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
     }
-    */
+
 
     /*
     // Override to support conditional rearranging of the table view.
