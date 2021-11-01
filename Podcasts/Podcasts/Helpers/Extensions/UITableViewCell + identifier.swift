@@ -12,4 +12,3 @@ extension UITableViewCell {
         return "\(Self.self)"
     }
 }
-

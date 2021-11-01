@@ -8,6 +8,10 @@
 import UIKit
 
 class PodcastByAuthorCell: UITableViewCell {
+    
+    var indexPath: IndexPath! = nil
+
+    
     var topInset: CGFloat = 0
     var leftInset: CGFloat = 0
     var rightInset: CGFloat = 0
@@ -22,7 +26,7 @@ class PodcastByAuthorCell: UITableViewCell {
 }
 
 extension PodcastByAuthorCell: CustomTableViewCell {
-    
+
     func layoutMargins(inset: UIEdgeInsets) {
         topInset = inset.top
         leftInset = inset.left
@@ -32,6 +36,8 @@ extension PodcastByAuthorCell: CustomTableViewCell {
     
     func configureCell<T>(with type: T,_ indexPath: IndexPath) {
         guard let author = type as? Author else { return }
+        self.indexPath = indexPath
+        
         label.text = author.artistName ?? "ddcsc"
     }
 }

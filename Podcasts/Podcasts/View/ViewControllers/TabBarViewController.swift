@@ -6,17 +6,30 @@ class TabBarViewController: UITabBarController {
     
     private var newPlayerVC = PlayerViewController()
     
-    
     lazy var constraintsSmallPlayer: [NSLayoutConstraint] = [
         newPlayerVC.view.heightAnchor.constraint(equalTo: tabBar.heightAnchor),
         newPlayerVC.view.widthAnchor.constraint(equalTo: view.widthAnchor),
         newPlayerVC.view.bottomAnchor.constraint(equalTo: tabBar.topAnchor, constant: -5)
     ]
+    
     lazy var constraintsBigPlayer: [NSLayoutConstraint] = [
         newPlayerVC.view.topAnchor.constraint(equalTo: view.topAnchor),
         newPlayerVC.view.widthAnchor.constraint(equalTo: view.widthAnchor),
         newPlayerVC.view.bottomAnchor.constraint(equalTo: view.bottomAnchor)
     ]
+    
+    lazy var searchVC: SearchViewController = {
+        let searchVC = storyboard?.instantiateViewController(withIdentifier: SearchViewController.identifier) as! SearchViewController
+        searchVC.tabBarItem.title = "Search"
+        searchVC.tabBarItem.image = UIImage(systemName: "magnifyingglass")
+        return searchVC
+    }()
+    
+    lazy var playListVc: PlaylistTableViewController = {
+        let playListVc =  storyboard?.instantiateViewController(withIdentifier: PlaylistTableViewController.identifier) as! PlaylistTableViewController
+        playListVc.navigationItem.title = "Playlist"
+        return playListVc
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,6 +38,7 @@ class TabBarViewController: UITabBarController {
     }
     
     private func configureTabBar() {
+<<<<<<< HEAD
         let main = UIStoryboard(name: "Main", bundle: nil)
         let searchVC = main.instantiateViewController(identifier: "SearchViewController") as SearchViewController
         let searchItem = UITabBarItem(title: "Search", image: nil, selectedImage: nil)
@@ -33,18 +47,26 @@ class TabBarViewController: UITabBarController {
         let playListItem = UITabBarItem(title: "PlayList", image: nil, selectedImage: nil)
         playListVC.tabBarItem = playListItem
         viewControllers = [searchVC,playListVC]
+=======
+        let navigationVC = UINavigationController(rootViewController: playListVc)
+        navigationVC.tabBarItem.title = "Playlist"
+        navigationVC.tabBarItem.image = UIImage(systemName: "book")
+        
+        viewControllers = [searchVC, navigationVC]
+>>>>>>> 006bc81f64ca466b445f5259dc9d6f0d3edfc40a
     }
     
     private func addPlayer() {
         self.addChild(newPlayerVC)
-        
-
         view.addSubview(newPlayerVC.view)
         newPlayerVC.didMove(toParent: self)
         newPlayerVC.view.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate(constraintsSmallPlayer)
         createAndAddGestures(to: newPlayerVC)
+<<<<<<< HEAD
 
+=======
+>>>>>>> 006bc81f64ca466b445f5259dc9d6f0d3edfc40a
     }
     
     private func updatePlayerConstraints() {
@@ -67,16 +89,15 @@ class TabBarViewController: UITabBarController {
     }
     
     @objc func respondToSwipe(gesture: UISwipeGestureRecognizer) {
-            switch gesture.direction {
-            case .up:
-                updatePlayerConstraints()
-                newPlayerVC.isPlayerBig = true
-            case .down:
-                updatePlayerConstraints()
-                newPlayerVC.isPlayerBig = false
-            default:
-                break
-            }
+        switch gesture.direction {
+        case .up:
+            updatePlayerConstraints()
+            newPlayerVC.isPlayerBig = true
+        case .down:
+            updatePlayerConstraints()
+            newPlayerVC.isPlayerBig = false
+        default:
+            break
+        }
     }
 }
-
