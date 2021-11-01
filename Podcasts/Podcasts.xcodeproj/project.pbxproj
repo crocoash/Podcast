@@ -23,6 +23,9 @@
 		049D480127286D3900B6DA3C /* PlaylistTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049D480027286D3900B6DA3C /* PlaylistTableViewController.swift */; };
 		049D480327286D5900B6DA3C /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049D480227286D5900B6DA3C /* DetailViewController.swift */; };
 		049D480627296ABD00B6DA3C /* AudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049D480527296ABD00B6DA3C /* AudioPlayer.swift */; };
+		1831DECC27304F5600EC09E2 /* PlayListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1831DECB27304F5600EC09E2 /* PlayListModel.swift */; };
+		1831DECF2730512F00EC09E2 /* String + conform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1831DECE2730512F00EC09E2 /* String + conform.swift */; };
+		1831DED12730560D00EC09E2 /* DownloadService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1831DED02730560D00EC09E2 /* DownloadService.swift */; };
 		18478128272C8B460036B89E /* Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18478126272C8B450036B89E /* Alert.swift */; };
 		18478129272C8B460036B89E /* MyActionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18478127272C8B460036B89E /* MyActionSheet.swift */; };
 		1847812E272C8F390036B89E /* MyAddGestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1847812C272C8F390036B89E /* MyAddGestureRecognizer.swift */; };
@@ -71,6 +74,9 @@
 		049D480027286D3900B6DA3C /* PlaylistTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistTableViewController.swift; sourceTree = "<group>"; };
 		049D480227286D5900B6DA3C /* DetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
 		049D480527296ABD00B6DA3C /* AudioPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlayer.swift; sourceTree = "<group>"; };
+		1831DECB27304F5600EC09E2 /* PlayListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayListModel.swift; sourceTree = "<group>"; };
+		1831DECE2730512F00EC09E2 /* String + conform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "String + conform.swift"; path = "../../../../../../../Screenshots/String + conform.swift"; sourceTree = "<group>"; };
+		1831DED02730560D00EC09E2 /* DownloadService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadService.swift; sourceTree = "<group>"; };
 		18478126272C8B450036B89E /* Alert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Alert.swift; sourceTree = "<group>"; };
 		18478127272C8B460036B89E /* MyActionSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyActionSheet.swift; sourceTree = "<group>"; };
 		1847812C272C8F390036B89E /* MyAddGestureRecognizer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyAddGestureRecognizer.swift; sourceTree = "<group>"; };
@@ -196,6 +202,7 @@
 				184CE18A272717680088044C /* PodcastModel.swift */,
 				189C1FB3272DF67900A8480E /* AuthorData.swift */,
 				189C1FB5272DF68600A8480E /* AuthorModel.swift */,
+				1831DECB27304F5600EC09E2 /* PlayListModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -230,6 +237,7 @@
 				1847811D272C8B450036B89E /* Gestures */,
 				18478122272C8B450036B89E /* Alert */,
 				184CE18827270C8D0088044C /* ApiService.swift */,
+				1831DED02730560D00EC09E2 /* DownloadService.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -241,6 +249,7 @@
 				189C1FAC272D496F00A8480E /* UIViewController + identifier.swift */,
 				189C1FBB272EE6F100A8480E /* UIView + loadFromNib.swift */,
 				189C1FA9272D336500A8480E /* UITableView + register.swift */,
+				1831DECE2730512F00EC09E2 /* String + conform.swift */,
 				189C1FB1272D876B00A8480E /* Collection.swift */,
 			);
 			path = Extensions;
@@ -439,10 +448,13 @@
 				189C1FAD272D496F00A8480E /* UIViewController + identifier.swift in Sources */,
 				18A500612727FA3800CD3F0C /* RegistrationViewController.swift in Sources */,
 				189C1FAA272D336500A8480E /* UITableView + register.swift in Sources */,
+				1831DED12730560D00EC09E2 /* DownloadService.swift in Sources */,
 				189C1FB2272D876B00A8480E /* Collection.swift in Sources */,
 				049D47DE2726E05B00B6DA3C /* SceneDelegate.swift in Sources */,
 				189C1FB8272ED56F00A8480E /* TestView.swift in Sources */,
+				1831DECF2730512F00EC09E2 /* String + conform.swift in Sources */,
 				18478129272C8B460036B89E /* MyActionSheet.swift in Sources */,
+				1831DECC27304F5600EC09E2 /* PlayListModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
