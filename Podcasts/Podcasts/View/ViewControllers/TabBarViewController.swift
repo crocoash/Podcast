@@ -26,13 +26,13 @@ class TabBarViewController: UITabBarController {
     
     private func configureTabBar() {
         let main = UIStoryboard(name: "Main", bundle: nil)
-        let searchVC = main.instantiateViewController(identifier: "SearchViewControllerID") as SearchViewController
+        let searchVC = main.instantiateViewController(identifier: "SearchViewController") as SearchViewController
         let searchItem = UITabBarItem(title: "Search", image: nil, selectedImage: nil)
         searchVC.tabBarItem = searchItem
-        let playListVC = main.instantiateViewController(identifier: "PlaylistTableViewControllerID") as PlaylistTableViewController
+        let playListVC = main.instantiateViewController(identifier: "PlaylistTableViewController") as PlaylistTableViewController
         let playListItem = UITabBarItem(title: "PlayList", image: nil, selectedImage: nil)
         playListVC.tabBarItem = playListItem
-        self.viewControllers = [searchVC,playListVC]
+        viewControllers = [searchVC,playListVC]
     }
     
     private func addPlayer() {
@@ -44,16 +44,6 @@ class TabBarViewController: UITabBarController {
         newPlayerVC.view.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate(constraintsSmallPlayer)
         createAndAddGestures(to: newPlayerVC)
-
-        let searchVC = storyboard?.instantiateViewController(withIdentifier: SearchViewController.identifier) as! SearchViewController
-        let playListVc =  storyboard?.instantiateViewController(withIdentifier: PlaylistTableViewController.identifier) as! PlaylistTableViewController
-        searchVC.tabBarItem.title = "Search"
-        playListVc.tabBarItem.title = "My PlayList"
-
-        viewControllers = [searchVC, playListVc]
-//        tabBar.bounds.height
-        
-//        showPlayer()
 
     }
     
