@@ -38,7 +38,7 @@ class TabBarViewController: UITabBarController {
     }
     
     private func configureTabBar() {
-<<<<<<< HEAD
+
         let main = UIStoryboard(name: "Main", bundle: nil)
         let searchVC = main.instantiateViewController(identifier: "SearchViewController") as SearchViewController
         let searchItem = UITabBarItem(title: "Search", image: nil, selectedImage: nil)
@@ -47,13 +47,12 @@ class TabBarViewController: UITabBarController {
         let playListItem = UITabBarItem(title: "PlayList", image: nil, selectedImage: nil)
         playListVC.tabBarItem = playListItem
         viewControllers = [searchVC,playListVC]
-=======
+
         let navigationVC = UINavigationController(rootViewController: playListVc)
         navigationVC.tabBarItem.title = "Playlist"
         navigationVC.tabBarItem.image = UIImage(systemName: "book")
         
-        viewControllers = [searchVC, navigationVC]
->>>>>>> 006bc81f64ca466b445f5259dc9d6f0d3edfc40a
+
     }
     
     private func addPlayer() {
@@ -63,10 +62,6 @@ class TabBarViewController: UITabBarController {
         newPlayerVC.view.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate(constraintsSmallPlayer)
         createAndAddGestures(to: newPlayerVC)
-<<<<<<< HEAD
-
-=======
->>>>>>> 006bc81f64ca466b445f5259dc9d6f0d3edfc40a
     }
     
     private func updatePlayerConstraints() {
