@@ -193,10 +193,10 @@ extension SearchViewController: UITableViewDataSource {
     }
     
     private func configureAuthorCell(_ indexPath: IndexPath,_ tableView: UITableView) -> UITableViewCell {
-        let authors = authors[indexPath.row]
+        let author = authors[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: PodcastByAuthorCell.identifier) as! PodcastByAuthorCell
         
-        cell.configureCell(with: authors, indexPath)
+        cell.configureCell(with: author, indexPath)
         cell.addMyGestureRecognizer(self, type: .tap(), selector: #selector(handelerTapCell))
         
         return cell
