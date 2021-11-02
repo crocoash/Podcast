@@ -26,6 +26,8 @@
 		1831DECC27304F5600EC09E2 /* PlayListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1831DECB27304F5600EC09E2 /* PlayListModel.swift */; };
 		1831DECF2730512F00EC09E2 /* String + conform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1831DECE2730512F00EC09E2 /* String + conform.swift */; };
 		1831DED12730560D00EC09E2 /* DownloadService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1831DED02730560D00EC09E2 /* DownloadService.swift */; };
+		1831DEDA2731944600EC09E2 /* PresentTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1831DED82731944600EC09E2 /* PresentTransition.swift */; };
+		1831DEDB2731944600EC09E2 /* DismissTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1831DED92731944600EC09E2 /* DismissTransition.swift */; };
 		18478128272C8B460036B89E /* Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18478126272C8B450036B89E /* Alert.swift */; };
 		18478129272C8B460036B89E /* MyActionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18478127272C8B460036B89E /* MyActionSheet.swift */; };
 		1847812E272C8F390036B89E /* MyAddGestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1847812C272C8F390036B89E /* MyAddGestureRecognizer.swift */; };
@@ -77,6 +79,8 @@
 		1831DECB27304F5600EC09E2 /* PlayListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayListModel.swift; sourceTree = "<group>"; };
 		1831DECE2730512F00EC09E2 /* String + conform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "String + conform.swift"; path = "../../../../../../../Screenshots/String + conform.swift"; sourceTree = "<group>"; };
 		1831DED02730560D00EC09E2 /* DownloadService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadService.swift; sourceTree = "<group>"; };
+		1831DED82731944600EC09E2 /* PresentTransition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PresentTransition.swift; sourceTree = "<group>"; };
+		1831DED92731944600EC09E2 /* DismissTransition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DismissTransition.swift; sourceTree = "<group>"; };
 		18478126272C8B450036B89E /* Alert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Alert.swift; sourceTree = "<group>"; };
 		18478127272C8B460036B89E /* MyActionSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyActionSheet.swift; sourceTree = "<group>"; };
 		1847812C272C8F390036B89E /* MyAddGestureRecognizer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyAddGestureRecognizer.swift; sourceTree = "<group>"; };
@@ -238,6 +242,8 @@
 				18478122272C8B450036B89E /* Alert */,
 				184CE18827270C8D0088044C /* ApiService.swift */,
 				1831DED02730560D00EC09E2 /* DownloadService.swift */,
+				1831DED92731944600EC09E2 /* DismissTransition.swift */,
+				1831DED82731944600EC09E2 /* PresentTransition.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -438,6 +444,7 @@
 				184CE18927270C8D0088044C /* ApiService.swift in Sources */,
 				049D47F02726EAE600B6DA3C /* TabBarViewController.swift in Sources */,
 				049D480127286D3900B6DA3C /* PlaylistTableViewController.swift in Sources */,
+				1831DEDA2731944600EC09E2 /* PresentTransition.swift in Sources */,
 				049D47DC2726E05B00B6DA3C /* AppDelegate.swift in Sources */,
 				184CE18B272717680088044C /* PodcastModel.swift in Sources */,
 				0457FB1C272F1ECC00D57280 /* PlayerViewController.swift in Sources */,
@@ -447,6 +454,7 @@
 				18478128272C8B460036B89E /* Alert.swift in Sources */,
 				189C1FAD272D496F00A8480E /* UIViewController + identifier.swift in Sources */,
 				18A500612727FA3800CD3F0C /* RegistrationViewController.swift in Sources */,
+				1831DEDB2731944600EC09E2 /* DismissTransition.swift in Sources */,
 				189C1FAA272D336500A8480E /* UITableView + register.swift in Sources */,
 				1831DED12730560D00EC09E2 /* DownloadService.swift in Sources */,
 				189C1FB2272D876B00A8480E /* Collection.swift in Sources */,

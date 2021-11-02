@@ -36,8 +36,8 @@ class RegistrationViewController: UIViewController {
     private let alert = Alert()
     
     //MARK: - Settings
-    private var email: String = ""
-    private var password: String = ""
+    private var email: String = "crocoash@gmail.com"
+    private var password: String = "123456"
     
     private let colorFails = #colorLiteral(red: 0.5807225108, green: 0.066734083, blue: 0, alpha: 1)
     private let colorOk = #colorLiteral(red: 0.6000000238, green: 0.6000000238, blue: 0.6000000238, alpha: 1)
@@ -186,9 +186,11 @@ extension RegistrationViewController {
                 }
             }
         } else {
-            view.backgroundColor = .red
-            //delegate setAuthorization(value: result)
-            alert.create(title: "Success", withTimeIntervalToDismiss: timeInterval)
+            let tabBarVC = storyboard?.instantiateViewController(withIdentifier: TabBarViewController.identifier) as! TabBarViewController
+            tabBarVC.modalPresentationStyle = .custom
+            tabBarVC.transitioningDelegate = self
+            
+            present(tabBarVC, animated: true)
         }
     }
     
@@ -301,5 +303,17 @@ extension RegistrationViewController: AlertDelegate {
     
     func alertShouldShow(_ alert: Alert, alertController: UIAlertController) {
         present(alertController, animated: true)
+    }
+}
+
+// MARK: - UIViewControllerTransitioningDelegate
+extension RegistrationViewController: UIViewControllerTransitioningDelegate {
+    
+    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        return PresentTransition()
+    }
+    
+    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        return DismissTransition()
     }
 }
