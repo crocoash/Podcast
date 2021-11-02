@@ -9,25 +9,33 @@ import UIKit
 
 class PlayerViewController: UIViewController {
 
-    @IBOutlet weak var heightSmallPlayer: NSLayoutConstraint!
-    @IBOutlet weak var imageView: UIImageView!
-    var isPlayerBig = false {
-        didSet {
-            setupUI()
-        }
-    }
+    @IBOutlet private weak var podcastImageView: UIImageView!
+    @IBOutlet private weak var podcastNameLabel: UILabel!
+    @IBOutlet private weak var autorNameLabel: UILabel!
+    @IBOutlet private weak var progressSlider: UISlider!
     
-    @IBOutlet private weak var bigPlayerView: UIView!
-    @IBOutlet private weak var smallPlayerView: UIView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-    }
-    private func setupUI() {
-        bigPlayerView.isHidden = !isPlayerBig
-        smallPlayerView.isHidden = isPlayerBig
+        addSwipeGesture()
     }
 
-
+    @IBAction func playPauseTouchUpInside(_ sender: UIButton) {
+    }
+    
+    private func addSwipeGesture() {
+        let swipeUp = UISwipeGestureRecognizer(target: self, action: #selector(respondToSwipe))
+        swipeUp.direction = .up
+        
+        let swipeDown = UISwipeGestureRecognizer(target: self, action: #selector(respondToSwipe))
+        swipeDown.direction = .down
+        view.addGestureRecognizer(swipeUp)
+    }
+    
+    @objc func respondToSwipe(gesture: UISwipeGestureRecognizer) {
+            let bigPlayerVC = BigPlayerViewController(nibName: "BigPlayerViewController", bundle: nil)
+        bigPlayerVC.modalPresentationStyle = .fullScreen
+            present(bigPlayerVC, animated: true, completion: nil)
+    }
+    
 }
