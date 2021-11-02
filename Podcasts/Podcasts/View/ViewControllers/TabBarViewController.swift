@@ -45,7 +45,6 @@ class TabBarViewController: UITabBarController {
         let navigationVC = UINavigationController(rootViewController: playListVc)
         navigationVC.tabBarItem.title = "Playlist"
         navigationVC.tabBarItem.image = UIImage(systemName: "book")
-        
     }
     
     private func addPlayer() {
