@@ -25,6 +25,13 @@ class TabBarViewController: UITabBarController {
         return searchVC
     }()
     
+    lazy var settingsVC: SettingsTableViewController = {
+        let searchVC = storyboard?.instantiateViewController(withIdentifier: SettingsTableViewController.identifier) as! SettingsTableViewController
+        searchVC.tabBarItem.title = "Settings"
+        searchVC.tabBarItem.image = UIImage(systemName: "gear")
+        return searchVC
+    }()
+    
     lazy var playListVc: PlaylistTableViewController = {
         let playListVc =  storyboard?.instantiateViewController(withIdentifier: PlaylistTableViewController.identifier) as! PlaylistTableViewController
         playListVc.navigationItem.title = "Playlist"
@@ -41,8 +48,7 @@ class TabBarViewController: UITabBarController {
         let navigationVC = UINavigationController(rootViewController: playListVc)
         navigationVC.tabBarItem.title = "Playlist"
         navigationVC.tabBarItem.image = UIImage(systemName: "book")
-        
-        viewControllers = [searchVC, navigationVC]
+        viewControllers = [searchVC, navigationVC, settingsVC]
     }
     
     private func addPlayer() {

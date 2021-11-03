@@ -28,6 +28,7 @@
 		1831DED12730560D00EC09E2 /* DownloadService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1831DED02730560D00EC09E2 /* DownloadService.swift */; };
 		1831DEDA2731944600EC09E2 /* PresentTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1831DED82731944600EC09E2 /* PresentTransition.swift */; };
 		1831DEDB2731944600EC09E2 /* DismissTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1831DED92731944600EC09E2 /* DismissTransition.swift */; };
+		1831DEDD27319E3900EC09E2 /* SettingsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1831DEDC27319E3900EC09E2 /* SettingsTableViewController.swift */; };
 		18478128272C8B460036B89E /* Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18478126272C8B450036B89E /* Alert.swift */; };
 		18478129272C8B460036B89E /* MyActionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18478127272C8B460036B89E /* MyActionSheet.swift */; };
 		1847812E272C8F390036B89E /* MyAddGestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1847812C272C8F390036B89E /* MyAddGestureRecognizer.swift */; };
@@ -81,6 +82,7 @@
 		1831DED02730560D00EC09E2 /* DownloadService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadService.swift; sourceTree = "<group>"; };
 		1831DED82731944600EC09E2 /* PresentTransition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PresentTransition.swift; sourceTree = "<group>"; };
 		1831DED92731944600EC09E2 /* DismissTransition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DismissTransition.swift; sourceTree = "<group>"; };
+		1831DEDC27319E3900EC09E2 /* SettingsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTableViewController.swift; sourceTree = "<group>"; };
 		18478126272C8B450036B89E /* Alert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Alert.swift; sourceTree = "<group>"; };
 		18478127272C8B460036B89E /* MyActionSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyActionSheet.swift; sourceTree = "<group>"; };
 		1847812C272C8F390036B89E /* MyAddGestureRecognizer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyAddGestureRecognizer.swift; sourceTree = "<group>"; };
@@ -177,6 +179,7 @@
 				049D47DF2726E05B00B6DA3C /* SearchViewController.swift */,
 				049D480027286D3900B6DA3C /* PlaylistTableViewController.swift */,
 				049D480227286D5900B6DA3C /* DetailViewController.swift */,
+				1831DEDC27319E3900EC09E2 /* SettingsTableViewController.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -452,6 +455,7 @@
 				1847812F272C8F390036B89E /* MyLongPressGestureRecognizer.swift in Sources */,
 				1847812E272C8F390036B89E /* MyAddGestureRecognizer.swift in Sources */,
 				18478128272C8B460036B89E /* Alert.swift in Sources */,
+				1831DEDD27319E3900EC09E2 /* SettingsTableViewController.swift in Sources */,
 				189C1FAD272D496F00A8480E /* UIViewController + identifier.swift in Sources */,
 				18A500612727FA3800CD3F0C /* RegistrationViewController.swift in Sources */,
 				1831DEDB2731944600EC09E2 /* DismissTransition.swift in Sources */,
