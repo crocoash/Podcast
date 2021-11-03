@@ -11,7 +11,7 @@ import FirebaseAuth
 class RegistrationViewController: UIViewController {
     
     @IBOutlet private weak var iconImageView: UIImageView!
-    @IBOutlet private weak var segmentalControl: UISegmentedControl!
+    @IBOutlet private weak var segmentedControl: UISegmentedControl!
     @IBOutlet private weak var emailTextField: UITextField!
     @IBOutlet private weak var passwordTextField: UITextField!
     @IBOutlet private weak var signButton: UIButton!
@@ -19,8 +19,16 @@ class RegistrationViewController: UIViewController {
     @IBOutlet private weak var secureShowButton: UIButton!
     @IBOutlet private weak var privacyPolicyLabel: UILabel!
     
-    // MARK: - View Methods
+    lazy var tabBarVC: TabBarViewController = {
+        let vc = storyboard?.instantiateViewController(withIdentifier: TabBarViewController.identifier) as! TabBarViewController
+        vc.modalPresentationStyle = .custom
+        vc.setUserViewModel(userViewModel)
+        vc.transitioningDelegate = self
+        
+        return vc
+    }()
     
+    // MARK: - View Methods
     override func viewDidLoad() {
         super.viewDidLoad()
         createGestureRecognizers()
@@ -29,15 +37,22 @@ class RegistrationViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        sleep(UInt32(1.5))
-        emailTextField.becomeFirstResponder()
+        if userViewModel.userDocument.user.isAuthorization {
+            present(tabBarVC, animated: true)
+        }
     }
     
+    //MARK: - Varibels
+    private var firstSegmentedControl: Bool {
+        segmentedControl.selectedSegmentIndex == 0
+    }
+    
+    private var userViewModel = UserViewModel()
     private let alert = Alert()
     
     //MARK: - Settings
-    private var email: String = "crocoash@gmail.com"
-    private var password: String = "123456"
+    lazy private var email: String = userViewModel.userDocument.user.userName
+    private var password: String = ""
     
     private let colorFails = #colorLiteral(red: 0.5807225108, green: 0.066734083, blue: 0, alpha: 1)
     private let colorOk = #colorLiteral(red: 0.6000000238, green: 0.6000000238, blue: 0.6000000238, alpha: 1)
@@ -56,21 +71,19 @@ class RegistrationViewController: UIViewController {
     
     
     //MARK: - @IBAction
-    @IBAction func signTouchUpUpInside(_ sender: UIButton) {
+    @IBAction func signTouchUpInside(_ sender: UIButton) {
         buttonSender(sender: sender)
     }
     
+    //SecureButtom
     @IBAction func secureTouchUpIncide(_ sender: UIButton) {
         isSecureTextEntry()
     }
     
+    //UISegmentedControl
     @IBAction func segmentedControlValueChange(_ sender: UISegmentedControl) {
         selectedValue()
     }
-}
-
-//MARK: - objc Methods
-extension RegistrationViewController {
     
     //UISwipeGestureRecognizer
     @objc private func swipeDirection(sender: UISwipeGestureRecognizer) {
@@ -81,11 +94,11 @@ extension RegistrationViewController {
             buttonSender(sender: signButton)
             
         case .right:
-            segmentalControl.selectedSegmentIndex -= 1
+            segmentedControl.selectedSegmentIndex -= 1
             selectedValue()
             
         case .left:
-            segmentalControl.selectedSegmentIndex += 1
+            segmentedControl.selectedSegmentIndex += 1
             selectedValue()
             
         case .down:
@@ -95,10 +108,12 @@ extension RegistrationViewController {
         }
     }
     
+    //tap for dissmiss keyboard
     @objc func handlerTap(sender: UITapGestureRecognizer) {
         view.endEditing(true)
     }
     
+    //Privacy Infor
     @objc func showPrivacyInfo(_ sender: UILabel) {
         let vc = UIViewController()
         let text = UITextView()
@@ -109,6 +124,7 @@ extension RegistrationViewController {
         present(vc, animated: true)
     }
     
+    //Forgot Passord
     @objc func forgotPasswordTap(_ sender: UIButton) {
         forgotPasswordAlert(with: email)
     }
@@ -119,8 +135,12 @@ extension RegistrationViewController {
     
     private func configureView() {
         secureShowButton.setImage(imageLockSecurePassword, for: .normal)
+        
         emailTextField.attributedPlaceholder = nSAttributedString(message: placeHolderEmailMessage, color: colorOk)
+        emailTextField.text = email
+    
         passwordTextField.attributedPlaceholder = nSAttributedString(message: placeHolderPasswordMessage, color: colorOk)
+        
         alert.delegate = self
     }
     
@@ -130,7 +150,7 @@ extension RegistrationViewController {
     }
     
     private func selectedValue() {
-        signButton.setTitle(segmentalControl.selectedSegmentIndex == 0 ? signIn : signUp, for: .normal)
+        signButton.setTitle( firstSegmentedControl ? signIn : signUp, for: .normal)
     }
     
     private func createGestureRecognizers() {
@@ -146,31 +166,35 @@ extension RegistrationViewController {
     
     private func buttonSender(sender: UIButton) {
         
-        if email.isEmpty { emailTextField.attributedPlaceholder = nSAttributedString(message: placeHolderEmailMessage, color: colorFails) }
-        if password.isEmpty { passwordTextField.attributedPlaceholder = nSAttributedString(message: placeHolderPasswordMessage, color: colorFails) }
-        
         if email.isEmpty {
+            
+            emailTextField.attributedPlaceholder = nSAttributedString(message: placeHolderEmailMessage, color: colorFails)
+            
             emailTextField.becomeFirstResponder()
+            
         } else if password.isEmpty {
+    
+            passwordTextField.attributedPlaceholder = nSAttributedString(message: placeHolderPasswordMessage, color: colorFails)
             passwordTextField.becomeFirstResponder()
+            
         } else {
             
             //signInWithEmail
-            if segmentalControl.selectedSegmentIndex == 0 {
+            if firstSegmentedControl {
                 signInWithEmail(email: email, password: password) { [weak self] (result, err) in
-                    self?.ifErrorSingInOrUp(err: err, result: result)
+                    self?.signIn(err: err, result: result)
                 }
                 
                 //signUpWithEmail
-            } else if segmentalControl.selectedSegmentIndex == 1 {
+            } else  {
                 signUpWithEmail(email: email, password: password) { [weak self] (result, err) in
-                    self?.ifErrorSingInOrUp(err: err, result: result)
+                    self?.signIn(err: err, result: result)
                 }
             }
         }
     }
     
-    private func ifErrorSingInOrUp(err: String, result: Bool) {
+    private func signIn(err: String, result: Bool) {
         
         let timeInterval: TimeInterval = 2
         
@@ -186,10 +210,7 @@ extension RegistrationViewController {
                 }
             }
         } else {
-            let tabBarVC = storyboard?.instantiateViewController(withIdentifier: TabBarViewController.identifier) as! TabBarViewController
-            tabBarVC.modalPresentationStyle = .custom
-            tabBarVC.transitioningDelegate = self
-            
+            userViewModel.changeUserName(newName: email)
             present(tabBarVC, animated: true)
         }
     }
@@ -231,8 +252,9 @@ extension RegistrationViewController {
 extension RegistrationViewController: UITextFieldDelegate {
     
     func textFieldDidBeginEditing(_ textField: UITextField) {
-        setupNativeClearButton()
-        if textField == passwordTextField {
+        if textField == emailTextField {
+//            setupNativeClearButton()
+        } else {
             secureShowButton.isHidden = false
         }
     }

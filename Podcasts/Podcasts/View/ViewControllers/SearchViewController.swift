@@ -39,7 +39,7 @@ class SearchViewController : UIViewController {
     
     private var searchText = "" {
         didSet {
-            if !searchText.isEmpty { getPodcasts(by: searchText.conform()) }
+            if !searchText.isEmpty { getPodcasts(by: searchText.conform) }
             searchBar.text = searchText
         }
     }
@@ -119,7 +119,7 @@ extension SearchViewController {
     }
     
     private func getPodcasts(by request: String) {
-        let request = request.conform()
+        let request = request.conform
         activityIndicator.startAnimating()
         
         if searchSegmentalControl.selectedSegmentIndex == 0 {
@@ -162,9 +162,9 @@ extension SearchViewController {
             let podcast = podcasts[view.indexPath.row]
             
             if podcast.isAddToPlaylist {
-                MyPlaylistDocument.shared.removeFromPlayList(podcast)
+                PlaylistDocument.shared.removeFromPlayList(podcast)
             } else {
-                MyPlaylistDocument.shared.addToPlayList(podcast)
+                PlaylistDocument.shared.addToPlayList(podcast)
                 downloadService.startDownload(podcast)
             }
             podcastTableView.reloadRows(at: [cell.indexPath], with: .none)
@@ -285,6 +285,9 @@ protocol CustomTableViewCell: UITableViewCell {
     var indexPath: IndexPath! { get set }
 }
 
+enum URLS: String {
+    case api = "http://ip-api.com/json/"
+}
 
 
 
@@ -336,11 +339,5 @@ extension SearchViewController: DetailViewControllerDelegate {
     func detailViewController(sender: DetailViewController, playButtonDidTouchFor podcast: Podcast) {
         delegate?.searchViewController(sender: self, sentPodcast: podcast)
     }
-    
-    
 }
-
-
-
-
 

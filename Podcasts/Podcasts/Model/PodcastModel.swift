@@ -45,5 +45,5 @@ struct Podcast: Codable, Equatable, Identifiable {
 }
 
 extension Podcast {
-    var isAddToPlaylist: Bool { MyPlaylistDocument.shared.playList.contains(self)  }
+    var isAddToPlaylist: Bool { PlaylistDocument.shared.playList.contains(self)  }
 }

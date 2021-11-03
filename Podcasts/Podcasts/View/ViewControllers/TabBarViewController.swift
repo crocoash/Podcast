@@ -4,7 +4,13 @@ import UIKit
 
 class TabBarViewController: UITabBarController {
     
-    private var playerVC = PlayerViewController()
+
+    private var newPlayerVC = PlayerViewController()
+    private var userViewModel: UserViewModel!
+    
+    func setUserViewModel(_ userViewModel: UserViewModel) {
+        self.userViewModel = userViewModel
+    }
     
     lazy var constraintsSmallPlayer: [NSLayoutConstraint] = [
         playerVC.view.heightAnchor.constraint(equalTo: tabBar.heightAnchor),
@@ -16,6 +22,14 @@ class TabBarViewController: UITabBarController {
         let searchVC = storyboard?.instantiateViewController(withIdentifier: SearchViewController.identifier) as! SearchViewController
         searchVC.tabBarItem.title = "Search"
         searchVC.tabBarItem.image = UIImage(systemName: "magnifyingglass")
+        return searchVC
+    }()
+    
+    lazy var settingsVC: SettingsTableViewController = {
+        let searchVC = storyboard?.instantiateViewController(withIdentifier: SettingsTableViewController.identifier) as! SettingsTableViewController
+        searchVC.tabBarItem.title = "Settings"
+        searchVC.setUser(userViewModel)
+        searchVC.tabBarItem.image = UIImage(systemName: "gear")
         return searchVC
     }()
     
@@ -32,20 +46,11 @@ class TabBarViewController: UITabBarController {
     }
     
     private func configureTabBar() {
-
-        let main = UIStoryboard(name: "Main", bundle: nil)
-        let searchVC = main.instantiateViewController(identifier: "SearchViewController") as SearchViewController
-        searchVC.delegate = playerVC
-        let searchItem = UITabBarItem(title: "Search", image: nil, selectedImage: nil)
-        searchVC.tabBarItem = searchItem
-        let playListVC = main.instantiateViewController(identifier: "PlaylistTableViewController") as PlaylistTableViewController
-        let playListItem = UITabBarItem(title: "PlayList", image: nil, selectedImage: nil)
-        playListVC.tabBarItem = playListItem
-        viewControllers = [searchVC,playListVC]
-
         let navigationVC = UINavigationController(rootViewController: playListVc)
         navigationVC.tabBarItem.title = "Playlist"
         navigationVC.tabBarItem.image = UIImage(systemName: "book")
+
+        viewControllers = [searchVC, navigationVC, settingsVC]
     }
     
     private func addPlayer() {
