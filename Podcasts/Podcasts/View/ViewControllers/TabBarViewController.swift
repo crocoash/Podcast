@@ -5,10 +5,10 @@ import UIKit
 class TabBarViewController: UITabBarController {
     
     private var newPlayerVC = PlayerViewController()
-    private var user: User!
+    private var userViewModel: UserViewModel!
     
-    func setUser(_ user: User) {
-        self.user = user
+    func setUserViewModel(_ userViewModel: UserViewModel) {
+        self.userViewModel = userViewModel
     }
     
     lazy var constraintsSmallPlayer: [NSLayoutConstraint] = [
@@ -33,7 +33,7 @@ class TabBarViewController: UITabBarController {
     lazy var settingsVC: SettingsTableViewController = {
         let searchVC = storyboard?.instantiateViewController(withIdentifier: SettingsTableViewController.identifier) as! SettingsTableViewController
         searchVC.tabBarItem.title = "Settings"
-        searchVC.setUser(user)
+        searchVC.setUser(userViewModel)
         searchVC.tabBarItem.image = UIImage(systemName: "gear")
         return searchVC
     }()

@@ -22,7 +22,7 @@ class RegistrationViewController: UIViewController {
     lazy var tabBarVC: TabBarViewController = {
         let vc = storyboard?.instantiateViewController(withIdentifier: TabBarViewController.identifier) as! TabBarViewController
         vc.modalPresentationStyle = .custom
-        vc.setUser(userViewModel!.userDocument!.user!) // TODO: -
+        vc.setUserViewModel(userViewModel)
         vc.transitioningDelegate = self
         
         return vc
@@ -35,6 +35,13 @@ class RegistrationViewController: UIViewController {
         configureView()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        if userViewModel.userDocument.user.isAuthorization {
+            present(tabBarVC, animated: true)
+        }
+    }
+    
     //MARK: - Varibels
     private var firstSegmentedControl: Bool {
         segmentedControl.selectedSegmentIndex == 0
@@ -44,7 +51,7 @@ class RegistrationViewController: UIViewController {
     private let alert = Alert()
     
     //MARK: - Settings
-    lazy private var email: String = userViewModel?.userDocument?.user?.userName ?? ""
+    lazy private var email: String = userViewModel.userDocument.user.userName
     private var password: String = ""
     
     private let colorFails = #colorLiteral(red: 0.5807225108, green: 0.066734083, blue: 0, alpha: 1)
@@ -128,13 +135,12 @@ extension RegistrationViewController {
     
     private func configureView() {
         secureShowButton.setImage(imageLockSecurePassword, for: .normal)
+        
         emailTextField.attributedPlaceholder = nSAttributedString(message: placeHolderEmailMessage, color: colorOk)
-        
-        if email != "" {
-            emailTextField.text = email
-        }
-        
+        emailTextField.text = email
+    
         passwordTextField.attributedPlaceholder = nSAttributedString(message: placeHolderPasswordMessage, color: colorOk)
+        
         alert.delegate = self
     }
     
@@ -204,11 +210,7 @@ extension RegistrationViewController {
                 }
             }
         } else {
-            if userViewModel?.userDocument == nil {
-                userViewModel = UserViewModel(user: UserDocument(user: User(userName: email)))
-                print("print userViewModel set")
-            }
-            
+            userViewModel.changeUserName(newName: email)
             present(tabBarVC, animated: true)
         }
     }
@@ -250,9 +252,11 @@ extension RegistrationViewController {
 extension RegistrationViewController: UITextFieldDelegate {
     
     func textFieldDidBeginEditing(_ textField: UITextField) {
-        setupNativeClearButton()
-        
-        secureShowButton.isHidden = !(textField == passwordTextField)
+        if textField == emailTextField {
+//            setupNativeClearButton()
+        } else {
+            secureShowButton.isHidden = false
+        }
     }
     
     func textFieldDidChangeSelection(_ textField: UITextField) {

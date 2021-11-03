@@ -11,24 +11,21 @@ class UserViewModel {
     
     private let key = "UserViewModel"
     
-    private(set) var userDocument: UserDocument? {
+    private(set) var userDocument: UserDocument {
         didSet {
-            UserDefaults.standard.setValue(userDocument?.json, forKey: key)
-            print("print UserDocument UserDefaults)")
+            UserDefaults.standard.setValue(userDocument.json, forKey: key)
         }
     }
     
-    init(user: UserDocument) {
-        self.userDocument = user
+    init() {
+       userDocument =  UserDocument(json: UserDefaults.standard.data(forKey: key)) ?? UserDocument()
     }
     
-    init?() {
-        userDocument = UserDocument(json: UserDefaults.standard.data(forKey: key))
-        
-        if userDocument == nil {
-            print("print UserDocument nil)")
-        } else {
-            print("print UserDocument not nil)")
-        }
+    func changeUserName(newName: String) {
+        userDocument.changeUserName(newName: newName)
+    }
+    
+    func changeAuthorization(value: Bool) {
+        userDocument.changeAuthorization(value: value)
     }
 }
