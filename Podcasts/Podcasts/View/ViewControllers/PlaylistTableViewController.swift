@@ -9,6 +9,8 @@ import UIKit
 
 class PlaylistTableViewController: UITableViewController {
     
+    private let cellHeight : CGFloat = 75.0 
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         tableView.reloadData()
@@ -32,6 +34,10 @@ extension PlaylistTableViewController {
 
 extension PlaylistTableViewController {
     
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return cellHeight
+    }
+
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return MyPlaylistDocument.shared.playList.count
     }
