@@ -8,17 +8,14 @@
 import UIKit
 
 class SearchViewController : UIViewController {
-
     
     @IBOutlet private weak var searchBar: UISearchBar!
     @IBOutlet private weak var podcastTableView: UITableView!
     @IBOutlet private weak var cancelLabel: UILabel!
     @IBOutlet private weak var searchSegmentalControl: UISegmentedControl!
-
-    private let activityIndicator = UIActivityIndicatorView()
     
+    private let activityIndicator = UIActivityIndicatorView()
     private var alert = Alert()
-
     
     private var podcasts: [Podcast] = [] {
         didSet {
@@ -40,10 +37,19 @@ class SearchViewController : UIViewController {
     }
     
     private var isPodcast: Bool { searchSegmentalControl.selectedSegmentIndex == 0 }
+    private let downloadService = DownloadService()
+
+    lazy var downloadsSession: URLSession = {
+        let configuration = URLSessionConfiguration.background(withIdentifier: "BackGroundSession")
+        return URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
+    }()
     
+    
+    // MARK: - View Methods
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
+        downloadService.downloadsSession = downloadsSession
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -96,7 +102,7 @@ extension SearchViewController {
     
     private func processResults<T>(data: [T]?, completion: ([T]) -> Void) {
         activityIndicator.stopAnimating()
-
+        
         guard let data = data else { return }
         
         if data.isEmpty {
@@ -109,7 +115,7 @@ extension SearchViewController {
     private func getPodcasts(by request: String) {
         let request = request.conform()
         activityIndicator.startAnimating()
-
+        
         if searchSegmentalControl.selectedSegmentIndex == 0 {
             ApiService.shared.getData(for: UrlRequest.getStringUrl(.podcast(request))) { [weak self] (info: PodcastData?) in
                 guard let self = self else { return }
@@ -148,11 +154,12 @@ extension SearchViewController {
         MyLongPressGestureRecognizer.createSelector(for: sender) { (cell: PodcastCell) in
             guard let view = sender.view as? PodcastCell else { return }
             let podcast = podcasts[view.indexPath.row]
-
+            
             if podcast.isAddToPlaylist {
                 MyPlaylistDocument.shared.removeFromPlayList(podcast)
             } else {
                 MyPlaylistDocument.shared.addToPlayList(podcast)
+                downloadService.startDownload(podcast)
             }
             podcastTableView.reloadRows(at: [cell.indexPath], with: .none)
         }
@@ -193,10 +200,10 @@ extension SearchViewController: UITableViewDataSource {
     }
     
     private func configureAuthorCell(_ indexPath: IndexPath,_ tableView: UITableView) -> UITableViewCell {
-        let authors = authors[indexPath.row]
+        let author = authors[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: PodcastByAuthorCell.identifier) as! PodcastByAuthorCell
         
-        cell.configureCell(with: authors, indexPath)
+        cell.configureCell(with: author, indexPath)
         cell.addMyGestureRecognizer(self, type: .tap(), selector: #selector(handelerTapCell))
         
         return cell
@@ -225,7 +232,7 @@ extension SearchViewController: UISearchBarDelegate {
     }
 }
 
-
+// MARK: - Alert Delegate
 extension SearchViewController: AlertDelegate {
     func alertEndShow(_ alert: Alert) {
         dismiss(animated: true)
@@ -271,8 +278,52 @@ protocol CustomTableViewCell: UITableViewCell {
     var indexPath: IndexPath! { get set }
 }
 
-extension String {
-    func conform() -> String {
-        String(self.map { $0 == " " ? "-" : $0 })
+
+
+
+extension SearchViewController: URLSessionDownloadDelegate {
+    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+        
+        guard let sourceURL = downloadTask.originalRequest?.url else { return }
+        
+        func localFilePath(for url: URL) -> URL {
+            return documentsPath.appendingPathComponent(url.lastPathComponent)
+        }
+        
+        downloadService.activeDownloads[sourceURL] = nil
+        
+        let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        
+        let destinationURL = localFilePath(for: sourceURL)
+        
+        let fileManager = FileManager.default
+        
+        try? fileManager.removeItem(at: destinationURL)
+        
+        do {
+            try fileManager.copyItem(at: location, to: destinationURL)
+        } catch let error {
+            print("Could not copy file to disk: \(error.localizedDescription)")
+        }
+        
+        //TODO: !!!!!!!!!!
+        DispatchQueue.main.async {
+            print("podcast download sucsellsfull")
+        }
     }
 }
+
+extension SearchViewController: URLSessionDelegate {
+  func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {
+    DispatchQueue.main.async {
+      if let appDelegate = UIApplication.shared.delegate as? AppDelegate,
+         let completionHandler = appDelegate.backgroundSessionCompletionHandler {
+        appDelegate.backgroundSessionCompletionHandler = nil
+        completionHandler()
+      }
+    }
+  }
+}
+
+
+
