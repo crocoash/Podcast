@@ -16,7 +16,7 @@ class PlayerViewController: UIViewController {
     @IBOutlet private weak var progressSlider: UISlider!
     
     private var player: AVQueuePlayer?
-    var currentPodcast: Podcast?
+    private var currentPodcast: Podcast?
     
     let url = URL(string: "https://pdst.fm/e/chtbl.com/track/479722/traffic.megaphone.fm/DGT9636625287.mp3")
     let url2 = URL(string: "https://s3.amazonaws.com/kargopolov/kukushka.mp3")
@@ -66,4 +66,12 @@ class PlayerViewController: UIViewController {
             self.progressSlider.value = Float(time.seconds)
         }
     }
+}
+
+extension PlayerViewController: SearchViewControllerDelegate {
+    func inDetailVCWasTouchedPlayButton(on: Podcast) {
+        currentPodcast = on
+    }
+    
+    
 }

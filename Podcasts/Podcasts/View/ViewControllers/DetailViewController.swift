@@ -7,7 +7,13 @@
 
 import UIKit
 
+protocol DetailViewControllerDelegate: AnyObject {
+    func playButtonTouched(on: Podcast)
+}
+
 class DetailViewController: UIViewController {
+    
+    weak var delegate: DetailViewControllerDelegate?
 
     override func viewDidLoad() {
         super.viewDidLoad()

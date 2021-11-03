@@ -7,6 +7,10 @@
 
 import UIKit
 
+protocol SearchViewControllerDelegate: AnyObject {
+    func inDetailVCWasTouchedPlayButton(on: Podcast)
+}
+
 class SearchViewController : UIViewController {
     
     @IBOutlet private weak var searchBar: UISearchBar!
@@ -16,6 +20,8 @@ class SearchViewController : UIViewController {
     
     private let activityIndicator = UIActivityIndicatorView()
     private var alert = Alert()
+    
+    weak var delegate: SearchViewControllerDelegate?
     
     private var podcasts: [Podcast] = [] {
         didSet {
@@ -325,6 +331,13 @@ extension SearchViewController: URLSessionDelegate {
       }
     }
   }
+}
+
+extension SearchViewController: DetailViewControllerDelegate {
+    func playButtonTouched(on: Podcast) {
+        delegate?.inDetailVCWasTouchedPlayButton(on: on)
+    }
+
 }
 
 
