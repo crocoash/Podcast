@@ -111,12 +111,10 @@ extension SearchViewController {
     private func processResults<T>(data: [T]?, completion: ([T]) -> Void) {
         activityIndicator.stopAnimating()
         
-        guard let data = data else { return }
-        
-        if data.isEmpty {
-            self.alert.create(title: "Ooops nothing search", withTimeIntervalToDismiss: 2)
-        } else {
+        if let data = data, !data.isEmpty {
             completion(data)
+        } else {
+            self.alert.create(title: "Ooops nothing search", withTimeIntervalToDismiss: 2)
         }
     }
     
