@@ -24,7 +24,7 @@
 		049D480327286D5900B6DA3C /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049D480227286D5900B6DA3C /* DetailViewController.swift */; };
 		049D480627296ABD00B6DA3C /* AudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049D480527296ABD00B6DA3C /* AudioPlayer.swift */; };
 		1831DECC27304F5600EC09E2 /* PlayListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1831DECB27304F5600EC09E2 /* PlayListModel.swift */; };
-		1831DECF2730512F00EC09E2 /* String + conform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1831DECE2730512F00EC09E2 /* String + conform.swift */; };
+		1831DECF2730512F00EC09E2 /* String + localized.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1831DECE2730512F00EC09E2 /* String + localized.swift */; };
 		1831DED12730560D00EC09E2 /* DownloadService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1831DED02730560D00EC09E2 /* DownloadService.swift */; };
 		1831DEDA2731944600EC09E2 /* PresentTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1831DED82731944600EC09E2 /* PresentTransition.swift */; };
 		1831DEDB2731944600EC09E2 /* DismissTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1831DED92731944600EC09E2 /* DismissTransition.swift */; };
@@ -78,7 +78,7 @@
 		049D480227286D5900B6DA3C /* DetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
 		049D480527296ABD00B6DA3C /* AudioPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlayer.swift; sourceTree = "<group>"; };
 		1831DECB27304F5600EC09E2 /* PlayListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayListModel.swift; sourceTree = "<group>"; };
-		1831DECE2730512F00EC09E2 /* String + conform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "String + conform.swift"; path = "../../../../../../../Screenshots/String + conform.swift"; sourceTree = "<group>"; };
+		1831DECE2730512F00EC09E2 /* String + localized.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "String + localized.swift"; path = "../String + localized.swift"; sourceTree = "<group>"; };
 		1831DED02730560D00EC09E2 /* DownloadService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadService.swift; sourceTree = "<group>"; };
 		1831DED82731944600EC09E2 /* PresentTransition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PresentTransition.swift; sourceTree = "<group>"; };
 		1831DED92731944600EC09E2 /* DismissTransition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DismissTransition.swift; sourceTree = "<group>"; };
@@ -257,7 +257,7 @@
 				189C1FAC272D496F00A8480E /* UIViewController + identifier.swift */,
 				189C1FBB272EE6F100A8480E /* UIView + loadFromNib.swift */,
 				189C1FA9272D336500A8480E /* UITableView + register.swift */,
-				1831DECE2730512F00EC09E2 /* String + conform.swift */,
+				1831DECE2730512F00EC09E2 /* String + localized.swift */,
 				189C1FB1272D876B00A8480E /* Collection.swift */,
 				3FDEE22E273153D300B245CE /* UIImageView + load.swift */,
 			);
@@ -464,7 +464,7 @@
 				189C1FB2272D876B00A8480E /* Collection.swift in Sources */,
 				049D47DE2726E05B00B6DA3C /* SceneDelegate.swift in Sources */,
 				189C1FB8272ED56F00A8480E /* TestView.swift in Sources */,
-				1831DECF2730512F00EC09E2 /* String + conform.swift in Sources */,
+				1831DECF2730512F00EC09E2 /* String + localized.swift in Sources */,
 				18478129272C8B460036B89E /* MyActionSheet.swift in Sources */,
 				1831DECC27304F5600EC09E2 /* PlayListModel.swift in Sources */,
 			);
