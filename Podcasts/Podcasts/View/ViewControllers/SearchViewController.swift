@@ -335,7 +335,7 @@ extension SearchViewController: URLSessionDelegate {
 }
 
 extension SearchViewController: DetailViewControllerDelegate {
-    func detaiViewController(sender: DetailViewController, onPlayButtonTouchUpInsideSend podcast: Podcast) {
+    func detaiViewController(sender: DetailViewController, playButtonDidTouchfor podcast: Podcast) {
         delegate?.searchViewController(sender: self, sentPodcast: podcast)
     }
     

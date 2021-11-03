@@ -8,7 +8,7 @@
 import UIKit
 
 protocol DetailViewControllerDelegate: AnyObject {
-    func detaiViewController(sender: DetailViewController, onPlayButtonTouchUpInsideSend podcast: Podcast)
+    func detaiViewController(sender: DetailViewController, playButtonDidTouchfor podcast: Podcast)
 }
 
 class DetailViewController: UIViewController {
