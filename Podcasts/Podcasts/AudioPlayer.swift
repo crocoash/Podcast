@@ -20,9 +20,14 @@ class AVPViewController: UIViewController  {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
+        
         let url = URL(string: "https://s3.amazonaws.com/kargopolov/kukushka.mp3")
         let playerItem:AVPlayerItem = AVPlayerItem(url: url!)
         player = AVPlayer(playerItem: playerItem)
+        
+        let a = AVQueuePlayer(items: [playerItem])
+        
+        
         
         let playerLayer=AVPlayerLayer(player: player!)
         playerLayer.frame=CGRect(x:0, y:0, width:10, height:50)

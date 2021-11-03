@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		045628252732EA370044878C /* String + conform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045628242732EA370044878C /* String + conform.swift */; };
+		04425A8A273012DA00E897FA /* BigPlayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04425A88273012DA00E897FA /* BigPlayerViewController.swift */; };
+		04425A8B273012DA00E897FA /* BigPlayerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 04425A89273012DA00E897FA /* BigPlayerViewController.xib */; };
 		0457FB16272F1DFC00D57280 /* BigPlayerView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0457FB12272F1DFB00D57280 /* BigPlayerView.xib */; };
 		0457FB17272F1DFC00D57280 /* SmallPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0457FB13272F1DFC00D57280 /* SmallPlayerView.swift */; };
 		0457FB18272F1DFC00D57280 /* SmallPlayerView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0457FB14272F1DFC00D57280 /* SmallPlayerView.xib */; };
@@ -60,6 +62,8 @@
 /* Begin PBXFileReference section */
 		00F531523154C13479CB9139 /* Pods-Podcasts.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Podcasts.release.xcconfig"; path = "Target Support Files/Pods-Podcasts/Pods-Podcasts.release.xcconfig"; sourceTree = "<group>"; };
 		045628242732EA370044878C /* String + conform.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "String + conform.swift"; path = "../../View/ViewControllers/String + conform.swift"; sourceTree = "<group>"; };
+		04425A88273012DA00E897FA /* BigPlayerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BigPlayerViewController.swift; sourceTree = "<group>"; };
+		04425A89273012DA00E897FA /* BigPlayerViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = BigPlayerViewController.xib; sourceTree = "<group>"; };
 		0457FB12272F1DFB00D57280 /* BigPlayerView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = BigPlayerView.xib; sourceTree = "<group>"; };
 		0457FB13272F1DFC00D57280 /* SmallPlayerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SmallPlayerView.swift; sourceTree = "<group>"; };
 		0457FB14272F1DFC00D57280 /* SmallPlayerView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SmallPlayerView.xib; sourceTree = "<group>"; };
@@ -179,6 +183,8 @@
 				049D47DF2726E05B00B6DA3C /* SearchViewController.swift */,
 				049D480027286D3900B6DA3C /* PlaylistTableViewController.swift */,
 				049D480227286D5900B6DA3C /* DetailViewController.swift */,
+				04425A88273012DA00E897FA /* BigPlayerViewController.swift */,
+				04425A89273012DA00E897FA /* BigPlayerViewController.xib */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -376,6 +382,7 @@
 				0457FB16272F1DFC00D57280 /* BigPlayerView.xib in Resources */,
 				3FBCF1C82728482A00B70522 /* PodcastByAuthorCell.xib in Resources */,
 				3FBCF1C3272847F100B70522 /* PodcastCell.xib in Resources */,
+				04425A8B273012DA00E897FA /* BigPlayerViewController.xib in Resources */,
 				18478131272C8F930036B89E /* Podfile in Resources */,
 				049D47E32726E05B00B6DA3C /* Main.storyboard in Resources */,
 				189C1FBA272ED58000A8480E /* TestView.xib in Resources */,
@@ -446,7 +453,11 @@
 				189C1FA8272D333A00A8480E /* UITableViewCell + identifier.swift in Sources */,
 				184CE18927270C8D0088044C /* ApiService.swift in Sources */,
 				049D47F02726EAE600B6DA3C /* TabBarViewController.swift in Sources */,
+
 				3FDEE22F273153D300B245CE /* UIImageView + load.swift in Sources */,
+
+				04425A8A273012DA00E897FA /* BigPlayerViewController.swift in Sources */,
+
 				049D480127286D3900B6DA3C /* PlaylistTableViewController.swift in Sources */,
 				1831DEDA2731944600EC09E2 /* PresentTransition.swift in Sources */,
 				049D47DC2726E05B00B6DA3C /* AppDelegate.swift in Sources */,
