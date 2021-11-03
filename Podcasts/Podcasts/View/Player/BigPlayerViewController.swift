@@ -23,7 +23,7 @@ class BigPlayerViewController: UIViewController {
         super.viewDidLoad()
         addSwipeGesture()
         addPlayerTimeObservers()
-        createAuduoSession()
+        createAudioSession()
     }
     @IBAction func progressSliderValueChanged(_ sender: UISlider) {
         player?.seek(to: CMTime(seconds: Double(progressSlider.value), preferredTimescale: 60))
@@ -64,7 +64,7 @@ class BigPlayerViewController: UIViewController {
         }
 }
     
-    func createAuduoSession() {
+    func createAudioSession() {
         let audioSession = AVAudioSession.sharedInstance()
         do{
             try audioSession.setCategory(.playback)
