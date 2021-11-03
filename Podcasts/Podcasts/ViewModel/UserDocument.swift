@@ -14,11 +14,12 @@ class UserViewModel {
     private(set) var userDocument: UserDocument? {
         didSet {
             UserDefaults.standard.setValue(userDocument?.json, forKey: key)
+            print("print UserDocument UserDefaults)")
         }
     }
     
     init(user: UserDocument) {
-        self.userDocument = UserDocument(json: UserDefaults.standard.data(forKey: key)) ?? user
+        self.userDocument = user
     }
     
     init?() {

@@ -31,7 +31,7 @@ class SearchViewController : UIViewController {
     
     private var searchText = "" {
         didSet {
-            if !searchText.isEmpty { getPodcasts(by: searchText.conform()) }
+            if !searchText.isEmpty { getPodcasts(by: searchText.conform) }
             searchBar.text = searchText
         }
     }
@@ -113,7 +113,7 @@ extension SearchViewController {
     }
     
     private func getPodcasts(by request: String) {
-        let request = request.conform()
+        let request = request.conform
         activityIndicator.startAnimating()
         
         if searchSegmentalControl.selectedSegmentIndex == 0 {

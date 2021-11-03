@@ -206,6 +206,7 @@ extension RegistrationViewController {
         } else {
             if userViewModel?.userDocument == nil {
                 userViewModel = UserViewModel(user: UserDocument(user: User(userName: email)))
+                print("print userViewModel set")
             }
             
             present(tabBarVC, animated: true)
