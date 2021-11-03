@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import AVFoundation
 
 class BigPlayerViewController: UIViewController {
 
@@ -16,22 +17,35 @@ class BigPlayerViewController: UIViewController {
     @IBOutlet private weak var timeToEndLabel: UILabel!
     @IBOutlet private weak var progressSlider: UISlider!
     
+    var player: AVQueuePlayer?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         addSwipeGesture()
-
+        addPlayerTimeObservers()
+        createAuduoSession()
     }
     @IBAction func progressSliderValueChanged(_ sender: UISlider) {
+        player?.seek(to: CMTime(seconds: Double(progressSlider.value), preferredTimescale: 60))
     }
     @IBAction func previousPodcastTouchUpInside(_ sender: UIButton) {
     }
     @IBAction func tenSecondBackTouchUpInside(_ sender: UIButton) {
     }
     @IBAction func playPauseTouchUpInside(_ sender: UIButton) {
+        guard let player = player else { return }
+        if player.rate == 0
+        {
+            player.play()
+            
+        } else {
+            player.pause()
+        }
     }
     @IBAction func tenSecondForwardTouchUpInside(_ sender: UIButton) {
     }
     @IBAction func nextPodcastTouchUpInside(_ sender: UIButton) {
+        player?.advanceToNextItem()
     }
     
     private func addSwipeGesture() {
@@ -42,5 +56,20 @@ class BigPlayerViewController: UIViewController {
 }
     @objc func respondToSwipe(gesture: UISwipeGestureRecognizer) {
             dismiss(animated: true, completion: nil)
+    }
+    private func addPlayerTimeObservers() {
+        player?.addPeriodicTimeObserver(forInterval: CMTime(seconds: 1, preferredTimescale: 60), queue: .main) { (time) in
+            self.progressSlider.maximumValue = Float(self.player?.currentItem?.duration.seconds ?? 0)
+            self.progressSlider.value = Float(time.seconds)
+        }
+}
+    
+    func createAuduoSession() {
+        let audioSession = AVAudioSession.sharedInstance()
+        do{
+            try audioSession.setCategory(.playback)
+        } catch {
+            print("error")
+        }
     }
 }

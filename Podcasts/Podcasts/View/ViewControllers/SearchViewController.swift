@@ -23,6 +23,8 @@ class SearchViewController : UIViewController {
     private var podcasts: [Podcast] = [] {
         didSet {
             podcastTableView.reloadData()
+            print("//////////////////////")
+            print(podcasts)
         }
     }
     

@@ -16,7 +16,11 @@ class PlayerViewController: UIViewController {
     @IBOutlet private weak var progressSlider: UISlider!
     
     private var player: AVQueuePlayer?
-    var playingPoscast: Podcast?
+    var currentPodcast: Podcast?
+    
+    let url = URL(string: "https://pdst.fm/e/chtbl.com/track/479722/traffic.megaphone.fm/DGT9636625287.mp3")
+    let url2 = URL(string: "https://s3.amazonaws.com/kargopolov/kukushka.mp3")
+    var playerItems: [AVPlayerItem]?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,7 +34,6 @@ class PlayerViewController: UIViewController {
         if player.rate == 0
         {
             player.play()
-            
         } else {
             player.pause()
         }
@@ -45,14 +48,16 @@ class PlayerViewController: UIViewController {
     @objc func respondToSwipe(gesture: UISwipeGestureRecognizer) {
         let bigPlayerVC = BigPlayerViewController(nibName: "BigPlayerViewController", bundle: nil)
         bigPlayerVC.modalPresentationStyle = .fullScreen
+        bigPlayerVC.player = player
         present(bigPlayerVC, animated: true, completion: nil)
     }
     
     private func createPlayer() {
-        let url = URL(string: "https://s3.amazonaws.com/kargopolov/kukushka.mp3")
+        let url = URL(string: "https://pdst.fm/e/chtbl.com/track/479722/traffic.megaphone.fm/DGT9636625287.mp3")
+        playerItems = [AVPlayerItem(url: url!), AVPlayerItem(url: url2!)]
         guard let url = url else { return }
         let playerItem: AVPlayerItem = AVPlayerItem(url: url)
-        player = AVQueuePlayer(items: [playerItem])
+        player = AVQueuePlayer(items: playerItems!)
     }
     
     private func addPlayerTimeObservers() {
