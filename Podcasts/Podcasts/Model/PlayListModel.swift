@@ -10,14 +10,15 @@ import Foundation
 struct PlaylistModel: Codable {
     
     var json: Data? { try? JSONEncoder().encode(self) }
-
+    
     init() {}
     init? (json: Data?) {
-        if let json = json , let playList = try? JSONDecoder().decode(PlaylistModel.self, from: json) {
-            self = playList
-        } else {
-            return nil
-        }
+        guard
+            let json = json ,
+            let playList = try? JSONDecoder().decode(PlaylistModel.self, from: json)
+        else { return nil }
+        
+        self = playList
     }
     
     private(set) var playList = [Podcast]()

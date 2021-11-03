@@ -1,5 +1,5 @@
 //
-//  PodcastViewModel.swift
+//  PlaylistDocument.swift
 //  Podcasts
 //
 //  Created by Tsvetkov Anton on 30.10.2021.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-class MyPlaylistDocument: Codable {
+class PlaylistDocument: Codable {
     
     private static var playlistKey = "playlistKey"
     
@@ -15,7 +15,8 @@ class MyPlaylistDocument: Codable {
         json: UserDefaults.standard.data(forKey: playlistKey)
     ) ?? PlaylistModel()  {
         didSet {
-            UserDefaults.standard.setValue(MyPlaylistDocument.shared.json, forKey: playlistKey)
+            UserDefaults.standard.setValue(PlaylistDocument.shared.json, forKey: playlistKey)
         }
     }
 }
+

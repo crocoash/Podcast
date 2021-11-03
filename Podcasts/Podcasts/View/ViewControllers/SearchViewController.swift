@@ -156,9 +156,9 @@ extension SearchViewController {
             let podcast = podcasts[view.indexPath.row]
             
             if podcast.isAddToPlaylist {
-                MyPlaylistDocument.shared.removeFromPlayList(podcast)
+                PlaylistDocument.shared.removeFromPlayList(podcast)
             } else {
-                MyPlaylistDocument.shared.addToPlayList(podcast)
+                PlaylistDocument.shared.addToPlayList(podcast)
                 downloadService.startDownload(podcast)
             }
             podcastTableView.reloadRows(at: [cell.indexPath], with: .none)
@@ -278,6 +278,9 @@ protocol CustomTableViewCell: UITableViewCell {
     var indexPath: IndexPath! { get set }
 }
 
+enum URLS: String {
+    case api = "http://ip-api.com/json/"
+}
 
 
 
@@ -324,6 +327,3 @@ extension SearchViewController: URLSessionDelegate {
     }
   }
 }
-
-
-

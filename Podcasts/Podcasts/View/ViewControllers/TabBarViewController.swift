@@ -5,6 +5,11 @@ import UIKit
 class TabBarViewController: UITabBarController {
     
     private var newPlayerVC = PlayerViewController()
+    private var user: User!
+    
+    func setUser(_ user: User) {
+        self.user = user
+    }
     
     lazy var constraintsSmallPlayer: [NSLayoutConstraint] = [
         newPlayerVC.view.heightAnchor.constraint(equalTo: tabBar.heightAnchor),
@@ -28,6 +33,7 @@ class TabBarViewController: UITabBarController {
     lazy var settingsVC: SettingsTableViewController = {
         let searchVC = storyboard?.instantiateViewController(withIdentifier: SettingsTableViewController.identifier) as! SettingsTableViewController
         searchVC.tabBarItem.title = "Settings"
+        searchVC.setUser(user)
         searchVC.tabBarItem.image = UIImage(systemName: "gear")
         return searchVC
     }()
