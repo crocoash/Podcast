@@ -8,7 +8,7 @@
 import UIKit
 
 protocol SearchViewControllerDelegate: AnyObject {
-    func inDetailVCWasTouchedPlayButton(on: Podcast)
+    func searchViewController(sender: SearchViewController, sentPodcast: Podcast)
 }
 
 class SearchViewController : UIViewController {
@@ -222,6 +222,7 @@ extension SearchViewController: UITableViewDataSource {
 //extension SearchViewController: UITableViewDelegate {
 //    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 //        //TODO: present DetailViewController
+            //let detailVC.delegate = self
 //    }
 //}
 
@@ -334,11 +335,14 @@ extension SearchViewController: URLSessionDelegate {
 }
 
 extension SearchViewController: DetailViewControllerDelegate {
-    func playButtonTouched(on: Podcast) {
-        delegate?.inDetailVCWasTouchedPlayButton(on: on)
+    func detaiViewController(sender: DetailViewController, onPlayButtonTouchUpInsideSend podcast: Podcast) {
+        delegate?.searchViewController(sender: self, sentPodcast: podcast)
     }
-
+    
+    
 }
+
+
 
 
 

@@ -69,9 +69,8 @@ class PlayerViewController: UIViewController {
 }
 
 extension PlayerViewController: SearchViewControllerDelegate {
-    func inDetailVCWasTouchedPlayButton(on: Podcast) {
-        currentPodcast = on
+    func searchViewController(sender: SearchViewController, sentPodcast: Podcast) {
+        currentPodcast = sentPodcast
     }
-    
     
 }

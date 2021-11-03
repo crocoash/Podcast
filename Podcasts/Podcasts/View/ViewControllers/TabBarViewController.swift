@@ -35,6 +35,7 @@ class TabBarViewController: UITabBarController {
 
         let main = UIStoryboard(name: "Main", bundle: nil)
         let searchVC = main.instantiateViewController(identifier: "SearchViewController") as SearchViewController
+        searchVC.delegate = playerVC
         let searchItem = UITabBarItem(title: "Search", image: nil, selectedImage: nil)
         searchVC.tabBarItem = searchItem
         let playListVC = main.instantiateViewController(identifier: "PlaylistTableViewController") as PlaylistTableViewController
@@ -54,5 +55,6 @@ class TabBarViewController: UITabBarController {
         playerVC.view.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate(constraintsSmallPlayer)
     }
+    
     
 }
