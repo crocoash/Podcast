@@ -5,7 +5,7 @@ import UIKit
 class TabBarViewController: UITabBarController {
     
 
-    private var newPlayerVC = PlayerViewController()
+    private var playerVC = PlayerViewController()
     private var userViewModel: UserViewModel!
     
     func setUserViewModel(_ userViewModel: UserViewModel) {

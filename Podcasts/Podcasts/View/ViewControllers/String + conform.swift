@@ -8,7 +8,7 @@
 import Foundation
 
 extension String {
-    func conform() -> String {
+    var conform: String {
         String(self.map { $0 == " " ? "-" : $0 })
     }
 }
