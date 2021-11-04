@@ -64,16 +64,14 @@ extension PlaylistTableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
         let podcast = PlaylistDocument.shared.playList[indexPath.row]
         guard let urlString = podcast.artworkUrl160, let url = URL(string: urlString), let trackName = podcast.trackName, let collectionName = podcast.collectionName, let description = podcast.description else { return }
         let detailViewController = storyboard?.instantiateViewController(identifier: DetailViewController.identifier) as! DetailViewController
         detailViewController.delegate = self
-        let image = UIImageView()
-        image.load(url: url)
-        detailViewController.receivePodcastInfoAndIndex(index: indexPath.row, image: image, episode: trackName, collection: collectionName, episodeDescription: description)
+
+        detailViewController.receivePodcastInfoAndIndex(index: indexPath.row, image: url, episode: trackName, collection: collectionName, episodeDescription: description)
         self.navigationController?.pushViewController(detailViewController, animated: true)
-    }
+   }
     
     // Override to support rearranging the table view.
     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
