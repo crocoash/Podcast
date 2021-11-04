@@ -190,6 +190,7 @@ extension SearchViewController {
 
         detailViewController.receivePodcastInfoAndIndex(index: view.indexPath.row, image: url, episode: trackName, collection: collectionName, episodeDescription: description)
         detailViewController.modalPresentationStyle = .custom
+        detailViewController.transitioningDelegate = self
         present(detailViewController, animated: true, completion: nil)
     }
 }
@@ -261,7 +262,17 @@ extension SearchViewController: AlertDelegate {
         present(alertController, animated: true)
     }
 }
-
+// MARK: - UIViewControllerTransitioningDelegate
+extension SearchViewController: UIViewControllerTransitioningDelegate {
+    
+    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        return PresentTransition()
+    }
+    
+    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        return DismissTransition()
+    }
+}
 
 
 
