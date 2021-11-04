@@ -17,7 +17,7 @@ class BigPlayerViewController: UIViewController {
     @IBOutlet private weak var durationOfTrackLabel: UILabel!
     @IBOutlet private weak var progressSlider: UISlider!
     
-    var player: AVQueuePlayer?
+    var player: AVPlayer?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -46,7 +46,7 @@ class BigPlayerViewController: UIViewController {
     @IBAction func tenSecondForwardTouchUpInside(_ sender: UIButton) {
     }
     @IBAction func nextPodcastTouchUpInside(_ sender: UIButton) {
-        player?.advanceToNextItem()
+        
     }
     
     private func addSwipeGesture() {
