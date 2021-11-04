@@ -28,7 +28,7 @@ class SettingsTableViewController: UITableViewController {
         autorizationSwitch.isOn = user.isAuthorization
         
         
-        ApiService.shared.getData(for: URLS.api.rawValue) { [weak self] (result: IpModel?) in
+        ApiService.getData(for: URLS.api.rawValue) { [weak self] (result: IpModel?) in
             guard let ipData = result else { return }
             
             self?.locationLabel.text = ipData.country + ipData.city

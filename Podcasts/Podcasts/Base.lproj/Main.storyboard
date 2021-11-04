@@ -292,6 +292,13 @@
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="HMG-An-jX5">
                                 <rect key="frame" x="0.0" y="33" width="414" height="863"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="teD-7p-vwS">
+                                        <rect key="frame" x="122" y="480" width="67" height="31"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <buttonConfiguration key="configuration" style="plain" title="Button"/>
+                                    </button>
+                                </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="yPi-gd-NnQ">
@@ -311,7 +318,7 @@
                                             <outlet property="delegate" destination="rXe-5j-P0v" id="dJk-yX-vO0"/>
                                         </connections>
                                     </textField>
-                                    <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" clearsOnBeginEditing="YES" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="Seh-Ku-B2b">
+                                    <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="Seh-Ku-B2b">
                                         <rect key="frame" x="17" y="181" width="314" height="34"/>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <color key="tintColor" red="0.99936121700000002" green="0.130012393" blue="0.29200571780000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -338,10 +345,7 @@
                                         </connections>
                                     </button>
                                     <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="SNx-bz-l4f">
-                                        <rect key="frame" x="291" y="227.5" width="40" height="31"/>
-                                        <constraints>
-                                            <constraint firstAttribute="width" secondItem="SNx-bz-l4f" secondAttribute="height" multiplier="40:31" id="Aim-6r-duL"/>
-                                        </constraints>
+                                        <rect key="frame" x="307" y="236" width="24" height="14"/>
                                         <color key="tintColor" red="0.6509079337" green="0.6510220766" blue="0.6509007215" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <state key="normal" title="Button"/>
                                         <buttonConfiguration key="configuration" style="plain" title=""/>
@@ -386,7 +390,6 @@
                                     <constraint firstItem="YXD-VH-0O3" firstAttribute="leading" secondItem="Seh-Ku-B2b" secondAttribute="leading" id="ZWj-C0-g0F"/>
                                     <constraint firstItem="fXT-dP-0oN" firstAttribute="leading" secondItem="yPi-gd-NnQ" secondAttribute="leading" id="ZZa-w8-GiE"/>
                                     <constraint firstItem="YXD-VH-0O3" firstAttribute="top" secondItem="Seh-Ku-B2b" secondAttribute="bottom" constant="11" id="apX-dZ-Pwn"/>
-                                    <constraint firstItem="SNx-bz-l4f" firstAttribute="height" secondItem="YXD-VH-0O3" secondAttribute="height" multiplier="0.911765" id="bUc-G1-o4v"/>
                                     <constraint firstAttribute="trailing" secondItem="fXT-dP-0oN" secondAttribute="trailing" id="drG-zZ-Wjc"/>
                                     <constraint firstItem="SEn-yI-5RJ" firstAttribute="top" secondItem="qMC-wa-T3Q" secondAttribute="bottom" constant="20" id="ejA-Zs-ghe"/>
                                     <constraint firstItem="fXT-dP-0oN" firstAttribute="height" secondItem="yPi-gd-NnQ" secondAttribute="height" multiplier="0.408983" constant="-40.595573999999999" id="enu-aC-EC4"/>

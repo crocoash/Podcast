@@ -31,7 +31,7 @@ class RegistrationViewController: UIViewController {
     // MARK: - View Methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        createGestureRecognizers()
+        configureGestures()
         configureView()
     }
     
@@ -72,7 +72,7 @@ class RegistrationViewController: UIViewController {
     
     //MARK: - @IBAction
     @IBAction func signTouchUpInside(_ sender: UIButton) {
-        buttonSender(sender: sender)
+        signButtonDidSelect()
     }
     
     //SecureButtom
@@ -82,7 +82,7 @@ class RegistrationViewController: UIViewController {
     
     //UISegmentedControl
     @IBAction func segmentedControlValueChange(_ sender: UISegmentedControl) {
-        selectedValue()
+        setTitleForSignButton()
     }
     
     //UISwipeGestureRecognizer
@@ -91,15 +91,15 @@ class RegistrationViewController: UIViewController {
         switch sender.direction {
             
         case .up :
-            buttonSender(sender: signButton)
+            signButtonDidSelect()
             
         case .right:
             segmentedControl.selectedSegmentIndex -= 1
-            selectedValue()
+            setTitleForSignButton()
             
         case .left:
             segmentedControl.selectedSegmentIndex += 1
-            selectedValue()
+            setTitleForSignButton()
             
         case .down:
             view.endEditing(true)
@@ -137,7 +137,8 @@ extension RegistrationViewController {
         secureShowButton.setImage(imageLockSecurePassword, for: .normal)
         
         emailTextField.attributedPlaceholder = nSAttributedString(message: placeHolderEmailMessage, color: colorOk)
-        emailTextField.text = email
+        
+        if !email.isEmpty { emailTextField.text = email }
     
         passwordTextField.attributedPlaceholder = nSAttributedString(message: placeHolderPasswordMessage, color: colorOk)
         
@@ -149,11 +150,11 @@ extension RegistrationViewController {
         passwordTextField.isSecureTextEntry.toggle()
     }
     
-    private func selectedValue() {
+    private func setTitleForSignButton() {
         signButton.setTitle( firstSegmentedControl ? signIn : signUp, for: .normal)
     }
     
-    private func createGestureRecognizers() {
+    private func configureGestures() {
         view.addMyGestureRecognizer(self, type: .swipe(), selector: #selector(swipeDirection))
         view.addMyGestureRecognizer(self, type: .tap(), selector:  #selector(handlerTap))
         privacyPolicyLabel.addMyGestureRecognizer(self, type: .tap(), selector: #selector(showPrivacyInfo))
@@ -164,19 +165,20 @@ extension RegistrationViewController {
         NSAttributedString(string: message, attributes: [NSAttributedString.Key.foregroundColor: color])
     }
     
-    private func buttonSender(sender: UIButton) {
+    private func signButtonDidSelect() {
         
         if email.isEmpty {
-            
             emailTextField.attributedPlaceholder = nSAttributedString(message: placeHolderEmailMessage, color: colorFails)
+        }
             
-            emailTextField.becomeFirstResponder()
-            
-        } else if password.isEmpty {
-    
+        if password.isEmpty {
             passwordTextField.attributedPlaceholder = nSAttributedString(message: placeHolderPasswordMessage, color: colorFails)
+        }
+          
+        if email.isEmpty {
+            emailTextField.becomeFirstResponder()
+        } else if password.isEmpty {
             passwordTextField.becomeFirstResponder()
-            
         } else {
             
             //signInWithEmail
@@ -253,22 +255,22 @@ extension RegistrationViewController: UITextFieldDelegate {
     
     func textFieldDidBeginEditing(_ textField: UITextField) {
         if textField == emailTextField {
-//            setupNativeClearButton()
+            setupNativeClearButton()
         } else {
             secureShowButton.isHidden = false
         }
     }
     
     func textFieldDidChangeSelection(_ textField: UITextField) {
-        guard let text = textField.text, !text.isEmpty else { return  }
-        if textField == emailTextField {
-            email = text
-        }
+        guard let text = textField.text, !text.isEmpty else { return }
+        
+        if textField == emailTextField { email = text }
         if textField == passwordTextField { password = text }
+        
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        buttonSender(sender: signButton)
+        signButtonDidSelect()
         return false
     }
     
@@ -277,6 +279,18 @@ extension RegistrationViewController: UITextFieldDelegate {
             secureShowButton.isHidden = true
         }
     }
+    
+    func textFieldShouldClear(_ textField: UITextField) -> Bool {
+        
+        if textField == emailTextField { email.removeAll() }
+        if textField == passwordTextField { password.removeAll() }
+        textField.text?.removeAll()
+        
+        return true
+        
+    }
+    
+    
 }
 
 // MARK: - AuthMethods

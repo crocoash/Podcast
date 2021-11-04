@@ -9,11 +9,6 @@ import Foundation
 
 class ApiService {
     
-    private static var uniqueInstance: ApiService?
-    private init() {}
-    
-    static var shared: ApiService { uniqueInstance ?? ApiService()  }
-    
     func getData<T: Decodable>(for request: String, completion: @escaping (T?) -> Void) {
         
         guard let url = URL(string: request) else { completion(nil); return }

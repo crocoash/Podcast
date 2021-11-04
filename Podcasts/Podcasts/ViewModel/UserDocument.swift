@@ -22,7 +22,9 @@ class UserViewModel {
     }
     
     func changeUserName(newName: String) {
-        userDocument.changeUserName(newName: newName)
+        if userDocument.user.userName != newName {
+            userDocument.changeUserName(newName: newName)
+        }
     }
     
     func changeAuthorization(value: Bool) {
