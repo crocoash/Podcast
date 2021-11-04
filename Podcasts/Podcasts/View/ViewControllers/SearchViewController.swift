@@ -121,7 +121,7 @@ extension SearchViewController {
         activityIndicator.startAnimating()
         
         if searchSegmentalControl.selectedSegmentIndex == 0 {
-            ApiService.getData(for: request) { [weak self] (info: PodcastData?) in
+            ApiService.getData(for: UrlRequest1.getStringUrl(.podcast(request))) { [weak self] (info: PodcastData?) in
                 guard let self = self else { return }
                 
                 DispatchQueue.main.async {
