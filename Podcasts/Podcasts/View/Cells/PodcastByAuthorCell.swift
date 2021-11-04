@@ -7,37 +7,18 @@
 
 import UIKit
 
-class PodcastByAuthorCell: UITableViewCell {
+class PodcastByAuthorCell: UITableViewCell, CustomTableViewCell {
     
-    var indexPath: IndexPath! = nil
-
+    @IBOutlet private weak var label: UILabel!
     
-    var topInset: CGFloat = 0
-    var leftInset: CGFloat = 0
-    var rightInset: CGFloat = 0
-    var bottomInset: CGFloat = 0
-    
-    @IBOutlet weak var label: UILabel!
-    
-    override func layoutMarginsDidChange() {
-        super.layoutMarginsDidChange()
-        self.layoutMargins = UIEdgeInsets(top: topInset, left: leftInset, bottom: bottomInset, right: rightInset)
-    }
+     var indexPath: IndexPath!
 }
 
-extension PodcastByAuthorCell: CustomTableViewCell {
-
-    func layoutMargins(inset: UIEdgeInsets) {
-        topInset = inset.top
-        leftInset = inset.left
-        rightInset = inset.right
-        bottomInset = inset.bottom
-    }
+extension PodcastByAuthorCell {
     
-    func configureCell<T>(with type: T,_ indexPath: IndexPath) {
-        guard let author = type as? Author else { return }
+    func configureCell(with author: Author,_ indexPath: IndexPath) {
         self.indexPath = indexPath
         
-        label.text = author.artistName ?? "ddcsc"
+        label.text = author.artistName ?? "no name"
     }
 }

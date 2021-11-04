@@ -28,12 +28,9 @@ class DetailViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        configureGestures()
         setupView()
         self.view.addMyGestureRecognizer(self, type: .tap(), selector: #selector(dismissOnScreenTap))
-    }
-    @IBAction private func listenButtonOnTouchUpInside(_ sender: UIButton) {
-        dismiss(animated: true, completion: nil)
-        delegate?.detailViewController(self, playButtonDidTouchFor: index)
     }
     
     func receivePodcastInfoAndIndex(index: Int, image url: URL, episode: String, collection: String, episodeDescription: String) {
@@ -44,15 +41,26 @@ class DetailViewController: UIViewController {
         self.episodeDescription = episodeDescription
     }
     
+    @IBAction private func listenButtonOnTouchUpInside(_ sender: UIButton) {
+        dismiss(animated: true, completion: nil)
+        delegate?.detailViewController(self, playButtonDidTouchFor: index)
+    }
+    
+    @objc private func dismissOnScreenTap(_ sender: UIGestureRecognizer) {
+        dismiss(animated: true)
+    }
+}
+
+extension DetailViewController {
+    
     private func setupView(){
-        episodeImage.load(url: image)
+//        episodeImage.load(url: image)
         episodeName.text = episode
         collectionName.text = collection
         descriptionTextView.text = episodeDescription
     }
     
-    @objc private func dismissOnScreenTap(_ sender: UITapGestureRecognizer) {
-        dismiss(animated: true, completion: nil)
+    private func configureGestures() {
+        view.addMyGestureRecognizer(self, type: .screenEdgePanGestureRecognizer(directions: [.right]), selector: #selector(dismissOnScreenTap))
     }
-    
 }

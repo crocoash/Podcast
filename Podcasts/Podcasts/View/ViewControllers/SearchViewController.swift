@@ -50,7 +50,6 @@ class SearchViewController : UIViewController {
         return URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
     }()
     
-    
     // MARK: - View Methods
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -62,89 +61,8 @@ class SearchViewController : UIViewController {
         super.viewWillAppear(animated)
         podcastTableView.reloadData()
     }
-}
-
-//MARK: - Private configure UI Methods
-extension SearchViewController {
     
-    private func configureUI() {
-        configureTableView()
-        configureCancelLabel()
-        configureSegmentalControl()
-        configureAlert()
-        configureActivityIndicator()
-    }
-    
-    private func configureTableView() {
-        podcastTableView.register(PodcastCell.self)
-        podcastTableView.register(PodcastByAuthorCell.self)
-        podcastTableView.rowHeight = 100
-    }
-    
-    private func configureCancelLabel() {
-        cancelLabel.addMyGestureRecognizer(self, type: .tap(), selector: #selector(cancelSearch))
-    }
-    
-    private func configureSegmentalControl() {
-        searchSegmentalControl.addTarget(self, action: #selector(changeTypeOfSearch), for: .valueChanged)
-    }
-    
-    private func configureAlert() {
-        alert.delegate = self
-    }
-    
-    private func configureActivityIndicator() {
-        activityIndicator.isHidden = true
-        activityIndicator.hidesWhenStopped = true
-        activityIndicator.style = .large
-        activityIndicator.center = view.center
-        view.addSubview(activityIndicator)
-    }
-}
-
-
-//MARK: - Private methods
-extension SearchViewController {
-    
-    private func processResults<T>(data: [T]?, completion: ([T]) -> Void) {
-        activityIndicator.stopAnimating()
-        
-        if let data = data, !data.isEmpty {
-            completion(data)
-        } else {
-            self.alert.create(title: "Ooops nothing search", withTimeIntervalToDismiss: 2)
-        }
-    }
-    
-    private func getPodcasts(by request: String) {
-        let request = request.conform
-        activityIndicator.startAnimating()
-        
-        if searchSegmentalControl.selectedSegmentIndex == 0 {
-            ApiService.getData(for: UrlRequest1.getStringUrl(.podcast(request))) { [weak self] (info: PodcastData?) in
-                guard let self = self else { return }
-                
-                DispatchQueue.main.async {
-                    self.processResults(data: info?.results, completion: { podcasts in
-                        self.podcasts = podcasts
-                    })
-                }
-                
-            }
-        } else {
-            ApiService.getData(for: UrlRequest1.getStringUrl(.authors(request))) { [weak self] (info: AuthorData?) in
-                guard let self = self else { return }
-                self.processResults(data: info?.results, completion: { authors in
-                    self.authors = authors
-                })
-            }
-        }
-    }
-}
-
-//MARK: - objc Methods
-extension SearchViewController {
-    
+    //MARK: - Actions
     @objc func cancelSearch(sender: UITapGestureRecognizer) {
         searchText = ""
         authors.removeAll()
@@ -195,6 +113,82 @@ extension SearchViewController {
     }
 }
 
+//MARK: - Private configure UI Methods
+extension SearchViewController {
+    
+    private func configureUI() {
+        configureTableView()
+        configureCancelLabel()
+        configureSegmentalControl()
+        configureAlert()
+        configureActivityIndicator()
+    }
+    
+    private func configureTableView() {
+        podcastTableView.register(PodcastCell.self)
+        podcastTableView.register(PodcastByAuthorCell.self)
+        podcastTableView.rowHeight = 100
+    }
+    
+    private func configureCancelLabel() {
+        cancelLabel.addMyGestureRecognizer(self, type: .tap(), selector: #selector(cancelSearch))
+    }
+    
+    private func configureSegmentalControl() {
+        searchSegmentalControl.addTarget(self, action: #selector(changeTypeOfSearch), for: .valueChanged)
+    }
+    
+    private func configureAlert() {
+        alert.delegate = self
+    }
+    
+    private func configureActivityIndicator() {
+        activityIndicator.isHidden = true
+        activityIndicator.hidesWhenStopped = true
+        activityIndicator.style = .large
+        activityIndicator.center = view.center
+        view.addSubview(activityIndicator)
+    }
+}
+
+//MARK: - Private methods
+extension SearchViewController {
+    
+    private func processResults<T>(data: [T]?, completion: ([T]) -> Void) {
+        activityIndicator.stopAnimating()
+        
+        if let data = data, !data.isEmpty {
+            completion(data)
+        } else {
+            self.alert.create(title: "Ooops nothing search", withTimeIntervalToDismiss: 2)
+        }
+    }
+    
+    private func getPodcasts(by request: String) {
+        let request = request.conform
+        activityIndicator.startAnimating()
+        
+        if searchSegmentalControl.selectedSegmentIndex == 0 {
+            ApiService.getData(for: UrlRequest1.getStringUrl(.podcast(request))) { [weak self] (info: PodcastData?) in
+                guard let self = self else { return }
+                
+                DispatchQueue.main.async {
+                    self.processResults(data: info?.results, completion: { podcasts in
+                        self.podcasts = podcasts
+                    })
+                }
+            }
+        } else {
+            ApiService.getData(for: UrlRequest1.getStringUrl(.authors(request))) { [weak self] (info: AuthorData?) in
+                guard let self = self else { return }
+                self.processResults(data: info?.results, completion: { authors in
+                    self.authors = authors
+                })
+            }
+        }
+    }
+}
+
 // MARK: - TableView Data Source
 extension SearchViewController: UITableViewDataSource {
     
@@ -214,7 +208,6 @@ extension SearchViewController: UITableViewDataSource {
         let podcast = podcasts[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: PodcastCell.identifier) as! PodcastCell
         
-        cell.layoutMargins(inset: UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10))
         cell.configureCell(with: podcast, indexPath)
         cell.addMyGestureRecognizer(self, type: .longPressGesture(minimumPressDuration: 1), selector: #selector(handlerLongPs))
         cell.addMyGestureRecognizer(self, type: .tap(), selector: #selector(handlerTapPodcastCell))
@@ -232,11 +225,6 @@ extension SearchViewController: UITableViewDataSource {
         return cell
     }
 }
-
-// MARK: - TableView Delegate
-extension SearchViewController: UITableViewDelegate {
-}
-
 
 //MARK: - UISearchBarDelegate
 extension SearchViewController: UISearchBarDelegate {
@@ -262,6 +250,7 @@ extension SearchViewController: AlertDelegate {
         present(alertController, animated: true)
     }
 }
+
 // MARK: - UIViewControllerTransitioningDelegate
 extension SearchViewController: UIViewControllerTransitioningDelegate {
     
@@ -274,46 +263,7 @@ extension SearchViewController: UIViewControllerTransitioningDelegate {
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-enum UrlRequest1 {
-    case podcast(String)
-    case authors(String)
-    
-    static func getStringUrl(_ type: UrlRequest1) -> String {
-        switch type {
-        case .podcast(let string):
-            return "https://itunes.apple.com/search?term=\(string)&entity=podcastEpisode"
-        case .authors(let string):
-            return "https://itunes.apple.com/search?term=\(string)&media=podcast&entity=podcastAuthor"
-        }
-    }
-}
-
-
-protocol CustomTableViewCell: UITableViewCell {
-    func configureCell<T>(with type: T,_ indexPath: IndexPath)
-    func layoutMargins(inset: UIEdgeInsets)
-    var indexPath: IndexPath! { get set }
-}
-
-enum URLS: String {
-    case api = "http://ip-api.com/json/"
-}
-
-
-
+//MARK: - URLSessionDownloadDelegate
 extension SearchViewController: URLSessionDownloadDelegate {
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         
@@ -364,4 +314,3 @@ extension SearchViewController: DetailViewControllerDelegate {
     }
 
 }
-
