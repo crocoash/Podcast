@@ -22,6 +22,7 @@ class TabBarViewController: UITabBarController {
         let searchVC = storyboard?.instantiateViewController(withIdentifier: SearchViewController.identifier) as! SearchViewController
         searchVC.tabBarItem.title = "Search"
         searchVC.tabBarItem.image = UIImage(systemName: "magnifyingglass")
+        searchVC.delegate = playerVC
         return searchVC
     }()
     
@@ -36,6 +37,7 @@ class TabBarViewController: UITabBarController {
     lazy var playListVc: PlaylistTableViewController = {
         let playListVc =  storyboard?.instantiateViewController(withIdentifier: PlaylistTableViewController.identifier) as! PlaylistTableViewController
         playListVc.navigationItem.title = "Playlist"
+        playListVc.delegate = playerVC
         return playListVc
     }()
     

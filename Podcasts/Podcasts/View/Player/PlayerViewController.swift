@@ -61,7 +61,8 @@ class PlayerViewController: UIViewController {
     private func playMusic() {
         guard let currentPodcastIndex = currentPodcastIndex else { return }
         player = AVPlayer(playerItem: soundTracks[currentPodcastIndex].playerItem)
-        playerQueue = AVQueuePlayer(items: playerItems)
+        player?.play()
+        //playerQueue = AVQueuePlayer(items: playerItems)
 
     }
     
