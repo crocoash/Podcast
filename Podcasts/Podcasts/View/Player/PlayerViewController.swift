@@ -16,7 +16,8 @@ class PlayerViewController: UIViewController {
     @IBOutlet private weak var progressSlider: UISlider!
     
     private var player: AVQueuePlayer?
-    private var currentPodcast: Podcast?
+    private var podcastIndex: Int?
+    private var playlistOfPodcasts: [Podcast]?
     
     let url = URL(string: "https://pdst.fm/e/chtbl.com/track/479722/traffic.megaphone.fm/DGT9636625287.mp3")
     let url2 = URL(string: "https://s3.amazonaws.com/kargopolov/kukushka.mp3")
@@ -69,8 +70,9 @@ class PlayerViewController: UIViewController {
 }
 
 extension PlayerViewController: SearchViewControllerDelegate {
-    func searchViewController(sender: SearchViewController, sentPodcast: Podcast) {
-        currentPodcast = sentPodcast
+    func searchViewController(_ searchViewController: SearchViewController, play podcasts: [Podcast], at index: Int) {
+        playlistOfPodcasts = podcasts
+        podcastIndex = index
     }
     
 }

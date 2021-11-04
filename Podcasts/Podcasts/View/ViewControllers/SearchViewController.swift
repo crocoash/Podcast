@@ -8,7 +8,7 @@
 import UIKit
 
 protocol SearchViewControllerDelegate: AnyObject {
-    func searchViewController(sender: SearchViewController, sentPodcast: Podcast)
+    func searchViewController(_ searchViewController: SearchViewController, play podcasts: [Podcast], at index: Int)
 }
 
 class SearchViewController : UIViewController {
@@ -26,8 +26,6 @@ class SearchViewController : UIViewController {
     private var podcasts: [Podcast] = [] {
         didSet {
             podcastTableView.reloadData()
-            print("//////////////////////")
-            print(podcasts)
         }
     }
     
@@ -335,11 +333,10 @@ extension SearchViewController: URLSessionDelegate {
 }
 
 extension SearchViewController: DetailViewControllerDelegate {
-    func detailViewController(sender: DetailViewController, playButtonDidTouchFor podcast: Podcast) {
-        delegate?.searchViewController(sender: self, sentPodcast: podcast)
+    func detailViewController(_ detailViewController: DetailViewController, playButtonDidTouchFor podcastIndex: Int) {
+        delegate?.searchViewController(self, play: podcasts, at: podcastIndex)
     }
-    
-    
+
 }
 
 

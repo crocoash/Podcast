@@ -12,11 +12,11 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="BigPlayerViewController" customModule="Podcasts" customModuleProvider="target">
             <connections>
                 <outlet property="autorNameLabel" destination="Wxb-Fd-2tV" id="YCU-DD-1gR"/>
-                <outlet property="passedTimeLabel" destination="oqM-Hi-VRJ" id="isi-kf-6H7"/>
+                <outlet property="currentTimeLabel" destination="oqM-Hi-VRJ" id="22g-Mt-VQj"/>
+                <outlet property="durationOfTrackLabel" destination="YBf-Sa-DCQ" id="R1P-Cj-B1q"/>
                 <outlet property="podcastImageView" destination="S9q-Kg-Gm0" id="NNi-hU-SuU"/>
                 <outlet property="podcastNameLabel" destination="4U4-Fn-z6L" id="OGF-ML-FQI"/>
                 <outlet property="progressSlider" destination="cXA-Ai-yFn" id="u4S-hQ-cQ3"/>
-                <outlet property="timeToEndLabel" destination="YBf-Sa-DCQ" id="gYZ-I1-h3A"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
         </placeholder>

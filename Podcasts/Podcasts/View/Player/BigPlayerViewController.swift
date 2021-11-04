@@ -13,8 +13,8 @@ class BigPlayerViewController: UIViewController {
     @IBOutlet private weak var podcastImageView: UIImageView!
     @IBOutlet private weak var podcastNameLabel: UILabel!
     @IBOutlet private weak var autorNameLabel: UILabel!
-    @IBOutlet private weak var passedTimeLabel: UILabel!
-    @IBOutlet private weak var timeToEndLabel: UILabel!
+    @IBOutlet private weak var currentTimeLabel: UILabel!
+    @IBOutlet private weak var durationOfTrackLabel: UILabel!
     @IBOutlet private weak var progressSlider: UISlider!
     
     var player: AVQueuePlayer?
@@ -24,6 +24,7 @@ class BigPlayerViewController: UIViewController {
         addSwipeGesture()
         addPlayerTimeObservers()
         createAudioSession()
+        displayDurationOfCurrentTrack()
     }
     @IBAction func progressSliderValueChanged(_ sender: UISlider) {
         player?.seek(to: CMTime(seconds: Double(progressSlider.value), preferredTimescale: 60))
@@ -61,6 +62,11 @@ class BigPlayerViewController: UIViewController {
         player?.addPeriodicTimeObserver(forInterval: CMTime(seconds: 1, preferredTimescale: 60), queue: .main) { (time) in
             self.progressSlider.maximumValue = Float(self.player?.currentItem?.duration.seconds ?? 0)
             self.progressSlider.value = Float(time.seconds)
+            
+            let currentTime = self.player?.currentTime().seconds
+            guard let currentTime = currentTime else {return}
+            self.currentTimeLabel.text = "\(Int(currentTime))"
+            
         }
 }
     
@@ -71,5 +77,11 @@ class BigPlayerViewController: UIViewController {
         } catch {
             print("error")
         }
+    }
+    
+    func displayDurationOfCurrentTrack() {
+        let duration = player?.currentItem?.duration.seconds
+        guard let duration = duration else { return }
+        self.durationOfTrackLabel.text = "\(Int(duration))"
     }
 }
