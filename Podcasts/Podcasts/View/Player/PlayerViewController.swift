@@ -44,6 +44,7 @@ class PlayerViewController: UIViewController {
         let swipeUp = UISwipeGestureRecognizer(target: self, action: #selector(respondToSwipe))
         swipeUp.direction = .up
         view.addGestureRecognizer(swipeUp)
+        view.addMyGestureRecognizer(self, type: .tap(1), selector: #selector(respondToSwipe))
     }
     
     @objc func respondToSwipe(gesture: UISwipeGestureRecognizer) {
