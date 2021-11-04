@@ -37,7 +37,7 @@ class SearchViewController : UIViewController {
     
     private var searchText = "" {
         didSet {
-            if !searchText.isEmpty { getPodcasts(by: searchText.conform()) }
+            if !searchText.isEmpty { getPodcasts(by: searchText.conform) }
             searchBar.text = searchText
         }
     }
@@ -109,28 +109,30 @@ extension SearchViewController {
     private func processResults<T>(data: [T]?, completion: ([T]) -> Void) {
         activityIndicator.stopAnimating()
         
-        guard let data = data else { return }
-        
-        if data.isEmpty {
-            self.alert.create(title: "Ooops nothing search", withTimeIntervalToDismiss: 2)
-        } else {
+        if let data = data, !data.isEmpty {
             completion(data)
+        } else {
+            self.alert.create(title: "Ooops nothing search", withTimeIntervalToDismiss: 2)
         }
     }
     
     private func getPodcasts(by request: String) {
-        let request = request.conform()
+        let request = request.conform
         activityIndicator.startAnimating()
         
         if searchSegmentalControl.selectedSegmentIndex == 0 {
-            ApiService.shared.getData(for: UrlRequest.getStringUrl(.podcast(request))) { [weak self] (info: PodcastData?) in
+            ApiService.getData(for: request) { [weak self] (info: PodcastData?) in
                 guard let self = self else { return }
-                self.processResults(data: info?.results, completion: { podcasts in
-                    self.podcasts = podcasts
-                })
+                
+                DispatchQueue.main.async {
+                    self.processResults(data: info?.results, completion: { podcasts in
+                        self.podcasts = podcasts
+                    })
+                }
+                
             }
         } else {
-            ApiService.shared.getData(for: UrlRequest.getStringUrl(.authors(request))) { [weak self] (info: AuthorData?) in
+            ApiService.getData(for: UrlRequest1.getStringUrl(.authors(request))) { [weak self] (info: AuthorData?) in
                 guard let self = self else { return }
                 self.processResults(data: info?.results, completion: { authors in
                     self.authors = authors
@@ -162,9 +164,9 @@ extension SearchViewController {
             let podcast = podcasts[view.indexPath.row]
             
             if podcast.isAddToPlaylist {
-                MyPlaylistDocument.shared.removeFromPlayList(podcast)
+                PlaylistDocument.shared.removeFromPlayList(podcast)
             } else {
-                MyPlaylistDocument.shared.addToPlayList(podcast)
+                PlaylistDocument.shared.addToPlayList(podcast)
                 downloadService.startDownload(podcast)
             }
             podcastTableView.reloadRows(at: [cell.indexPath], with: .none)
@@ -264,11 +266,11 @@ extension SearchViewController: AlertDelegate {
 
 
 
-enum UrlRequest {
+enum UrlRequest1 {
     case podcast(String)
     case authors(String)
     
-    static func getStringUrl(_ type: UrlRequest) -> String {
+    static func getStringUrl(_ type: UrlRequest1) -> String {
         switch type {
         case .podcast(let string):
             return "https://itunes.apple.com/search?term=\(string)&entity=podcastEpisode"
@@ -285,6 +287,9 @@ protocol CustomTableViewCell: UITableViewCell {
     var indexPath: IndexPath! { get set }
 }
 
+enum URLS: String {
+    case api = "http://ip-api.com/json/"
+}
 
 
 
@@ -338,8 +343,4 @@ extension SearchViewController: DetailViewControllerDelegate {
     }
 
 }
-
-
-
-
 
