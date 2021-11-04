@@ -9,7 +9,7 @@ import Foundation
 
 class ApiService {
     
-    func getData<T: Decodable>(for request: String, completion: @escaping (T?) -> Void) {
+    static func getData<T: Decodable>(for request: String, completion: @escaping (T?) -> Void) {
         
         guard let url = URL(string: request) else { completion(nil); return }
         
