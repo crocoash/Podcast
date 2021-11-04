@@ -31,7 +31,7 @@ class DetailViewController: UIViewController {
         setupView()
     }
     @IBAction private func listenButtonOnTouchUpInside(_ sender: UIButton) {
-        //delegate?.detailViewController(sender: self, playButtonDidTouchFor: <#T##Podcast#>)
+        delegate?.detailViewController(self, playButtonDidTouchFor: index)
     }
     
     func receivePodcastInfoAndIndex(index: Int, image: UIImageView, episode: String, collection: String, episodeDescription: String) {

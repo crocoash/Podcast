@@ -428,7 +428,7 @@
         <!--Detail View Controller-->
         <scene sceneID="k3F-OI-boR">
             <objects>
-                <viewController id="Tk4-Wq-FgL" customClass="DetailViewController" customModule="Podcasts" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="DetailViewController" id="Tk4-Wq-FgL" customClass="DetailViewController" customModule="Podcasts" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Lui-FX-vnI">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
