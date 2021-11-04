@@ -29,8 +29,10 @@ class DetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupView()
+        self.view.addMyGestureRecognizer(self, type: .tap(), selector: #selector(dismissOnScreenTap))
     }
     @IBAction private func listenButtonOnTouchUpInside(_ sender: UIButton) {
+        dismiss(animated: true, completion: nil)
         delegate?.detailViewController(self, playButtonDidTouchFor: index)
     }
     
@@ -47,6 +49,10 @@ class DetailViewController: UIViewController {
         episodeName.text = episode
         collectionName.text = collection
         descriptionTextView.text = episodeDescription
+    }
+    
+    @objc private func dismissOnScreenTap(_ sender: UITapGestureRecognizer) {
+        dismiss(animated: true, completion: nil)
     }
     
 }

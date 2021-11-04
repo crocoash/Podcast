@@ -70,7 +70,8 @@ extension PlaylistTableViewController {
         detailViewController.delegate = self
 
         detailViewController.receivePodcastInfoAndIndex(index: indexPath.row, image: url, episode: trackName, collection: collectionName, episodeDescription: description)
-        self.navigationController?.pushViewController(detailViewController, animated: true)
+        detailViewController.modalPresentationStyle = .custom
+        present(detailViewController, animated: true, completion: nil)
    }
     
     // Override to support rearranging the table view.

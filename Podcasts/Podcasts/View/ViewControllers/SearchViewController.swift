@@ -189,7 +189,8 @@ extension SearchViewController {
         detailViewController.delegate = self
 
         detailViewController.receivePodcastInfoAndIndex(index: view.indexPath.row, image: url, episode: trackName, collection: collectionName, episodeDescription: description)
-        self.navigationController?.pushViewController(detailViewController, animated: true)
+        detailViewController.modalPresentationStyle = .custom
+        present(detailViewController, animated: true, completion: nil)
     }
 }
 
