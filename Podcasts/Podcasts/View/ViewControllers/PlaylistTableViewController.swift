@@ -71,6 +71,7 @@ extension PlaylistTableViewController {
 
         detailViewController.receivePodcastInfoAndIndex(index: indexPath.row, image: url, episode: trackName, collection: collectionName, episodeDescription: description)
         detailViewController.modalPresentationStyle = .custom
+        detailViewController.transitioningDelegate = self
         present(detailViewController, animated: true, completion: nil)
    }
     
@@ -84,5 +85,18 @@ extension PlaylistTableViewController {
 extension PlaylistTableViewController : DetailViewControllerDelegate {
     func detailViewController(_ detailViewController: DetailViewController, playButtonDidTouchFor podcastIndex: Int) {
         delegate?.playlistTableViewController(self, play: PlaylistDocument.shared.playList, at: podcastIndex)
+    }
+}
+
+//MARK: - UIViewControllerTransitioningDelegate
+
+extension PlaylistTableViewController: UIViewControllerTransitioningDelegate {
+    
+    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        return PresentTransition()
+    }
+    
+    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        return DismissTransition()
     }
 }
