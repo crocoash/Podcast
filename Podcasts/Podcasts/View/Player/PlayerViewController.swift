@@ -23,14 +23,12 @@ class PlayerViewController: UIViewController {
     
     private var soundTracks: [SoundTrack] = []
     
-//    let url = URL(string: "https://pdst.fm/e/chtbl.com/track/479722/traffic.megaphone.fm/DGT9636625287.mp3")
-//    let url2 = URL(string: "https://s3.amazonaws.com/kargopolov/kukushka.mp3")
-    //var playerItems: [AVPlayerItem]?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         addSwipeGesture()
         addPlayerTimeObservers()
+        playMusic()
     }
     
     @IBAction func playPauseTouchUpInside(_ sender: UIButton) {
@@ -60,9 +58,10 @@ class PlayerViewController: UIViewController {
 
     private func playMusic() {
         guard let currentPodcastIndex = currentPodcastIndex else { return }
-        player = AVPlayer(playerItem: soundTracks[currentPodcastIndex].playerItem)
-        player?.play()
-        //playerQueue = AVQueuePlayer(items: playerItems)
+//        player = AVPlayer(playerItem: soundTracks[currentPodcastIndex].playerItem)
+//        player?.play()
+        playerQueue = AVQueuePlayer(items: playerItems)
+        //playerQueue?.play()
 
     }
     

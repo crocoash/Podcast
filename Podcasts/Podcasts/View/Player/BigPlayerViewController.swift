@@ -16,6 +16,8 @@ class BigPlayerViewController: UIViewController {
     @IBOutlet private weak var currentTimeLabel: UILabel!
     @IBOutlet private weak var durationOfTrackLabel: UILabel!
     @IBOutlet private weak var progressSlider: UISlider!
+    private var playerItems: [AVPlayerItem] = []
+    private var currentPodcastIndex: Int?
     
     var player: AVPlayer?
     
@@ -30,6 +32,9 @@ class BigPlayerViewController: UIViewController {
         player?.seek(to: CMTime(seconds: Double(progressSlider.value), preferredTimescale: 60))
     }
     @IBAction func previousPodcastTouchUpInside(_ sender: UIButton) {
+        guard let index = currentPodcastIndex else { return }
+        player?.replaceCurrentItem(with: playerItems[index - 1])
+        player?.play()
     }
     @IBAction func tenSecondBackTouchUpInside(_ sender: UIButton) {
     }
@@ -46,7 +51,9 @@ class BigPlayerViewController: UIViewController {
     @IBAction func tenSecondForwardTouchUpInside(_ sender: UIButton) {
     }
     @IBAction func nextPodcastTouchUpInside(_ sender: UIButton) {
-        
+        guard let index = currentPodcastIndex else { return }
+        player?.replaceCurrentItem(with: playerItems[index + 1])
+        player?.play()
     }
     
     private func addSwipeGesture() {
@@ -70,7 +77,7 @@ class BigPlayerViewController: UIViewController {
         }
 }
     
-    func createAudioSession() {
+    private func createAudioSession() {
         let audioSession = AVAudioSession.sharedInstance()
         do{
             try audioSession.setCategory(.playback)
@@ -79,9 +86,14 @@ class BigPlayerViewController: UIViewController {
         }
     }
     
-    func displayDurationOfCurrentTrack() {
+    private func displayDurationOfCurrentTrack() {
         let duration = player?.currentItem?.duration.seconds
         guard let durationn = duration else { return }
         self.durationOfTrackLabel.text = "\(Int(durationn))"
+    }
+    
+    private func receive(_ playerItems: [AVPlayerItem], and currentPodcastIndex: Int?) {
+        self.playerItems = playerItems
+        self.currentPodcastIndex = currentPodcastIndex
     }
 }
