@@ -7,9 +7,15 @@
 
 import UIKit
 
+protocol PlaylistTableViewControllerDelegate : AnyObject {
+    func playlistTableViewController(_ playlistTableViewController: PlaylistTableViewController, play podcasts: [Podcast], at index: Int)
+}
+
 class PlaylistTableViewController: UITableViewController {
     
-    private let cellHeight : CGFloat = 75.0 
+    private let cellHeight : CGFloat = 75.0
+    
+    weak var delegate: PlaylistTableViewControllerDelegate?
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -57,8 +63,40 @@ extension PlaylistTableViewController {
         }
     }
     
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let podcast = PlaylistDocument.shared.playList[indexPath.row]
+        guard let urlString = podcast.artworkUrl160, let url = URL(string: urlString), let trackName = podcast.trackName, let collectionName = podcast.collectionName, let description = podcast.description else { return }
+        let detailViewController = storyboard?.instantiateViewController(identifier: DetailViewController.identifier) as! DetailViewController
+        detailViewController.delegate = self
+
+        detailViewController.receivePodcastInfoAndIndex(index: indexPath.row, image: url, episode: trackName, collection: collectionName, episodeDescription: description)
+        detailViewController.modalPresentationStyle = .custom
+        detailViewController.transitioningDelegate = self
+        present(detailViewController, animated: true, completion: nil)
+   }
+    
     // Override to support rearranging the table view.
     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
     }
     
+}
+
+// MARK: - DetailViewControllerDelegate
+extension PlaylistTableViewController : DetailViewControllerDelegate {
+    func detailViewController(_ detailViewController: DetailViewController, playButtonDidTouchFor podcastIndex: Int) {
+        delegate?.playlistTableViewController(self, play: PlaylistDocument.shared.playList, at: podcastIndex)
+    }
+}
+
+//MARK: - UIViewControllerTransitioningDelegate
+
+extension PlaylistTableViewController: UIViewControllerTransitioningDelegate {
+    
+    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        return PresentTransition()
+    }
+    
+    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        return DismissTransition()
+    }
 }

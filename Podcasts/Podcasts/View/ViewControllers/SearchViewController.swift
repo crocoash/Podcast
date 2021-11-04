@@ -121,7 +121,7 @@ extension SearchViewController {
         activityIndicator.startAnimating()
         
         if searchSegmentalControl.selectedSegmentIndex == 0 {
-            ApiService.getData(for: request) { [weak self] (info: PodcastData?) in
+            ApiService.getData(for: UrlRequest1.getStringUrl(.podcast(request))) { [weak self] (info: PodcastData?) in
                 guard let self = self else { return }
                 
                 DispatchQueue.main.async {
@@ -173,17 +173,31 @@ extension SearchViewController {
         }
     }
     
-    @objc func handelerTapCell(sender: UITapGestureRecognizer) {
+    @objc func handlerTapAuthorCell(sender: UITapGestureRecognizer) {
         guard let view = sender.view as? CustomTableViewCell, let request = authors[view.indexPath.row].artistName else { return }
         
         searchSegmentalControl.selectedSegmentIndex = 0
         searchText = request
         podcastTableView.deselectRow(at: view.indexPath, animated: true)
     }
+    
+    @objc func handlerTapPodcastCell(sender : UITapGestureRecognizer) {
+        guard let view = sender.view as? CustomTableViewCell else { return }
+        let podcast = podcasts[view.indexPath.row]
+        guard let urlString = podcast.artworkUrl160, let url = URL(string: urlString), let trackName = podcast.trackName, let collectionName = podcast.collectionName, let description = podcast.description else { return }
+        let detailViewController = storyboard?.instantiateViewController(identifier: DetailViewController.identifier) as! DetailViewController
+        detailViewController.delegate = self
+
+        detailViewController.receivePodcastInfoAndIndex(index: view.indexPath.row, image: url, episode: trackName, collection: collectionName, episodeDescription: description)
+        detailViewController.modalPresentationStyle = .custom
+        detailViewController.transitioningDelegate = self
+        present(detailViewController, animated: true, completion: nil)
+    }
 }
 
 // MARK: - TableView Data Source
 extension SearchViewController: UITableViewDataSource {
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return isPodcast ? podcasts.count : authors.count
     }
@@ -203,6 +217,7 @@ extension SearchViewController: UITableViewDataSource {
         cell.layoutMargins(inset: UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10))
         cell.configureCell(with: podcast, indexPath)
         cell.addMyGestureRecognizer(self, type: .longPressGesture(minimumPressDuration: 1), selector: #selector(handlerLongPs))
+        cell.addMyGestureRecognizer(self, type: .tap(), selector: #selector(handlerTapPodcastCell))
         
         return cell
     }
@@ -212,19 +227,15 @@ extension SearchViewController: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: PodcastByAuthorCell.identifier) as! PodcastByAuthorCell
         
         cell.configureCell(with: author, indexPath)
-        cell.addMyGestureRecognizer(self, type: .tap(), selector: #selector(handelerTapCell))
+        cell.addMyGestureRecognizer(self, type: .tap(), selector: #selector(handlerTapAuthorCell))
         
         return cell
     }
 }
 
 // MARK: - TableView Delegate
-//extension SearchViewController: UITableViewDelegate {
-//    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//        //TODO: present DetailViewController
-            //let detailVC.delegate = self
-//    }
-//}
+extension SearchViewController: UITableViewDelegate {
+}
 
 
 //MARK: - UISearchBarDelegate
@@ -251,7 +262,17 @@ extension SearchViewController: AlertDelegate {
         present(alertController, animated: true)
     }
 }
-
+// MARK: - UIViewControllerTransitioningDelegate
+extension SearchViewController: UIViewControllerTransitioningDelegate {
+    
+    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        return PresentTransition()
+    }
+    
+    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        return DismissTransition()
+    }
+}
 
 
 

@@ -64,8 +64,8 @@ class BigPlayerViewController: UIViewController {
             self.progressSlider.value = Float(time.seconds)
             
             let currentTime = self.player?.currentTime().seconds
-            guard let currentTime = currentTime else {return}
-            self.currentTimeLabel.text = "\(Int(currentTime))"
+            guard let currentTimee = currentTime else {return}
+            self.currentTimeLabel.text = "\(Int(currentTimee))"
             
         }
 }
@@ -81,7 +81,7 @@ class BigPlayerViewController: UIViewController {
     
     func displayDurationOfCurrentTrack() {
         let duration = player?.currentItem?.duration.seconds
-        guard let duration = duration else { return }
-        self.durationOfTrackLabel.text = "\(Int(duration))"
+        guard let durationn = duration else { return }
+        self.durationOfTrackLabel.text = "\(Int(durationn))"
     }
 }

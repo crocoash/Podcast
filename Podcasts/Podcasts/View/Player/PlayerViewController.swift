@@ -47,6 +47,7 @@ class PlayerViewController: UIViewController {
         let swipeUp = UISwipeGestureRecognizer(target: self, action: #selector(respondToSwipe))
         swipeUp.direction = .up
         view.addGestureRecognizer(swipeUp)
+        view.addMyGestureRecognizer(self, type: .tap(1), selector: #selector(respondToSwipe))
     }
     
     @objc func respondToSwipe(gesture: UISwipeGestureRecognizer) {
@@ -56,10 +57,12 @@ class PlayerViewController: UIViewController {
         present(bigPlayerVC, animated: true, completion: nil)
     }
     
+
     private func playMusic() {
         guard let currentPodcastIndex = currentPodcastIndex else { return }
         player = AVPlayer(playerItem: soundTracks[currentPodcastIndex].playerItem)
         playerQueue = AVQueuePlayer(items: playerItems)
+
     }
     
     private func addPlayerTimeObservers() {
@@ -91,4 +94,11 @@ extension PlayerViewController: SearchViewControllerDelegate {
         playMusic() 
     }
     
+}
+
+extension PlayerViewController : PlaylistTableViewControllerDelegate {
+    func playlistTableViewController(_ playlistTableViewController: PlaylistTableViewController, play podcasts: [Podcast], at index: Int) {
+        //playlistOfPodcasts = podcasts
+        //podcastIndex = index
+    }
 }
