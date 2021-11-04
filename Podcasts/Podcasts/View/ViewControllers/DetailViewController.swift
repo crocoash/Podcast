@@ -19,7 +19,7 @@ class DetailViewController: UIViewController {
     @IBOutlet private weak var descriptionTextView: UITextView!
     
     private var index : Int!
-    private var image : UIImage!
+    private var image : URL!
     private var episode : String!
     private var collection : String!
     private var episodeDescription : String!
@@ -29,24 +29,30 @@ class DetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupView()
+        self.view.addMyGestureRecognizer(self, type: .tap(), selector: #selector(dismissOnScreenTap))
     }
     @IBAction private func listenButtonOnTouchUpInside(_ sender: UIButton) {
-        //delegate?.detailViewController(sender: self, playButtonDidTouchFor: <#T##Podcast#>)
+        dismiss(animated: true, completion: nil)
+        delegate?.detailViewController(self, playButtonDidTouchFor: index)
     }
     
-    func receivePodcastInfoAndIndex(index: Int, image: UIImageView, episode: String, collection: String, episodeDescription: String) {
+    func receivePodcastInfoAndIndex(index: Int, image url: URL, episode: String, collection: String, episodeDescription: String) {
         self.index = index
-        self.image = image.image
+        self.image = url
         self.episode = episode
         self.collection = collection
         self.episodeDescription = episodeDescription
     }
     
     private func setupView(){
-        episodeImage.image = image
+        episodeImage.load(url: image)
         episodeName.text = episode
         collectionName.text = collection
         descriptionTextView.text = episodeDescription
+    }
+    
+    @objc private func dismissOnScreenTap(_ sender: UITapGestureRecognizer) {
+        dismiss(animated: true, completion: nil)
     }
     
 }

@@ -57,8 +57,8 @@ class PlayerViewController: UIViewController {
     private func createPlayer() {
         let url = URL(string: "https://pdst.fm/e/chtbl.com/track/479722/traffic.megaphone.fm/DGT9636625287.mp3")
         playerItems = [AVPlayerItem(url: url!), AVPlayerItem(url: url2!)]
-        guard let url = url else { return }
-        let playerItem: AVPlayerItem = AVPlayerItem(url: url)
+        guard let urll = url else { return }
+        let playerItem: AVPlayerItem = AVPlayerItem(url: urll)
         player = AVQueuePlayer(items: playerItems!)
     }
     
@@ -76,4 +76,11 @@ extension PlayerViewController: SearchViewControllerDelegate {
         podcastIndex = index
     }
     
+}
+
+extension PlayerViewController : PlaylistTableViewControllerDelegate {
+    func playlistTableViewController(_ playlistTableViewController: PlaylistTableViewController, play podcasts: [Podcast], at index: Int) {
+        playlistOfPodcasts = podcasts
+        podcastIndex = index
+    }
 }
