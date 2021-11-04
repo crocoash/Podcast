@@ -11,6 +11,6 @@ import UIKit
 
 struct SoundTrack {
     let playerItem: AVPlayerItem
-    let image60: URL
-    let image600: URL
+    let image60URL: URL
+    let image600URL: URL
 }

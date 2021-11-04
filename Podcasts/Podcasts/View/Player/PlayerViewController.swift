@@ -19,12 +19,13 @@ class PlayerViewController: UIViewController {
     private var currentPodcastIndex: Int?
     private var incomingPodcasts: [Podcast] = []
     private var playerQueue: AVQueuePlayer?
+    private var playerItems: [AVPlayerItem] = []
     
-    private var playlist: [SoundTrack] = []
+    private var soundTracks: [SoundTrack] = []
     
 //    let url = URL(string: "https://pdst.fm/e/chtbl.com/track/479722/traffic.megaphone.fm/DGT9636625287.mp3")
 //    let url2 = URL(string: "https://s3.amazonaws.com/kargopolov/kukushka.mp3")
-    var playerItems: [AVPlayerItem]?
+    //var playerItems: [AVPlayerItem]?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -57,7 +58,8 @@ class PlayerViewController: UIViewController {
     
     private func playMusic() {
         guard let currentPodcastIndex = currentPodcastIndex else { return }
-        player = AVPlayer(playerItem: playlist[currentPodcastIndex].playerItem)
+        player = AVPlayer(playerItem: soundTracks[currentPodcastIndex].playerItem)
+        playerQueue = AVQueuePlayer(items: playerItems)
     }
     
     private func addPlayerTimeObservers() {
@@ -73,8 +75,10 @@ class PlayerViewController: UIViewController {
             let playerItem = AVPlayerItem(url: trackURL)
             guard let image60StringURL = podcast.artworkUrl60, let image60URL = URL(string: image60StringURL) else { return }
             guard let image600StringURL = podcast.artworkUrl600, let image600URL = URL(string: image600StringURL) else { return }
-            playlist.append(SoundTrack(playerItem: playerItem, image60: image60URL, image600: image600URL))
-            
+            soundTracks.append(SoundTrack(playerItem: playerItem, image60URL: image60URL, image600URL: image600URL))
+            soundTracks.forEach { soundtrack in
+                playerItems.append(soundtrack.playerItem)
+            }
         }
     }
 }
@@ -84,7 +88,7 @@ extension PlayerViewController: SearchViewControllerDelegate {
         incomingPodcasts = podcasts
         currentPodcastIndex = index
         createPlaylist()
-        playMusic()
+        playMusic() 
     }
     
 }
