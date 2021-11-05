@@ -20,6 +20,7 @@ class PlayerViewController: UIViewController {
     private var incomingPodcasts: [Podcast] = []
     private var playerQueue: AVQueuePlayer?
     private var playerItems: [AVPlayerItem] = []
+    private var avAudioPlayer: AVAudioPlayer?
     
     private var soundTracks: [SoundTrack] = []
     
@@ -29,6 +30,12 @@ class PlayerViewController: UIViewController {
         addSwipeGesture()
         addPlayerTimeObservers()
         playMusic()
+    }
+    @IBAction func changeCurentTimeSlider(_ sender: UISlider) {
+        //avAudioPlayer?.stop()
+        avAudioPlayer?.currentTime = TimeInterval(progressSlider.value)
+        avAudioPlayer?.prepareToPlay()
+        avAudioPlayer?.play()
     }
     
     @IBAction func playPauseTouchUpInside(_ sender: UIButton) {
@@ -62,6 +69,7 @@ class PlayerViewController: UIViewController {
 //        player?.play()
         playerQueue = AVQueuePlayer(items: playerItems)
         //playerQueue?.play()
+        
 
     }
     
@@ -70,6 +78,52 @@ class PlayerViewController: UIViewController {
             self.progressSlider.maximumValue = Float(self.player?.currentItem?.duration.seconds ?? 0)
             self.progressSlider.value = Float(time.seconds)
         }
+    }
+    
+    func downLoadAndPlay(from url: URL?) {
+        if let audioUrl = url {
+
+            // then lets create your document folder url
+            let documentsDirectoryURL =  FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+
+            // lets create your destination file url
+            let destinationUrl = documentsDirectoryURL.appendingPathComponent(audioUrl.lastPathComponent)
+            print(destinationUrl)
+
+            // to check if it exists before downloading it
+            if FileManager.default.fileExists(atPath: destinationUrl.path) {
+                print("The file already exists at path")
+                do {
+                    self.avAudioPlayer = try AVAudioPlayer(contentsOf: destinationUrl)
+                        avAudioPlayer!.prepareToPlay()
+                        avAudioPlayer!.volume = 1
+                    self.avAudioPlayer?.delegate = self
+                        avAudioPlayer!.play()
+                    } catch {
+                        print(error)
+                    }
+                // if the file doesn't exist
+            } else {
+                let task = URLSession.shared.downloadTask(with: audioUrl) { (location, response, error) in
+                    guard let location = location else {return}
+                    do{
+                        try FileManager.default.moveItem(at: location, to: destinationUrl)
+                        print("File moved to documents folder")
+                        self.avAudioPlayer = try AVAudioPlayer(contentsOf: destinationUrl)
+                        self.avAudioPlayer!.prepareToPlay()
+                        self.avAudioPlayer!.volume = 1
+                        self.avAudioPlayer?.delegate = self
+                        self.avAudioPlayer!.play()
+                    }
+                    catch {
+                        print("error")
+                    }
+                }
+                task.resume()
+            }
+        }
+        progressSlider.maximumValue = Float(avAudioPlayer!.duration)
+        
     }
     
     func createPlaylist() {
@@ -90,8 +144,9 @@ extension PlayerViewController: SearchViewControllerDelegate {
     func searchViewController(_ searchViewController: SearchViewController, play podcasts: [Podcast], at index: Int) {
         incomingPodcasts = podcasts
         currentPodcastIndex = index
-        createPlaylist()
-        playMusic() 
+        //createPlaylist()
+        //playMusic()
+        downLoadAndPlay(from: URL(string: podcasts[index].episodeUrl!))
     }
     
 }
@@ -100,5 +155,17 @@ extension PlayerViewController : PlaylistTableViewControllerDelegate {
     func playlistTableViewController(_ playlistTableViewController: PlaylistTableViewController, play podcasts: [Podcast], at index: Int) {
         //playlistOfPodcasts = podcasts
         //podcastIndex = index
+    }
+}
+
+extension PlayerViewController: AVAudioPlayerDelegate {
+    func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+        if flag == true {
+            print("hi!")
+        downLoadAndPlay(from: URL(string: incomingPodcasts[currentPodcastIndex! + 1].episodeUrl!))
+        print("hi!")
+        } else {
+            print("Hello")
+        }
     }
 }

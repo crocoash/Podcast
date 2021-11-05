@@ -63,6 +63,9 @@
                         <constraint firstAttribute="height" constant="3" id="n15-go-A4Q"/>
                     </constraints>
                     <color key="thumbTintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <connections>
+                        <action selector="changeCurentTimeSlider:" destination="-1" eventType="valueChanged" id="2ts-Lf-DjC"/>
+                    </connections>
                 </slider>
             </subviews>
             <viewLayoutGuide key="safeArea" id="fnl-2z-Ty3"/>
