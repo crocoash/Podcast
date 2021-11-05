@@ -5,6 +5,7 @@
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19454"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -31,6 +32,7 @@
                         <color key="tintColor" red="0.66799789669999998" green="0.47512125970000002" blue="0.25860109930000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </imageView>
                 </subviews>
+                <color key="backgroundColor" systemColor="tertiarySystemBackgroundColor"/>
                 <constraints>
                     <constraint firstItem="Eh8-Wt-E35" firstAttribute="width" secondItem="H2p-sc-9uM" secondAttribute="width" multiplier="0.078125" id="4hV-TH-kPp"/>
                     <constraint firstItem="G1I-LD-L1E" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="BCu-dM-d8O"/>
@@ -58,5 +60,8 @@
     </objects>
     <resources>
         <image name="star.fill" catalog="system" width="128" height="116"/>
+        <systemColor name="tertiarySystemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
     </resources>
 </document>

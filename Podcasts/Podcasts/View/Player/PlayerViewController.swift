@@ -66,7 +66,7 @@ extension PlayerViewController {
     
     private func configureUI() {
         podcastImageView.load(string: currentPodcast?.artworkUrl600)
-        podcastNameLabel.text = currentPodcast?.trackName ?? "No Track Name"
+        podcastNameLabel.text = currentPodcast?.trackName
         authorNameLabel.text = currentPodcast?.country
     }
     

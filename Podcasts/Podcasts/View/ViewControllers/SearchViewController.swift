@@ -64,31 +64,15 @@ class SearchViewController : UIViewController {
     
     //MARK: - Actions
     @objc func cancelSearch(sender: UITapGestureRecognizer) {
-        searchText = ""
-        authors.removeAll()
-        podcasts.removeAll()
-        searchSegmentalControl.selectedSegmentIndex = 0
+        cancelSearchAction()
     }
     
     @objc func changeTypeOfSearch(sender: UISegmentedControl) {
-        if !searchText.isEmpty {
-            getPodcasts(by: searchText)
-        }
+        if !searchText.isEmpty { getPodcasts(by: searchText) }
     }
     
     @objc func handlerLongPs(sender: UILongPressGestureRecognizer) {
-        MyLongPressGestureRecognizer.createSelector(for: sender) { (cell: PodcastCell) in
-            guard let view = sender.view as? PodcastCell else { return }
-            let podcast = podcasts[view.indexPath.row]
-            
-            if podcast.isAddToPlaylist {
-                PlaylistDocument.shared.removeFromPlayList(podcast)
-            } else {
-                PlaylistDocument.shared.addToPlayList(podcast)
-                downloadService.startDownload(podcast)
-            }
-            podcastTableView.reloadRows(at: [cell.indexPath], with: .none)
-        }
+        longPressGesture(sender)
     }
     
     @objc func handlerTapAuthorCell(sender: UITapGestureRecognizer) {
@@ -127,6 +111,8 @@ extension SearchViewController {
         configureActivityIndicator()
     }
     
+  
+    
     private func configureTableView() {
         podcastTableView.register(PodcastCell.self)
         podcastTableView.register(PodcastByAuthorCell.self)
@@ -151,6 +137,38 @@ extension SearchViewController {
         activityIndicator.style = .large
         activityIndicator.center = view.center
         view.addSubview(activityIndicator)
+    }
+    
+    private func feedbackGenerator() {
+        let feedbackGenerator = UIImpactFeedbackGenerator()
+        feedbackGenerator.prepare()
+        feedbackGenerator.impactOccurred()
+    }
+    
+    private func longPressGesture(_ sender: UILongPressGestureRecognizer) {
+        MyLongPressGestureRecognizer.createSelector(for: sender) { (cell: PodcastCell) in
+            guard let view = sender.view as? PodcastCell else { return }
+            let podcast = podcasts[view.indexPath.row]
+            
+            if podcast.isAddToPlaylist {
+                PlaylistDocument.shared.removeFromPlayList(podcast)
+            } else {
+                PlaylistDocument.shared.addToPlayList(podcast)
+                downloadService.startDownload(podcast)
+            }
+            podcastTableView.reloadRows(at: [cell.indexPath], with: .none)
+            
+            MyToast.create(title: (podcast.trackName ?? "podcast") + "is added to playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
+//
+            feedbackGenerator()
+        }
+    }
+    
+    private func cancelSearchAction() {
+        searchText = ""
+        authors.removeAll()
+        podcasts.removeAll()
+        searchSegmentalControl.selectedSegmentIndex = 0
     }
 }
 

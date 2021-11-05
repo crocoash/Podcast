@@ -46,7 +46,17 @@ class TabBarViewController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureTabBar()
+        configureGesture()
         addPlayer()
+    }
+    
+    // MARK: - Actions
+    @objc func handlerSwipe(sender: UISwipeGestureRecognizer) {
+        switch sender.direction {
+        case .left: selectedIndex += 1
+        case .right: selectedIndex -= 1
+        default: break
+        }
     }
 }
 
@@ -67,4 +77,10 @@ extension TabBarViewController {
         playerVC.view.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate(constraintsSmallPlayer)
     }
+    
+    private func configureGesture() {
+        view.addMyGestureRecognizer(self, type: .swipe(directions: [.left, .right]), selector: #selector(handlerSwipe))
+    }
+    
+   
 }
