@@ -28,6 +28,12 @@
                     <constraints>
                         <constraint firstAttribute="width" secondItem="3vw-cZ-C9n" secondAttribute="height" multiplier="1:1" id="Nz5-q6-RUT"/>
                     </constraints>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="boolean" keyPath="layer.maskToBounds" value="YES"/>
+                        <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                            <integer key="value" value="5"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
                 </imageView>
                 <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="top" translatesAutoresizingMaskIntoConstraints="NO" id="jvh-vt-WDU">
                     <rect key="frame" x="120" y="33" width="99.5" height="34"/>

@@ -8,6 +8,10 @@
 import UIKit
 import AVFoundation
 
+protocol PlayerViewControllerDelegate: AnyObject {
+    func updateTrackTimeWith(duration: Float, currentTime: Float)
+}
+
 class PlayerViewController: UIViewController {
     
     @IBOutlet private weak var podcastImageView: UIImageView!
@@ -15,11 +19,14 @@ class PlayerViewController: UIViewController {
     @IBOutlet private weak var authorNameLabel: UILabel!
     
     @IBOutlet weak var progressView: UIProgressView!
-    @IBOutlet private weak var progressSlider: UISlider!
+    
+    weak var delegate: PlayerViewControllerDelegate?
     
     private var player: AVPlayer = AVPlayer()
     private var podcasts: [Podcast] = []
     private var currentPodcast: Podcast? { !podcasts.isEmpty ? podcasts[index] : nil }
+    
+    private var timeObserver: Any?
     
     lazy private var bigPlayerVC: BigPlayerViewController = {
         $0.delegate = self
@@ -52,6 +59,7 @@ class PlayerViewController: UIViewController {
     }
     
     @objc func respondToSwipe(gesture: UISwipeGestureRecognizer) {
+        self.delegate = bigPlayerVC
         present(bigPlayerVC, animated: true)
     }
 }
@@ -77,9 +85,11 @@ extension PlayerViewController {
     }
     
     private func addPlayerTimeObservers() {
-        player.addPeriodicTimeObserver(forInterval: CMTime(seconds: 1, preferredTimescale: 60), queue: .main) { [self] (time) in
+            timeObserver = player.addPeriodicTimeObserver(forInterval: CMTime(seconds: 1, preferredTimescale: 60), queue: .main) { [self] (time) in
             guard let trackDuration = player.currentItem?.duration.seconds else { return }
             progressView.progress = Float(time.seconds)/Float(trackDuration)
+            let currentTime = Float(player.currentTime().seconds)
+            delegate?.updateTrackTimeWith(duration: Float(trackDuration), currentTime: currentTime)
         }
     }
     
@@ -91,8 +101,13 @@ extension PlayerViewController {
         else { return }
         
         player = AVPlayer(url: url)
-        addPlayerTimeObservers()
         player.play()
+        addPlayerTimeObservers()
+    }
+    
+    private func deleteTimeObserver() {
+        guard let timeObserver = timeObserver else { return }
+        player.removeTimeObserver(timeObserver)
     }
 }
 
@@ -127,15 +142,18 @@ extension PlayerViewController: BigPlayerViewControllerDelegate {
     
     func bigPlayerViewControllerDidSelectNextTrackButton(_ bigPlayerViewController: BigPlayerViewController) {
         index += 1
-       
+        deleteTimeObserver()
         startPlay(podcast: currentPodcast)
         bigPlayerViewController.upDateUI(with: currentPodcast)
+        
     }
     
     func bigPlayerViewControllerDidSelectPreviewsTrackButton(_ bigPlayerViewController: BigPlayerViewController) {
         index -= 1
-      
+        deleteTimeObserver()
         startPlay(podcast: currentPodcast)
         bigPlayerViewController.upDateUI(with: currentPodcast)
     }
+    
+    
 }

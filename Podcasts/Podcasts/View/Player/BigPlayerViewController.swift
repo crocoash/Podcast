@@ -45,9 +45,7 @@ class BigPlayerViewController: UIViewController {
         super.viewDidLoad()
         addSwipeGesture()
         if let podcast = podcast { configureUI(with: podcast) }
-        addPlayerTimeObservers()
         createAudioSession()
-        displayDurationOfCurrentTrack()
     }
     
     @IBAction func progressSliderValueChanged(_ sender: UISlider) {
@@ -124,10 +122,35 @@ extension BigPlayerViewController {
     }
     
     func displayDurationOfCurrentTrack() {
-//        let duration = player?.currentItem?.duration.seconds
-//        guard let durationn = duration else { return }
-//        self.durationOfTrackLabel.text = "\(Int(durationn))"
-//    }
+    //        let duration = player?.currentItem?.duration.seconds
+    //        guard let durationn = duration else { return }
+    //        self.durationOfTrackLabel.text = "\(Int(durationn))"
+    //    }
+    }
+
+func convertSecondsToReadableFormat(_ seconds: Float) -> String {
+        let secondsInt = Int(seconds)
+        let hours = Int(seconds/3600)
+        let min = Int(secondsInt % 3600 / 60)
+        let sec = Int((secondsInt % 60) % 60)
+    if hours > 0 {
+        return ("\(hours):\(min):\(sec)")
+    } else {
+        return ("\(min):\(sec)")
+    }
+    }
+
+extension BigPlayerViewController: PlayerViewControllerDelegate {
+    func updateTrackTimeWith(duration: Float, currentTime: Float) {
+        progressSlider.maximumValue = duration
+        progressSlider.value = currentTime
+        currentTimeLabel.text = convertSecondsToReadableFormat(currentTime)
+        durationOfTrackLabel.text = convertSecondsToReadableFormat(duration)
+    }
+    
+
+    
+    
 }
 
 
