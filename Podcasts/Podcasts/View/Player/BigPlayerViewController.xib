@@ -14,8 +14,10 @@
                 <outlet property="authorNameLabel" destination="Wxb-Fd-2tV" id="YCU-DD-1gR"/>
                 <outlet property="currentTimeLabel" destination="oqM-Hi-VRJ" id="22g-Mt-VQj"/>
                 <outlet property="durationOfTrackLabel" destination="YBf-Sa-DCQ" id="R1P-Cj-B1q"/>
+                <outlet property="nextPodcastButton" destination="l7l-J4-oxV" id="1oF-pf-Kd3"/>
                 <outlet property="podcastImageView" destination="S9q-Kg-Gm0" id="NNi-hU-SuU"/>
                 <outlet property="podcastNameLabel" destination="4U4-Fn-z6L" id="OGF-ML-FQI"/>
+                <outlet property="previousPodcastButton" destination="Efo-Ay-eoH" id="ne5-8b-CUg"/>
                 <outlet property="progressSlider" destination="cXA-Ai-yFn" id="u4S-hQ-cQ3"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
@@ -25,7 +27,7 @@
             <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="S9q-Kg-Gm0">
+                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="S9q-Kg-Gm0">
                     <rect key="frame" x="20" y="64" width="374" height="249.5"/>
                     <color key="backgroundColor" red="0.69553225799999996" green="0.55586313639999996" blue="0.4945483806" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <constraints>

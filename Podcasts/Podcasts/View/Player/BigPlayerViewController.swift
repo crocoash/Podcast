@@ -26,18 +26,25 @@ class BigPlayerViewController: UIViewController {
     @IBOutlet private weak var durationOfTrackLabel: UILabel!
     @IBOutlet private weak var progressSlider: UISlider!
     
+    @IBOutlet private weak var previousPodcastButton: UIButton!
+    @IBOutlet private weak var nextPodcastButton: UIButton!
+    
     weak var delegate: BigPlayerViewControllerDelegate?
     
-    private var podcast: Podcast! 
+    private var podcast: Podcast?
+    private var isLast: Bool!
+    private var isFirst: Bool!
     
-    func setUP(podcast: Podcast) {
+    func setUP(podcast: Podcast?, isLast: Bool, isFirst: Bool) {
         self.podcast = podcast
+        self.isLast = isLast
+        self.isFirst = isFirst
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         addSwipeGesture()
-        configureUI(with: podcast)
+        if let podcast = podcast { configureUI(with: podcast) }
         addPlayerTimeObservers()
         createAudioSession()
         displayDurationOfCurrentTrack()
@@ -60,11 +67,11 @@ class BigPlayerViewController: UIViewController {
     }
     
     @IBAction func tenSecondBackTouchUpInside(_ sender: UIButton) {
-    
+        //TODO:
     }
     
     @IBAction func tenSecondForwardTouchUpInside(_ sender: UIButton) {
-    
+        //TODO:
     }
     
     @objc func respondToSwipe(gesture: UISwipeGestureRecognizer) {
@@ -75,7 +82,8 @@ class BigPlayerViewController: UIViewController {
 
 extension BigPlayerViewController {
     
-    func upDateUI(with podcast: Podcast) {
+    func upDateUI(with podcast: Podcast?) {
+        guard let podcast = podcast else { return }
         configureUI(with: podcast)
     }
     
@@ -83,6 +91,9 @@ extension BigPlayerViewController {
         podcastImageView.load(string: podcast.artworkUrl600)
         podcastNameLabel.text = podcast.trackName
         authorNameLabel.text = podcast.country
+        
+        previousPodcastButton.isEnabled = !isFirst
+        nextPodcastButton.isEnabled = !isLast
     }
     
     private func addSwipeGesture() {
