@@ -174,11 +174,12 @@
 		049D480427286D6300B6DA3C /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
+				18A5005E2727FA3800CD3F0C /* RegistrationViewController.swift */,
 				049D47EF2726EAE600B6DA3C /* TabBarViewController.swift */,
 				049D47DF2726E05B00B6DA3C /* SearchViewController.swift */,
 				049D480027286D3900B6DA3C /* PlaylistTableViewController.swift */,
-				049D480227286D5900B6DA3C /* DetailViewController.swift */,
 				1831DEDC27319E3900EC09E2 /* SettingsTableViewController.swift */,
+				049D480227286D5900B6DA3C /* DetailViewController.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -218,7 +219,6 @@
 		184CE18F27271D8D0088044C /* View */ = {
 			isa = PBXGroup;
 			children = (
-				18A5006F2728503800CD3F0C /* Registration */,
 				3FBCF1BF272847E400B70522 /* Cells */,
 				049D47FF27286CA100B6DA3C /* Player */,
 				049D480427286D6300B6DA3C /* ViewControllers */,
@@ -283,15 +283,6 @@
 				189C1FAE272D84AB00A8480E /* PlaylistDocument.swift */,
 			);
 			path = ViewModel;
-			sourceTree = "<group>";
-		};
-		18A5006F2728503800CD3F0C /* Registration */ = {
-			isa = PBXGroup;
-			children = (
-				18A5005E2727FA3800CD3F0C /* RegistrationViewController.swift */,
-			);
-			name = Registration;
-			path = ../Registration;
 			sourceTree = "<group>";
 		};
 		26863FFB79128477A1FFB53A /* Pods */ = {

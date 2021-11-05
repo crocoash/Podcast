@@ -11,7 +11,7 @@ class PodcastCell: UITableViewCell, CustomTableViewCell {
     
     @IBOutlet private weak var podcastImage: UIImageView!
     @IBOutlet private weak var podcastName: UILabel!
-    @IBOutlet private weak var collectionName: UILabel!
+    @IBOutlet private weak var playlistStarImageView: UIImageView!
     
     var indexPath: IndexPath!
 }
@@ -24,8 +24,7 @@ extension PodcastCell {
         backgroundColor = .white
         podcastName.text = podcast.trackName
         podcastImage.load(string: podcast.artworkUrl160!)
-        collectionName.text = podcast.collectionName
         
-        if podcast.isAddToPlaylist { backgroundColor = .yellow }
+        playlistStarImageView.isHidden = !podcast.isAddToPlaylist
     }
 }

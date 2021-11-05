@@ -7,7 +7,7 @@
 
 import Foundation
 
-class PlaylistDocument: Codable {
+class PlaylistDocument {
     
     private static var playlistKey = "playlistKey"
     

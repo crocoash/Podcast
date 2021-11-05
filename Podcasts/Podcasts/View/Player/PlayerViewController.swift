@@ -17,13 +17,14 @@ class PlayerViewController: UIViewController {
     @IBOutlet private weak var progressSlider: UISlider!
     
     private var player: AVPlayer = AVPlayer()
+    
     private var podcasts: [Podcast] = []
+    
     private var currentPodcast: Podcast? { !podcasts.isEmpty ? podcasts[index] : nil }
     
     lazy private var bigPlayerVC: BigPlayerViewController = {
         $0.delegate = self
         $0.modalPresentationStyle = .fullScreen
-        $0.setUP(podcast: currentPodcast, isLast: isLast, isFirst: index == 0)
         return $0
     }(BigPlayerViewController.loadFromXib())
     
@@ -34,13 +35,13 @@ class PlayerViewController: UIViewController {
     private var index: Int = 0 {
         didSet {
             configureUI()
-            bigPlayerVC.setUP(podcast: currentPodcast, isLast: index == (podcasts.count - 1), isFirst: index == 0)
         }
     }
         
    // MARK: - View Methods
     override func viewDidLoad() {
         super.viewDidLoad()
+        configureUI()
         configureGesture()
         addPlayerTimeObservers()
     }
@@ -52,6 +53,7 @@ class PlayerViewController: UIViewController {
     
     @objc func respondToSwipe(gesture: UISwipeGestureRecognizer) {
         present(bigPlayerVC, animated: true)
+        bigPlayerVC.upDateUI(with: currentPodcast, isFirst: isFirst, isLast: isLast)
     }
 }
 
@@ -103,7 +105,7 @@ extension PlayerViewController: SearchViewControllerDelegate {
 
 // MARK: - PlaylistTableViewControllerDelegate
 extension PlayerViewController : PlaylistTableViewControllerDelegate {
-    
+
     func playlistTableViewController(_ playlistTableViewController: PlaylistTableViewController, play podcasts: [Podcast], at index: Int) {
         self.podcasts = podcasts
 
@@ -124,13 +126,13 @@ extension PlayerViewController: BigPlayerViewControllerDelegate {
         index += 1
        
         startPlay(podcast: currentPodcast)
-        bigPlayerViewController.upDateUI(with: currentPodcast)
+        bigPlayerViewController.upDateUI(with: currentPodcast, isFirst: isFirst, isLast: isLast)
     }
     
     func bigPlayerViewControllerDidSelectPreviewsTrackButton(_ bigPlayerViewController: BigPlayerViewController) {
         index -= 1
       
         startPlay(podcast: currentPodcast)
-        bigPlayerViewController.upDateUI(with: currentPodcast)
+        bigPlayerViewController.upDateUI(with: currentPodcast, isFirst: isFirst, isLast: isLast)
     }
 }

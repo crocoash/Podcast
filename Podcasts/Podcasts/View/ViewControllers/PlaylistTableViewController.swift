@@ -14,9 +14,11 @@ protocol PlaylistTableViewControllerDelegate : AnyObject {
 class PlaylistTableViewController: UITableViewController {
     
     private let cellHeight : CGFloat = 75.0
+    private var playListDocument = PlaylistDocument.shared
     
     weak var delegate: PlaylistTableViewControllerDelegate?
 
+    // MARK: - View Methods
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         tableView.reloadData()
@@ -24,20 +26,26 @@ class PlaylistTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("print playlist \(PlaylistDocument.shared.playList.count)")
-        tableView.register(PodcastCell.self)
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(trash))
+        configureUI()
     }
-}
-
-// MARK: - Table view data source
-extension PlaylistTableViewController {
+    
+    //MARK: - Actions
     @objc func trash(sender: UIBarButtonItem) {
         PlaylistDocument.shared.removeAllFromPlaylist()
         tableView.reloadData()
     }
 }
 
+//MARK: - Private methods
+extension PlaylistTableViewController {
+    
+    private func configureUI() {
+        tableView.register(PodcastCell.self)
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(trash))
+    }
+}
+
+// MARK: - Table View data source
 extension PlaylistTableViewController {
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -60,6 +68,7 @@ extension PlaylistTableViewController {
             let podcast = PlaylistDocument.shared.playList[indexPath.row]
             PlaylistDocument.shared.removeFromPlayList(podcast)
             tableView.reloadData()
+            
         }
     }
     
@@ -74,23 +83,19 @@ extension PlaylistTableViewController {
         detailViewController.modalPresentationStyle = .custom
         detailViewController.transitioningDelegate = self
         present(detailViewController, animated: true, completion: nil)
+        
    }
-    
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-    }
-    
 }
 
 // MARK: - DetailViewControllerDelegate
 extension PlaylistTableViewController : DetailViewControllerDelegate {
+    
     func detailViewController(_ detailViewController: DetailViewController, playButtonDidTouchFor podcastIndex: Int) {
         delegate?.playlistTableViewController(self, play: PlaylistDocument.shared.playList, at: podcastIndex)
     }
 }
 
 //MARK: - UIViewControllerTransitioningDelegate
-
 extension PlaylistTableViewController: UIViewControllerTransitioningDelegate {
     
     func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {

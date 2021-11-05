@@ -32,6 +32,7 @@ class BigPlayerViewController: UIViewController {
     weak var delegate: BigPlayerViewControllerDelegate?
     
     private var podcast: Podcast?
+    
     private var isLast: Bool!
     private var isFirst: Bool!
     
@@ -82,10 +83,13 @@ class BigPlayerViewController: UIViewController {
 
 extension BigPlayerViewController {
     
-    func upDateUI(with podcast: Podcast?) {
+    func upDateUI(with podcast: Podcast?, isFirst: Bool, isLast: Bool) {
         guard let podcast = podcast else { return }
+        self.isLast = isLast
+        self.isFirst = isFirst
+        
         configureUI(with: podcast)
-    }
+  }
     
     private func configureUI(with podcast: Podcast) {
         podcastImageView.load(string: podcast.artworkUrl600)
