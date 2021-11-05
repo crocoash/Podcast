@@ -50,6 +50,7 @@
 		18A500612727FA3800CD3F0C /* RegistrationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A5005E2727FA3800CD3F0C /* RegistrationViewController.swift */; };
 		18A5006C2728490E00CD3F0C /* (null) in Resources */ = {isa = PBXBuildFile; };
 		18A5006E27284BA100CD3F0C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 18A5006D27284BA100CD3F0C /* GoogleService-Info.plist */; };
+		18CA6D8927352AF800F32CE5 /* UIViewController + loadFromXib.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA6D8827352AF800F32CE5 /* UIViewController + loadFromXib.swift */; };
 		3FBCF1C2272847F100B70522 /* PodcastCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FBCF1C0272847F100B70522 /* PodcastCell.swift */; };
 		3FBCF1C3272847F100B70522 /* PodcastCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3FBCF1C1272847F100B70522 /* PodcastCell.xib */; };
 		3FBCF1C72728482A00B70522 /* PodcastByAuthorCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FBCF1C52728482A00B70522 /* PodcastByAuthorCell.swift */; };
@@ -104,6 +105,7 @@
 		189C1FBB272EE6F100A8480E /* UIView + loadFromNib.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView + loadFromNib.swift"; sourceTree = "<group>"; };
 		18A5005E2727FA3800CD3F0C /* RegistrationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegistrationViewController.swift; sourceTree = "<group>"; };
 		18A5006D27284BA100CD3F0C /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		18CA6D8827352AF800F32CE5 /* UIViewController + loadFromXib.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController + loadFromXib.swift"; sourceTree = "<group>"; };
 		3FBCF1C0272847F100B70522 /* PodcastCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastCell.swift; sourceTree = "<group>"; };
 		3FBCF1C1272847F100B70522 /* PodcastCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PodcastCell.xib; sourceTree = "<group>"; };
 		3FBCF1C52728482A00B70522 /* PodcastByAuthorCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastByAuthorCell.swift; sourceTree = "<group>"; };
@@ -264,6 +266,7 @@
 			children = (
 				189C1FA7272D333A00A8480E /* UITableViewCell + identifier.swift */,
 				189C1FAC272D496F00A8480E /* UIViewController + identifier.swift */,
+				18CA6D8827352AF800F32CE5 /* UIViewController + loadFromXib.swift */,
 				189C1FBB272EE6F100A8480E /* UIView + loadFromNib.swift */,
 				189C1FA9272D336500A8480E /* UITableView + register.swift */,
 				189C1FB1272D876B00A8480E /* Collection.swift */,
@@ -463,6 +466,7 @@
 				049D47DC2726E05B00B6DA3C /* AppDelegate.swift in Sources */,
 				184CE18B272717680088044C /* PodcastModel.swift in Sources */,
 				18557D642732B61D00CA08CA /* IpModel.swift in Sources */,
+				18CA6D8927352AF800F32CE5 /* UIViewController + loadFromXib.swift in Sources */,
 				0457FB1C272F1ECC00D57280 /* PlayerViewController.swift in Sources */,
 				1847812F272C8F390036B89E /* MyLongPressGestureRecognizer.swift in Sources */,
 				1847812E272C8F390036B89E /* MyAddGestureRecognizer.swift in Sources */,

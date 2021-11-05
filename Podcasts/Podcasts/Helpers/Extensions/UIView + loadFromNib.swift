@@ -15,4 +15,8 @@ extension UIView {
         view.frame = bounds
         addSubview(view)
     }
+    
+    func loadFromNib<T: UIView>() -> T {
+        return Bundle.main.loadNibNamed(String(describing: T.self), owner: nil, options: nil)!.first as! T
+    }
 }

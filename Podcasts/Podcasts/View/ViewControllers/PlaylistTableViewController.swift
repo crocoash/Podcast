@@ -65,11 +65,12 @@ extension PlaylistTableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let podcast = PlaylistDocument.shared.playList[indexPath.row]
-        guard let urlString = podcast.artworkUrl160, let url = URL(string: urlString), let trackName = podcast.trackName, let collectionName = podcast.collectionName, let description = podcast.description else { return }
+        
         let detailViewController = storyboard?.instantiateViewController(identifier: DetailViewController.identifier) as! DetailViewController
+        
         detailViewController.delegate = self
-
-        detailViewController.receivePodcastInfoAndIndex(index: indexPath.row, image: url, episode: trackName, collection: collectionName, episodeDescription: description)
+        detailViewController.setUp(index: indexPath.row, podcast: podcast)
+        
         detailViewController.modalPresentationStyle = .custom
         detailViewController.transitioningDelegate = self
         present(detailViewController, animated: true, completion: nil)

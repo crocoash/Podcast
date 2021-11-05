@@ -15,72 +15,94 @@ class PlayerViewController: UIViewController {
     @IBOutlet private weak var autorNameLabel: UILabel!
     @IBOutlet private weak var progressSlider: UISlider!
     
-    private var player: AVQueuePlayer?
-    private var podcastIndex: Int?
-    private var playlistOfPodcasts: [Podcast]?
+    lazy private var bigPlayerVC: BigPlayerViewController = {
+        $0.delegate = self
+        $0.modalPresentationStyle = .fullScreen
+        $0.setUP(podcast: podcasts[current])
+        return $0
+    }(BigPlayerViewController.loadFromXib())
     
-    let url = URL(string: "https://pdst.fm/e/chtbl.com/track/479722/traffic.megaphone.fm/DGT9636625287.mp3")
-    let url2 = URL(string: "https://s3.amazonaws.com/kargopolov/kukushka.mp3")
-    var playerItems: [AVPlayerItem]?
+    private var player: AVPlayer = AVPlayer()
+    private var current: Int = 0
     
+    private var podcasts: [Podcast] = []
+ 
     override func viewDidLoad() {
         super.viewDidLoad()
-        addSwipeGesture()
-        createPlayer()
+        configureGesture()
         addPlayerTimeObservers()
     }
     
     @IBAction func playPauseTouchUpInside(_ sender: UIButton) {
-        guard let player = player else { return }
-        if player.rate == 0
-        {
-            player.play()
-        } else {
-            player.pause()
-        }
+        playStop()
     }
     
-    private func addSwipeGesture() {
+    @objc func respondToSwipe(gesture: UISwipeGestureRecognizer) {
+        present(bigPlayerVC, animated: true)
+    }
+}
+
+//MARK: - Private methods
+extension PlayerViewController {
+    
+    private func playStop() {
+        player.rate == 0 ? player.play() : player.pause()
+    }
+    
+    private func configureGesture() {
         let swipeUp = UISwipeGestureRecognizer(target: self, action: #selector(respondToSwipe))
         swipeUp.direction = .up
         view.addGestureRecognizer(swipeUp)
         view.addMyGestureRecognizer(self, type: .tap(1), selector: #selector(respondToSwipe))
     }
     
-    @objc func respondToSwipe(gesture: UISwipeGestureRecognizer) {
-        let bigPlayerVC = BigPlayerViewController(nibName: "BigPlayerViewController", bundle: nil)
-        bigPlayerVC.modalPresentationStyle = .fullScreen
-        bigPlayerVC.player = player
-        present(bigPlayerVC, animated: true, completion: nil)
-    }
-    
-    private func createPlayer() {
-        let url = URL(string: "https://pdst.fm/e/chtbl.com/track/479722/traffic.megaphone.fm/DGT9636625287.mp3")
-        playerItems = [AVPlayerItem(url: url!), AVPlayerItem(url: url2!)]
-        guard let urll = url else { return }
-        let playerItem: AVPlayerItem = AVPlayerItem(url: urll)
-        player = AVQueuePlayer(items: playerItems!)
-    }
-    
     private func addPlayerTimeObservers() {
-        player?.addPeriodicTimeObserver(forInterval: CMTime(seconds: 1, preferredTimescale: 60), queue: .main) { (time) in
-            self.progressSlider.maximumValue = Float(self.player?.currentItem?.duration.seconds ?? 0)
-            self.progressSlider.value = Float(time.seconds)
-        }
+    
+    }
+    
+    private func startPlay(podcast: Podcast) {
+        guard let string = podcast.episodeUrl, let url = URL(string: string) else { return }
+        player = AVPlayer(url: url)
+        player.play()
     }
 }
 
+// MARK: - SearchViewControllerDelegate
 extension PlayerViewController: SearchViewControllerDelegate {
     func searchViewController(_ searchViewController: SearchViewController, play podcasts: [Podcast], at index: Int) {
-        playlistOfPodcasts = podcasts
-        podcastIndex = index
+        self.podcasts = podcasts
+        current = index
+        startPlay(podcast: podcasts[index])
     }
-    
 }
 
+// MARK: - PlaylistTableViewControllerDelegate
 extension PlayerViewController : PlaylistTableViewControllerDelegate {
     func playlistTableViewController(_ playlistTableViewController: PlaylistTableViewController, play podcasts: [Podcast], at index: Int) {
-        playlistOfPodcasts = podcasts
-        podcastIndex = index
+        self.podcasts = podcasts
+        current = index
+        startPlay(podcast: podcasts[index])
+    }
+}
+
+// MARK: - BigPlayerViewControllerDelegate
+extension PlayerViewController: BigPlayerViewControllerDelegate {
+    
+    func bigPlayerViewControllerDidSelectStopButton(_ bigPlayerViewController: BigPlayerViewController) {
+        playStop()
+    }
+    
+    func bigPlayerViewControllerDidSelectNextTrackButton(_ bigPlayerViewController: BigPlayerViewController) {
+        current += 1
+        let podcast = podcasts[current]
+        startPlay(podcast: podcast)
+        bigPlayerViewController.upDateUI(with: podcast)
+    }
+    
+    func bigPlayerViewControllerDidSelectPreviewsTrackButton(_ bigPlayerViewController: BigPlayerViewController) {
+        current -= 1
+        let podcast = podcasts[current]
+        startPlay(podcast: podcast)
+        bigPlayerViewController.upDateUI(with: podcast)
     }
 }

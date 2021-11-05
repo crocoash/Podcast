@@ -4,23 +4,11 @@ import UIKit
 
 class TabBarViewController: UITabBarController {
     
-
-    private var playerVC = PlayerViewController()
-    private var userViewModel: UserViewModel!
-    
-    func setUserViewModel(_ userViewModel: UserViewModel) {
-        self.userViewModel = userViewModel
-    }
-    
-    lazy var constraintsSmallPlayer: [NSLayoutConstraint] = [
-        playerVC.view.heightAnchor.constraint(equalTo: tabBar.heightAnchor),
-        playerVC.view.widthAnchor.constraint(equalTo: view.widthAnchor),
-        playerVC.view.bottomAnchor.constraint(equalTo: tabBar.topAnchor)
-    ]
-    
+    // MARK: - View
     lazy var searchVC: SearchViewController = {
         let searchVC = storyboard?.instantiateViewController(withIdentifier: SearchViewController.identifier) as! SearchViewController
         searchVC.tabBarItem.title = "Search"
+        searchVC.delegate = playerVC
         searchVC.tabBarItem.image = UIImage(systemName: "magnifyingglass")
         return searchVC
     }()
@@ -36,14 +24,34 @@ class TabBarViewController: UITabBarController {
     lazy var playListVc: PlaylistTableViewController = {
         let playListVc =  storyboard?.instantiateViewController(withIdentifier: PlaylistTableViewController.identifier) as! PlaylistTableViewController
         playListVc.navigationItem.title = "Playlist"
+        playListVc.delegate = playerVC
         return playListVc
     }()
     
+    //constraintsSmallPlayer
+    lazy var constraintsSmallPlayer: [NSLayoutConstraint] = [
+        playerVC.view.heightAnchor.constraint(equalTo: tabBar.heightAnchor),
+        playerVC.view.widthAnchor.constraint(equalTo: view.widthAnchor),
+        playerVC.view.bottomAnchor.constraint(equalTo: tabBar.topAnchor)
+    ]
+    
+    private var playerVC = PlayerViewController()
+    private var userViewModel: UserViewModel!
+    
+    func setUserViewModel(_ userViewModel: UserViewModel) {
+        self.userViewModel = userViewModel
+    }
+    
+    // MARK: - View Methods
     override func viewDidLoad() {
         super.viewDidLoad()
         configureTabBar()
         addPlayer()
     }
+}
+
+//MARK: - Private methods
+extension TabBarViewController {
     
     private func configureTabBar() {
         let navigationVC = UINavigationController(rootViewController: playListVc)
@@ -56,10 +64,7 @@ class TabBarViewController: UITabBarController {
     private func addPlayer() {
         self.addChild(playerVC)
         view.addSubview(playerVC.view)
-        playerVC.didMove(toParent: self)
         playerVC.view.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate(constraintsSmallPlayer)
     }
-    
-    
 }

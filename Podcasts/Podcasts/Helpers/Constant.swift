@@ -24,4 +24,4 @@ enum UrlRequest1 {
 //TODO: change name
 enum URLS: String {
     case api = "http://ip-api.com/json/"
-}œ
+}

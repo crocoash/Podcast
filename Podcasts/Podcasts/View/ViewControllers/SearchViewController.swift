@@ -101,15 +101,18 @@ class SearchViewController : UIViewController {
     
     @objc func handlerTapPodcastCell(sender : UITapGestureRecognizer) {
         guard let view = sender.view as? CustomTableViewCell else { return }
-        let podcast = podcasts[view.indexPath.row]
-        guard let urlString = podcast.artworkUrl160, let url = URL(string: urlString), let trackName = podcast.trackName, let collectionName = podcast.collectionName, let description = podcast.description else { return }
+        let index = view.indexPath.row
+        let podcast = podcasts[index]
+        
         let detailViewController = storyboard?.instantiateViewController(identifier: DetailViewController.identifier) as! DetailViewController
+        
         detailViewController.delegate = self
-
-        detailViewController.receivePodcastInfoAndIndex(index: view.indexPath.row, image: url, episode: trackName, collection: collectionName, episodeDescription: description)
+        detailViewController.setUp(index: index, podcast: podcast)
+        
         detailViewController.modalPresentationStyle = .custom
         detailViewController.transitioningDelegate = self
-        present(detailViewController, animated: true, completion: nil)
+        
+        present(detailViewController, animated: true)
     }
 }
 
