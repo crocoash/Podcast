@@ -7,6 +7,8 @@
 
 import Foundation
 
+// FIXME: Нужно понимать, что сервисы и хелперы - разные по своей сути сущности. Нужно создать отдельно папку для хелперов и отдельно для сервисов
+
 class ApiService {
     
     static func getData<T: Decodable>(for request: String, completion: @escaping (T?) -> Void) {
@@ -14,7 +16,7 @@ class ApiService {
         guard let url = URL(string: request) else { completion(nil); return }
         
         URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
-            guard let data = data, response != nil, error == nil else { print(error!.localizedDescription)
+            guard let data = data, response != nil, error == nil else { print(error!.localizedDescription) // FIXME:  форс
                 completion(nil)
                 return
             }

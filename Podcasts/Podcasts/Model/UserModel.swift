@@ -7,7 +7,10 @@
 
 import Foundation
 
+// FIXME: Имя файла снова содержит Модел
+
 struct User: Codable {
+    // FIXME: должны быть немутабельными
     var userName: String = ""
     var isAuthorization: Bool = false
 }
@@ -19,8 +22,10 @@ struct UserDocument: Codable {
     var json: Data? { try? JSONEncoder().encode(self) }
 
     init() {
-        
+        // FIXME: Зачем пустой инит?
     }
+
+    // FIXME: Вижу, что подобный метод повторяется уже в нескольких местах. Можно попробовать написать какой-то протокол ил идженерик, который будет делать декодирование в зависимости от переданного типа
     init? (json: Data?) {
         guard
             let json = json,

@@ -5,9 +5,12 @@
 //  Created by Tsvetkov Anton on 25.10.2021.
 //
 
+// FIXME: Название файла PodcastModel - слово Model является избычотным и лишним
 
 import Foundation
 
+// FIXME: Зачем нам тут марк?
+// FIXME: Комменты в коде не нужны
 // MARK: - Result
 struct Podcast: Codable, Equatable, Identifiable {
     let previewUrl: String? //podcast
@@ -44,6 +47,7 @@ struct Podcast: Codable, Equatable, Identifiable {
     }
 }
 
+// FIXME: Плохо, что модель сама обращается к какому-то синглтону. Нужно от этого избавиться
 extension Podcast {
     var isAddToPlaylist: Bool { PlaylistDocument.shared.playList.contains(self)  }
 }

@@ -8,6 +8,7 @@
 import UIKit
 
 protocol PlaylistTableViewControllerDelegate : AnyObject {
+    // FIXME: Что значит "play podcasts"? Я так понимаю, что были выбраны подкасты и кто-то должен начать их воспроизводить. Но мы помним, что делегат НЕ МОЖЕТ ГОВОРИТЬ ЧТО ДЕЛАТЬ, а говорит о то, что он сделал. Например didSelect podcasts: [Podcast]
     func playlistTableViewController(_ playlistTableViewController: PlaylistTableViewController, play podcasts: [Podcast], at index: Int)
 }
 
@@ -19,11 +20,12 @@ class PlaylistTableViewController: UITableViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        tableView.reloadData()
+        tableView.reloadData() // FIXME: В приватный метод
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        // FIXME: В приватный метод
         print("print playlist \(PlaylistDocument.shared.playList.count)")
         tableView.register(PodcastCell.self)
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(trash))
@@ -45,6 +47,7 @@ extension PlaylistTableViewController {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        // FIXME: Плейлист документ можно в проперти добавить, чтобы не писать каждый раз PlaylistDocument.shared
         return PlaylistDocument.shared.playList.count
     }
     
@@ -78,6 +81,7 @@ extension PlaylistTableViewController {
     
     // Override to support rearranging the table view.
     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
+        // FIXME: Нужно ли оно тут? Удаляем, если не нужно
     }
     
 }

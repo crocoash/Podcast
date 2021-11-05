@@ -8,6 +8,8 @@
 import UIKit
 import AVFoundation
 
+// FIXME: Хорошее именованием делегатов, лайк и респект)
+
 protocol BigPlayerViewControllerDelegate: AnyObject {
     
     func bigPlayerViewControllerDidSelectStopButton (_ bigPlayerViewController: BigPlayerViewController)
@@ -74,7 +76,8 @@ class BigPlayerViewController: UIViewController {
 
 
 extension BigPlayerViewController {
-    
+
+    // FIXME: Почему он не приватный? И почему буква D большая?)
     func upDateUI(with podcast: Podcast) {
         configureUI(with: podcast)
     }
@@ -104,6 +107,7 @@ extension BigPlayerViewController {
     }
     
     func createAudioSession() {
+        // FIXME: Работы с аудио сессией в отдельный сервис (менеджер)
         let audioSession = AVAudioSession.sharedInstance()
         do{
             try audioSession.setCategory(.playback)

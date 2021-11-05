@@ -27,6 +27,7 @@ class DetailViewController: UIViewController {
         super.viewDidLoad()
         configureGestures()
         setupView()
+        // FIXME: В приватный метод, селф лишний
         self.view.addMyGestureRecognizer(self, type: .tap(), selector: #selector(dismissOnScreenTap))
     }
     

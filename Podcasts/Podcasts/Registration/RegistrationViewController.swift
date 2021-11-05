@@ -5,8 +5,10 @@
 //  Created by Tsvetkov Anton on 26.10.2021.
 //
 
+// FIXME: Слишком сложный и большой файл. Тут и регистрация, и что-то с таб баром - нужно подумать про это
+
 import UIKit
-import FirebaseAuth
+import FirebaseAuth // FIXME:Вся работа с файрбейз - в отдельном сервисе (менеджере)
 
 class RegistrationViewController: UIViewController {
     
@@ -18,7 +20,8 @@ class RegistrationViewController: UIViewController {
     @IBOutlet private weak var forgotPasswordLabel: UILabel!
     @IBOutlet private weak var secureShowButton: UIButton!
     @IBOutlet private weak var privacyPolicyLabel: UILabel!
-    
+
+    // FIXME: Не вижу смысла хранить это в лейзи и в проперти вообще
     lazy var tabBarVC: TabBarViewController = {
         let vc = storyboard?.instantiateViewController(withIdentifier: TabBarViewController.identifier) as! TabBarViewController
         vc.modalPresentationStyle = .custom

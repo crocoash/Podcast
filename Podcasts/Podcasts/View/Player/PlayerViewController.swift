@@ -14,7 +14,8 @@ class PlayerViewController: UIViewController {
     @IBOutlet private weak var podcastNameLabel: UILabel!
     @IBOutlet private weak var autorNameLabel: UILabel!
     @IBOutlet private weak var progressSlider: UISlider!
-    
+
+    // FIXME: Не вижу смысла это делать лейзи и хранить в проперти
     lazy private var bigPlayerVC: BigPlayerViewController = {
         $0.delegate = self
         $0.modalPresentationStyle = .fullScreen

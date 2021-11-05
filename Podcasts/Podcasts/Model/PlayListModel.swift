@@ -7,11 +7,13 @@
 
 import Foundation
 
+// FIXME: Слово Модел
+
 struct PlaylistModel: Codable {
     
     var json: Data? { try? JSONEncoder().encode(self) }
     
-    init() {}
+    init() {} // FIXME: Зачем это тут нужно вообще?
     init? (json: Data?) {
         guard
             let json = json ,
@@ -32,11 +34,11 @@ struct PlaylistModel: Codable {
     
     mutating func addToPlayList(_ podcast: Podcast) {
         playList.append(podcast)
-        
+        // FIXME: Лишний пропуск
     }
     
     mutating func removeAllFromPlaylist() {
         playList.removeAll()
     }
-
+    // FIXME: Лишний пропуск
 }

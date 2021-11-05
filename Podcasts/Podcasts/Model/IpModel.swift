@@ -8,7 +8,7 @@
 import Foundation
 
 struct IpModel: Codable {
-    let status, country, countryCode, region: String
+    let status, country, countryCode, region: String // FIXME: Пишем такие вещи отдельно в каждую строку для повышения читабельности
     let regionName, city, zip: String
     let lat, lon: Double
     let timezone, isp, org, welcomeAs: String

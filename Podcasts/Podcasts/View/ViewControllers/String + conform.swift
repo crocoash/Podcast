@@ -5,6 +5,8 @@
 //  Created by Tsvetkov Anton on 01.11.2021.
 //
 
+// FIXME: Именование метода непоятное
+
 import Foundation
 
 extension String {

@@ -54,12 +54,12 @@ class SearchViewController : UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
-        downloadService.downloadsSession = downloadsSession
+        downloadService.downloadsSession = downloadsSession // FIXME: В приватный метод
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        podcastTableView.reloadData()
+        podcastTableView.reloadData() // FIXME: В приватный метод
     }
     
     //MARK: - Actions

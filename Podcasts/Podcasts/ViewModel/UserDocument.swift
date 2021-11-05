@@ -7,12 +7,15 @@
 
 import Foundation
 
+// FIXME: Имя файла и имя класса не совпадает
+
 class UserViewModel {
     
     private let key = "UserViewModel"
     
     private(set) var userDocument: UserDocument {
         didSet {
+            // FIXME: Логику с юзер дефолтс выносим в отдельный сервис (менеджер)
             UserDefaults.standard.setValue(userDocument.json, forKey: key)
         }
     }

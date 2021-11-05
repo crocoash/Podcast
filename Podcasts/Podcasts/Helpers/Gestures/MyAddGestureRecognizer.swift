@@ -8,8 +8,10 @@
 import UIKit
 
 extension UIView {
+    // FIXME: Отступы:  func addMyGestureRecognizer(_ target: Any?, type gesture: TypeOfGestureRecognizer, selector: Selector)
     func addMyGestureRecognizer(_ target: Any?,type gesture: TypeOfGestureRecognizer, selector: Selector) {
         self.isUserInteractionEnabled = true
+        // FIXME: не должно быть закоментированного кода
         // get array of GestureRecognizer then add him to the View
         gesture.createGestures(for: target, selector: selector).forEach { addGestureRecognizer($0) }
     }
@@ -39,7 +41,7 @@ enum TypeOfGestureRecognizer {
     func createGestures(for target: Any?, selector: Selector?) -> [UIGestureRecognizer] {
         
         switch self {
-        
+        // FIXME: Лишние комменты
         //tap
         case .tap(let count) :
             let tap = UITapGestureRecognizer(target: target, action: selector)

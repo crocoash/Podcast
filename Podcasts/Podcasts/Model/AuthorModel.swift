@@ -7,6 +7,8 @@
 
 import Foundation
 
+// FIXME: Про слово Model уже отписал
+
 struct Author: Codable {
     let wrapperType: String? // artist
     let artistType: String? // Podcast Artist

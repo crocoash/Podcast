@@ -9,7 +9,7 @@ import UIKit
 
 class PodcastByAuthorCell: UITableViewCell, CustomTableViewCell {
     
-    @IBOutlet private weak var label: UILabel!
+    @IBOutlet private weak var label: UILabel! // FIXME: Дать конкретное нвзвание
     
      var indexPath: IndexPath!
 }

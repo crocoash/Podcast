@@ -15,6 +15,7 @@ class PlaylistDocument: Codable {
         json: UserDefaults.standard.data(forKey: playlistKey)
     ) ?? PlaylistModel()  {
         didSet {
+            // FIXME:
             UserDefaults.standard.setValue(PlaylistDocument.shared.json, forKey: playlistKey)
         }
     }

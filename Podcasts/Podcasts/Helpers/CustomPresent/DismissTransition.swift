@@ -21,6 +21,7 @@ class DismissTransition: NSObject, UIViewControllerAnimatedTransitioning {
     }
     
     func interruptibleAnimator(using transitionContext: UIViewControllerContextTransitioning) -> UIViewImplicitlyAnimating {
+        // FIXME: guard
         if self.animator != nil {
             return self.animator!
         }
@@ -33,7 +34,7 @@ class DismissTransition: NSObject, UIViewControllerAnimatedTransitioning {
         fromViewFinalFrame.origin.x = fromViewFinalFrame.width
         
         let fromView = fromVC.view!
-        let toView = transitionContext.viewController(forKey: .to)!.view!
+        let toView = transitionContext.viewController(forKey: .to)!.view! // FIXME: форс анврапы
         
         var toViewInitialFrame = fromViewInitialFrame
         toViewInitialFrame.origin.x = -toView.frame.size.width
@@ -41,7 +42,7 @@ class DismissTransition: NSObject, UIViewControllerAnimatedTransitioning {
         toView.frame = toViewInitialFrame
         
         let animator = UIViewPropertyAnimator(duration: self.transitionDuration(using: transitionContext), curve: .easeInOut) {
-            
+            // FIXME: лишний пропуск
             toView.frame = fromViewInitialFrame
             fromView.frame = fromViewFinalFrame
         }

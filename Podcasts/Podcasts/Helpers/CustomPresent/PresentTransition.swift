@@ -21,6 +21,7 @@ class PresentTransition: NSObject, UIViewControllerAnimatedTransitioning {
     }
     
     func interruptibleAnimator(using transitionContext: UIViewControllerContextTransitioning) -> UIViewImplicitlyAnimating {
+        // FIXME: guard
         if self.animator != nil {
             return self.animator!
         }
@@ -32,7 +33,7 @@ class PresentTransition: NSObject, UIViewControllerAnimatedTransitioning {
         var fromViewFinalFrame = fromViewInitialFrame
         fromViewFinalFrame.origin.x = -fromViewFinalFrame.width
         
-        let fromView = fromVC.view!
+        let fromView = fromVC.view! // FIXME: Форс анврап
         let toView = transitionContext.view(forKey: .to)!
         
         var toViewInitialFrame = fromViewInitialFrame
@@ -42,7 +43,7 @@ class PresentTransition: NSObject, UIViewControllerAnimatedTransitioning {
         container.addSubview(toView)
         
         let animator = UIViewPropertyAnimator(duration: self.transitionDuration(using: transitionContext), curve: .easeInOut) {
-            
+            // FIXME: лишний пропуск
             toView.frame = fromViewInitialFrame
             fromView.frame = fromViewFinalFrame
         }

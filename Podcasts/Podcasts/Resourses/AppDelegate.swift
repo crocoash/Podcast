@@ -8,6 +8,8 @@
 import UIKit
 import Firebase
 
+// FIXME: Файлы AppDelegate и SceneDelegate - явно не относятся к ресурсам. Лучше создать для них отдельную папку и назвать ее Application, например
+
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     

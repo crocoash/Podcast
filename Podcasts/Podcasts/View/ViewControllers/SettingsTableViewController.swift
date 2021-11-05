@@ -23,6 +23,8 @@ class SettingsTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        // FIXME: В приватный метод
     
         userNameLabel.text = user.userName
         autorizationSwitch.isOn = user.isAuthorization

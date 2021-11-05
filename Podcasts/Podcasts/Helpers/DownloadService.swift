@@ -8,9 +8,9 @@
 import Foundation
 
 class DownloadService {
-    var downloadsSession: URLSession!
+    var downloadsSession: URLSession! // FIXME: должно быть приватный
     
-    var activeDownloads: [URL: Download] = [:]
+    var activeDownloads: [URL: Download] = [:] // FIXME: должно быть приватным, только геттер публичным (если уж сильно надо)
     
     func startDownload(_ podcast: Podcast) {
         let download = Download(podcast: podcast)
@@ -24,6 +24,7 @@ class DownloadService {
     }
 }
 
+// FIXME: В отдельный файл
 class Download {
     
     // MARK: - Variables And Properties

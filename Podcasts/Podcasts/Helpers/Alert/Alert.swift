@@ -8,9 +8,11 @@
 import UIKit
 
 protocol AlertDelegate: AnyObject {
-    func alertEndShow(_ alert: Alert)
-    func alertShouldShow(_ alert: Alert, alertController: UIAlertController)
+    func alertEndShow(_ alert: Alert) // FIXME: alertDidHide - кажется выглядит более логичным название, если мы хотим сообщить о закрытии алерта
+    func alertShouldShow(_ alert: Alert, alertController: UIAlertController) // FIXME: Почему should? Я так понимаю, что метод говорит о том, что алерт показался
 }
+
+// FIXME: Лучше назвать AlertManager или AlertService
 
 class Alert {
     
@@ -28,6 +30,7 @@ class Alert {
         create(title: title, actions: nil)
         
         Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: false) { [weak self] _ in
+            // FIXME: Форс анврап - избавиться
             self?.delegate?.alertEndShow(self!)
         }
     }
