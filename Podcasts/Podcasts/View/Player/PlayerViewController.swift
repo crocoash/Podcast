@@ -14,6 +14,7 @@ class PlayerViewController: UIViewController {
     @IBOutlet private weak var podcastNameLabel: UILabel!
     @IBOutlet private weak var authorNameLabel: UILabel!
     
+    @IBOutlet weak var progressView: UIProgressView!
     @IBOutlet private weak var progressSlider: UISlider!
     
     private var player: AVPlayer = AVPlayer()
@@ -42,7 +43,7 @@ class PlayerViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureGesture()
-        addPlayerTimeObservers()
+        progressView.progress = 0.0
     }
     
     // MARK: - Actions
@@ -76,7 +77,10 @@ extension PlayerViewController {
     }
     
     private func addPlayerTimeObservers() {
-    
+        player.addPeriodicTimeObserver(forInterval: CMTime(seconds: 1, preferredTimescale: 60), queue: .main) { [self] (time) in
+            guard let trackDuration = player.currentItem?.duration.seconds else { return }
+            progressView.progress = Float(time.seconds)/Float(trackDuration)
+        }
     }
     
     private func startPlay(podcast: Podcast? ) {
@@ -87,6 +91,7 @@ extension PlayerViewController {
         else { return }
         
         player = AVPlayer(url: url)
+        addPlayerTimeObservers()
         player.play()
     }
 }
