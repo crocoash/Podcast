@@ -84,13 +84,13 @@ extension PlayerViewController {
         view.addMyGestureRecognizer(self, type: .tap(1), selector: #selector(respondToSwipe))
     }
     
-    private func addPlayerTimeObservers() {
-            timeObserver = player.addPeriodicTimeObserver(forInterval: CMTime(seconds: 1, preferredTimescale: 60), queue: .main) { [self] (time) in
-            guard let trackDuration = player.currentItem?.duration.seconds else { return }
-            progressView.progress = Float(time.seconds)/Float(trackDuration)
-            let currentTime = Float(player.currentTime().seconds)
-            delegate?.updateTrackTimeWith(duration: Float(trackDuration), currentTime: currentTime)
-        }
+    @objc private func updateTrackProgress() {
+        guard player.currentItem?.status == .readyToPlay else { return }
+        guard player.currentItem!.duration >= CMTime.zero else { return }
+        guard let trackDuration = player.currentItem?.duration.seconds else { return }
+        let currentTime = Float(player.currentTime().seconds)
+        progressView.progress = currentTime/Float(trackDuration)
+        delegate?.updateTrackTimeWith(duration: Float(trackDuration), currentTime: currentTime)
     }
     
     private func startPlay(podcast: Podcast? ) {
@@ -99,16 +99,11 @@ extension PlayerViewController {
             let string = podcast.episodeUrl,
             let url = URL(string: string)
         else { return }
-        
         player = AVPlayer(url: url)
         player.play()
-        addPlayerTimeObservers()
+        var timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateTrackProgress), userInfo: nil, repeats: true)
     }
     
-    private func deleteTimeObserver() {
-        guard let timeObserver = timeObserver else { return }
-        player.removeTimeObserver(timeObserver)
-    }
 }
 
 // MARK: - SearchViewControllerDelegate
@@ -128,7 +123,6 @@ extension PlayerViewController : PlaylistTableViewControllerDelegate {
         self.podcasts = podcasts
 
         self.index = index
-        
         startPlay(podcast: currentPodcast)
     }
 }
@@ -142,7 +136,6 @@ extension PlayerViewController: BigPlayerViewControllerDelegate {
     
     func bigPlayerViewControllerDidSelectNextTrackButton(_ bigPlayerViewController: BigPlayerViewController) {
         index += 1
-        deleteTimeObserver()
         startPlay(podcast: currentPodcast)
         bigPlayerViewController.upDateUI(with: currentPodcast)
         
@@ -150,10 +143,8 @@ extension PlayerViewController: BigPlayerViewControllerDelegate {
     
     func bigPlayerViewControllerDidSelectPreviewsTrackButton(_ bigPlayerViewController: BigPlayerViewController) {
         index -= 1
-        deleteTimeObserver()
         startPlay(podcast: currentPodcast)
         bigPlayerViewController.upDateUI(with: currentPodcast)
     }
-    
     
 }

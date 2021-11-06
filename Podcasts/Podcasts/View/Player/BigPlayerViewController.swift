@@ -15,6 +15,7 @@ protocol BigPlayerViewControllerDelegate: AnyObject {
     func bigPlayerViewControllerDidSelectNextTrackButton (_ bigPlayerViewController: BigPlayerViewController)
     
     func bigPlayerViewControllerDidSelectPreviewsTrackButton (_ bigPlayerViewController: BigPlayerViewController)
+    
 }
 
 class BigPlayerViewController: UIViewController {
@@ -147,10 +148,7 @@ extension BigPlayerViewController: PlayerViewControllerDelegate {
         currentTimeLabel.text = convertSecondsToReadableFormat(currentTime)
         durationOfTrackLabel.text = convertSecondsToReadableFormat(duration)
     }
-    
 
-    
-    
 }
 
 
