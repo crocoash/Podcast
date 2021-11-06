@@ -61,6 +61,7 @@ class SearchViewController : UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         podcastTableView.reloadData()
+        if podcasts.isEmpty { searchBar.becomeFirstResponder() }
     }
     
     //MARK: - Actions

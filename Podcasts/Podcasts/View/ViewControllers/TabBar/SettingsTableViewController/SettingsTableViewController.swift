@@ -8,8 +8,12 @@
 import UIKit
 
 protocol SettingsTableViewControllerDelegate: AnyObject {
+    
     func settingsTableViewControllerDidApear(_ settingsTableViewController: SettingsTableViewController)
+    
     func settingsTableViewControllerDidDisapear(_ settingsTableViewController: SettingsTableViewController)
+    
+    func settingsTableViewControllerDarkModeDidSelect(_ settingsTableViewController: SettingsTableViewController)
 }
 
 class SettingsTableViewController: UITableViewController {
@@ -25,21 +29,22 @@ class SettingsTableViewController: UITableViewController {
     
     @IBOutlet private weak var userNameLabel: UILabel!
     @IBOutlet private weak var locationLabel: UILabel!
-    @IBOutlet private weak var darkModeSwitch: UISwitch!
+    @IBOutlet weak var darkModeSwitch: UISwitch!
+    
     @IBOutlet private weak var autorizationSwitch: UISwitch!
+    
+    override func loadView() {
+        super.loadView()
+        ApiService.getData(for: URLS.api.rawValue) { [weak self] (result: IpModel?) in
+            guard let ipData = result else { return }
+            self?.locationLabel.text = ipData.country + " " + ipData.city
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-    
         userNameLabel.text = user.userName
         autorizationSwitch.isOn = user.isAuthorization
-        
-        
-        ApiService.getData(for: URLS.api.rawValue) { [weak self] (result: IpModel?) in
-            guard let ipData = result else { return }
-            
-            self?.locationLabel.text = ipData.country + ipData.city
-        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -53,7 +58,7 @@ class SettingsTableViewController: UITableViewController {
     }
     
     @IBAction func darkModeValueChanged(_ sender: UISwitch) {
-        
+        delegate?.settingsTableViewControllerDarkModeDidSelect(self)
     }
     
     @IBAction func avtorizationChangeValue(_ sender: UISwitch) {
