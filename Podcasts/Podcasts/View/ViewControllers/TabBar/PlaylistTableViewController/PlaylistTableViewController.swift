@@ -14,7 +14,6 @@ protocol PlaylistTableViewControllerDelegate : AnyObject {
 class PlaylistTableViewController: UITableViewController {
     
     private let cellHeight : CGFloat = 75.0
-    private var playListDocument = PlaylistDocument.shared
     
     weak var delegate: PlaylistTableViewControllerDelegate?
 
@@ -91,7 +90,8 @@ extension PlaylistTableViewController {
 extension PlaylistTableViewController : DetailViewControllerDelegate {
     
     func detailViewController(_ detailViewController: DetailViewController, playButtonDidTouchFor didSelectIndex: Int) {
-        delegate?.playlistTableViewController(self, playListDocument.playList, didSelectIndex: didSelectIndex)
+        print("print count \(PlaylistDocument.shared.playList.count)")
+        delegate?.playlistTableViewController(self, PlaylistDocument.shared.playList, didSelectIndex: didSelectIndex)
     }
 }
 

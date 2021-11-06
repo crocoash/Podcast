@@ -77,12 +77,10 @@ extension PlayerViewController {
             guard let pauseImage = pauseImage else { return }
             player.play()
             playPauseButton.setImage(pauseImage, for: .normal)
-            bigPlayerVC.setPlayStopButton(with: pauseImage)
         } else {
             guard let playImage = playImage else { return }
             player.pause()
             playPauseButton.setImage(playImage, for: .normal)
-            bigPlayerVC.setPlayStopButton(with: playImage)
         }
     }
     
@@ -129,6 +127,9 @@ extension PlayerViewController: BigPlayerViewControllerDelegate {
     
     func bigPlayerViewControllerDidSelectStopButton(_ bigPlayerViewController: BigPlayerViewController) {
         playStop()
+        guard let pauseImage = pauseImage, let playImage = playImage else { return }
+       
+        bigPlayerVC.setPlayStopButton(with: player.rate != 0 ? pauseImage : playImage)
     }
     
     func bigPlayerViewControllerDidSelectNextTrackButton(_ bigPlayerViewController: BigPlayerViewController) {
