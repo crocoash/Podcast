@@ -12,8 +12,6 @@ protocol SettingsTableViewControllerDelegate: AnyObject {
     func settingsTableViewControllerDidApear(_ settingsTableViewController: SettingsTableViewController)
     
     func settingsTableViewControllerDidDisapear(_ settingsTableViewController: SettingsTableViewController)
-    
-    func settingsTableViewControllerDarkModeDidSelect(_ settingsTableViewController: SettingsTableViewController)
 }
 
 class SettingsTableViewController: UITableViewController {
@@ -58,7 +56,6 @@ class SettingsTableViewController: UITableViewController {
     }
     
     @IBAction func darkModeValueChanged(_ sender: UISwitch) {
-        delegate?.settingsTableViewControllerDarkModeDidSelect(self)
     }
     
     @IBAction func avtorizationChangeValue(_ sender: UISwitch) {
