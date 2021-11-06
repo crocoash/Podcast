@@ -129,6 +129,9 @@ extension PlayerViewController : PlaylistTableViewControllerDelegate {
 
 // MARK: - BigPlayerViewControllerDelegate
 extension PlayerViewController: BigPlayerViewControllerDelegate {
+    func theNewSlider(valueIs: Float) {
+        player.seek(to: CMTime(seconds: Double(valueIs), preferredTimescale: 60))
+    }
     
     func bigPlayerViewControllerDidSelectStopButton(_ bigPlayerViewController: BigPlayerViewController) {
         playStop()

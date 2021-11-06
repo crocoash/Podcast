@@ -16,6 +16,8 @@ protocol BigPlayerViewControllerDelegate: AnyObject {
     
     func bigPlayerViewControllerDidSelectPreviewsTrackButton (_ bigPlayerViewController: BigPlayerViewController)
     
+    func theNewSlider(valueIs: Float)
+    
 }
 
 class BigPlayerViewController: UIViewController {
@@ -50,7 +52,7 @@ class BigPlayerViewController: UIViewController {
     }
     
     @IBAction func progressSliderValueChanged(_ sender: UISlider) {
-//        player?.seek(to: CMTime(seconds: Double(progressSlider.value), preferredTimescale: 60))
+        delegate?.theNewSlider(valueIs: progressSlider.value)
     }
     
     @IBAction func playPauseTouchUpInside(_ sender: UIButton) {
