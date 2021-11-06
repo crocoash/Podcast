@@ -15,6 +15,7 @@
                 <outlet property="currentTimeLabel" destination="oqM-Hi-VRJ" id="22g-Mt-VQj"/>
                 <outlet property="durationOfTrackLabel" destination="YBf-Sa-DCQ" id="R1P-Cj-B1q"/>
                 <outlet property="nextPodcastButton" destination="l7l-J4-oxV" id="1oF-pf-Kd3"/>
+                <outlet property="playStopButton" destination="31N-RF-imm" id="Uef-rF-HxG"/>
                 <outlet property="podcastImageView" destination="S9q-Kg-Gm0" id="NNi-hU-SuU"/>
                 <outlet property="podcastNameLabel" destination="4U4-Fn-z6L" id="OGF-ML-FQI"/>
                 <outlet property="previousPodcastButton" destination="Efo-Ay-eoH" id="ne5-8b-CUg"/>
@@ -108,7 +109,7 @@
                                 <constraint firstAttribute="width" priority="900" constant="40" id="WiO-GD-xkW"/>
                                 <constraint firstAttribute="height" constant="40" id="f3l-zh-zTu"/>
                             </constraints>
-                            <state key="normal" image="playpause.fill" catalog="system"/>
+                            <state key="normal" image="play.fill" catalog="system"/>
                             <connections>
                                 <action selector="playPauseTouchUpInside:" destination="-1" eventType="touchUpInside" id="2mt-J5-cvM"/>
                             </connections>
@@ -164,7 +165,7 @@
         </view>
     </objects>
     <resources>
-        <image name="playpause.fill" catalog="system" width="128" height="70"/>
+        <image name="play.fill" catalog="system" width="116" height="128"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

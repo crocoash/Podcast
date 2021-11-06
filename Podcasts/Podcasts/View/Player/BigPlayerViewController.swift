@@ -19,6 +19,7 @@ protocol BigPlayerViewControllerDelegate: AnyObject {
 
 class BigPlayerViewController: UIViewController {
     
+    @IBOutlet private weak var playStopButton: UIButton!
     @IBOutlet private weak var podcastImageView: UIImageView!
     @IBOutlet private weak var podcastNameLabel: UILabel!
     @IBOutlet private weak var authorNameLabel: UILabel!
@@ -33,14 +34,9 @@ class BigPlayerViewController: UIViewController {
     weak var delegate: BigPlayerViewControllerDelegate?
     
     private var podcast: Podcast?
-    private var player: AVPlayer!
     
     private var isLast: Bool!
     private var isFirst: Bool!
-    
-    func setUP(player: AVPlayer) {
-        self.player = player
-    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -51,7 +47,7 @@ class BigPlayerViewController: UIViewController {
     }
     
     @IBAction func progressSliderValueChanged(_ sender: UISlider) {
-        player?.seek(to: CMTime(seconds: Double(progressSlider.value), preferredTimescale: 60))
+//        player?.seek(to: CMTime(seconds: Double(progressSlider.value), preferredTimescale: 60))
     }
     
     @IBAction func playPauseTouchUpInside(_ sender: UIButton) {
@@ -82,6 +78,10 @@ class BigPlayerViewController: UIViewController {
 
 extension BigPlayerViewController {
     
+    func setPlayStopButton(with image: UIImage) {
+        playStopButton.setImage(image, for: .normal)
+    }
+    
     func upDateUI( with podcast: Podcast?, isFirst: Bool, isLast: Bool) {
         guard let podcast = podcast else { return }
         self.isLast = isLast
@@ -97,6 +97,7 @@ extension BigPlayerViewController {
         durationOfTrackLabel.text = "\(podcast.date)"
         previousPodcastButton.isEnabled = !isFirst
         nextPodcastButton.isEnabled = !isLast
+        
     }
     
     private func addSwipeGesture() {
@@ -106,14 +107,14 @@ extension BigPlayerViewController {
     }
     
     private func addPlayerTimeObservers() {
-        player.addPeriodicTimeObserver(forInterval: CMTime(seconds: 1, preferredTimescale: 60), queue: .main) { (time) in
-            self.progressSlider.maximumValue = Float((self.player?.currentItem?.duration.seconds) ?? 0 / 60000 )
-            self.progressSlider.value = Float(time.seconds)
-            
-            let currentTime = self.player.currentTime().seconds 
-            
-            self.currentTimeLabel.text = "\(currentTime)"
-        }
+//        player.addPeriodicTimeObserver(forInterval: CMTime(seconds: 1, preferredTimescale: 60), queue: .main) { (time) in
+//            self.progressSlider.maximumValue = Float((self.player?.currentItem?.duration.seconds) ?? 0 / 60000 )
+//            self.progressSlider.value = Float(time.seconds)
+//            
+//            let currentTime = self.player.currentTime().seconds 
+//            
+//            self.currentTimeLabel.text = "\(currentTime)"
+//        }
     }
     
     func createAudioSession() {

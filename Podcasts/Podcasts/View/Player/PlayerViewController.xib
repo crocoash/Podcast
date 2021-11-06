@@ -11,9 +11,10 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="PlayerViewController" customModule="Podcasts" customModuleProvider="target">
             <connections>
+                <outlet property="playPauseButton" destination="WGq-qB-fKe" id="s00-B3-bhy"/>
                 <outlet property="podcastImageView" destination="3vw-cZ-C9n" id="9jJ-kK-hQv"/>
                 <outlet property="podcastNameLabel" destination="A1c-4Y-GlG" id="1Fs-le-GtF"/>
-                <outlet property="progressSlider" destination="D3L-pr-Ge6" id="kX4-Zf-9aS"/>
+                <outlet property="progressView" destination="UkG-9Q-AK5" id="ynS-fd-8o0"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
         </placeholder>
@@ -28,18 +29,11 @@
                         <constraint firstAttribute="height" constant="30" id="GL8-Jj-Tdv"/>
                         <constraint firstAttribute="width" constant="30" id="Lxl-hl-KTp"/>
                     </constraints>
-                    <state key="normal" image="playpause.fill" catalog="system"/>
+                    <state key="normal" image="play.fill" catalog="system"/>
                     <connections>
                         <action selector="playPauseTouchUpInside:" destination="-1" eventType="touchUpInside" id="Pr9-2n-hfw"/>
                     </connections>
                 </button>
-                <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="D3L-pr-Ge6">
-                    <rect key="frame" x="-2" y="97" width="418" height="4"/>
-                    <constraints>
-                        <constraint firstAttribute="height" constant="3" id="n15-go-A4Q"/>
-                    </constraints>
-                    <color key="thumbTintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                </slider>
                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" adjustsImageSizeForAccessibilityContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3vw-cZ-C9n">
                     <rect key="frame" x="0.0" y="5.5" width="101" height="89"/>
                     <constraints>
@@ -52,30 +46,34 @@
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
                 </label>
+                <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" progressViewStyle="bar" translatesAutoresizingMaskIntoConstraints="NO" id="UkG-9Q-AK5">
+                    <rect key="frame" x="0.0" y="98.5" width="414" height="2.5"/>
+                    <color key="tintColor" red="0.99516242740000005" green="0.1948511004" blue="0.37298858169999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                </progressView>
             </subviews>
             <viewLayoutGuide key="safeArea" id="fnl-2z-Ty3"/>
-            <color key="backgroundColor" systemColor="systemPinkColor"/>
+            <color key="backgroundColor" systemColor="systemGray3Color"/>
             <constraints>
+                <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="UkG-9Q-AK5" secondAttribute="trailing" constant="0.11478882384039935" id="3r8-g7-x0u"/>
                 <constraint firstItem="3vw-cZ-C9n" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" id="EyS-FX-sXt"/>
-                <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="D3L-pr-Ge6" secondAttribute="trailing" id="JJE-Q8-XtU"/>
+                <constraint firstItem="fnl-2z-Ty3" firstAttribute="bottom" secondItem="UkG-9Q-AK5" secondAttribute="bottom" id="FHR-0o-8Ms"/>
                 <constraint firstItem="WGq-qB-fKe" firstAttribute="leading" secondItem="A1c-4Y-GlG" secondAttribute="trailing" constant="15" id="PMh-5c-1nP"/>
                 <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="WGq-qB-fKe" secondAttribute="trailing" constant="20" id="Q5A-lQ-UH1"/>
-                <constraint firstItem="D3L-pr-Ge6" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" id="RmQ-3T-rqV"/>
                 <constraint firstItem="3vw-cZ-C9n" firstAttribute="height" secondItem="i5M-Pr-FkT" secondAttribute="height" multiplier="0.8" constant="9" id="ZH6-1O-nb2"/>
                 <constraint firstItem="A1c-4Y-GlG" firstAttribute="top" secondItem="3vw-cZ-C9n" secondAttribute="top" id="bJv-ig-WQK"/>
+                <constraint firstItem="fnl-2z-Ty3" firstAttribute="leading" secondItem="UkG-9Q-AK5" secondAttribute="leading" constant="0.18947236269698484" id="dhV-mR-IWY"/>
                 <constraint firstItem="WGq-qB-fKe" firstAttribute="centerY" secondItem="i5M-Pr-FkT" secondAttribute="centerY" id="imy-Tm-rUh"/>
                 <constraint firstItem="A1c-4Y-GlG" firstAttribute="leading" secondItem="3vw-cZ-C9n" secondAttribute="trailing" constant="8" symbolic="YES" id="pdh-uQ-DTG"/>
                 <constraint firstItem="3vw-cZ-C9n" firstAttribute="centerY" secondItem="i5M-Pr-FkT" secondAttribute="centerY" id="pjA-UH-JeE"/>
-                <constraint firstItem="D3L-pr-Ge6" firstAttribute="bottom" secondItem="fnl-2z-Ty3" secondAttribute="bottom" id="qg9-xV-VbB"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <point key="canvasLocation" x="50.724637681159422" y="333.48214285714283"/>
         </view>
     </objects>
     <resources>
-        <image name="playpause.fill" catalog="system" width="128" height="70"/>
-        <systemColor name="systemPinkColor">
-            <color red="1" green="0.17647058823529413" blue="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        <image name="play.fill" catalog="system" width="116" height="128"/>
+        <systemColor name="systemGray3Color">
+            <color red="0.7803921568627451" green="0.7803921568627451" blue="0.80000000000000004" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>
