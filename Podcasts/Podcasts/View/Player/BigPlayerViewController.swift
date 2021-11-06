@@ -101,16 +101,6 @@ extension BigPlayerViewController {
         view.addGestureRecognizer(swipeDown)
     }
     
-    private func addPlayerTimeObservers() {
-//        player?.addPeriodicTimeObserver(forInterval: CMTime(seconds: 1, preferredTimescale: 60), queue: .main) { (time) in
-//            self.progressSlider.maximumValue = Float(self.player?.currentItem?.duration.seconds ?? 0)
-//            self.progressSlider.value = Float(time.seconds)
-//
-//            let currentTime = self.player?.currentTime().seconds
-//            guard let currentTimee = currentTime else {return}
-//            self.currentTimeLabel.text = "\(Int(currentTimee))"
-            
-        }
     }
     
     func createAudioSession() {
@@ -122,12 +112,6 @@ extension BigPlayerViewController {
         }
     }
     
-    func displayDurationOfCurrentTrack() {
-    //        let duration = player?.currentItem?.duration.seconds
-    //        guard let durationn = duration else { return }
-    //        self.durationOfTrackLabel.text = "\(Int(durationn))"
-    //    }
-    }
 
 func convertSecondsToReadableFormat(_ seconds: Float) -> String {
         let secondsInt = Int(seconds)
