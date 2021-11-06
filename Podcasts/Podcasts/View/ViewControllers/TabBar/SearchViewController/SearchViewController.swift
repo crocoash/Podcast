@@ -103,10 +103,12 @@ class SearchViewController : UIViewController {
     
     @objc func handlerSwipe(sender: UISwipeGestureRecognizer) {
         switch sender.direction {
-        case .left: searchSegmentalControl.selectedSegmentIndex += 1
+        case .left:
+            searchSegmentalControl.selectedSegmentIndex += 1
         case .right: searchSegmentalControl.selectedSegmentIndex -= 1
         default: break
         }
+        if !searchText.isEmpty { getPodcasts(by: searchText) }
     }
 }
 

@@ -22,7 +22,6 @@ class BigPlayerViewController: UIViewController {
     @IBOutlet private weak var playStopButton: UIButton!
     @IBOutlet private weak var podcastImageView: UIImageView!
     @IBOutlet private weak var podcastNameLabel: UILabel!
-    @IBOutlet private weak var authorNameLabel: UILabel!
     @IBOutlet private weak var currentTimeLabel: UILabel!
     @IBOutlet private weak var durationOfTrackLabel: UILabel!
     
@@ -93,7 +92,6 @@ extension BigPlayerViewController {
     private func configureUI(with podcast: Podcast) {
         podcastImageView.load(string: podcast.artworkUrl600)
         podcastNameLabel.text = podcast.trackName
-        authorNameLabel.text = podcast.country
         durationOfTrackLabel.text = "\(podcast.date)"
         previousPodcastButton.isEnabled = !isFirst
         nextPodcastButton.isEnabled = !isLast
