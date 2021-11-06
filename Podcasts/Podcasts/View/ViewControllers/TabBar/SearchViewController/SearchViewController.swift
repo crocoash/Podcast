@@ -8,7 +8,7 @@
 import UIKit
 
 protocol SearchViewControllerDelegate: AnyObject {
-    func searchViewController(_ searchViewController: SearchViewController, play podcasts: [Podcast], at index: Int)
+    func searchViewController(_ searchViewController: SearchViewController,_ podcasts: [Podcast], didSelectIndex: Int)
 }
 
 class SearchViewController : UIViewController {
@@ -54,6 +54,7 @@ class SearchViewController : UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
+        configureGesture()
         downloadService.downloadsSession = downloadsSession
     }
     
@@ -98,10 +99,20 @@ class SearchViewController : UIViewController {
         
         present(detailViewController, animated: true)
     }
+    
+    @objc func handlerSwipe(sender: UISwipeGestureRecognizer) {
+        switch sender.direction {
+        case .left: searchSegmentalControl.selectedSegmentIndex += 1
+        case .right: searchSegmentalControl.selectedSegmentIndex -= 1
+        default: break
+        }
+    }
 }
 
 //MARK: - Private configure UI Methods
 extension SearchViewController {
+    
+    
     
     private func configureUI() {
         configureTableView()
@@ -111,12 +122,14 @@ extension SearchViewController {
         configureActivityIndicator()
     }
     
-  
-    
     private func configureTableView() {
         podcastTableView.register(PodcastCell.self)
         podcastTableView.register(PodcastByAuthorCell.self)
         podcastTableView.rowHeight = 100
+    }
+    
+    private func configureGesture() {
+        view.addMyGestureRecognizer(self, type: .swipe(directions: [.left, .right]), selector: #selector(handlerSwipe))
     }
     
     private func configureCancelLabel() {
@@ -150,7 +163,7 @@ extension SearchViewController {
             guard let view = sender.view as? PodcastCell else { return }
             let podcast = podcasts[view.indexPath.row]
             
-            if podcast.isAddToPlaylist {
+            if PlaylistDocument.shared.playList.contains(podcast) {
                 PlaylistDocument.shared.removeFromPlayList(podcast)
             } else {
                 PlaylistDocument.shared.addToPlayList(podcast)
@@ -159,7 +172,7 @@ extension SearchViewController {
             podcastTableView.reloadRows(at: [cell.indexPath], with: .none)
             
             MyToast.create(title: (podcast.trackName ?? "podcast") + "is added to playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
-//
+
             feedbackGenerator()
         }
     }
@@ -230,7 +243,7 @@ extension SearchViewController: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: PodcastCell.identifier) as! PodcastCell
         
         cell.configureCell(with: podcast, indexPath)
-        cell.addMyGestureRecognizer(self, type: .longPressGesture(minimumPressDuration: 1), selector: #selector(handlerLongPs))
+        cell.addMyGestureRecognizer(self, type: .longPressGesture(minimumPressDuration: 0.3), selector: #selector(handlerLongPs))
         cell.addMyGestureRecognizer(self, type: .tap(), selector: #selector(handlerTapPodcastCell))
         
         return cell
@@ -331,7 +344,7 @@ extension SearchViewController: URLSessionDelegate {
 
 extension SearchViewController: DetailViewControllerDelegate {
     func detailViewController(_ detailViewController: DetailViewController, playButtonDidTouchFor podcastIndex: Int) {
-        delegate?.searchViewController(self, play: podcasts, at: podcastIndex)
+        delegate?.searchViewController(self, podcasts, didSelectIndex: podcastIndex)
     }
 
 }

@@ -25,6 +25,6 @@ extension PodcastCell {
         podcastName.text = podcast.trackName
         podcastImage.load(string: podcast.artworkUrl160!)
         
-        playlistStarImageView.isHidden = !podcast.isAddToPlaylist
+        playlistStarImageView.isHidden = !PlaylistDocument.shared.playList.contains(podcast)
     }
 }

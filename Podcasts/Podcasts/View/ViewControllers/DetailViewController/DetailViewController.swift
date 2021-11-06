@@ -8,7 +8,7 @@
 import UIKit
 
 protocol DetailViewControllerDelegate: AnyObject {
-    func detailViewController(_ detailViewController: DetailViewController, playButtonDidTouchFor podcastIndex: Int)
+    func detailViewController(_ detailViewController: DetailViewController, playButtonDidTouchFor didSelectIndex: Int)
 }
 
 class DetailViewController: UIViewController {
@@ -27,7 +27,6 @@ class DetailViewController: UIViewController {
         super.viewDidLoad()
         configureGestures()
         setupView()
-        self.view.addMyGestureRecognizer(self, type: .tap(), selector: #selector(dismissOnScreenTap))
     }
     
     func setUp(index: Int, podcast: Podcast) {
@@ -56,5 +55,6 @@ extension DetailViewController {
     
     private func configureGestures() {
         view.addMyGestureRecognizer(self, type: .screenEdgePanGestureRecognizer(directions: [.right]), selector: #selector(dismissOnScreenTap))
+        view.addMyGestureRecognizer(self, type: .tap(), selector: #selector(dismissOnScreenTap))
     }
 }

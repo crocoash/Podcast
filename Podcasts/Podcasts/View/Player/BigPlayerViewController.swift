@@ -18,12 +18,13 @@ protocol BigPlayerViewControllerDelegate: AnyObject {
 }
 
 class BigPlayerViewController: UIViewController {
-
+    
     @IBOutlet private weak var podcastImageView: UIImageView!
     @IBOutlet private weak var podcastNameLabel: UILabel!
     @IBOutlet private weak var authorNameLabel: UILabel!
     @IBOutlet private weak var currentTimeLabel: UILabel!
     @IBOutlet private weak var durationOfTrackLabel: UILabel!
+    
     @IBOutlet private weak var progressSlider: UISlider!
     
     @IBOutlet private weak var previousPodcastButton: UIButton!
@@ -32,14 +33,13 @@ class BigPlayerViewController: UIViewController {
     weak var delegate: BigPlayerViewControllerDelegate?
     
     private var podcast: Podcast?
+    private var player: AVPlayer!
     
     private var isLast: Bool!
     private var isFirst: Bool!
     
-    func setUP(podcast: Podcast?, isLast: Bool, isFirst: Bool) {
-        self.podcast = podcast
-        self.isLast = isLast
-        self.isFirst = isFirst
+    func setUP(player: AVPlayer) {
+        self.player = player
     }
     
     override func viewDidLoad() {
@@ -48,11 +48,10 @@ class BigPlayerViewController: UIViewController {
         if let podcast = podcast { configureUI(with: podcast) }
         addPlayerTimeObservers()
         createAudioSession()
-        displayDurationOfCurrentTrack()
     }
     
     @IBAction func progressSliderValueChanged(_ sender: UISlider) {
-//        player?.seek(to: CMTime(seconds: Double(progressSlider.value), preferredTimescale: 60))
+        player?.seek(to: CMTime(seconds: Double(progressSlider.value), preferredTimescale: 60))
     }
     
     @IBAction func playPauseTouchUpInside(_ sender: UIButton) {
@@ -76,26 +75,26 @@ class BigPlayerViewController: UIViewController {
     }
     
     @objc func respondToSwipe(gesture: UISwipeGestureRecognizer) {
-            dismiss(animated: true, completion: nil)
+        dismiss(animated: true)
     }
 }
 
 
 extension BigPlayerViewController {
     
-    func upDateUI(with podcast: Podcast?, isFirst: Bool, isLast: Bool) {
+    func upDateUI( with podcast: Podcast?, isFirst: Bool, isLast: Bool) {
         guard let podcast = podcast else { return }
         self.isLast = isLast
         self.isFirst = isFirst
         
         configureUI(with: podcast)
-  }
+    }
     
     private func configureUI(with podcast: Podcast) {
         podcastImageView.load(string: podcast.artworkUrl600)
         podcastNameLabel.text = podcast.trackName
         authorNameLabel.text = podcast.country
-        
+        durationOfTrackLabel.text = "\(podcast.date)"
         previousPodcastButton.isEnabled = !isFirst
         nextPodcastButton.isEnabled = !isLast
     }
@@ -107,14 +106,13 @@ extension BigPlayerViewController {
     }
     
     private func addPlayerTimeObservers() {
-//        player?.addPeriodicTimeObserver(forInterval: CMTime(seconds: 1, preferredTimescale: 60), queue: .main) { (time) in
-//            self.progressSlider.maximumValue = Float(self.player?.currentItem?.duration.seconds ?? 0)
-//            self.progressSlider.value = Float(time.seconds)
-//
-//            let currentTime = self.player?.currentTime().seconds
-//            guard let currentTimee = currentTime else {return}
-//            self.currentTimeLabel.text = "\(Int(currentTimee))"
+        player.addPeriodicTimeObserver(forInterval: CMTime(seconds: 1, preferredTimescale: 60), queue: .main) { (time) in
+            self.progressSlider.maximumValue = Float((self.player?.currentItem?.duration.seconds) ?? 0 / 60000 )
+            self.progressSlider.value = Float(time.seconds)
             
+            let currentTime = self.player.currentTime().seconds 
+            
+            self.currentTimeLabel.text = "\(currentTime)"
         }
     }
     
@@ -126,12 +124,6 @@ extension BigPlayerViewController {
             print("error")
         }
     }
-    
-    func displayDurationOfCurrentTrack() {
-//        let duration = player?.currentItem?.duration.seconds
-//        guard let durationn = duration else { return }
-//        self.durationOfTrackLabel.text = "\(Int(durationn))"
-//    }
 }
 
 

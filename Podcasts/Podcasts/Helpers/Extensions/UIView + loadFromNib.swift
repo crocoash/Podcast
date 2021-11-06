@@ -8,6 +8,7 @@
 import UIKit
 
 extension UIView {
+    
     func loadFromNib() {
         let bundle = Bundle(for: Self.self)
         let nib = UINib(nibName: "\(Self.self)", bundle: bundle)

@@ -8,7 +8,7 @@
 import UIKit
 
 protocol PlaylistTableViewControllerDelegate : AnyObject {
-    func playlistTableViewController(_ playlistTableViewController: PlaylistTableViewController, play podcasts: [Podcast], at index: Int)
+    func playlistTableViewController(_ playlistTableViewController: PlaylistTableViewController, _ podcasts: [Podcast], didSelectIndex: Int)
 }
 
 class PlaylistTableViewController: UITableViewController {
@@ -90,8 +90,8 @@ extension PlaylistTableViewController {
 // MARK: - DetailViewControllerDelegate
 extension PlaylistTableViewController : DetailViewControllerDelegate {
     
-    func detailViewController(_ detailViewController: DetailViewController, playButtonDidTouchFor podcastIndex: Int) {
-        delegate?.playlistTableViewController(self, play: PlaylistDocument.shared.playList, at: podcastIndex)
+    func detailViewController(_ detailViewController: DetailViewController, playButtonDidTouchFor didSelectIndex: Int) {
+        delegate?.playlistTableViewController(self, playListDocument.playList, didSelectIndex: didSelectIndex)
     }
 }
 

@@ -7,10 +7,17 @@
 
 import UIKit
 
+protocol SettingsTableViewControllerDelegate: AnyObject {
+    func settingsTableViewControllerDidApear(_ settingsTableViewController: SettingsTableViewController)
+    func settingsTableViewControllerDidDisapear(_ settingsTableViewController: SettingsTableViewController)
+}
+
 class SettingsTableViewController: UITableViewController {
     
     private var userViewModel: UserViewModel!
     private var user: User { userViewModel.userDocument.user }
+    
+    weak var delegate: SettingsTableViewControllerDelegate?
     
     func setUser(_ userViewModel: UserViewModel) {
         self.userViewModel = userViewModel
@@ -34,6 +41,17 @@ class SettingsTableViewController: UITableViewController {
             self?.locationLabel.text = ipData.country + ipData.city
         }
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        delegate?.settingsTableViewControllerDidApear(self)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        delegate?.settingsTableViewControllerDidDisapear(self)
+    }
+    
     @IBAction func darkModeValueChanged(_ sender: UISwitch) {
         
     }

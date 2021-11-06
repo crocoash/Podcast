@@ -176,12 +176,9 @@
 		049D480427286D6300B6DA3C /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
-				18A5005E2727FA3800CD3F0C /* RegistrationViewController.swift */,
-				049D47EF2726EAE600B6DA3C /* TabBarViewController.swift */,
-				049D47DF2726E05B00B6DA3C /* SearchViewController.swift */,
-				049D480027286D3900B6DA3C /* PlaylistTableViewController.swift */,
-				1831DEDC27319E3900EC09E2 /* SettingsTableViewController.swift */,
-				049D480227286D5900B6DA3C /* DetailViewController.swift */,
+				18CA6D8C2735E41C00F32CE5 /* RegistrationViewController */,
+				18CA6D922735E46B00F32CE5 /* TabBar */,
+				18CA6D912735E45A00F32CE5 /* DetailViewController */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -286,6 +283,57 @@
 				189C1FAE272D84AB00A8480E /* PlaylistDocument.swift */,
 			);
 			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		18CA6D8C2735E41C00F32CE5 /* RegistrationViewController */ = {
+			isa = PBXGroup;
+			children = (
+				18A5005E2727FA3800CD3F0C /* RegistrationViewController.swift */,
+			);
+			path = RegistrationViewController;
+			sourceTree = "<group>";
+		};
+		18CA6D8E2735E43600F32CE5 /* SearchViewController */ = {
+			isa = PBXGroup;
+			children = (
+				049D47DF2726E05B00B6DA3C /* SearchViewController.swift */,
+			);
+			path = SearchViewController;
+			sourceTree = "<group>";
+		};
+		18CA6D8F2735E44400F32CE5 /* PlaylistTableViewController */ = {
+			isa = PBXGroup;
+			children = (
+				049D480027286D3900B6DA3C /* PlaylistTableViewController.swift */,
+			);
+			path = PlaylistTableViewController;
+			sourceTree = "<group>";
+		};
+		18CA6D902735E44F00F32CE5 /* SettingsTableViewController */ = {
+			isa = PBXGroup;
+			children = (
+				1831DEDC27319E3900EC09E2 /* SettingsTableViewController.swift */,
+			);
+			path = SettingsTableViewController;
+			sourceTree = "<group>";
+		};
+		18CA6D912735E45A00F32CE5 /* DetailViewController */ = {
+			isa = PBXGroup;
+			children = (
+				049D480227286D5900B6DA3C /* DetailViewController.swift */,
+			);
+			path = DetailViewController;
+			sourceTree = "<group>";
+		};
+		18CA6D922735E46B00F32CE5 /* TabBar */ = {
+			isa = PBXGroup;
+			children = (
+				049D47EF2726EAE600B6DA3C /* TabBarViewController.swift */,
+				18CA6D8E2735E43600F32CE5 /* SearchViewController */,
+				18CA6D8F2735E44400F32CE5 /* PlaylistTableViewController */,
+				18CA6D902735E44F00F32CE5 /* SettingsTableViewController */,
+			);
+			path = TabBar;
 			sourceTree = "<group>";
 		};
 		26863FFB79128477A1FFB53A /* Pods */ = {
