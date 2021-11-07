@@ -36,6 +36,12 @@
 		184CE18D272717B20088044C /* PodacstData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184CE18C272717B20088044C /* PodacstData.swift */; };
 		18557D642732B61D00CA08CA /* IpModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18557D632732B61D00CA08CA /* IpModel.swift */; };
 		18557D662732BF0100CA08CA /* UserModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18557D652732BF0100CA08CA /* UserModel.swift */; };
+		1855933D27380AA10012BA91 /* BigPlayerViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1855933C27380AA10012BA91 /* BigPlayerViewControllerDelegate.swift */; };
+		1855933F27380B400012BA91 /* SearchViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1855933E27380B400012BA91 /* SearchViewControllerDelegate.swift */; };
+		1855934127380B610012BA91 /* PlaylistTableViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1855934027380B610012BA91 /* PlaylistTableViewControllerDelegate.swift */; };
+		1855934327380BAF0012BA91 /* SettingsTableViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1855934227380BAF0012BA91 /* SettingsTableViewControllerDelegate.swift */; };
+		1855934527380BDC0012BA91 /* DetailViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1855934427380BDC0012BA91 /* DetailViewControllerDelegate.swift */; };
+		1855934727380C270012BA91 /* AuthManger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1855934627380C270012BA91 /* AuthManger.swift */; };
 		187B2B3E2732C11000C3EFFF /* UserDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187B2B3D2732C11000C3EFFF /* UserDocument.swift */; };
 		187B2B4027345DCC00C3EFFF /* CustomTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187B2B3F27345DCC00C3EFFF /* CustomTableViewCell.swift */; };
 		187B2B4227345F6200C3EFFF /* Constant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187B2B4127345F6200C3EFFF /* Constant.swift */; };
@@ -93,6 +99,12 @@
 		184CE18C272717B20088044C /* PodacstData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodacstData.swift; sourceTree = "<group>"; };
 		18557D632732B61D00CA08CA /* IpModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IpModel.swift; sourceTree = "<group>"; };
 		18557D652732BF0100CA08CA /* UserModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserModel.swift; sourceTree = "<group>"; };
+		1855933C27380AA10012BA91 /* BigPlayerViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BigPlayerViewControllerDelegate.swift; sourceTree = "<group>"; };
+		1855933E27380B400012BA91 /* SearchViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewControllerDelegate.swift; sourceTree = "<group>"; };
+		1855934027380B610012BA91 /* PlaylistTableViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistTableViewControllerDelegate.swift; sourceTree = "<group>"; };
+		1855934227380BAF0012BA91 /* SettingsTableViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTableViewControllerDelegate.swift; sourceTree = "<group>"; };
+		1855934427380BDC0012BA91 /* DetailViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewControllerDelegate.swift; sourceTree = "<group>"; };
+		1855934627380C270012BA91 /* AuthManger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManger.swift; sourceTree = "<group>"; };
 		187B2B3D2732C11000C3EFFF /* UserDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDocument.swift; sourceTree = "<group>"; };
 		187B2B3F27345DCC00C3EFFF /* CustomTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTableViewCell.swift; sourceTree = "<group>"; };
 		187B2B4127345F6200C3EFFF /* Constant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constant.swift; sourceTree = "<group>"; };
@@ -165,10 +177,8 @@
 		049D47FF27286CA100B6DA3C /* Player */ = {
 			isa = PBXGroup;
 			children = (
-				0457FB1A272F1ECA00D57280 /* PlayerViewController.swift */,
-				0457FB1B272F1ECB00D57280 /* PlayerViewController.xib */,
-				04425A88273012DA00E897FA /* BigPlayerViewController.swift */,
-				04425A89273012DA00E897FA /* BigPlayerViewController.xib */,
+				1855933B27380A6C0012BA91 /* Player */,
+				1855933A27380A570012BA91 /* BigPlayer */,
 			);
 			path = Player;
 			sourceTree = "<group>";
@@ -220,7 +230,6 @@
 			isa = PBXGroup;
 			children = (
 				3FBCF1BF272847E400B70522 /* Cells */,
-				049D47FF27286CA100B6DA3C /* Player */,
 				049D480427286D6300B6DA3C /* ViewControllers */,
 			);
 			path = View;
@@ -248,8 +257,28 @@
 				184CE18827270C8D0088044C /* ApiService.swift */,
 				187B2B4127345F6200C3EFFF /* Constant.swift */,
 				1831DED02730560D00EC09E2 /* DownloadService.swift */,
+				1855934627380C270012BA91 /* AuthManger.swift */,
 			);
 			path = Helpers;
+			sourceTree = "<group>";
+		};
+		1855933A27380A570012BA91 /* BigPlayer */ = {
+			isa = PBXGroup;
+			children = (
+				1855933C27380AA10012BA91 /* BigPlayerViewControllerDelegate.swift */,
+				04425A88273012DA00E897FA /* BigPlayerViewController.swift */,
+				04425A89273012DA00E897FA /* BigPlayerViewController.xib */,
+			);
+			path = BigPlayer;
+			sourceTree = "<group>";
+		};
+		1855933B27380A6C0012BA91 /* Player */ = {
+			isa = PBXGroup;
+			children = (
+				0457FB1A272F1ECA00D57280 /* PlayerViewController.swift */,
+				0457FB1B272F1ECB00D57280 /* PlayerViewController.xib */,
+			);
+			path = Player;
 			sourceTree = "<group>";
 		};
 		187B2B3C2732C0BD00C3EFFF /* CustomPresent */ = {
@@ -296,6 +325,7 @@
 		18CA6D8E2735E43600F32CE5 /* SearchViewController */ = {
 			isa = PBXGroup;
 			children = (
+				1855933E27380B400012BA91 /* SearchViewControllerDelegate.swift */,
 				049D47DF2726E05B00B6DA3C /* SearchViewController.swift */,
 			);
 			path = SearchViewController;
@@ -304,6 +334,7 @@
 		18CA6D8F2735E44400F32CE5 /* PlaylistTableViewController */ = {
 			isa = PBXGroup;
 			children = (
+				1855934027380B610012BA91 /* PlaylistTableViewControllerDelegate.swift */,
 				049D480027286D3900B6DA3C /* PlaylistTableViewController.swift */,
 			);
 			path = PlaylistTableViewController;
@@ -313,6 +344,7 @@
 			isa = PBXGroup;
 			children = (
 				1831DEDC27319E3900EC09E2 /* SettingsTableViewController.swift */,
+				1855934227380BAF0012BA91 /* SettingsTableViewControllerDelegate.swift */,
 			);
 			path = SettingsTableViewController;
 			sourceTree = "<group>";
@@ -320,6 +352,7 @@
 		18CA6D912735E45A00F32CE5 /* DetailViewController */ = {
 			isa = PBXGroup;
 			children = (
+				1855934427380BDC0012BA91 /* DetailViewControllerDelegate.swift */,
 				049D480227286D5900B6DA3C /* DetailViewController.swift */,
 			);
 			path = DetailViewController;
@@ -329,6 +362,7 @@
 			isa = PBXGroup;
 			children = (
 				049D47EF2726EAE600B6DA3C /* TabBarViewController.swift */,
+				049D47FF27286CA100B6DA3C /* Player */,
 				18CA6D8E2735E43600F32CE5 /* SearchViewController */,
 				18CA6D8F2735E44400F32CE5 /* PlaylistTableViewController */,
 				18CA6D902735E44F00F32CE5 /* SettingsTableViewController */,
@@ -489,12 +523,16 @@
 				189C1FB4272DF67A00A8480E /* AuthorData.swift in Sources */,
 				189C1FB6272DF68600A8480E /* AuthorModel.swift in Sources */,
 				049D480327286D5900B6DA3C /* DetailViewController.swift in Sources */,
+				1855933D27380AA10012BA91 /* BigPlayerViewControllerDelegate.swift in Sources */,
 				189C1FAF272D84AB00A8480E /* PlaylistDocument.swift in Sources */,
+				1855934327380BAF0012BA91 /* SettingsTableViewControllerDelegate.swift in Sources */,
 				189C1FAF272D84AB00A8480E /* PlaylistDocument.swift in Sources */,
 				3FBCF1C72728482A00B70522 /* PodcastByAuthorCell.swift in Sources */,
 				3FBCF1C2272847F100B70522 /* PodcastCell.swift in Sources */,
 				18557D662732BF0100CA08CA /* UserModel.swift in Sources */,
+				1855934127380B610012BA91 /* PlaylistTableViewControllerDelegate.swift in Sources */,
 				049D47E02726E05B00B6DA3C /* SearchViewController.swift in Sources */,
+				1855934727380C270012BA91 /* AuthManger.swift in Sources */,
 				187B2B3E2732C11000C3EFFF /* UserDocument.swift in Sources */,
 				189C1FBC272EE6F100A8480E /* UIView + loadFromNib.swift in Sources */,
 				184CE18D272717B20088044C /* PodacstData.swift in Sources */,
@@ -503,6 +541,7 @@
 				049D47F02726EAE600B6DA3C /* TabBarViewController.swift in Sources */,
 				3FDEE22F273153D300B245CE /* UIImageView + load.swift in Sources */,
 				04425A8A273012DA00E897FA /* BigPlayerViewController.swift in Sources */,
+				1855933F27380B400012BA91 /* SearchViewControllerDelegate.swift in Sources */,
 				049D480127286D3900B6DA3C /* PlaylistTableViewController.swift in Sources */,
 				18CA6D8B2735902000F32CE5 /* MyToast.swift in Sources */,
 				1831DEDA2731944600EC09E2 /* PresentTransition.swift in Sources */,
@@ -520,6 +559,7 @@
 				1831DEDB2731944600EC09E2 /* DismissTransition.swift in Sources */,
 				189C1FAA272D336500A8480E /* UITableView + register.swift in Sources */,
 				1831DED12730560D00EC09E2 /* DownloadService.swift in Sources */,
+				1855934527380BDC0012BA91 /* DetailViewControllerDelegate.swift in Sources */,
 				189C1FB2272D876B00A8480E /* Collection.swift in Sources */,
 				049D47DE2726E05B00B6DA3C /* SceneDelegate.swift in Sources */,
 				187B2B4027345DCC00C3EFFF /* CustomTableViewCell.swift in Sources */,

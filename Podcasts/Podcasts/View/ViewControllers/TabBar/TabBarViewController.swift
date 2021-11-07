@@ -72,6 +72,10 @@ extension TabBarViewController {
         playerVC.view.isHidden = true
         playerVC.view.layer.borderColor = UIColor.gray.cgColor
         playerVC.view.layer.borderWidth = 0.3
+        playerVC.view.layer.shadowRadius = 3
+        playerVC.view.layer.shadowColor = UIColor.black.cgColor
+        playerVC.view.layer.shadowOpacity = 1
+        playerVC.view.layer.shadowOffset = .zero
         self.addChild(playerVC)
         view.addSubview(playerVC.view)
         playerVC.view.translatesAutoresizingMaskIntoConstraints = false
@@ -106,7 +110,7 @@ extension TabBarViewController: SettingsTableViewControllerDelegate {
 extension TabBarViewController: PlaylistTableViewControllerDelegate {
     
     func playlistTableViewController(_ playlistTableViewController: PlaylistTableViewController, _ podcasts: [Podcast], didSelectIndex: Int) {
-        self.playerVC.view.isHidden = false
+        playerVC.view.isHidden = false
         playerVC.play(podcasts: podcasts, at: didSelectIndex)
     }
 }

@@ -7,13 +7,6 @@
 
 import UIKit
 
-protocol SettingsTableViewControllerDelegate: AnyObject {
-    
-    func settingsTableViewControllerDidApear(_ settingsTableViewController: SettingsTableViewController)
-    
-    func settingsTableViewControllerDidDisapear(_ settingsTableViewController: SettingsTableViewController)
-}
-
 class SettingsTableViewController: UITableViewController {
     
     private var userViewModel: UserViewModel!
