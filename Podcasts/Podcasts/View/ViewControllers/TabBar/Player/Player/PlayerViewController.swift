@@ -58,6 +58,7 @@ class PlayerViewController: UIViewController {
         super.viewDidLoad()
         configureUI()
         configureGesture()
+        addObserverForEndTrack()
     }
     
     //MARK: - Methods
@@ -162,6 +163,9 @@ extension PlayerViewController {
         podcastImageView.load(string: currentPodcast?.artworkUrl600)
         playPauseButton.setImage(playStopImage, for: .normal)
         podcastNameLabel.text = currentPodcast?.trackName
+    }
+    
+    private func addObserverForEndTrack() {
         NotificationCenter.default.addObserver(self, selector: #selector(endTrack), name: .AVPlayerItemDidPlayToEndTime, object: nil)
     }
     
