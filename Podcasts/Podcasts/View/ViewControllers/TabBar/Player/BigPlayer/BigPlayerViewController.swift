@@ -78,13 +78,14 @@ extension BigPlayerViewController {
         progressSlider.value = currentTime
     }
     
-    func upDateUI(currentItem: AVPlayerItem?, with podcast: Podcast?, isFirst: Bool, isLast: Bool) {
+    func upDateUI(currentItem: Float, with podcast: Podcast?, isFirst: Bool, isLast: Bool) {
         isPresented = true
         guard let podcast = podcast else { return }
         self.isLast = isLast
         self.isFirst = isFirst
         
-        progressSlider.maximumValue = 100
+        progressSlider.maximumValue = currentItem
+        durationOfTrackLabel.text = String(describing: currentItem)
         progressSlider.value = 0
         
         configureUI(with: podcast)
@@ -93,7 +94,6 @@ extension BigPlayerViewController {
     private func configureUI(with podcast: Podcast) {
         podcastImageView.load(string: podcast.artworkUrl600)
         podcastNameLabel.text = podcast.trackName
-        durationOfTrackLabel.text = "\(podcast.date)"
         previousPodcastButton.isEnabled = !isFirst
         nextPodcastButton.isEnabled = !isLast
     }

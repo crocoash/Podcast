@@ -36,8 +36,13 @@ class PlayerViewController: UIViewController {
             configureUI()
             
             if bigPlayerVC.isPresented {
-                
-                bigPlayerVC.upDateUI(currentItem: player.currentItem, with: currentPodcast, isFirst: isFirstPodcast, isLast: isLastPodcast)
+           
+                bigPlayerVC.upDateUI(
+                    currentItem: Float(player.currentItem!.asset.duration.seconds),
+                    with: currentPodcast,
+                    isFirst: isFirstPodcast,
+                    isLast: isLastPodcast
+                )
             }
         }
     }
@@ -70,6 +75,7 @@ class PlayerViewController: UIViewController {
     }
     
     @objc func respondToSwipe(gesture: UIGestureRecognizer) {
+
         
         guard let playStopImage = playStopImage,
               let currentItem = player.currentItem,
@@ -80,7 +86,12 @@ class PlayerViewController: UIViewController {
         addTimeObserve()
         
         bigPlayerVC.setPlayStopButton(with: playStopImage)
-        bigPlayerVC.upDateUI(currentItem: currentItem ,with: currentPodcast, isFirst: isFirstPodcast, isLast: isLastPodcast)
+        bigPlayerVC.upDateUI(
+            currentItem: Float(currentItem.asset.duration.seconds),
+            with: currentPodcast,
+            isFirst: isFirstPodcast,
+            isLast: isLastPodcast
+        )
     }
 }
 
