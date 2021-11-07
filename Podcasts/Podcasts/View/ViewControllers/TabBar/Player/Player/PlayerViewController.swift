@@ -29,6 +29,7 @@ class PlayerViewController: UIViewController {
     private var isLastPodcast: Bool { index == (podcasts.count - 1) }
     private var isFirstPodcast: Bool { index == 0 }
     
+    private var observe: Any?
     private var index: Int = 0 {
         didSet {
             activityIndicator.startAnimating()
@@ -111,27 +112,20 @@ extension PlayerViewController {
         }
     }
     
-    private func addTimeObserve() {
-        player.addPeriodicTimeObserver(
-            forInterval: CMTimeMakeWithSeconds(1/60, preferredTimescale: Int32(NSEC_PER_SEC)),
-            queue: .main
-        ) { [weak self] time in
-            
-            guard let self = self else { return }
-            let currentTime = Float(self.player.currentTime().seconds)
-            self.bigPlayerVC.upDateProgressSlider(currentTime: currentTime)
-        }
-    }
-    
     private func startPlay() {
         guard let podcast = currentPodcast,
               let string = podcast.episodeUrl,
               let url = URL(string: string),
               let playStopImage = playStopImage else { return }
 
-        player = AVPlayer(playerItem: AVPlayerItem(url: url))
         
-        player.addPeriodicTimeObserver(
+        if let observe = observe {
+            player.removeTimeObserver(observe)
+        }
+        
+        player = AVPlayer(playerItem: AVPlayerItem(url: url))
+
+        observe = player.addPeriodicTimeObserver(
             forInterval: CMTimeMakeWithSeconds(1/30.0, preferredTimescale: Int32(NSEC_PER_SEC)),
             queue: .main
         ) { [weak self] time in
@@ -147,6 +141,18 @@ extension PlayerViewController {
         playPauseButton.setImage(playStopImage, for: .normal)
         
         player.play()
+    }
+    
+    private func addTimeObserve() {
+        player.addPeriodicTimeObserver(
+            forInterval: CMTimeMakeWithSeconds(1/60, preferredTimescale: Int32(NSEC_PER_SEC)),
+            queue: .main
+        ) { [weak self] time in
+            
+            guard let self = self else { return }
+            let currentTime = Float(self.player.currentTime().seconds)
+            self.bigPlayerVC.upDateProgressSlider(currentTime: currentTime)
+        }
     }
     
     private func createBigPlayer() -> BigPlayerViewController {
