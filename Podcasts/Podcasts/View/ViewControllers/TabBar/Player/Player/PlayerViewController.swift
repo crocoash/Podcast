@@ -30,6 +30,8 @@ class PlayerViewController: UIViewController {
     private var isFirstPodcast: Bool { index == 0 }
     
     private var observe: Any?
+    private var observeBigPlayer: Any?
+
     private var index: Int = 0 {
         didSet {
             activityIndicator.startAnimating()
@@ -37,7 +39,7 @@ class PlayerViewController: UIViewController {
             configureUI()
             
             if bigPlayerVC.isPresented {
-           
+                addTimeObserve()
                 bigPlayerVC.upDateUI(
                     currentItem: Float(player.currentItem!.asset.duration.seconds),
                     with: currentPodcast,
@@ -58,6 +60,7 @@ class PlayerViewController: UIViewController {
         super.viewDidLoad()
         configureUI()
         configureGesture()
+        addPlayerObserver()
     }
     
     //MARK: - Methods
@@ -117,16 +120,21 @@ extension PlayerViewController {
               let string = podcast.episodeUrl,
               let url = URL(string: string),
               let playStopImage = playStopImage else { return }
-
         
         if let observe = observe {
             player.removeTimeObserver(observe)
+            self.observeBigPlayer = nil
+        }
+        
+        if let observeBigPlayer = observeBigPlayer {
+            player.removeTimeObserver(observeBigPlayer)
+            self.observeBigPlayer = nil
         }
         
         player = AVPlayer(playerItem: AVPlayerItem(url: url))
 
         observe = player.addPeriodicTimeObserver(
-            forInterval: CMTimeMakeWithSeconds(1/30.0, preferredTimescale: Int32(NSEC_PER_SEC)),
+            forInterval: CMTimeMakeWithSeconds(1 / 30, preferredTimescale: Int32(NSEC_PER_SEC)),
             queue: .main
         ) { [weak self] time in
             
@@ -144,8 +152,9 @@ extension PlayerViewController {
     }
     
     private func addTimeObserve() {
-        player.addPeriodicTimeObserver(
-            forInterval: CMTimeMakeWithSeconds(1/60, preferredTimescale: Int32(NSEC_PER_SEC)),
+       
+        observeBigPlayer = player.addPeriodicTimeObserver(
+            forInterval: CMTimeMakeWithSeconds(1 / 30 , preferredTimescale: Int32(NSEC_PER_SEC)),
             queue: .main
         ) { [weak self] time in
             
@@ -167,6 +176,9 @@ extension PlayerViewController {
         podcastImageView.load(string: currentPodcast?.artworkUrl600)
         playPauseButton.setImage(playStopImage, for: .normal)
         podcastNameLabel.text = currentPodcast?.trackName
+    }
+    
+    private func addPlayerObserver() {
         NotificationCenter.default.addObserver(self, selector: #selector(endTrack), name: .AVPlayerItemDidPlayToEndTime, object: nil)
     }
     
