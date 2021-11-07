@@ -74,7 +74,7 @@ extension BigPlayerViewController {
     }
     
     func upDateProgressSlider(currentTime: Float) {
-        currentTimeLabel.text = String(describing: currentTime)
+        currentTimeLabel.text = convertTimeToReadableFormat(currentTime)
         progressSlider.value = currentTime
     }
     
@@ -85,7 +85,7 @@ extension BigPlayerViewController {
         self.isFirst = isFirst
         
         progressSlider.maximumValue = currentItem
-        durationOfTrackLabel.text = String(describing: currentItem)
+        durationOfTrackLabel.text = convertTimeToReadableFormat(currentItem)
         progressSlider.value = 0
         
         configureUI(with: podcast)
@@ -101,6 +101,19 @@ extension BigPlayerViewController {
     private func addSwipeGesture() {
         view.addMyGestureRecognizer(self, type: .swipe(directions: [.down]), selector: #selector(respondToSwipe))
     }
+    
+    private func convertTimeToReadableFormat(_ time: Float) -> String {
+        let timeInt = Int(time)
+        let hours = Int(timeInt/3600)
+        let min = Int(timeInt % 3600 / 60)
+        let sec = Int ((timeInt % 60) % 60)
+        if hours > 0 {
+            return ("\(hours):\(min):\(sec)")
+        } else {
+            return ("\(min):\(sec)")
+        }
+    }
+    
 }
 
 
