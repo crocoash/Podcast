@@ -13,15 +13,17 @@ class PlayerViewController: UIViewController {
     @IBOutlet private weak var playPauseButton: UIButton!
     @IBOutlet private weak var podcastImageView: UIImageView!
     @IBOutlet private weak var podcastNameLabel: UILabel!
+    @IBOutlet private weak var activityIndicator: UIActivityIndicatorView!
     
     @IBOutlet weak var progressView: UIProgressView!
     
     private var player: AVPlayer = AVPlayer()
+    
     lazy private var bigPlayerVC = createBigPlayer()
     
     private var podcasts: [Podcast] = []
     
-    private var playStopImage: UIImage? { player.rate != 0 ? pauseImage : playImage }
+    private var playStopImage: UIImage? { player.rate == 2 ? playImage : pauseImage }
     var currentPodcast: Podcast? { !podcasts.isEmpty ? podcasts[index] : nil }
     
     private var isLastPodcast: Bool { index == (podcasts.count - 1) }
@@ -29,13 +31,26 @@ class PlayerViewController: UIViewController {
     
     private var index: Int = 0 {
         didSet {
+            activityIndicator.startAnimating()
             startPlay()
             configureUI()
+            
             if bigPlayerVC.isPresented {
+                repeat {
+                    print("print -----")
+                } while player.currentItem?.duration >= CMTime.zero
+                
+                
+                print("print ++++++++")
+                
+                
                 bigPlayerVC.upDateUI(currentItem: player.currentItem, with: currentPodcast, isFirst: isFirstPodcast, isLast: isLastPodcast)
             }
         }
     }
+    
+    private var observeForPlayer: Any?
+    private var observeForBigPlayer: Any?
     
     //MARK: - Settings
     private var pauseImage = UIImage(systemName: "pause.fill")
@@ -81,7 +96,8 @@ class PlayerViewController: UIViewController {
 extension PlayerViewController {
     
     private func playStopPlayer() {
-        if player.rate == 0 {
+
+        if player.rate != 2 {
             guard let pauseImage = pauseImage else { return }
             player.play()
             playPauseButton.setImage(pauseImage, for: .normal)
@@ -93,14 +109,20 @@ extension PlayerViewController {
     }
     
     private func addTimeObserve() {
-        player.addPeriodicTimeObserver(
+        
+        if let observeForBigPlayer = observeForBigPlayer {
+            player.removeTimeObserver(observeForBigPlayer)
+        }
+        
+        observeForBigPlayer = player.addPeriodicTimeObserver(
             forInterval: CMTimeMakeWithSeconds(1/60, preferredTimescale: Int32(NSEC_PER_SEC)),
-            queue: nil) { [weak self] time in
-                
-                guard let self = self else { return }
-                let currentTime = Float(self.player.currentTime().seconds)
-                self.bigPlayerVC.upDateProgressSlider(currentTime: currentTime)
-            }
+            queue: .main
+        ) { [weak self] time in
+            
+            guard let self = self else { return }
+            let currentTime = Float(self.player.currentTime().seconds)
+            self.bigPlayerVC.upDateProgressSlider(currentTime: currentTime)
+        }
     }
     
     private func createBigPlayer() -> BigPlayerViewController {
@@ -113,6 +135,7 @@ extension PlayerViewController {
     
     private func configureUI() {
         podcastImageView.load(string: currentPodcast?.artworkUrl600)
+        playPauseButton.setImage(playStopImage, for: .normal)
         podcastNameLabel.text = currentPodcast?.trackName
         NotificationCenter.default.addObserver(self, selector: #selector(endTrack), name: .AVPlayerItemDidPlayToEndTime, object: nil)
     }
@@ -127,12 +150,16 @@ extension PlayerViewController {
               let string = podcast.episodeUrl,
               let url = URL(string: string),
               let playStopImage = playStopImage else { return }
+       
+        if let observeForPlayer = observeForPlayer {
+            player.removeTimeObserver(observeForPlayer)
+            self.observeForPlayer = nil
+        }
+        player = AVPlayer(playerItem: AVPlayerItem(url: url))
         
-        player = AVPlayer(url: url)
-        
-        player.addPeriodicTimeObserver(
+        observeForPlayer = player.addPeriodicTimeObserver(
             forInterval: CMTimeMakeWithSeconds(1/30.0, preferredTimescale: Int32(NSEC_PER_SEC)),
-            queue: nil
+            queue: .main
         ) { [weak self] time in
             
             guard let self = self,
@@ -140,6 +167,7 @@ extension PlayerViewController {
             
             let duration = CMTimeGetSeconds(duaration)
             self.progressView.progress = Float((CMTimeGetSeconds(time) / duration))
+            self.activityIndicator.stopAnimating()
         }
         
         playPauseButton.setImage(playStopImage, for: .normal)

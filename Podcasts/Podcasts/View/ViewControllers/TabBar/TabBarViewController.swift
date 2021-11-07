@@ -110,7 +110,7 @@ extension TabBarViewController: SettingsTableViewControllerDelegate {
 extension TabBarViewController: PlaylistTableViewControllerDelegate {
     
     func playlistTableViewController(_ playlistTableViewController: PlaylistTableViewController, _ podcasts: [Podcast], didSelectIndex: Int) {
-        self.playerVC.view.isHidden = false
+        playerVC.view.isHidden = false
         playerVC.play(podcasts: podcasts, at: didSelectIndex)
     }
 }

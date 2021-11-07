@@ -11,6 +11,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="PlayerViewController" customModule="Podcasts" customModuleProvider="target">
             <connections>
+                <outlet property="activityIndicator" destination="23u-4B-sHm" id="SJ9-xL-cBj"/>
                 <outlet property="playPauseButton" destination="WGq-qB-fKe" id="s00-B3-bhy"/>
                 <outlet property="podcastImageView" destination="3vw-cZ-C9n" id="9jJ-kK-hQv"/>
                 <outlet property="podcastNameLabel" destination="A1c-4Y-GlG" id="1Fs-le-GtF"/>
@@ -29,7 +30,7 @@
                         <constraint firstAttribute="height" constant="30" id="GL8-Jj-Tdv"/>
                         <constraint firstAttribute="width" constant="30" id="Lxl-hl-KTp"/>
                     </constraints>
-                    <state key="normal" image="play.fill" catalog="system"/>
+                    <state key="normal" image="pause.fill" catalog="system"/>
                     <connections>
                         <action selector="playPauseTouchUpInside:" destination="-1" eventType="touchUpInside" id="Pr9-2n-hfw"/>
                     </connections>
@@ -50,6 +51,10 @@
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
                 </label>
+                <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" animating="YES" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="23u-4B-sHm">
+                    <rect key="frame" x="346" y="62" width="20" height="20"/>
+                    <color key="tintColor" red="0.9992973208" green="0.13010036950000001" blue="0.29632696510000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                </activityIndicatorView>
             </subviews>
             <viewLayoutGuide key="safeArea" id="fnl-2z-Ty3"/>
             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -59,7 +64,9 @@
                 <constraint firstItem="fnl-2z-Ty3" firstAttribute="bottom" secondItem="UkG-9Q-AK5" secondAttribute="bottom" id="FHR-0o-8Ms"/>
                 <constraint firstItem="WGq-qB-fKe" firstAttribute="leading" secondItem="A1c-4Y-GlG" secondAttribute="trailing" constant="15" id="PMh-5c-1nP"/>
                 <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="WGq-qB-fKe" secondAttribute="trailing" constant="20" id="Q5A-lQ-UH1"/>
+                <constraint firstItem="WGq-qB-fKe" firstAttribute="leading" secondItem="23u-4B-sHm" secondAttribute="trailing" constant="-2" id="XBS-3Z-thG"/>
                 <constraint firstItem="3vw-cZ-C9n" firstAttribute="height" secondItem="i5M-Pr-FkT" secondAttribute="height" multiplier="0.8" constant="9" id="ZH6-1O-nb2"/>
+                <constraint firstItem="23u-4B-sHm" firstAttribute="centerY" secondItem="fnl-2z-Ty3" secondAttribute="centerY" id="an2-qC-9XY"/>
                 <constraint firstItem="WGq-qB-fKe" firstAttribute="centerY" secondItem="i5M-Pr-FkT" secondAttribute="centerY" id="imy-Tm-rUh"/>
                 <constraint firstItem="UkG-9Q-AK5" firstAttribute="leading" secondItem="3vw-cZ-C9n" secondAttribute="trailing" id="jnv-dW-tJ7"/>
                 <constraint firstItem="A1c-4Y-GlG" firstAttribute="centerY" secondItem="fnl-2z-Ty3" secondAttribute="centerY" id="mNO-fh-Ha6"/>
@@ -71,7 +78,7 @@
         </view>
     </objects>
     <resources>
-        <image name="play.fill" catalog="system" width="116" height="128"/>
+        <image name="pause.fill" catalog="system" width="116" height="128"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

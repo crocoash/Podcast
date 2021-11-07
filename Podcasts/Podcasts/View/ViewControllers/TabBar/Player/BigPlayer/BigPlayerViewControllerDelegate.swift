@@ -14,5 +14,4 @@ protocol BigPlayerViewControllerDelegate: AnyObject {
     func bigPlayerViewControllerDidSelectPreviewsTrackButton (_ bigPlayerViewController: BigPlayerViewController)
     func bigPlayerViewController (_ bigPlayerViewController: BigPlayerViewController, didChangeCurrentTime  value: Double)
     func bigPlayerViewController (_ bigPlayerViewController: BigPlayerViewController, didAddCurrentTimeBy value: Double)
-    
 }

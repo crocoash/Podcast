@@ -84,9 +84,7 @@ extension BigPlayerViewController {
         self.isLast = isLast
         self.isFirst = isFirst
         
-        if currentItem?.status == .readyToPlay {
-            progressSlider.maximumValue = Float(currentItem!.duration.seconds)
-        }
+        progressSlider.maximumValue = Float(currentItem!.duration.seconds)
         progressSlider.value = 0
         
         configureUI(with: podcast)
