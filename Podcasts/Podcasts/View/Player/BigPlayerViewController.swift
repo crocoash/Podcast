@@ -15,6 +15,8 @@ protocol BigPlayerViewControllerDelegate: AnyObject {
     func bigPlayerViewControllerDidSelectNextTrackButton (_ bigPlayerViewController: BigPlayerViewController)
     
     func bigPlayerViewControllerDidSelectPreviewsTrackButton (_ bigPlayerViewController: BigPlayerViewController)
+    
+    func bigPlayerViewController (_ bigPlayerViewController: BigPlayerViewController, didChangeProgressSlider  value: Double)
 }
 
 class BigPlayerViewController: UIViewController {
@@ -34,6 +36,8 @@ class BigPlayerViewController: UIViewController {
     
     private var podcast: Podcast?
     
+    private(set) var isPresented: Bool = false
+    
     private var isLast: Bool!
     private var isFirst: Bool!
     
@@ -41,12 +45,10 @@ class BigPlayerViewController: UIViewController {
         super.viewDidLoad()
         addSwipeGesture()
         if let podcast = podcast { configureUI(with: podcast) }
-        addPlayerTimeObservers()
-        createAudioSession()
     }
     
     @IBAction func progressSliderValueChanged(_ sender: UISlider) {
-//        player?.seek(to: CMTime(seconds: Double(progressSlider.value), preferredTimescale: 60))
+        delegate?.bigPlayerViewController(self, didChangeProgressSlider:  Double(sender.value))
     }
     
     @IBAction func playPauseTouchUpInside(_ sender: UIButton) {
@@ -70,6 +72,7 @@ class BigPlayerViewController: UIViewController {
     }
     
     @objc func respondToSwipe(gesture: UISwipeGestureRecognizer) {
+        isPresented = false
         dismiss(animated: true)
     }
 }
@@ -81,10 +84,21 @@ extension BigPlayerViewController {
         playStopButton.setImage(image, for: .normal)
     }
     
-    func upDateUI( with podcast: Podcast?, isFirst: Bool, isLast: Bool) {
+    func upDateProgressSlider(currentTime: Float) {
+        currentTimeLabel.text = String(describing: currentTime)
+        progressSlider.value = currentTime
+    }
+    
+    func upDateUI(currentItem: AVPlayerItem?, with podcast: Podcast?, isFirst: Bool, isLast: Bool) {
+        isPresented = true
         guard let podcast = podcast else { return }
         self.isLast = isLast
         self.isFirst = isFirst
+        
+        if currentItem?.status == .readyToPlay {
+            progressSlider.maximumValue = Float(currentItem!.duration.seconds)
+        }
+    
         
         configureUI(with: podcast)
     }
@@ -95,33 +109,10 @@ extension BigPlayerViewController {
         durationOfTrackLabel.text = "\(podcast.date)"
         previousPodcastButton.isEnabled = !isFirst
         nextPodcastButton.isEnabled = !isLast
-        
     }
     
     private func addSwipeGesture() {
-        let swipeDown = UISwipeGestureRecognizer(target: self, action: #selector(respondToSwipe))
-        swipeDown.direction = .down
-        view.addGestureRecognizer(swipeDown)
-    }
-    
-    private func addPlayerTimeObservers() {
-//        player.addPeriodicTimeObserver(forInterval: CMTime(seconds: 1, preferredTimescale: 60), queue: .main) { (time) in
-//            self.progressSlider.maximumValue = Float((self.player?.currentItem?.duration.seconds) ?? 0 / 60000 )
-//            self.progressSlider.value = Float(time.seconds)
-//            
-//            let currentTime = self.player.currentTime().seconds 
-//            
-//            self.currentTimeLabel.text = "\(currentTime)"
-//        }
-    }
-    
-    func createAudioSession() {
-        let audioSession = AVAudioSession.sharedInstance()
-        do{
-            try audioSession.setCategory(.playback)
-        } catch {
-            print("error")
-        }
+        view.addMyGestureRecognizer(self, type: .swipe(directions: [.down]), selector: #selector(respondToSwipe))
     }
 }
 
