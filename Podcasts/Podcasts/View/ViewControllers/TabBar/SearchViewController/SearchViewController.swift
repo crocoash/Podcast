@@ -7,10 +7,6 @@
 
 import UIKit
 
-protocol SearchViewControllerDelegate: AnyObject {
-    func searchViewController(_ searchViewController: SearchViewController,_ podcasts: [Podcast], didSelectIndex: Int)
-}
-
 class SearchViewController : UIViewController {
     
     @IBOutlet private weak var searchBar: UISearchBar!

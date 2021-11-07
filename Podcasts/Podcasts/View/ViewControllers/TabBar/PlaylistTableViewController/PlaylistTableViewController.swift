@@ -7,10 +7,6 @@
 
 import UIKit
 
-protocol PlaylistTableViewControllerDelegate : AnyObject {
-    func playlistTableViewController(_ playlistTableViewController: PlaylistTableViewController, _ podcasts: [Podcast], didSelectIndex: Int)
-}
-
 class PlaylistTableViewController: UITableViewController {
     
     private let cellHeight : CGFloat = 75.0

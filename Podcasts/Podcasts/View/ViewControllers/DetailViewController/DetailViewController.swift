@@ -7,10 +7,6 @@
 
 import UIKit
 
-protocol DetailViewControllerDelegate: AnyObject {
-    func detailViewController(_ detailViewController: DetailViewController, playButtonDidTouchFor didSelectIndex: Int)
-}
-
 class DetailViewController: UIViewController {
     
     @IBOutlet private weak var episodeImage: UIImageView!

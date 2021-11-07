@@ -8,17 +8,6 @@
 import UIKit
 import AVFoundation
 
-protocol BigPlayerViewControllerDelegate: AnyObject {
-    
-    func bigPlayerViewControllerDidSelectStopButton (_ bigPlayerViewController: BigPlayerViewController)
-    
-    func bigPlayerViewControllerDidSelectNextTrackButton (_ bigPlayerViewController: BigPlayerViewController)
-    
-    func bigPlayerViewControllerDidSelectPreviewsTrackButton (_ bigPlayerViewController: BigPlayerViewController)
-    
-    func bigPlayerViewController (_ bigPlayerViewController: BigPlayerViewController, didChangeProgressSlider  value: Double)
-}
-
 class BigPlayerViewController: UIViewController {
     
     @IBOutlet private weak var playStopButton: UIButton!
@@ -48,7 +37,7 @@ class BigPlayerViewController: UIViewController {
     }
     
     @IBAction func progressSliderValueChanged(_ sender: UISlider) {
-        delegate?.bigPlayerViewController(self, didChangeProgressSlider:  Double(sender.value))
+        delegate?.bigPlayerViewController(self, didChangeCurrentTime:  Double(sender.value))
     }
     
     @IBAction func playPauseTouchUpInside(_ sender: UIButton) {
@@ -64,11 +53,11 @@ class BigPlayerViewController: UIViewController {
     }
     
     @IBAction func tenSecondBackTouchUpInside(_ sender: UIButton) {
-        //TODO:
+        delegate?.bigPlayerViewController(self, didAddCurrentTimeBy: -50)
     }
     
     @IBAction func tenSecondForwardTouchUpInside(_ sender: UIButton) {
-        //TODO:
+        delegate?.bigPlayerViewController(self, didAddCurrentTimeBy: 50)
     }
     
     @objc func respondToSwipe(gesture: UISwipeGestureRecognizer) {
@@ -98,7 +87,7 @@ extension BigPlayerViewController {
         if currentItem?.status == .readyToPlay {
             progressSlider.maximumValue = Float(currentItem!.duration.seconds)
         }
-    
+        progressSlider.value = 0
         
         configureUI(with: podcast)
     }
