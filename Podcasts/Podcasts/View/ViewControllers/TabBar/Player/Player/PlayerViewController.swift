@@ -125,18 +125,7 @@ extension PlayerViewController {
         
         player = AVPlayer(playerItem: AVPlayerItem(url: url))
 
-        observe = player.addPeriodicTimeObserver(
-            forInterval: CMTimeMakeWithSeconds(1/30.0, preferredTimescale: Int32(NSEC_PER_SEC)),
-            queue: .main
-        ) { [weak self] time in
-            
-            guard let self = self,
-                let duaration = self.player.currentItem?.duration else { return }
-            
-            let duration = CMTimeGetSeconds(duaration)
-            self.progressView.progress = Float((CMTimeGetSeconds(time) / duration))
-            self.activityIndicator.stopAnimating()
-        }
+        addTimeObserve()
         
         playPauseButton.setImage(playStopImage, for: .normal)
         
@@ -144,14 +133,20 @@ extension PlayerViewController {
     }
     
     private func addTimeObserve() {
-        player.addPeriodicTimeObserver(
+        observe = player.addPeriodicTimeObserver(
             forInterval: CMTimeMakeWithSeconds(1/60, preferredTimescale: Int32(NSEC_PER_SEC)),
             queue: .main
         ) { [weak self] time in
             
-            guard let self = self else { return }
+            guard let self = self, let duaration = self.player.currentItem?.duration else { return }
+            let duration = CMTimeGetSeconds(duaration)
+            self.progressView.progress = Float((CMTimeGetSeconds(time) / duration))
+            self.activityIndicator.stopAnimating()
             let currentTime = Float(self.player.currentTime().seconds)
-            self.bigPlayerVC.upDateProgressSlider(currentTime: currentTime)
+            
+            if self.bigPlayerVC.isPresented {
+                self.bigPlayerVC.upDateProgressSlider(currentTime: currentTime)
+            }
         }
     }
     
