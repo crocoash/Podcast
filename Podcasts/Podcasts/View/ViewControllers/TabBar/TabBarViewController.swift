@@ -43,6 +43,10 @@ extension TabBarViewController {
             $0.delegate = self
         }
         
+        let likedMomentsVC = createTabBar(LikedMomentsViewController.self, title: "Moments", imageName: "like") {
+            $0.delegate = self
+        }
+        
         let settingsVC = createTabBar(SettingsTableViewController.self, title: "Settings", imageName: "gear") { [weak self] vc in
             guard let self = self else { return }
             vc.setUser((self.userViewModel) )
@@ -53,7 +57,7 @@ extension TabBarViewController {
         navigationPlaylistVc.tabBarItem.title = "Playlist"
         navigationPlaylistVc.tabBarItem.image = UIImage(systemName: "book")
 
-        viewControllers = [navigationPlaylistVc, searchVC, settingsVC]
+        viewControllers = [navigationPlaylistVc, searchVC, likedMomentsVC, settingsVC]
     }
     
     private func createTabBar<T: UIViewController>(_ type: T.Type, title: String, imageName: String, completion: ((T) -> Void)? = nil) -> T {
@@ -113,4 +117,14 @@ extension TabBarViewController: PlaylistTableViewControllerDelegate {
         playerVC.view.isHidden = false
         playerVC.play(podcasts: podcasts, at: didSelectIndex)
     }
+}
+
+// MARK: - LikedMomentsViewControllerDelegate
+extension TabBarViewController: LikedMomentsViewControllerDelegate {
+    func likedMomentsViewController(_ likedMomentsViewController: LikedMomentsViewController, _ didSelectMoment: LikedMoment) {
+        playerVC.view.isHidden = false
+        playerVC.play(moment: didSelectMoment)
+    }
+    
+    
 }

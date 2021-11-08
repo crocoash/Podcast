@@ -19,11 +19,25 @@ class PlayerViewController: UIViewController {
     
     private var player: AVPlayer = AVPlayer()
     
-    private var likedMoments : [LikedMoment] = []
+    
+    lazy private var likedMoments: [LikedMoment] = {
+        if let data = UserDefaults.standard.data(forKey: "LikedMoments") {
+            do {
+                let decode = JSONDecoder()
+                let moments = try decode.decode([LikedMoment].self, from: data)
+                return moments
+            } catch {
+                print("Error of decoding")
+            }
+        }
+        let moments: [LikedMoment] = []
+        return moments
+    }()
     
     lazy private var bigPlayerVC = createBigPlayer()
     
     private var podcasts: [Podcast] = []
+    private var likedMoment: LikedMoment?
     
     private var playStopImage: UIImage? { player.rate == 0 ? playImage : pauseImage }
     var currentPodcast: Podcast? { !podcasts.isEmpty ? podcasts[index] : nil }
@@ -67,6 +81,10 @@ class PlayerViewController: UIViewController {
     func play(podcasts: [Podcast], at index: Int) {
         self.podcasts = podcasts
         self.index = index
+    }
+    
+    func play(moment: LikedMoment) {
+        startPlay(moment: moment)
     }
     
     // MARK: - Actions
@@ -133,6 +151,19 @@ extension PlayerViewController {
         playPauseButton.setImage(playStopImage, for: .normal)
         
         player.play()
+    }
+    
+    private func startPlay(moment: LikedMoment) {
+        if let observe = observe {
+            player.removeTimeObserver(observe)
+        }
+        guard let stringURL = moment.podcast.episodeUrl else { return }
+        guard let url = URL(string: stringURL) else { return }
+        player = AVPlayer(playerItem: AVPlayerItem(url: url))
+        addTimeObserve()
+        playPauseButton.setImage(playStopImage, for: .normal)
+        player.play()
+        player.seek(to: CMTime(seconds: moment.moment, preferredTimescale: 60))
     }
     
     private func addTimeObserve() {

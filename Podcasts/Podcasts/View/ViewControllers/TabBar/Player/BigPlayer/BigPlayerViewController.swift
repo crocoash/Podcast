@@ -64,22 +64,6 @@ class BigPlayerViewController: UIViewController {
         delegate?.bigPlayerViewController(self, didLikeThisMoment: Double(progressSlider.value))
     }
     
-    
-    @IBAction func playLikedMoment(_ sender: Any) {
-        
-        if let data = UserDefaults.standard.data(forKey: "LikedMoments") {
-            do {
-                let decode = JSONDecoder()
-                let moments = try decode.decode([LikedMoment].self, from: data)
-                print(moments.last!.moment)
-                delegate?.bigPlayerViewController(self, didChangeCurrentTime: moments.last!.moment)
-            } catch {
-                print("Error of decoding")
-            }
-        }
-
-    }
-    
     @objc func respondToSwipe(gesture: UISwipeGestureRecognizer) {
         isPresented = false
         dismiss(animated: true)
