@@ -70,10 +70,9 @@ class BigPlayerViewController: UIViewController {
         if let data = UserDefaults.standard.data(forKey: "LikedMoments") {
             do {
                 let decode = JSONDecoder()
-                let moment = try decode.decode([LikedMoment].self, from: data)
-                print(moment.last!.moment)
-                delegate?.bigPlayerViewController(self, didChangeCurrentTime: moment.last!.moment)
-
+                let moments = try decode.decode([LikedMoment].self, from: data)
+                print(moments.last!.moment)
+                delegate?.bigPlayerViewController(self, didChangeCurrentTime: moments.last!.moment)
             } catch {
                 print("Error of decoding")
             }
