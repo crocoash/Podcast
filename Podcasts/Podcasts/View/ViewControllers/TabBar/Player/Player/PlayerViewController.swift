@@ -36,6 +36,7 @@ class PlayerViewController: UIViewController {
         didSet {
             activityIndicator.startAnimating()
             upDateUI()
+            player.pause()
             startPlay()
         }
     }
@@ -61,10 +62,6 @@ class PlayerViewController: UIViewController {
     // MARK: - Actions
     @objc func endTrack() {
         if !isLastPodcast { index += 1 }
-    }
-    
-    @objc func test() {
-        print("print test")
     }
     
     @IBAction func playPauseTouchUpInside(_ sender: UIButton) {
@@ -103,16 +100,20 @@ extension PlayerViewController {
               let string = podcast.episodeUrl,
               let url = URL(string: string) else { return }
         
-        let item = AVPlayerItem(url: url)
+        workItem?.cancel()
         
-        DispatchQueue.global(qos: .userInteractive).async {
+        let requestWorkItem = DispatchWorkItem {
+            let item = AVPlayerItem(url: url)
             self.player.replaceCurrentItem(with: item)
             self.player.play()
         }
         
-        DispatchQueue.main.async {
-            self.playPauseButton.setImage(self.pauseImage, for: .normal)
-        }
+        workItem = requestWorkItem
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: requestWorkItem)
+        
+        self.playPauseButton.setImage(self.pauseImage, for: .normal)
+
     }
     
     private func addTimeObserve() {
@@ -173,10 +174,16 @@ extension PlayerViewController {
     }
     
     private func configureGesture() {
-        
         view.addMyGestureRecognizer(self, type: .swipe(directions: [.up]), selector: #selector(respondToSwipe))
-        
         view.addMyGestureRecognizer(self, type: .tap(1), selector: #selector(respondToSwipe))
+    }
+    
+    private func nextPodcast() {
+        index += 1
+    }
+    
+    private func previewsPodcast() {
+        index -= 1
     }
 }
 
@@ -195,11 +202,11 @@ extension PlayerViewController: BigPlayerViewControllerDelegate {
     }
     
     func bigPlayerViewControllerDidSelectNextTrackButton(_ bigPlayerViewController: BigPlayerViewController) {
-        index += 1
+        nextPodcast()
     }
     
     func bigPlayerViewControllerDidSelectPreviewsTrackButton(_ bigPlayerViewController: BigPlayerViewController) {
-        index -= 1
+        previewsPodcast()
     }
     
     func bigPlayerViewController (_ bigPlayerViewController: BigPlayerViewController, didAddCurrentTimeBy value: Double) {
