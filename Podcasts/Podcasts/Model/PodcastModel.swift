@@ -66,5 +66,7 @@ struct Podcast: Codable, Equatable, Identifiable {
         case wrapperType
     }
     
-    var date: Float { Float(trackTimeMillis ?? 0) / 60000 }
+    var isDownLoad = false
+    var isFavorite: Bool { !PlaylistDocument.shared.playList.contains(self) } 
 }
+

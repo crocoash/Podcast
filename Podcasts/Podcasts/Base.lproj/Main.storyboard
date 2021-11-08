@@ -9,23 +9,40 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Playlist Table View Controller-->
-        <scene sceneID="E2s-Cm-ivu">
+        <!--Playlist View Controller-->
+        <scene sceneID="0zp-aS-4PU">
             <objects>
-                <tableViewController storyboardIdentifier="PlaylistTableViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="KR2-di-pFg" customClass="PlaylistTableViewController" customModule="Podcasts" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="grN-UZ-lbi">
+                <viewController storyboardIdentifier="PlaylistViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="7Uc-V1-0KJ" customClass="PlaylistViewController" customModule="Podcasts" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="mhe-tu-pKn">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="HeM-j5-IbM">
+                                <rect key="frame" x="0.0" y="44" width="414" height="818"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <connections>
+                                    <outlet property="dataSource" destination="7Uc-V1-0KJ" id="cgN-C7-TLv"/>
+                                    <outlet property="delegate" destination="7Uc-V1-0KJ" id="Lot-B4-YMl"/>
+                                </connections>
+                            </tableView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="q61-HT-dHd"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <connections>
-                            <outlet property="dataSource" destination="KR2-di-pFg" id="agC-OW-0qH"/>
-                            <outlet property="delegate" destination="KR2-di-pFg" id="2x4-98-fpU"/>
-                        </connections>
-                    </tableView>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="A3r-0r-03o" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                        <constraints>
+                            <constraint firstItem="HeM-j5-IbM" firstAttribute="leading" secondItem="q61-HT-dHd" secondAttribute="leading" id="6UP-et-Dab"/>
+                            <constraint firstItem="HeM-j5-IbM" firstAttribute="bottom" secondItem="q61-HT-dHd" secondAttribute="bottom" id="YSE-mT-ffV"/>
+                            <constraint firstItem="HeM-j5-IbM" firstAttribute="trailing" secondItem="q61-HT-dHd" secondAttribute="trailing" id="ZgA-RZ-2tC"/>
+                            <constraint firstItem="HeM-j5-IbM" firstAttribute="top" secondItem="q61-HT-dHd" secondAttribute="top" id="eQK-jg-7Ib"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="playListTableView" destination="HeM-j5-IbM" id="A27-B6-BvN"/>
+                        <outlet property="playerConstraint" destination="YSE-mT-ffV" id="Glf-dR-MHT"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="59r-5D-xGx" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2108" y="540"/>
+            <point key="canvasLocation" x="2216" y="-510"/>
         </scene>
         <!--Search View Controller-->
         <scene sceneID="Ybt-eR-hL1">
@@ -49,7 +66,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="hiH-Hg-cRV">
-                                <rect key="frame" x="5" y="136" width="404" height="676"/>
+                                <rect key="frame" x="5" y="136" width="404" height="726"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <connections>
                                     <outlet property="dataSource" destination="6ES-0M-x1B" id="0Q8-F9-vAB"/>
@@ -69,7 +86,7 @@
                         <gestureRecognizers/>
                         <constraints>
                             <constraint firstItem="tKm-PZ-SdX" firstAttribute="leading" secondItem="gel-su-3Px" secondAttribute="leading" id="0Hp-PT-KJ9"/>
-                            <constraint firstItem="3I1-ps-mnm" firstAttribute="bottom" secondItem="hiH-Hg-cRV" secondAttribute="bottom" constant="50" id="0WI-sJ-fGR"/>
+                            <constraint firstItem="3I1-ps-mnm" firstAttribute="bottom" secondItem="hiH-Hg-cRV" secondAttribute="bottom" id="0WI-sJ-fGR"/>
                             <constraint firstItem="fvi-Xo-H37" firstAttribute="centerY" secondItem="gel-su-3Px" secondAttribute="centerY" id="2RA-Yk-yD2"/>
                             <constraint firstItem="gel-su-3Px" firstAttribute="top" secondItem="3I1-ps-mnm" secondAttribute="top" id="D6f-kF-fJX"/>
                             <constraint firstItem="tKm-PZ-SdX" firstAttribute="top" secondItem="gel-su-3Px" secondAttribute="bottom" constant="5" id="Mvk-Vm-8hP"/>
@@ -85,6 +102,7 @@
                     <navigationItem key="navigationItem" id="TTQ-sd-hom"/>
                     <connections>
                         <outlet property="cancelLabel" destination="fvi-Xo-H37" id="Tan-kW-moy"/>
+                        <outlet property="playerOffSetConstraint" destination="0WI-sJ-fGR" id="vEr-n7-IdI"/>
                         <outlet property="podcastTableView" destination="hiH-Hg-cRV" id="Hux-dL-LN1"/>
                         <outlet property="searchBar" destination="gel-su-3Px" id="WeV-C2-LKQ"/>
                         <outlet property="searchSegmentalControl" destination="tKm-PZ-SdX" id="z5o-X1-EHN"/>
@@ -92,7 +110,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="PBN-GM-Lop" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2090" y="-140"/>
+            <point key="canvasLocation" x="2216" y="177"/>
         </scene>
         <!--Settings Table View Controller-->
         <scene sceneID="vyL-rx-UdX">
@@ -270,7 +288,7 @@
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                 </imageView>
             </objects>
-            <point key="canvasLocation" x="2107" y="1205"/>
+            <point key="canvasLocation" x="2216" y="869"/>
         </scene>
         <!--Tab Bar View Controller-->
         <scene sceneID="ukh-YP-QXv">
@@ -509,7 +527,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="8yq-mi-zfC" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2881.1594202898555" y="346.875"/>
+            <point key="canvasLocation" x="2972" y="177"/>
         </scene>
     </scenes>
     <resources>

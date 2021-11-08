@@ -13,6 +13,7 @@ class SearchViewController : UIViewController {
     @IBOutlet private weak var podcastTableView: UITableView!
     @IBOutlet private weak var cancelLabel: UILabel!
     @IBOutlet private weak var searchSegmentalControl: UISegmentedControl!
+    @IBOutlet private weak var playerOffSetConstraint: NSLayoutConstraint!
     
     private let activityIndicator = UIActivityIndicatorView()
     private var alert = Alert()
@@ -46,6 +47,12 @@ class SearchViewController : UIViewController {
         return URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
     }()
     
+    func playerIsHidden(hidden: Bool) {
+        playerOffSetConstraint.constant = hidden ?  0 : 50
+        view.layoutIfNeeded()
+        
+    }
+    
     // MARK: - View Methods
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -74,22 +81,24 @@ class SearchViewController : UIViewController {
     }
     
     @objc func handlerTapAuthorCell(sender: UITapGestureRecognizer) {
-        guard let view = sender.view as? CustomTableViewCell, let request = authors[view.indexPath.row].artistName else { return }
+        
+        guard let view = sender.view as? UITableViewCell,
+              let indexPath = podcastTableView.indexPath(for: view),
+              let request = authors[indexPath.row].artistName else { return }
         
         searchSegmentalControl.selectedSegmentIndex = 0
         searchText = request
-        podcastTableView.deselectRow(at: view.indexPath, animated: true)
     }
     
     @objc func handlerTapPodcastCell(sender : UITapGestureRecognizer) {
-        guard let view = sender.view as? CustomTableViewCell else { return }
-        let index = view.indexPath.row
-        let podcast = podcasts[index]
+        guard let view = sender.view as? UITableViewCell,
+              let indexPath = podcastTableView.indexPath(for: view) else { return }
+        let podcast = podcasts[indexPath.row]
         
         let detailViewController = storyboard?.instantiateViewController(identifier: DetailViewController.identifier) as! DetailViewController
         
         detailViewController.delegate = self
-        detailViewController.setUp(index: index, podcast: podcast)
+        detailViewController.setUp(index: indexPath.row, podcast: podcast)
         
         detailViewController.modalPresentationStyle = .custom
         detailViewController.transitioningDelegate = self
@@ -110,8 +119,6 @@ class SearchViewController : UIViewController {
 
 //MARK: - Private configure UI Methods
 extension SearchViewController {
-    
-    
     
     private func configureUI() {
         configureTableView()
@@ -159,19 +166,26 @@ extension SearchViewController {
     
     private func longPressGesture(_ sender: UILongPressGestureRecognizer) {
         MyLongPressGestureRecognizer.createSelector(for: sender) { (cell: PodcastCell) in
-            guard let view = sender.view as? PodcastCell else { return }
-            let podcast = podcasts[view.indexPath.row]
+            guard
+                let view = sender.view as? PodcastCell,
+                let indexPath = podcastTableView.indexPath(for: view) else { return }
+            
+            print("print indexPath \(indexPath)")
+
+            let podcast = podcasts[indexPath.row]
             
             if PlaylistDocument.shared.playList.contains(podcast) {
                 PlaylistDocument.shared.removeFromPlayList(podcast)
+                MyToast.create(title: (podcast.trackName ?? "podcast") + "is removed to playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
             } else {
                 PlaylistDocument.shared.addToPlayList(podcast)
-                downloadService.startDownload(podcast)
+                MyToast.create(title: (podcast.trackName ?? "podcast") + "is added to playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
+                
+//                downloadService.startDownload(podcast)
+                podcasts[indexPath.row].isDownLoad = true
             }
-            podcastTableView.reloadRows(at: [cell.indexPath], with: .none)
-            
-            MyToast.create(title: (podcast.trackName ?? "podcast") + "is added to playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
-
+            podcastTableView.reloadRows(at: [indexPath], with: .none)
+           
             feedbackGenerator()
         }
     }
@@ -241,7 +255,7 @@ extension SearchViewController: UITableViewDataSource {
         let podcast = podcasts[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: PodcastCell.identifier) as! PodcastCell
         
-        cell.configureCell(with: podcast, indexPath)
+        cell.configureCell(with: podcast)
         cell.addMyGestureRecognizer(self, type: .longPressGesture(minimumPressDuration: 0.3), selector: #selector(handlerLongPs))
         cell.addMyGestureRecognizer(self, type: .tap(), selector: #selector(handlerTapPodcastCell))
         
@@ -252,7 +266,7 @@ extension SearchViewController: UITableViewDataSource {
         let author = authors[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: PodcastByAuthorCell.identifier) as! PodcastByAuthorCell
         
-        cell.configureCell(with: author, indexPath)
+        cell.configureCell(with: author)
         cell.addMyGestureRecognizer(self, type: .tap(), selector: #selector(handlerTapAuthorCell))
         
         return cell
@@ -300,6 +314,7 @@ extension SearchViewController: UIViewControllerTransitioningDelegate {
 
 //MARK: - URLSessionDownloadDelegate
 extension SearchViewController: URLSessionDownloadDelegate {
+    
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         
         guard let sourceURL = downloadTask.originalRequest?.url else { return }
@@ -347,5 +362,4 @@ extension SearchViewController: DetailViewControllerDelegate {
     func detailViewController(_ detailViewController: DetailViewController, playButtonDidTouchFor podcastIndex: Int) {
         delegate?.searchViewController(self, podcasts, didSelectIndex: podcastIndex)
     }
-
 }

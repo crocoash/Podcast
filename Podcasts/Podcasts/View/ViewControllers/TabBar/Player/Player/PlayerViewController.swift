@@ -102,8 +102,11 @@ extension PlayerViewController {
         
         workItem?.cancel()
         
+        print("print isDownLoad \(podcast.isDownLoad)")
+
+        
         let requestWorkItem = DispatchWorkItem {
-            let item = AVPlayerItem(url: url)
+            let item = AVPlayerItem(url: podcast.isDownLoad ? url.locaPath : url)
             self.player.replaceCurrentItem(with: item)
             self.player.play()
         }
@@ -113,7 +116,6 @@ extension PlayerViewController {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: requestWorkItem)
         
         self.playPauseButton.setImage(self.pauseImage, for: .normal)
-
     }
     
     private func addTimeObserve() {
@@ -212,5 +214,16 @@ extension PlayerViewController: BigPlayerViewControllerDelegate {
     func bigPlayerViewController (_ bigPlayerViewController: BigPlayerViewController, didAddCurrentTimeBy value: Double) {
         guard let currentItem = player.currentItem else { return }
             self.player.seek(to: currentItem.currentTime() + CMTime(seconds: value, preferredTimescale: 60))
+    }
+}
+
+
+
+
+extension URL {
+    
+    var locaPath: URL {
+        let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        return documentsPath.appendingPathComponent(self.lastPathComponent)
     }
 }

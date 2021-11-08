@@ -59,7 +59,6 @@ class BigPlayerViewController: UIViewController {
         configureUI(with: podcast)
     }
     
-    
     @IBAction func progressSliderValueChanged(_ sender: UISlider) {
         delegate?.bigPlayerViewController(self, didChangeCurrentTime:  Double(sender.value))
     }
@@ -70,10 +69,8 @@ class BigPlayerViewController: UIViewController {
     
     @IBAction func nextPodcastTouchUpInside(_ sender: UIButton) {
         activityIndicator.startAnimating()
-        print("print nextPodcastTouchUpInside")
         durationTrackLabel.text = "0:0"
         delegate?.bigPlayerViewControllerDidSelectNextTrackButton(self)
-        
     }
     
     @IBAction func previousPodcastTouchUpInside(_ sender: UIButton) {
@@ -101,7 +98,7 @@ extension BigPlayerViewController {
     
     private func configureUI(with podcast: Podcast) {
         
-        DataProvider().downloadImage(string: podcast.artworkUrl160) { [weak self] image in
+        DataProvider().downloadImage(string: podcast.artworkUrl600) { [weak self] image in
             self?.podcastImageView.image = image
         }
         
