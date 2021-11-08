@@ -92,6 +92,15 @@ extension TabBarViewController: SearchViewControllerDelegate {
     }
 }
 
+// MARK: - PlaylistTableViewControllerDelegate
+extension TabBarViewController: PlaylistTableViewControllerDelegate {
+    
+    func playlistTableViewController(_ playlistTableViewController: PlaylistTableViewController, _ podcasts: [Podcast], didSelectIndex: Int) {
+        playerVC.view.isHidden = false
+        playerVC.play(podcasts: podcasts, at: didSelectIndex)
+    }
+}
+
 // MARK: - SettingsTableViewControllerDelegate
 extension TabBarViewController: SettingsTableViewControllerDelegate {
     
@@ -103,14 +112,5 @@ extension TabBarViewController: SettingsTableViewControllerDelegate {
         if self.playerVC.currentPodcast != nil {
             self.playerVC.view.isHidden = false
         }
-    }
-}
-
-// MARK: - PlaylistTableViewControllerDelegate
-extension TabBarViewController: PlaylistTableViewControllerDelegate {
-    
-    func playlistTableViewController(_ playlistTableViewController: PlaylistTableViewController, _ podcasts: [Podcast], didSelectIndex: Int) {
-        playerVC.view.isHidden = false
-        playerVC.play(podcasts: podcasts, at: didSelectIndex)
     }
 }

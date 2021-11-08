@@ -86,7 +86,6 @@ extension PlaylistTableViewController {
 extension PlaylistTableViewController : DetailViewControllerDelegate {
     
     func detailViewController(_ detailViewController: DetailViewController, playButtonDidTouchFor didSelectIndex: Int) {
-        print("print count \(PlaylistDocument.shared.playList.count)")
         delegate?.playlistTableViewController(self, PlaylistDocument.shared.playList, didSelectIndex: didSelectIndex)
     }
 }

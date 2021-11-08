@@ -21,6 +21,7 @@
 		049D47F02726EAE600B6DA3C /* TabBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049D47EF2726EAE600B6DA3C /* TabBarViewController.swift */; };
 		049D480127286D3900B6DA3C /* PlaylistTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049D480027286D3900B6DA3C /* PlaylistTableViewController.swift */; };
 		049D480327286D5900B6DA3C /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049D480227286D5900B6DA3C /* DetailViewController.swift */; };
+		1828F9BB2738798F00761CD5 /* DataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1828F9BA2738798F00761CD5 /* DataProvider.swift */; };
 		1831DECC27304F5600EC09E2 /* PlayListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1831DECB27304F5600EC09E2 /* PlayListModel.swift */; };
 		1831DED12730560D00EC09E2 /* DownloadService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1831DED02730560D00EC09E2 /* DownloadService.swift */; };
 		1831DEDA2731944600EC09E2 /* PresentTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1831DED82731944600EC09E2 /* PresentTransition.swift */; };
@@ -62,7 +63,6 @@
 		3FBCF1C3272847F100B70522 /* PodcastCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3FBCF1C1272847F100B70522 /* PodcastCell.xib */; };
 		3FBCF1C72728482A00B70522 /* PodcastByAuthorCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FBCF1C52728482A00B70522 /* PodcastByAuthorCell.swift */; };
 		3FBCF1C82728482A00B70522 /* PodcastByAuthorCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3FBCF1C62728482A00B70522 /* PodcastByAuthorCell.xib */; };
-		3FDEE22F273153D300B245CE /* UIImageView + load.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FDEE22E273153D300B245CE /* UIImageView + load.swift */; };
 		40C7A47D0675B0F12895CF45 /* Pods_Podcasts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7228A46944BB64D3CDDE354E /* Pods_Podcasts.framework */; };
 /* End PBXBuildFile section */
 
@@ -84,6 +84,7 @@
 		049D47EF2726EAE600B6DA3C /* TabBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarViewController.swift; sourceTree = "<group>"; };
 		049D480027286D3900B6DA3C /* PlaylistTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistTableViewController.swift; sourceTree = "<group>"; };
 		049D480227286D5900B6DA3C /* DetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
+		1828F9BA2738798F00761CD5 /* DataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataProvider.swift; sourceTree = "<group>"; };
 		1831DECB27304F5600EC09E2 /* PlayListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayListModel.swift; sourceTree = "<group>"; };
 		1831DED02730560D00EC09E2 /* DownloadService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadService.swift; sourceTree = "<group>"; };
 		1831DED82731944600EC09E2 /* PresentTransition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PresentTransition.swift; sourceTree = "<group>"; };
@@ -124,7 +125,6 @@
 		3FBCF1C1272847F100B70522 /* PodcastCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PodcastCell.xib; sourceTree = "<group>"; };
 		3FBCF1C52728482A00B70522 /* PodcastByAuthorCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastByAuthorCell.swift; sourceTree = "<group>"; };
 		3FBCF1C62728482A00B70522 /* PodcastByAuthorCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PodcastByAuthorCell.xib; sourceTree = "<group>"; };
-		3FDEE22E273153D300B245CE /* UIImageView + load.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImageView + load.swift"; sourceTree = "<group>"; };
 		613855CB045635B5A47619F6 /* Pods-Podcasts.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Podcasts.debug.xcconfig"; path = "Target Support Files/Pods-Podcasts/Pods-Podcasts.debug.xcconfig"; sourceTree = "<group>"; };
 		7228A46944BB64D3CDDE354E /* Pods_Podcasts.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Podcasts.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -257,6 +257,7 @@
 				184CE18827270C8D0088044C /* ApiService.swift */,
 				187B2B4127345F6200C3EFFF /* Constant.swift */,
 				1831DED02730560D00EC09E2 /* DownloadService.swift */,
+				1828F9BA2738798F00761CD5 /* DataProvider.swift */,
 				1855934627380C270012BA91 /* AuthManger.swift */,
 			);
 			path = Helpers;
@@ -300,7 +301,6 @@
 				189C1FA9272D336500A8480E /* UITableView + register.swift */,
 				189C1FB1272D876B00A8480E /* Collection.swift */,
 				045628242732EA370044878C /* String + conform.swift */,
-				3FDEE22E273153D300B245CE /* UIImageView + load.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -526,7 +526,6 @@
 				1855933D27380AA10012BA91 /* BigPlayerViewControllerDelegate.swift in Sources */,
 				189C1FAF272D84AB00A8480E /* PlaylistDocument.swift in Sources */,
 				1855934327380BAF0012BA91 /* SettingsTableViewControllerDelegate.swift in Sources */,
-				189C1FAF272D84AB00A8480E /* PlaylistDocument.swift in Sources */,
 				3FBCF1C72728482A00B70522 /* PodcastByAuthorCell.swift in Sources */,
 				3FBCF1C2272847F100B70522 /* PodcastCell.swift in Sources */,
 				18557D662732BF0100CA08CA /* UserModel.swift in Sources */,
@@ -538,8 +537,8 @@
 				184CE18D272717B20088044C /* PodacstData.swift in Sources */,
 				189C1FA8272D333A00A8480E /* UITableViewCell + identifier.swift in Sources */,
 				184CE18927270C8D0088044C /* ApiService.swift in Sources */,
+				1828F9BB2738798F00761CD5 /* DataProvider.swift in Sources */,
 				049D47F02726EAE600B6DA3C /* TabBarViewController.swift in Sources */,
-				3FDEE22F273153D300B245CE /* UIImageView + load.swift in Sources */,
 				04425A8A273012DA00E897FA /* BigPlayerViewController.swift in Sources */,
 				1855933F27380B400012BA91 /* SearchViewControllerDelegate.swift in Sources */,
 				049D480127286D3900B6DA3C /* PlaylistTableViewController.swift in Sources */,

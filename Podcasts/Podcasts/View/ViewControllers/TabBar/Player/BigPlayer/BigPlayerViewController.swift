@@ -14,12 +14,13 @@ class BigPlayerViewController: UIViewController {
     @IBOutlet private weak var podcastImageView: UIImageView!
     @IBOutlet private weak var podcastNameLabel: UILabel!
     @IBOutlet private weak var currentTimeLabel: UILabel!
-    @IBOutlet private weak var durationOfTrackLabel: UILabel!
+    @IBOutlet private weak var durationTrackLabel: UILabel!
     
     @IBOutlet private weak var progressSlider: UISlider!
     
     @IBOutlet private weak var previousPodcastButton: UIButton!
     @IBOutlet private weak var nextPodcastButton: UIButton!
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
     weak var delegate: BigPlayerViewControllerDelegate?
     
@@ -36,6 +37,29 @@ class BigPlayerViewController: UIViewController {
         if let podcast = podcast { configureUI(with: podcast) }
     }
     
+    func setPlayStopButton(with image: UIImage) {
+        playStopButton.setImage(image, for: .normal)
+    }
+    
+    func upDateProgressSlider(currentTime: Float, currentItem: Float) {
+        currentTimeLabel.text = convertTimeToReadableFormat(currentTime)
+        
+        self.progressSlider.value = currentTime
+        progressSlider.maximumValue = currentItem
+        durationTrackLabel.text = convertTimeToReadableFormat(currentItem)
+
+        if !activityIndicator.isHidden { activityIndicator.stopAnimating() }
+    }
+    
+    func upDateUI(with podcast: Podcast, isFirst: Bool, isLast: Bool) {
+        isPresented = true
+        self.isLast = isLast
+        self.isFirst = isFirst
+        progressSlider.value = 0
+        configureUI(with: podcast)
+    }
+    
+    
     @IBAction func progressSliderValueChanged(_ sender: UISlider) {
         delegate?.bigPlayerViewController(self, didChangeCurrentTime:  Double(sender.value))
     }
@@ -45,10 +69,12 @@ class BigPlayerViewController: UIViewController {
     }
     
     @IBAction func nextPodcastTouchUpInside(_ sender: UIButton) {
+        activityIndicator.startAnimating()
         delegate?.bigPlayerViewControllerDidSelectNextTrackButton(self)
     }
     
     @IBAction func previousPodcastTouchUpInside(_ sender: UIButton) {
+        activityIndicator.startAnimating()
         delegate?.bigPlayerViewControllerDidSelectPreviewsTrackButton(self)
     }
     
@@ -69,30 +95,12 @@ class BigPlayerViewController: UIViewController {
 
 extension BigPlayerViewController {
     
-    func setPlayStopButton(with image: UIImage) {
-        playStopButton.setImage(image, for: .normal)
-    }
-    
-    func upDateProgressSlider(currentTime: Float) {
-        currentTimeLabel.text = convertTimeToReadableFormat(currentTime)
-        progressSlider.value = currentTime
-    }
-    
-    func upDateUI(currentItem: Float, with podcast: Podcast?, isFirst: Bool, isLast: Bool) {
-        isPresented = true
-        guard let podcast = podcast else { return }
-        self.isLast = isLast
-        self.isFirst = isFirst
-        
-        progressSlider.maximumValue = currentItem
-        durationOfTrackLabel.text = convertTimeToReadableFormat(currentItem)
-        progressSlider.value = 0
-        
-        configureUI(with: podcast)
-    }
-    
     private func configureUI(with podcast: Podcast) {
-        podcastImageView.load(string: podcast.artworkUrl600)
+        
+        DataProvider().downloadImage(string: podcast.artworkUrl600) { [weak self] image in
+            self?.podcastImageView.image = image
+        }
+        
         podcastNameLabel.text = podcast.trackName
         previousPodcastButton.isEnabled = !isFirst
         nextPodcastButton.isEnabled = !isLast

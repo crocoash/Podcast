@@ -25,10 +25,10 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WGq-qB-fKe">
-                    <rect key="frame" x="364" y="35" width="30" height="30"/>
+                    <rect key="frame" x="357" y="-0.5" width="57" height="101"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="30" id="GL8-Jj-Tdv"/>
-                        <constraint firstAttribute="width" constant="30" id="Lxl-hl-KTp"/>
+                        <constraint firstAttribute="height" constant="101" id="GL8-Jj-Tdv"/>
+                        <constraint firstAttribute="width" constant="57" id="Lxl-hl-KTp"/>
                     </constraints>
                     <state key="normal" image="pause.fill" catalog="system"/>
                     <connections>
@@ -45,26 +45,26 @@
                     <rect key="frame" x="101" y="98.5" width="313" height="2.5"/>
                     <color key="tintColor" red="0.99516242740000005" green="0.1948511004" blue="0.37298858169999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                 </progressView>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Podcast Name" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="A1c-4Y-GlG">
-                    <rect key="frame" x="109" y="63.5" width="240" height="17"/>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Podcast Name" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="A1c-4Y-GlG">
+                    <rect key="frame" x="109" y="63.5" width="226" height="17"/>
                     <fontDescription key="fontDescription" type="boldSystem" pointSize="14"/>
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" animating="YES" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="23u-4B-sHm">
-                    <rect key="frame" x="346" y="62" width="20" height="20"/>
+                    <rect key="frame" x="336" y="62" width="20" height="20"/>
                     <color key="tintColor" red="0.9992973208" green="0.13010036950000001" blue="0.29632696510000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                 </activityIndicatorView>
             </subviews>
             <viewLayoutGuide key="safeArea" id="fnl-2z-Ty3"/>
             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
             <constraints>
+                <constraint firstItem="23u-4B-sHm" firstAttribute="leading" secondItem="A1c-4Y-GlG" secondAttribute="trailing" constant="1" id="1ue-St-HQx"/>
                 <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="UkG-9Q-AK5" secondAttribute="trailing" constant="0.11478882384039935" id="3r8-g7-x0u"/>
                 <constraint firstItem="3vw-cZ-C9n" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" id="EyS-FX-sXt"/>
                 <constraint firstItem="fnl-2z-Ty3" firstAttribute="bottom" secondItem="UkG-9Q-AK5" secondAttribute="bottom" id="FHR-0o-8Ms"/>
-                <constraint firstItem="WGq-qB-fKe" firstAttribute="leading" secondItem="A1c-4Y-GlG" secondAttribute="trailing" constant="15" id="PMh-5c-1nP"/>
-                <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="WGq-qB-fKe" secondAttribute="trailing" constant="20" id="Q5A-lQ-UH1"/>
-                <constraint firstItem="WGq-qB-fKe" firstAttribute="leading" secondItem="23u-4B-sHm" secondAttribute="trailing" constant="-2" id="XBS-3Z-thG"/>
+                <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="WGq-qB-fKe" secondAttribute="trailing" id="Q5A-lQ-UH1"/>
+                <constraint firstItem="WGq-qB-fKe" firstAttribute="leading" secondItem="23u-4B-sHm" secondAttribute="trailing" constant="1" id="XBS-3Z-thG"/>
                 <constraint firstItem="3vw-cZ-C9n" firstAttribute="height" secondItem="i5M-Pr-FkT" secondAttribute="height" multiplier="0.8" constant="9" id="ZH6-1O-nb2"/>
                 <constraint firstItem="23u-4B-sHm" firstAttribute="centerY" secondItem="fnl-2z-Ty3" secondAttribute="centerY" id="an2-qC-9XY"/>
                 <constraint firstItem="WGq-qB-fKe" firstAttribute="centerY" secondItem="i5M-Pr-FkT" secondAttribute="centerY" id="imy-Tm-rUh"/>
