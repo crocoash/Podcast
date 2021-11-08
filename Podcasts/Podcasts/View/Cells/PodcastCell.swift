@@ -19,11 +19,15 @@ class PodcastCell: UITableViewCell, CustomTableViewCell {
 extension PodcastCell {
     
     func configureCell(with podcast: Podcast,_ indexPath: IndexPath) {
+        podcastImage.image = nil
         self.indexPath = indexPath
         
         backgroundColor = .white
         podcastName.text = podcast.trackName
-        podcastImage.load(string: podcast.artworkUrl160!)
+        
+        DataProvider().downloadImage(string: podcast.artworkUrl160) { [weak self] image in
+            self?.podcastImage.image = image
+        }
         
         playlistStarImageView.isHidden = !PlaylistDocument.shared.playList.contains(podcast)
     }

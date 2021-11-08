@@ -43,7 +43,10 @@ class DetailViewController: UIViewController {
 extension DetailViewController {
     
     private func setupView(){
-        episodeImage.load(string: podcast.artworkUrl600)
+        DataProvider().downloadImage(string: podcast.artworkUrl600) { [weak self] image in
+            self?.episodeImage.image = image
+        }
+        
         episodeName.text = podcast.trackName
         collectionName.text = podcast.trackName
         descriptionTextView.text = podcast.description

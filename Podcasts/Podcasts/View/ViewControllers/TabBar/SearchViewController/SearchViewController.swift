@@ -275,8 +275,10 @@ extension SearchViewController: UISearchBarDelegate {
 
 // MARK: - Alert Delegate
 extension SearchViewController: AlertDelegate {
+    
     func alertEndShow(_ alert: Alert) {
         dismiss(animated: true)
+        searchBar.becomeFirstResponder()
     }
     
     func alertShouldShow(_ alert: Alert, alertController: UIAlertController) {
