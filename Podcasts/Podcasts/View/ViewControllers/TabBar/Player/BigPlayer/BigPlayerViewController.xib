@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19455" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19454"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -128,6 +128,20 @@
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
                 </label>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9gG-hY-OqD">
+                    <rect key="frame" x="162.5" y="563.5" width="89" height="30"/>
+                    <state key="normal" title="Like Moment"/>
+                    <connections>
+                        <action selector="likeMomentTouchUpInside:" destination="-1" eventType="touchUpInside" id="AVv-rd-Ze2"/>
+                    </connections>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="taT-o3-ypF">
+                    <rect key="frame" x="184" y="673.5" width="46" height="30"/>
+                    <state key="normal" title="Button"/>
+                    <connections>
+                        <action selector="playLikedMoment:" destination="-1" eventType="touchUpInside" id="1kA-Kw-qCK"/>
+                    </connections>
+                </button>
             </subviews>
             <viewLayoutGuide key="safeArea" id="fnl-2z-Ty3"/>
             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -137,15 +151,19 @@
                 <constraint firstItem="cXA-Ai-yFn" firstAttribute="top" secondItem="oqM-Hi-VRJ" secondAttribute="bottom" constant="5" id="2L3-Ig-edm"/>
                 <constraint firstItem="S9q-Kg-Gm0" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" constant="20" id="40m-1f-6cq"/>
                 <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="YBf-Sa-DCQ" secondAttribute="trailing" constant="20" id="Eox-SO-0op"/>
+                <constraint firstItem="9gG-hY-OqD" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="LX0-5U-OJ4"/>
+                <constraint firstItem="9gG-hY-OqD" firstAttribute="top" secondItem="arR-z9-12W" secondAttribute="bottom" constant="40" id="Lrx-35-E9l"/>
                 <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="cXA-Ai-yFn" secondAttribute="trailing" constant="20" id="M6y-ND-Yr8"/>
                 <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="arR-z9-12W" secondAttribute="trailing" constant="20" id="T9p-ts-w93"/>
                 <constraint firstItem="cXA-Ai-yFn" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" constant="20" id="TaX-uu-tmD"/>
                 <constraint firstItem="4U4-Fn-z6L" firstAttribute="leading" secondItem="S9q-Kg-Gm0" secondAttribute="leading" id="XTT-er-kZM"/>
                 <constraint firstItem="4U4-Fn-z6L" firstAttribute="top" secondItem="S9q-Kg-Gm0" secondAttribute="bottom" constant="16.5" id="f0a-P2-bff"/>
+                <constraint firstItem="taT-o3-ypF" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="fyW-k5-DNh"/>
                 <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="S9q-Kg-Gm0" secondAttribute="trailing" constant="20" id="gtM-Mt-biR"/>
                 <constraint firstItem="oqM-Hi-VRJ" firstAttribute="top" secondItem="4U4-Fn-z6L" secondAttribute="bottom" constant="13.5" id="hg4-Fb-Mkw"/>
                 <constraint firstItem="arR-z9-12W" firstAttribute="top" secondItem="cXA-Ai-yFn" secondAttribute="bottom" constant="50" id="jAm-Sq-TTW"/>
                 <constraint firstItem="arR-z9-12W" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" constant="20" id="jB7-D9-F9s"/>
+                <constraint firstItem="taT-o3-ypF" firstAttribute="top" secondItem="9gG-hY-OqD" secondAttribute="bottom" constant="80" id="uO2-SA-Lka"/>
                 <constraint firstItem="oqM-Hi-VRJ" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" constant="20" id="uq2-ZD-KfI"/>
                 <constraint firstItem="S9q-Kg-Gm0" firstAttribute="top" secondItem="fnl-2z-Ty3" secondAttribute="top" constant="20" id="zht-tE-0Lw"/>
             </constraints>

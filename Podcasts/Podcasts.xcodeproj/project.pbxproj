@@ -12,6 +12,7 @@
 		045628252732EA370044878C /* String + conform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045628242732EA370044878C /* String + conform.swift */; };
 		0457FB1C272F1ECC00D57280 /* PlayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0457FB1A272F1ECA00D57280 /* PlayerViewController.swift */; };
 		0457FB1D272F1ECC00D57280 /* PlayerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0457FB1B272F1ECB00D57280 /* PlayerViewController.xib */; };
+		047B479827388439008E844F /* LikedMoment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047B479727388439008E844F /* LikedMoment.swift */; };
 		049D47DC2726E05B00B6DA3C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049D47DB2726E05B00B6DA3C /* AppDelegate.swift */; };
 		049D47DE2726E05B00B6DA3C /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049D47DD2726E05B00B6DA3C /* SceneDelegate.swift */; };
 		049D47E02726E05B00B6DA3C /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049D47DF2726E05B00B6DA3C /* SearchViewController.swift */; };
@@ -73,6 +74,7 @@
 		045628242732EA370044878C /* String + conform.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "String + conform.swift"; path = "../../View/ViewControllers/String + conform.swift"; sourceTree = "<group>"; };
 		0457FB1A272F1ECA00D57280 /* PlayerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerViewController.swift; sourceTree = "<group>"; };
 		0457FB1B272F1ECB00D57280 /* PlayerViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PlayerViewController.xib; sourceTree = "<group>"; };
+		047B479727388439008E844F /* LikedMoment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LikedMoment.swift; sourceTree = "<group>"; };
 		049D47D82726E05B00B6DA3C /* Podcasts.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Podcasts.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		049D47DB2726E05B00B6DA3C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		049D47DD2726E05B00B6DA3C /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -222,6 +224,7 @@
 				1831DECB27304F5600EC09E2 /* PlayListModel.swift */,
 				18557D632732B61D00CA08CA /* IpModel.swift */,
 				18557D652732BF0100CA08CA /* UserModel.swift */,
+				047B479727388439008E844F /* LikedMoment.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -541,6 +544,7 @@
 				049D47F02726EAE600B6DA3C /* TabBarViewController.swift in Sources */,
 				3FDEE22F273153D300B245CE /* UIImageView + load.swift in Sources */,
 				04425A8A273012DA00E897FA /* BigPlayerViewController.swift in Sources */,
+				047B479827388439008E844F /* LikedMoment.swift in Sources */,
 				1855933F27380B400012BA91 /* SearchViewControllerDelegate.swift in Sources */,
 				049D480127286D3900B6DA3C /* PlaylistTableViewController.swift in Sources */,
 				18CA6D8B2735902000F32CE5 /* MyToast.swift in Sources */,

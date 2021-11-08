@@ -19,6 +19,8 @@ class PlayerViewController: UIViewController {
     
     private var player: AVPlayer = AVPlayer()
     
+    private var likedMoments : [LikedMoment] = []
+    
     lazy private var bigPlayerVC = createBigPlayer()
     
     private var podcasts: [Podcast] = []
@@ -200,4 +202,18 @@ extension PlayerViewController: BigPlayerViewControllerDelegate {
     func bigPlayerViewController (_ bigPlayerViewController: BigPlayerViewController, didAddCurrentTimeBy value: Double) {
         player.seek(to: player.currentItem!.currentTime() + CMTime(seconds: value, preferredTimescale: 60))
     }
+    
+    func bigPlayerViewController(_ bigPlayerViewController: BigPlayerViewController, didLikeThisMoment value: Double) {
+        guard let podcast = currentPodcast else { return }
+        likedMoments.append(LikedMoment(podcast: podcast, moment: value))
+        do {
+            let encoder = JSONEncoder()
+            let data = try encoder.encode(likedMoments)
+            UserDefaults.standard.setValue(data, forKey: "LikedMoments")
+        } catch {
+            print("error of encoding")
+        }
+    }
+    
+
 }
