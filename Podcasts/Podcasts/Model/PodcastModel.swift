@@ -66,5 +66,5 @@ struct Podcast: Codable, Equatable, Identifiable {
         case wrapperType
     }
     
-    var date: Float { Float(trackTimeMillis ?? 0) / 60000 }
+    var isDownloaded = false
 }

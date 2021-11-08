@@ -7,20 +7,18 @@
 
 import UIKit
 
-class PodcastCell: UITableViewCell, CustomTableViewCell {
+class PodcastCell: UITableViewCell {
     
     @IBOutlet private weak var podcastImage: UIImageView!
     @IBOutlet private weak var podcastName: UILabel!
     @IBOutlet private weak var playlistStarImageView: UIImageView!
     
-    var indexPath: IndexPath!
 }
 
 extension PodcastCell {
     
-    func configureCell(with podcast: Podcast,_ indexPath: IndexPath) {
+    func configureCell(with podcast: Podcast) {
         podcastImage.image = nil
-        self.indexPath = indexPath
         
         backgroundColor = .white
         podcastName.text = podcast.trackName

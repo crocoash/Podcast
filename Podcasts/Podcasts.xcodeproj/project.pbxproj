@@ -44,8 +44,8 @@
 		1855934527380BDC0012BA91 /* DetailViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1855934427380BDC0012BA91 /* DetailViewControllerDelegate.swift */; };
 		1855934727380C270012BA91 /* AuthManger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1855934627380C270012BA91 /* AuthManger.swift */; };
 		187B2B3E2732C11000C3EFFF /* UserDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187B2B3D2732C11000C3EFFF /* UserDocument.swift */; };
-		187B2B4027345DCC00C3EFFF /* CustomTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187B2B3F27345DCC00C3EFFF /* CustomTableViewCell.swift */; };
 		187B2B4227345F6200C3EFFF /* Constant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187B2B4127345F6200C3EFFF /* Constant.swift */; };
+		1888C2AF2739A8D000395B5B /* URL + localPath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1888C2AE2739A8CF00395B5B /* URL + localPath.swift */; };
 		189C1FA8272D333A00A8480E /* UITableViewCell + identifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189C1FA7272D333A00A8480E /* UITableViewCell + identifier.swift */; };
 		189C1FAA272D336500A8480E /* UITableView + register.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189C1FA9272D336500A8480E /* UITableView + register.swift */; };
 		189C1FAD272D496F00A8480E /* UIViewController + identifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189C1FAC272D496F00A8480E /* UIViewController + identifier.swift */; };
@@ -107,8 +107,8 @@
 		1855934427380BDC0012BA91 /* DetailViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewControllerDelegate.swift; sourceTree = "<group>"; };
 		1855934627380C270012BA91 /* AuthManger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManger.swift; sourceTree = "<group>"; };
 		187B2B3D2732C11000C3EFFF /* UserDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDocument.swift; sourceTree = "<group>"; };
-		187B2B3F27345DCC00C3EFFF /* CustomTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTableViewCell.swift; sourceTree = "<group>"; };
 		187B2B4127345F6200C3EFFF /* Constant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constant.swift; sourceTree = "<group>"; };
+		1888C2AE2739A8CF00395B5B /* URL + localPath.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "URL + localPath.swift"; sourceTree = "<group>"; };
 		189C1FA7272D333A00A8480E /* UITableViewCell + identifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITableViewCell + identifier.swift"; sourceTree = "<group>"; };
 		189C1FA9272D336500A8480E /* UITableView + register.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITableView + register.swift"; sourceTree = "<group>"; };
 		189C1FAC272D496F00A8480E /* UIViewController + identifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController + identifier.swift"; sourceTree = "<group>"; };
@@ -300,6 +300,7 @@
 				189C1FBB272EE6F100A8480E /* UIView + loadFromNib.swift */,
 				189C1FA9272D336500A8480E /* UITableView + register.swift */,
 				189C1FB1272D876B00A8480E /* Collection.swift */,
+				1888C2AE2739A8CF00395B5B /* URL + localPath.swift */,
 				045628242732EA370044878C /* String + conform.swift */,
 			);
 			path = Extensions;
@@ -382,7 +383,6 @@
 		3FBCF1BF272847E400B70522 /* Cells */ = {
 			isa = PBXGroup;
 			children = (
-				187B2B3F27345DCC00C3EFFF /* CustomTableViewCell.swift */,
 				3FBCF1C0272847F100B70522 /* PodcastCell.swift */,
 				3FBCF1C1272847F100B70522 /* PodcastCell.xib */,
 				3FBCF1C52728482A00B70522 /* PodcastByAuthorCell.swift */,
@@ -546,6 +546,7 @@
 				1831DEDA2731944600EC09E2 /* PresentTransition.swift in Sources */,
 				049D47DC2726E05B00B6DA3C /* AppDelegate.swift in Sources */,
 				184CE18B272717680088044C /* PodcastModel.swift in Sources */,
+				1888C2AF2739A8D000395B5B /* URL + localPath.swift in Sources */,
 				18557D642732B61D00CA08CA /* IpModel.swift in Sources */,
 				18CA6D8927352AF800F32CE5 /* UIViewController + loadFromXib.swift in Sources */,
 				0457FB1C272F1ECC00D57280 /* PlayerViewController.swift in Sources */,
@@ -561,7 +562,6 @@
 				1855934527380BDC0012BA91 /* DetailViewControllerDelegate.swift in Sources */,
 				189C1FB2272D876B00A8480E /* Collection.swift in Sources */,
 				049D47DE2726E05B00B6DA3C /* SceneDelegate.swift in Sources */,
-				187B2B4027345DCC00C3EFFF /* CustomTableViewCell.swift in Sources */,
 				187B2B4227345F6200C3EFFF /* Constant.swift in Sources */,
 				045628252732EA370044878C /* String + conform.swift in Sources */,
 				18478129272C8B460036B89E /* MyActionSheet.swift in Sources */,

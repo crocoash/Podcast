@@ -103,7 +103,7 @@ extension PlayerViewController {
         workItem?.cancel()
         
         let requestWorkItem = DispatchWorkItem {
-            let item = AVPlayerItem(url: url)
+            let item = AVPlayerItem(url: podcast.isDownloaded ? url.locaPath : url)
             self.player.replaceCurrentItem(with: item)
             self.player.play()
         }

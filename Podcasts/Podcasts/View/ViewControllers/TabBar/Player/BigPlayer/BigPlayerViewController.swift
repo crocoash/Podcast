@@ -127,6 +127,3 @@ extension BigPlayerViewController {
     }
     
 }
-
-
-

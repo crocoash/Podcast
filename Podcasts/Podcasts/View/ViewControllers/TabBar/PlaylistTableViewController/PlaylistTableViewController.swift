@@ -54,7 +54,7 @@ extension PlaylistTableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let podcast = PlaylistDocument.shared.playList[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: PodcastCell.identifier, for: indexPath) as! PodcastCell
-        cell.configureCell(with: podcast, indexPath)
+        cell.configureCell(with: podcast)
         return cell
     }
     

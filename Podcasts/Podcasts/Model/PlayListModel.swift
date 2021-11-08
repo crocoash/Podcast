@@ -32,7 +32,6 @@ struct PlaylistModel: Codable {
     
     mutating func addToPlayList(_ podcast: Podcast) {
         playList.append(podcast)
-        
     }
     
     mutating func removeAllFromPlaylist() {

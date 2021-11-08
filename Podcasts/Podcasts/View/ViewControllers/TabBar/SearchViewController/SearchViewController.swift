@@ -74,16 +74,20 @@ class SearchViewController : UIViewController {
     }
     
     @objc func handlerTapAuthorCell(sender: UITapGestureRecognizer) {
-        guard let view = sender.view as? CustomTableViewCell, let request = authors[view.indexPath.row].artistName else { return }
+        guard let view = sender.view as? UITableViewCell,
+              let indexPath = podcastTableView.indexPath(for: view),
+              let request = authors[indexPath.row].artistName else { return }
         
         searchSegmentalControl.selectedSegmentIndex = 0
         searchText = request
-        podcastTableView.deselectRow(at: view.indexPath, animated: true)
+        podcastTableView.deselectRow(at: indexPath, animated: true)
     }
     
     @objc func handlerTapPodcastCell(sender : UITapGestureRecognizer) {
-        guard let view = sender.view as? CustomTableViewCell else { return }
-        let index = view.indexPath.row
+        guard let view = sender.view as? UITableViewCell,
+        let indexPath = podcastTableView.indexPath(for: view) else { return }
+        
+        let index = indexPath.row
         let podcast = podcasts[index]
         
         let detailViewController = storyboard?.instantiateViewController(identifier: DetailViewController.identifier) as! DetailViewController
@@ -159,19 +163,22 @@ extension SearchViewController {
     
     private func longPressGesture(_ sender: UILongPressGestureRecognizer) {
         MyLongPressGestureRecognizer.createSelector(for: sender) { (cell: PodcastCell) in
-            guard let view = sender.view as? PodcastCell else { return }
-            let podcast = podcasts[view.indexPath.row]
+            guard let view = sender.view as? PodcastCell,
+                  let indexPath = podcastTableView.indexPath(for: view) else { return }
+            
+            var podcast = podcasts[indexPath.row]
             
             if PlaylistDocument.shared.playList.contains(podcast) {
                 PlaylistDocument.shared.removeFromPlayList(podcast)
+                MyToast.create(title: (podcast.trackName ?? "podcast") + "is removed to playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
             } else {
+                podcast.isDownloaded = true
                 PlaylistDocument.shared.addToPlayList(podcast)
+                MyToast.create(title: (podcast.trackName ?? "podcast") + "is added to playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
                 downloadService.startDownload(podcast)
             }
-            podcastTableView.reloadRows(at: [cell.indexPath], with: .none)
+            podcastTableView.reloadRows(at: [indexPath], with: .none)            
             
-            MyToast.create(title: (podcast.trackName ?? "podcast") + "is added to playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
-
             feedbackGenerator()
         }
     }
@@ -241,7 +248,7 @@ extension SearchViewController: UITableViewDataSource {
         let podcast = podcasts[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: PodcastCell.identifier) as! PodcastCell
         
-        cell.configureCell(with: podcast, indexPath)
+        cell.configureCell(with: podcast)
         cell.addMyGestureRecognizer(self, type: .longPressGesture(minimumPressDuration: 0.3), selector: #selector(handlerLongPs))
         cell.addMyGestureRecognizer(self, type: .tap(), selector: #selector(handlerTapPodcastCell))
         

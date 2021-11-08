@@ -7,17 +7,15 @@
 
 import UIKit
 
-class PodcastByAuthorCell: UITableViewCell, CustomTableViewCell {
+class PodcastByAuthorCell: UITableViewCell {
     
     @IBOutlet private weak var label: UILabel!
     
-     var indexPath: IndexPath!
 }
 
 extension PodcastByAuthorCell {
     
     func configureCell(with author: Author,_ indexPath: IndexPath) {
-        self.indexPath = indexPath
         
         label.text = author.artistName ?? "no name"
     }
