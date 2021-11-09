@@ -94,6 +94,7 @@ class SearchViewController : UIViewController {
         
         detailViewController.delegate = self
         detailViewController.setUp(index: index, podcast: podcast)
+        detailViewController.title = "Additional info"
         
         self.navigationController?.pushViewController(detailViewController, animated: true)
     }
@@ -352,4 +353,11 @@ extension SearchViewController: DetailViewControllerDelegate {
         delegate?.searchViewController(self, podcasts, didSelectIndex: podcastIndex)
     }
 
+    func detailViewController(_ detailViewController: DetailViewController, addButtonDidTouchFor selectedPodcast: Podcast) {
+        PlaylistDocument.shared.addToPlayList(selectedPodcast)
+    }
+    
+    func detailViewController(_ detailViewController: DetailViewController, removeButtonDidTouchFor selectedPodcast: Podcast) {
+        PlaylistDocument.shared.removeFromPlayList(selectedPodcast)
+    }
 }

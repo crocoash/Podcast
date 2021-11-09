@@ -74,6 +74,7 @@ extension PlaylistTableViewController {
         
         detailViewController.delegate = self
         detailViewController.setUp(index: indexPath.row, podcast: podcast)
+        detailViewController.title = "Additional info"
         
         self.navigationController?.pushViewController(detailViewController, animated: true)
         
@@ -85,6 +86,14 @@ extension PlaylistTableViewController : DetailViewControllerDelegate {
     
     func detailViewController(_ detailViewController: DetailViewController, playButtonDidTouchFor didSelectIndex: Int) {
         delegate?.playlistTableViewController(self, PlaylistDocument.shared.playList, didSelectIndex: didSelectIndex)
+    }
+    
+    func detailViewController(_ detailViewController: DetailViewController, addButtonDidTouchFor selectedPodcast: Podcast) {
+        PlaylistDocument.shared.addToPlayList(selectedPodcast)
+    }
+    
+    func detailViewController(_ detailViewController: DetailViewController, removeButtonDidTouchFor selectedPodcast: Podcast) {
+        PlaylistDocument.shared.removeFromPlayList(selectedPodcast)
     }
 }
 

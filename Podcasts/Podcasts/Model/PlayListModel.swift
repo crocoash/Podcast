@@ -37,5 +37,9 @@ struct PlaylistModel: Codable {
     mutating func removeAllFromPlaylist() {
         playList.removeAll()
     }
+    
+    func isPodcastInPlaylist(_ podcast: Podcast) -> Bool {
+        return playList.contains(podcast)
+    }
 
 }
