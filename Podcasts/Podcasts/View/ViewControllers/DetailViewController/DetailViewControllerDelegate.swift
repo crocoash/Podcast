@@ -8,5 +8,5 @@
 import Foundation
 
 protocol DetailViewControllerDelegate: AnyObject {
-    func detailViewController(_ detailViewController: DetailViewController, playButtonDidTouchFor didSelectIndex: Int)
+    func detailViewController(_ detailViewController: DetailViewController, playButtonDidTouchFor selectedPodcastAtIndex: Int)
 }

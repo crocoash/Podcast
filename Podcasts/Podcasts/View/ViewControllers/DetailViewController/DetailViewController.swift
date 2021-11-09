@@ -30,12 +30,8 @@ class DetailViewController: UIViewController {
     }
     
     @IBAction private func listenButtonOnTouchUpInside(_ sender: UIButton) {
-        dismiss(animated: true, completion: nil)
+        self.navigationController?.popViewController(animated: true)
         delegate?.detailViewController(self, playButtonDidTouchFor: index)
-    }
-    
-    @objc private func dismissOnScreenTap(_ sender: UIGestureRecognizer) {
-        dismiss(animated: true)
     }
 }
 
