@@ -43,7 +43,7 @@ extension TabBarViewController {
             $0.delegate = self
         }
         
-        let likedMoments = createTabBar(LikedMomentsViewController.self , title: "Liked", imageName: "love.fill") {
+        let likedMoments = createTabBar(LikedMomentsViewController.self , title: "Liked", imageName: "heart.fill") {
             $0.delegate = self
         }
         
