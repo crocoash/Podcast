@@ -38,7 +38,7 @@ class RegistrationViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         if userViewModel.userDocument.user.isAuthorization {
-            present(tabBarVC, animated: false)
+            present(tabBarVC, animated: true)
         }
     }
     
@@ -231,7 +231,7 @@ extension RegistrationViewController {
                                 self.alert.create(title: error.localizedDescription, withTimeIntervalToDismiss: 2)
                             } else {
                                 self.alert.create(title: "email will be send to \(self.email)", withTimeIntervalToDismiss: 2)
-                                self.email = self.email
+                                self.email = self.emailTextField.text!
                                 self.forgotPasswordAlert(with: self.email)
                             }
                         }

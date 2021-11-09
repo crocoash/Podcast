@@ -10,17 +10,31 @@ import Foundation
 class DownloadService {
     var downloadsSession: URLSession!
     
-    var activeDownloads: [URL: Podcast] = [:]
+    var activeDownloads: [URL: Download] = [:]
     
-    func startDownload(_ podcast: Podcast, index: Int) {
+    func startDownload(_ podcast: Podcast) {
+        let download = Download(podcast: podcast)
         
-        guard let stringUrl = podcast.previewUrl,
-              let url = URL(string: stringUrl) else { return }
+        guard let stringUrl = podcast.previewUrl, let url = URL(string: stringUrl) else { return }
         
-        var podcast = podcast
-        podcast.index = index 
-        podcast.task = downloadsSession.downloadTask(with: url)
-        podcast.task?.resume()
-        activeDownloads[url] = podcast
+        download.task = downloadsSession.downloadTask(with: url)
+        download.task?.resume()
+        download.isDownloading = true
+        activeDownloads[url] = download
+    }
+}
+
+class Download {
+    
+    // MARK: - Variables And Properties
+    var isDownloading = false
+    var progress: Float = 0
+    var resumeData: Data?
+    var task: URLSessionDownloadTask?
+    var podcast: Podcast
+    
+    // MARK: - Initialization
+    init(podcast: Podcast) {
+        self.podcast = podcast
     }
 }

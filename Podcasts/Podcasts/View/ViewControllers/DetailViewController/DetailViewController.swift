@@ -23,6 +23,7 @@ class DetailViewController: UIViewController {
         super.viewDidLoad()
         configureGestures()
         setupView()
+        self.view.addMyGestureRecognizer(self, type: .tap(), selector: #selector(dismissOnScreenTap))
     }
     
     func setUp(index: Int, podcast: Podcast) {

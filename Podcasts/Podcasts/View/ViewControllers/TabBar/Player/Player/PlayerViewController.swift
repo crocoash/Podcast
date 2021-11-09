@@ -102,9 +102,6 @@ extension PlayerViewController {
         
         workItem?.cancel()
         
-        print("print isDownLoad \(podcast.isDownLoad)")
-
-        
         let requestWorkItem = DispatchWorkItem {
             let item = AVPlayerItem(url: podcast.isDownloaded ? url.locaPath : url)
             self.player.replaceCurrentItem(with: item)
@@ -116,6 +113,7 @@ extension PlayerViewController {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: requestWorkItem)
         
         self.playPauseButton.setImage(self.pauseImage, for: .normal)
+
     }
     
     private func addTimeObserve() {

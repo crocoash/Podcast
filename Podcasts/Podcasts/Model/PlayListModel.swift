@@ -34,22 +34,8 @@ struct PlaylistModel: Codable {
         playList.append(podcast)
     }
     
-    mutating func trackIsDownloaded(index: Int) {
-        if let index = playList.firstIndex(matching: index) {
-            playList[index].isDownLoad = true
-        }
-    }
-    
     mutating func removeAllFromPlaylist() {
         playList.removeAll()
-    }
-    
-    mutating func podcastIsDownloaded(podcast: Podcast) -> Bool {
-        if let index = playList.firstIndex(matching: podcast.id) {
-            return playList[index].isDownLoad
-        } else {
-            return true
-        }
     }
 
 }
