@@ -19,6 +19,8 @@ class PlayerViewController: UIViewController {
     
     private var player: AVPlayer = AVPlayer()
     
+    private var playingFromLikedMoments: Bool?
+    
     lazy private var bigPlayerVC = createBigPlayer()
     
     private var podcasts: [Podcast] = []
@@ -60,6 +62,7 @@ class PlayerViewController: UIViewController {
     }
     
     func play(moment: LikedMoment) {
+        playingFromLikedMoments = true
         startPlay(moment: moment)
     }
     
@@ -137,7 +140,7 @@ extension PlayerViewController {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: requestWorkItem)
         
         self.playPauseButton.setImage(self.pauseImage, for: .normal)
-        updateUI(with: moment)
+        
     }
     
     private func addTimeObserve() {

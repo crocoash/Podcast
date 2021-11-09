@@ -59,6 +59,13 @@ class BigPlayerViewController: UIViewController {
         configureUI(with: podcast)
     }
     
+//    func updateUI(with moment: LikedMoment) {
+//        isPresented = true
+//        self.isLast = false
+//        self.isFirst = false
+//        progressSlider.value = 0
+//    }
+    
     
     @IBAction func progressSliderValueChanged(_ sender: UISlider) {
         delegate?.bigPlayerViewController(self, didChangeCurrentTime:  Double(sender.value))
@@ -101,7 +108,6 @@ class BigPlayerViewController: UIViewController {
     
 }
 
-
 extension BigPlayerViewController {
     
     private func configureUI(with podcast: Podcast) {
@@ -114,6 +120,7 @@ extension BigPlayerViewController {
         previousPodcastButton.isEnabled = !isFirst
         nextPodcastButton.isEnabled = !isLast
     }
+    
     
     private func addSwipeGesture() {
         view.addMyGestureRecognizer(self, type: .swipe(directions: [.down]), selector: #selector(respondToSwipe))
