@@ -216,14 +216,3 @@ extension PlayerViewController: BigPlayerViewControllerDelegate {
             self.player.seek(to: currentItem.currentTime() + CMTime(seconds: value, preferredTimescale: 60))
     }
 }
-
-
-
-
-extension URL {
-    
-    var locaPath: URL {
-        let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        return documentsPath.appendingPathComponent(self.lastPathComponent)
-    }
-}
