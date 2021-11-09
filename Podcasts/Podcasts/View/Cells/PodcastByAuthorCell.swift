@@ -10,12 +10,12 @@ import UIKit
 class PodcastByAuthorCell: UITableViewCell {
     
     @IBOutlet private weak var label: UILabel!
-    
+
 }
 
 extension PodcastByAuthorCell {
     
-    func configureCell(with author: Author,_ indexPath: IndexPath) {
+    func configureCell(with author: Author) {
         
         label.text = author.artistName ?? "no name"
     }

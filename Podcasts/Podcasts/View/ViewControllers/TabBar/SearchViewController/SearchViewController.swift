@@ -13,17 +13,14 @@ class SearchViewController : UIViewController {
     @IBOutlet private weak var podcastTableView: UITableView!
     @IBOutlet private weak var cancelLabel: UILabel!
     @IBOutlet private weak var searchSegmentalControl: UISegmentedControl!
+    @IBOutlet private weak var playerOffSetConstraint: NSLayoutConstraint!
     
     private let activityIndicator = UIActivityIndicatorView()
     private var alert = Alert()
     
     weak var delegate: SearchViewControllerDelegate?
     
-    private var podcasts: [Podcast] = [] {
-        didSet {
-            podcastTableView.reloadData()
-        }
-    }
+    private var podcasts: [Podcast] = []
     
     private var authors: [Author] = [] {
         didSet {
@@ -45,6 +42,12 @@ class SearchViewController : UIViewController {
         let configuration = URLSessionConfiguration.background(withIdentifier: "BackGroundSession")
         return URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
     }()
+    
+    func playerIsHidden(hidden: Bool) {
+        playerOffSetConstraint.constant = hidden ?  0 : 50
+        view.layoutIfNeeded()
+        
+    }
     
     // MARK: - View Methods
     override func viewDidLoad() {
@@ -74,26 +77,24 @@ class SearchViewController : UIViewController {
     }
     
     @objc func handlerTapAuthorCell(sender: UITapGestureRecognizer) {
+        
         guard let view = sender.view as? UITableViewCell,
               let indexPath = podcastTableView.indexPath(for: view),
               let request = authors[indexPath.row].artistName else { return }
         
         searchSegmentalControl.selectedSegmentIndex = 0
         searchText = request
-        podcastTableView.deselectRow(at: indexPath, animated: true)
     }
     
     @objc func handlerTapPodcastCell(sender : UITapGestureRecognizer) {
         guard let view = sender.view as? UITableViewCell,
-        let indexPath = podcastTableView.indexPath(for: view) else { return }
-        
-        let index = indexPath.row
-        let podcast = podcasts[index]
+              let indexPath = podcastTableView.indexPath(for: view) else { return }
+        let podcast = podcasts[indexPath.row]
         
         let detailViewController = storyboard?.instantiateViewController(identifier: DetailViewController.identifier) as! DetailViewController
         
         detailViewController.delegate = self
-        detailViewController.setUp(index: index, podcast: podcast)
+        detailViewController.setUp(index: indexPath.row, podcast: podcast)
         
         detailViewController.modalPresentationStyle = .custom
         detailViewController.transitioningDelegate = self
@@ -114,8 +115,6 @@ class SearchViewController : UIViewController {
 
 //MARK: - Private configure UI Methods
 extension SearchViewController {
-    
-    
     
     private func configureUI() {
         configureTableView()
@@ -163,21 +162,26 @@ extension SearchViewController {
     
     private func longPressGesture(_ sender: UILongPressGestureRecognizer) {
         MyLongPressGestureRecognizer.createSelector(for: sender) { (cell: PodcastCell) in
-            guard let view = sender.view as? PodcastCell,
-                  let indexPath = podcastTableView.indexPath(for: view) else { return }
+
+            guard
+                let view = sender.view as? PodcastCell,
+                let indexPath = podcastTableView.indexPath(for: view) else { return }
             
-            var podcast = podcasts[indexPath.row]
-            
-            if PlaylistDocument.shared.playList.contains(podcast) {
-                PlaylistDocument.shared.removeFromPlayList(podcast)
-                MyToast.create(title: (podcast.trackName ?? "podcast") + "is removed to playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
+
+            if PlaylistDocument.shared.playList.contains(podcasts[indexPath.row]) {
+                podcasts[indexPath.row].isDownLoad = false
+
+                PlaylistDocument.shared.removeFromPlayList(podcasts[indexPath.row])
+                MyToast.create(title: (podcasts[indexPath.row].trackName ?? "podcast") + "is removed to playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
             } else {
-                podcast.isDownloaded = true
-                PlaylistDocument.shared.addToPlayList(podcast)
-                MyToast.create(title: (podcast.trackName ?? "podcast") + "is added to playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
-                downloadService.startDownload(podcast)
+                podcasts[indexPath.row].isDownLoad = true
+                
+                PlaylistDocument.shared.addToPlayList(podcasts[indexPath.row])
+                MyToast.create(title: (podcasts[indexPath.row].trackName ?? "podcast") + "is added to playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
+                downloadService.startDownload(podcasts[indexPath.row], index: indexPath.row)
             }
-            podcastTableView.reloadRows(at: [indexPath], with: .none)            
+            
+            podcastTableView.reloadRows(at: [indexPath], with: .none)
             
             feedbackGenerator()
         }
@@ -215,6 +219,7 @@ extension SearchViewController {
                 DispatchQueue.main.async {
                     self.processResults(data: info?.results, completion: { podcasts in
                         self.podcasts = podcasts
+                        self.podcastTableView.reloadData()
                     })
                 }
             }
@@ -223,6 +228,7 @@ extension SearchViewController {
                 guard let self = self else { return }
                 self.processResults(data: info?.results, completion: { authors in
                     self.authors = authors
+                    self.podcastTableView.reloadData()
                 })
             }
         }
@@ -259,7 +265,7 @@ extension SearchViewController: UITableViewDataSource {
         let author = authors[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: PodcastByAuthorCell.identifier) as! PodcastByAuthorCell
         
-        cell.configureCell(with: author, indexPath)
+        cell.configureCell(with: author)
         cell.addMyGestureRecognizer(self, type: .tap(), selector: #selector(handlerTapAuthorCell))
         
         return cell
@@ -307,6 +313,7 @@ extension SearchViewController: UIViewControllerTransitioningDelegate {
 
 //MARK: - URLSessionDownloadDelegate
 extension SearchViewController: URLSessionDownloadDelegate {
+    
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         
         guard let sourceURL = downloadTask.originalRequest?.url else { return }
@@ -315,7 +322,6 @@ extension SearchViewController: URLSessionDownloadDelegate {
             return documentsPath.appendingPathComponent(url.lastPathComponent)
         }
         
-        downloadService.activeDownloads[sourceURL] = nil
         
         let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         
@@ -331,11 +337,43 @@ extension SearchViewController: URLSessionDownloadDelegate {
             print("Could not copy file to disk: \(error.localizedDescription)")
         }
         
-        //TODO: !!!!!!!!!!
         DispatchQueue.main.async {
-            print("podcast download sucsellsfull")
+            print("print sourceURL \(sourceURL)")
+            
+            guard let podcast = self.downloadService.activeDownloads[sourceURL],
+                    let index = PlaylistDocument.shared.playList.firstIndex(matching: podcast) else { return }
+            
+            if let podcastCell = self.podcastTableView.cellForRow(at: IndexPath(row: podcast.index,
+                                                                     section: 0)) as? PodcastCell {
+                podcastCell.podcastFinishDownload()
+          }
+//            self.downloadService.activeDownloads[sourceURL] = nil
+
         }
     }
+    
+    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask,
+                    didWriteData bytesWritten: Int64, totalBytesWritten: Int64,
+                    totalBytesExpectedToWrite: Int64) {
+        
+        guard
+          let url = downloadTask.originalRequest?.url,
+          var podcast = downloadService.activeDownloads[url] else {
+            return
+        }
+        
+        podcast.progress = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite)
+        
+        let totalSize = ByteCountFormatter.string(fromByteCount: totalBytesExpectedToWrite, countStyle: .file)
+                
+        DispatchQueue.main.async {
+            if let podcastCell = self.podcastTableView.cellForRow(at: IndexPath(row: podcast.index,
+                                                                     section: 0)) as? PodcastCell {
+              podcastCell.updateDisplay(progress: podcast.progress, totalSize: totalSize)
+          }
+        }
+    }
+   
 }
 
 extension SearchViewController: URLSessionDelegate {
@@ -354,5 +392,4 @@ extension SearchViewController: DetailViewControllerDelegate {
     func detailViewController(_ detailViewController: DetailViewController, playButtonDidTouchFor podcastIndex: Int) {
         delegate?.searchViewController(self, podcasts, didSelectIndex: podcastIndex)
     }
-
 }

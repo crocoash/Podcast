@@ -13,6 +13,7 @@ class TabBarViewController: UITabBarController {
     ]
 
     private var playerVC = PlayerViewController()
+    
     private var userViewModel: UserViewModel!
     
     func setUserViewModel(_ userViewModel: UserViewModel) {
@@ -21,6 +22,20 @@ class TabBarViewController: UITabBarController {
     
     private var trailConstraint: NSLayoutConstraint?
     private var leadConstraint: NSLayoutConstraint?
+    
+    lazy private var searchVC = createTabBar(SearchViewController.self, title: "Search", imageName: "magnifyingglass") {
+        $0.delegate = self
+    }
+
+    lazy private var playListVc = createTabBar(PlaylistViewController.self , title: "Playlist", imageName: "magnifyingglass") {
+        $0.delegate = self
+    }
+    
+    lazy private var settingsVC = createTabBar(SettingsTableViewController.self, title: "Settings", imageName: "gear") { [weak self] vc in
+        guard let self = self else { return }
+        vc.setUser((self.userViewModel) )
+        vc.delegate = self
+    }
     
     // MARK: - View Methods
     override func viewDidLoad() {
@@ -34,21 +49,7 @@ class TabBarViewController: UITabBarController {
 extension TabBarViewController {
     
     private func configureTabBar() {
-        tabBar.backgroundColor = .gray
-        let searchVC = createTabBar(SearchViewController.self, title: "Search", imageName: "magnifyingglass") {
-            $0.delegate = self
-        }
 
-        let playListVc = createTabBar(PlaylistTableViewController.self , title: "Playlist", imageName: "magnifyingglass") {
-            $0.delegate = self
-        }
-        
-        let settingsVC = createTabBar(SettingsTableViewController.self, title: "Settings", imageName: "gear") { [weak self] vc in
-            guard let self = self else { return }
-            vc.setUser((self.userViewModel) )
-            vc.delegate = self
-        }
-        
         let navigationPlaylistVc = UINavigationController(rootViewController: playListVc)
         navigationPlaylistVc.tabBarItem.title = "Playlist"
         navigationPlaylistVc.tabBarItem.image = UIImage(systemName: "book")
@@ -89,13 +90,14 @@ extension TabBarViewController: SearchViewControllerDelegate {
     func searchViewController(_ searchViewController: SearchViewController, _ podcasts: [Podcast], didSelectIndex: Int) {
         playerVC.view.isHidden = false
         playerVC.play(podcasts: podcasts, at: didSelectIndex)
+        searchVC.playerIsHidden(hidden: playerVC.view.isHidden)
     }
 }
 
 // MARK: - PlaylistTableViewControllerDelegate
 extension TabBarViewController: PlaylistTableViewControllerDelegate {
     
-    func playlistTableViewController(_ playlistTableViewController: PlaylistTableViewController, _ podcasts: [Podcast], didSelectIndex: Int) {
+    func playlistTableViewController(_ playlistTableViewController: PlaylistViewController, _ podcasts: [Podcast], didSelectIndex: Int) {
         playerVC.view.isHidden = false
         playerVC.play(podcasts: podcasts, at: didSelectIndex)
     }

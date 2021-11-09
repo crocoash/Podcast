@@ -8,5 +8,5 @@
 import Foundation
 
 protocol PlaylistTableViewControllerDelegate : AnyObject {
-    func playlistTableViewController(_ playlistTableViewController: PlaylistTableViewController, _ podcasts: [Podcast], didSelectIndex: Int)
+    func playlistTableViewController(_ playlistTableViewController: PlaylistViewController, _ podcasts: [Podcast], didSelectIndex: Int)
 }
