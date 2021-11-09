@@ -94,6 +94,11 @@ class BigPlayerViewController: UIViewController {
         isPresented = false
         dismiss(animated: true)
     }
+    
+    @IBAction func likedButton(_ sender: UIButton) {
+        delegate?.bigPlayerViewController(self, didLikeThis: Double(progressSlider.value))
+    }
+    
 }
 
 

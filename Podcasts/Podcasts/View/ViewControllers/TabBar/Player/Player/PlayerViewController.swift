@@ -59,6 +59,10 @@ class PlayerViewController: UIViewController {
         self.index = index
     }
     
+    func play(moment: LikedMoment) {
+        startPlay(moment: moment)
+    }
+    
     // MARK: - Actions
     @objc func endTrack() {
         if !isLastPodcast { index += 1 }
@@ -114,6 +118,25 @@ extension PlayerViewController {
         
         self.playPauseButton.setImage(self.pauseImage, for: .normal)
 
+    }
+    
+    private func startPlay(moment: LikedMoment) {
+              let podcast = moment.podcast
+        guard let string = moment.podcast.episodeUrl,
+              let url = URL(string: string) else { return }
+        workItem?.cancel()
+        
+        let requestWorkItem = DispatchWorkItem {
+            let item = AVPlayerItem(url: podcast.isDownloaded ? url.locaPath : url)
+            self.player.replaceCurrentItem(with: item)
+            self.player.play()
+        }
+        
+        workItem = requestWorkItem
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: requestWorkItem)
+        
+        self.playPauseButton.setImage(self.pauseImage, for: .normal)
     }
     
     private func addTimeObserve() {
@@ -189,6 +212,11 @@ extension PlayerViewController {
 
 // MARK: - BigPlayerViewControllerDelegate
 extension PlayerViewController: BigPlayerViewControllerDelegate {
+    
+    func bigPlayerViewController(_ bigPlayerViewController: BigPlayerViewController, didLikeThis moment: Double) {
+        guard let podcast = currentPodcast else { return }
+        LikedMomentsManager.shared().saveThis(LikedMoment(podcast: podcast, moment: moment))
+    }
     
     func bigPlayerViewController(_ bigPlayerViewController: BigPlayerViewController, didChangeCurrentTime value: Double) {
         player.seek(to: CMTime(seconds: value, preferredTimescale: 60))

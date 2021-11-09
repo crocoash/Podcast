@@ -12,6 +12,9 @@
 		045628252732EA370044878C /* String + conform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045628242732EA370044878C /* String + conform.swift */; };
 		0457FB1C272F1ECC00D57280 /* PlayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0457FB1A272F1ECA00D57280 /* PlayerViewController.swift */; };
 		0457FB1D272F1ECC00D57280 /* PlayerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0457FB1B272F1ECB00D57280 /* PlayerViewController.xib */; };
+		047B47AF273B1FF6008E844F /* LikedMomentsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047B47AD273B1FF6008E844F /* LikedMomentsViewController.swift */; };
+		047B47B0273B1FF6008E844F /* LikedMomentsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047B47AE273B1FF6008E844F /* LikedMomentsManager.swift */; };
+		047B47B2273B2054008E844F /* LikedMoment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047B47B1273B2054008E844F /* LikedMoment.swift */; };
 		049D47DC2726E05B00B6DA3C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049D47DB2726E05B00B6DA3C /* AppDelegate.swift */; };
 		049D47DE2726E05B00B6DA3C /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049D47DD2726E05B00B6DA3C /* SceneDelegate.swift */; };
 		049D47E02726E05B00B6DA3C /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049D47DF2726E05B00B6DA3C /* SearchViewController.swift */; };
@@ -73,6 +76,9 @@
 		045628242732EA370044878C /* String + conform.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "String + conform.swift"; path = "../../View/ViewControllers/String + conform.swift"; sourceTree = "<group>"; };
 		0457FB1A272F1ECA00D57280 /* PlayerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerViewController.swift; sourceTree = "<group>"; };
 		0457FB1B272F1ECB00D57280 /* PlayerViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PlayerViewController.xib; sourceTree = "<group>"; };
+		047B47AD273B1FF6008E844F /* LikedMomentsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LikedMomentsViewController.swift; sourceTree = "<group>"; };
+		047B47AE273B1FF6008E844F /* LikedMomentsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LikedMomentsManager.swift; sourceTree = "<group>"; };
+		047B47B1273B2054008E844F /* LikedMoment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LikedMoment.swift; sourceTree = "<group>"; };
 		049D47D82726E05B00B6DA3C /* Podcasts.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Podcasts.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		049D47DB2726E05B00B6DA3C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		049D47DD2726E05B00B6DA3C /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -141,6 +147,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		047B47A8273B1F27008E844F /* LikedMomentsViewController */ = {
+			isa = PBXGroup;
+			children = (
+				047B47AE273B1FF6008E844F /* LikedMomentsManager.swift */,
+				047B47AD273B1FF6008E844F /* LikedMomentsViewController.swift */,
+			);
+			path = LikedMomentsViewController;
+			sourceTree = "<group>";
+		};
 		049D47CF2726E05B00B6DA3C = {
 			isa = PBXGroup;
 			children = (
@@ -215,6 +230,7 @@
 		184CE18E27271D7B0088044C /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				047B47B1273B2054008E844F /* LikedMoment.swift */,
 				184CE18C272717B20088044C /* PodacstData.swift */,
 				184CE18A272717680088044C /* PodcastModel.swift */,
 				189C1FB3272DF67900A8480E /* AuthorData.swift */,
@@ -362,6 +378,7 @@
 		18CA6D922735E46B00F32CE5 /* TabBar */ = {
 			isa = PBXGroup;
 			children = (
+				047B47A8273B1F27008E844F /* LikedMomentsViewController */,
 				049D47EF2726EAE600B6DA3C /* TabBarViewController.swift */,
 				049D47FF27286CA100B6DA3C /* Player */,
 				18CA6D8E2735E43600F32CE5 /* SearchViewController */,
@@ -531,6 +548,7 @@
 				18557D662732BF0100CA08CA /* UserModel.swift in Sources */,
 				1855934127380B610012BA91 /* PlaylistTableViewControllerDelegate.swift in Sources */,
 				049D47E02726E05B00B6DA3C /* SearchViewController.swift in Sources */,
+				047B47B0273B1FF6008E844F /* LikedMomentsManager.swift in Sources */,
 				1855934727380C270012BA91 /* AuthManger.swift in Sources */,
 				187B2B3E2732C11000C3EFFF /* UserDocument.swift in Sources */,
 				189C1FBC272EE6F100A8480E /* UIView + loadFromNib.swift in Sources */,
@@ -540,7 +558,9 @@
 				1828F9BB2738798F00761CD5 /* DataProvider.swift in Sources */,
 				049D47F02726EAE600B6DA3C /* TabBarViewController.swift in Sources */,
 				04425A8A273012DA00E897FA /* BigPlayerViewController.swift in Sources */,
+				047B47B2273B2054008E844F /* LikedMoment.swift in Sources */,
 				1855933F27380B400012BA91 /* SearchViewControllerDelegate.swift in Sources */,
+				047B47AF273B1FF6008E844F /* LikedMomentsViewController.swift in Sources */,
 				049D480127286D3900B6DA3C /* PlaylistTableViewController.swift in Sources */,
 				18CA6D8B2735902000F32CE5 /* MyToast.swift in Sources */,
 				1831DEDA2731944600EC09E2 /* PresentTransition.swift in Sources */,
