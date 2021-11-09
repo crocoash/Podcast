@@ -15,6 +15,7 @@
 		047B47A027398FC3008E844F /* LikedMoment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047B479F27398FC3008E844F /* LikedMoment.swift */; };
 		047B47A327399240008E844F /* LikedMomentsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047B47A227399240008E844F /* LikedMomentsViewController.swift */; };
 		047B47A527399347008E844F /* LikedMomentsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047B47A427399347008E844F /* LikedMomentsManager.swift */; };
+		047B47A72739D29C008E844F /* LikedMomentsViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047B47A62739D29C008E844F /* LikedMomentsViewControllerDelegate.swift */; };
 		049D47DC2726E05B00B6DA3C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049D47DB2726E05B00B6DA3C /* AppDelegate.swift */; };
 		049D47DE2726E05B00B6DA3C /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049D47DD2726E05B00B6DA3C /* SceneDelegate.swift */; };
 		049D47E02726E05B00B6DA3C /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049D47DF2726E05B00B6DA3C /* SearchViewController.swift */; };
@@ -79,6 +80,7 @@
 		047B479F27398FC3008E844F /* LikedMoment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LikedMoment.swift; sourceTree = "<group>"; };
 		047B47A227399240008E844F /* LikedMomentsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LikedMomentsViewController.swift; sourceTree = "<group>"; };
 		047B47A427399347008E844F /* LikedMomentsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LikedMomentsManager.swift; sourceTree = "<group>"; };
+		047B47A62739D29C008E844F /* LikedMomentsViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LikedMomentsViewControllerDelegate.swift; sourceTree = "<group>"; };
 		049D47D82726E05B00B6DA3C /* Podcasts.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Podcasts.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		049D47DB2726E05B00B6DA3C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		049D47DD2726E05B00B6DA3C /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -152,6 +154,7 @@
 			children = (
 				047B47A227399240008E844F /* LikedMomentsViewController.swift */,
 				047B47A427399347008E844F /* LikedMomentsManager.swift */,
+				047B47A62739D29C008E844F /* LikedMomentsViewControllerDelegate.swift */,
 			);
 			path = LikedMoments;
 			sourceTree = "<group>";
@@ -550,6 +553,7 @@
 				1855934127380B610012BA91 /* PlaylistTableViewControllerDelegate.swift in Sources */,
 				049D47E02726E05B00B6DA3C /* SearchViewController.swift in Sources */,
 				1855934727380C270012BA91 /* AuthManger.swift in Sources */,
+				047B47A72739D29C008E844F /* LikedMomentsViewControllerDelegate.swift in Sources */,
 				047B47A527399347008E844F /* LikedMomentsManager.swift in Sources */,
 				187B2B3E2732C11000C3EFFF /* UserDocument.swift in Sources */,
 				189C1FBC272EE6F100A8480E /* UIView + loadFromNib.swift in Sources */,

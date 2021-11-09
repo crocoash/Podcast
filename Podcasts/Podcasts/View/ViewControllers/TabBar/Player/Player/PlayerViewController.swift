@@ -21,6 +21,7 @@ class PlayerViewController: UIViewController {
     
     lazy private var bigPlayerVC = createBigPlayer()
     
+    
     private var podcasts: [Podcast] = []
     
     private var playStopImage: UIImage? { player.rate == 0 ? playImage : pauseImage }
@@ -57,6 +58,10 @@ class PlayerViewController: UIViewController {
     func play(podcasts: [Podcast], at index: Int) {
         self.podcasts = podcasts
         self.index = index
+    }
+    
+    func play(moment: LikedMoment) {
+        startPlay(moment: moment)
     }
     
     // MARK: - Actions
@@ -114,6 +119,19 @@ extension PlayerViewController {
         
         self.playPauseButton.setImage(self.pauseImage, for: .normal)
 
+    }
+    
+    private func startPlay(moment: LikedMoment) {
+        if let observe = observe {
+            player.removeTimeObserver(observe)
+        }
+        guard let stringURL = moment.podcast.episodeUrl else { return }
+        guard let url = URL(string: stringURL) else { return }
+        player = AVPlayer(playerItem: AVPlayerItem(url: url))
+        addTimeObserve()
+        playPauseButton.setImage(playStopImage, for: .normal)
+        player.play()
+        player.seek(to: CMTime(seconds: moment.moment, preferredTimescale: 60))
     }
     
     private func addTimeObserve() {
@@ -212,5 +230,12 @@ extension PlayerViewController: BigPlayerViewControllerDelegate {
     func bigPlayerViewController (_ bigPlayerViewController: BigPlayerViewController, didAddCurrentTimeBy value: Double) {
         guard let currentItem = player.currentItem else { return }
             self.player.seek(to: currentItem.currentTime() + CMTime(seconds: value, preferredTimescale: 60))
+    }
+    
+    func bigPlayerViewController(_ bigPlayerViewController: BigPlayerViewController, didLikeThis moment: Double) {
+        guard let podcast = currentPodcast else { return }
+        //LikedMomentsManager.shared().likedMoments.append(LikedMoment(podcast: podcast, moment: moment))
+        LikedMomentsManager.shared().saveThis(LikedMoment(podcast: podcast, moment: moment))
+        //print(LikedMomentsManager.shared().likedMoments)
     }
 }

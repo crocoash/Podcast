@@ -94,8 +94,12 @@ class BigPlayerViewController: UIViewController {
         isPresented = false
         dismiss(animated: true)
     }
+    
+    @IBAction func likeMomentTouchUpInside(_ sender: UIButton) {
+        delegate?.bigPlayerViewController(self, didLikeThis: Double(progressSlider.value))
+    }
+    
 }
-
 
 extension BigPlayerViewController {
     
