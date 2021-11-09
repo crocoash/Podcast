@@ -7,10 +7,6 @@
 
 import UIKit
 
-protocol DetailViewControllerDelegate: AnyObject {
-    func detailViewController(_ detailViewController: DetailViewController, playButtonDidTouchFor podcastIndex: Int)
-}
-
 class DetailViewController: UIViewController {
     
     @IBOutlet private weak var episodeImage: UIImageView!
@@ -52,7 +48,10 @@ class DetailViewController: UIViewController {
 extension DetailViewController {
     
     private func setupView(){
-        episodeImage.load(string: podcast.artworkUrl600)
+        DataProvider().downloadImage(string: podcast.artworkUrl600) { [weak self] image in
+            self?.episodeImage.image = image
+        }
+        
         episodeName.text = podcast.trackName
         collectionName.text = podcast.trackName
         descriptionTextView.text = podcast.description
@@ -60,5 +59,6 @@ extension DetailViewController {
     
     private func configureGestures() {
         view.addMyGestureRecognizer(self, type: .screenEdgePanGestureRecognizer(directions: [.right]), selector: #selector(dismissOnScreenTap))
+        view.addMyGestureRecognizer(self, type: .tap(), selector: #selector(dismissOnScreenTap))
     }
 }

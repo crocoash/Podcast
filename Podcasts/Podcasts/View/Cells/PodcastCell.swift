@@ -7,25 +7,26 @@
 
 import UIKit
 
-class PodcastCell: UITableViewCell, CustomTableViewCell {
+class PodcastCell: UITableViewCell {
     
     @IBOutlet private weak var podcastImage: UIImageView!
     @IBOutlet private weak var podcastName: UILabel!
-    @IBOutlet private weak var collectionName: UILabel!
+    @IBOutlet private weak var playlistStarImageView: UIImageView!
     
-    var indexPath: IndexPath!
 }
 
 extension PodcastCell {
     
-    func configureCell(with podcast: Podcast,_ indexPath: IndexPath) {
-        self.indexPath = indexPath
+    func configureCell(with podcast: Podcast) {
+        podcastImage.image = nil
         
         backgroundColor = .white
         podcastName.text = podcast.trackName
-        podcastImage.load(string: podcast.artworkUrl160!)
-        collectionName.text = podcast.collectionName
         
-        if podcast.isAddToPlaylist { backgroundColor = .yellow }
+        DataProvider().downloadImage(string: podcast.artworkUrl160) { [weak self] image in
+            self?.podcastImage.image = image
+        }
+        
+        playlistStarImageView.isHidden = !PlaylistDocument.shared.playList.contains(podcast)
     }
 }

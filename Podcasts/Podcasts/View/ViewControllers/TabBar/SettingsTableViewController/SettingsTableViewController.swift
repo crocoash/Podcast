@@ -12,30 +12,43 @@ class SettingsTableViewController: UITableViewController {
     private var userViewModel: UserViewModel!
     private var user: User { userViewModel.userDocument.user }
     
+    weak var delegate: SettingsTableViewControllerDelegate?
+    
     func setUser(_ userViewModel: UserViewModel) {
         self.userViewModel = userViewModel
     }
     
     @IBOutlet private weak var userNameLabel: UILabel!
     @IBOutlet private weak var locationLabel: UILabel!
-    @IBOutlet private weak var darkModeSwitch: UISwitch!
+    @IBOutlet weak var darkModeSwitch: UISwitch!
+    
     @IBOutlet private weak var autorizationSwitch: UISwitch!
+    
+    override func loadView() {
+        super.loadView()
+        ApiService.getData(for: URLS.api.rawValue) { [weak self] (result: IpModel?) in
+            guard let ipData = result else { return }
+            self?.locationLabel.text = ipData.country + " " + ipData.city
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-    
         userNameLabel.text = user.userName
         autorizationSwitch.isOn = user.isAuthorization
-        
-        
-        ApiService.getData(for: URLS.api.rawValue) { [weak self] (result: IpModel?) in
-            guard let ipData = result else { return }
-            
-            self?.locationLabel.text = ipData.country + ipData.city
-        }
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        delegate?.settingsTableViewControllerDidApear(self)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        delegate?.settingsTableViewControllerDidDisapear(self)
+    }
+    
     @IBAction func darkModeValueChanged(_ sender: UISwitch) {
-        
     }
     
     @IBAction func avtorizationChangeValue(_ sender: UISwitch) {

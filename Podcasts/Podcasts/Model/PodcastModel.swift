@@ -38,12 +38,33 @@ struct Podcast: Codable, Equatable, Identifiable {
     let wrapperType: String? // podcastEpisode
     
     private enum CodingKeys: String, CodingKey {
-        case previewUrl, episodeFileExtension, artworkUrl160, episodeContentType, artworkUrl600 , artworkUrl60, artistViewUrl, contentAdvisoryRating, trackViewUrl, trackTimeMillis, collectionViewUrl, episodeUrl, collectionId, collectionName
+        case previewUrl
+        case episodeFileExtension
+        case artworkUrl160
+        case episodeContentType
+        case artworkUrl600
+        case artworkUrl60
+        case artistViewUrl
+        case contentAdvisoryRating
+        case trackViewUrl
+        case trackTimeMillis
+        case collectionViewUrl
+        case episodeUrl
+        case collectionId
+        case collectionName
         case id = "trackId"
-        case trackName, releaseDate, shortDescription, feedUrl, artistIds, closedCaptioning, country, description, episodeGuid, kind, wrapperType
+        case trackName
+        case releaseDate
+        case shortDescription
+        case feedUrl
+        case artistIds
+        case closedCaptioning
+        case country
+        case description
+        case episodeGuid
+        case kind
+        case wrapperType
     }
-}
-
-extension Podcast {
-    var isAddToPlaylist: Bool { PlaylistDocument.shared.playList.contains(self)  }
+    
+    var isDownloaded = false
 }

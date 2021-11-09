@@ -46,7 +46,7 @@ class RegistrationViewController: UIViewController {
     private var firstSegmentedControl: Bool {
         segmentedControl.selectedSegmentIndex == 0
     }
-    
+    private let authManger = AuthManger()
     private var userViewModel = UserViewModel()
     private let alert = Alert()
     
@@ -183,13 +183,13 @@ extension RegistrationViewController {
             
             //signInWithEmail
             if firstSegmentedControl {
-                signInWithEmail(email: email, password: password) { [weak self] (result, err) in
+                authManger.signInWithEmail(email: email, password: password) { [weak self] (result, err) in
                     self?.signIn(err: err, result: result)
                 }
                 
                 //signUpWithEmail
             } else  {
-                signUpWithEmail(email: email, password: password) { [weak self] (result, err) in
+                authManger.signUpWithEmail(email: email, password: password) { [weak self] (result, err) in
                     self?.signIn(err: err, result: result)
                 }
             }
@@ -224,7 +224,17 @@ extension RegistrationViewController {
             actions: { text in
                 [
                     UIAlertAction(title: "Send Password", style: .default, handler: { [weak self] _ in
-                        self?.forgotPassword(with: text)
+                        guard let self = self else { return }
+                        self.authManger.forgotPassword(with: text) { error in
+                            
+                            if let error = error {
+                                self.alert.create(title: error.localizedDescription, withTimeIntervalToDismiss: 2)
+                            } else {
+                                self.alert.create(title: "email will be send to \(self.email)", withTimeIntervalToDismiss: 2)
+                                self.email = self.email
+                                self.forgotPasswordAlert(with: self.email)
+                            }
+                        }
                     }),
                     UIAlertAction(title: "Close", style: .destructive, handler: nil),
                 ]
@@ -287,47 +297,6 @@ extension RegistrationViewController: UITextFieldDelegate {
         textField.text?.removeAll()
         
         return true
-        
-    }
-    
-    
-}
-
-// MARK: - AuthMethods
-extension RegistrationViewController {
-    private func signInWithEmail (email: String, password: String, completion: @escaping (Bool, String) -> Void) {
-        Auth.auth().signIn(withEmail: email, password: password) { (result, err) in
-            if err != nil {
-                completion(false, (err!.localizedDescription))
-                return
-            }
-            
-            completion(true, (result?.user.email)!)
-        }
-    }
-    
-    private func signUpWithEmail (email: String, password: String, completion: @escaping (Bool, String) -> Void) {
-        Auth.auth().createUser(withEmail: email, password: password) { (result, err) in
-            
-            if err != nil {
-                completion (false, (err!.localizedDescription))
-                return
-            }
-            
-            completion(true, (result?.user.email)!)
-        }
-    }
-    
-    private func forgotPassword(with email: String) {
-        Auth.auth().sendPasswordReset(withEmail: email) { [weak self] error in
-            if let error = error {
-                self?.alert.create(title: error.localizedDescription, withTimeIntervalToDismiss: 2)
-            } else {
-                self?.alert.create(title: "email will be send to \(email)", withTimeIntervalToDismiss: 2)
-                self?.email = email
-                self?.forgotPasswordAlert(with: email)
-            }
-        }
     }
 }
 
