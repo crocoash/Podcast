@@ -21,9 +21,7 @@ class DetailViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        configureGestures()
         setupView()
-        self.view.addMyGestureRecognizer(self, type: .tap(), selector: #selector(dismissOnScreenTap))
     }
     
     func setUp(index: Int, podcast: Podcast) {
@@ -51,10 +49,5 @@ extension DetailViewController {
         episodeName.text = podcast.trackName
         collectionName.text = podcast.trackName
         descriptionTextView.text = podcast.description
-    }
-    
-    private func configureGestures() {
-        view.addMyGestureRecognizer(self, type: .screenEdgePanGestureRecognizer(directions: [.right]), selector: #selector(dismissOnScreenTap))
-        view.addMyGestureRecognizer(self, type: .tap(), selector: #selector(dismissOnScreenTap))
     }
 }

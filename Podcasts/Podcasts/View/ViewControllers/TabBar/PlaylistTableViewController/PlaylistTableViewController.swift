@@ -75,9 +75,7 @@ extension PlaylistTableViewController {
         detailViewController.delegate = self
         detailViewController.setUp(index: indexPath.row, podcast: podcast)
         
-        detailViewController.modalPresentationStyle = .custom
-        detailViewController.transitioningDelegate = self
-        present(detailViewController, animated: true, completion: nil)
+        self.navigationController?.pushViewController(detailViewController, animated: true)
         
    }
 }
