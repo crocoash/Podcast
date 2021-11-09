@@ -137,6 +137,7 @@ extension PlayerViewController {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: requestWorkItem)
         
         self.playPauseButton.setImage(self.pauseImage, for: .normal)
+        updateUI(with: moment)
     }
     
     private func addTimeObserve() {
@@ -189,6 +190,17 @@ extension PlayerViewController {
             isFirst: isFirstPodcast,
             isLast: isLastPodcast
         )
+    }
+    
+    private func updateUI(with moment: LikedMoment) {
+        let podcast = moment.podcast
+        DataProvider().downloadImage(string: podcast.artworkUrl600) { [weak self] image in
+            self?.podcastImageView.image = image
+        }
+        
+        playPauseButton.setImage(pauseImage, for: .normal)
+        podcastNameLabel.text = podcast.trackName
+        
     }
     
     private func addObserverForEndTrack() {
