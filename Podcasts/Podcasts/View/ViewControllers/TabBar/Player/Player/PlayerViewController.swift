@@ -234,9 +234,7 @@ extension PlayerViewController: BigPlayerViewControllerDelegate {
     
     func bigPlayerViewController(_ bigPlayerViewController: BigPlayerViewController, didLikeThis moment: Double) {
         guard let podcast = currentPodcast else { return }
-        //LikedMomentsManager.shared().likedMoments.append(LikedMoment(podcast: podcast, moment: moment))
         LikedMomentsManager.shared().likedMoments = LikedMomentsManager.shared().getLikedMomentsFromUserDefault()
         LikedMomentsManager.shared().saveThis(LikedMoment(podcast: podcast, moment: moment))
-        //print(LikedMomentsManager.shared().likedMoments)
     }
 }

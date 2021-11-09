@@ -20,10 +20,9 @@ class LikedMomentsManager {
         return uniqueInstance!
     }
     
-    var likedMoments: [LikedMoment] = [] {
+    private(set) var likedMoments: [LikedMoment] = [] {
         didSet {
             writeInUserDefaults(LikedMomentsManager.shared().likedMoments)
-            print("Hi from didSet")
         }
     }
     
