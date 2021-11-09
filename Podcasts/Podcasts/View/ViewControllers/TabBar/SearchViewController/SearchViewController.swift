@@ -95,10 +95,7 @@ class SearchViewController : UIViewController {
         detailViewController.delegate = self
         detailViewController.setUp(index: index, podcast: podcast)
         
-        detailViewController.modalPresentationStyle = .custom
-        detailViewController.transitioningDelegate = self
-        
-        present(detailViewController, animated: true)
+        self.navigationController?.pushViewController(detailViewController, animated: true)
     }
     
     @objc func handlerSwipe(sender: UISwipeGestureRecognizer) {

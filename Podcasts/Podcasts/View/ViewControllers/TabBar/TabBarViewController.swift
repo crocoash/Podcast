@@ -52,8 +52,12 @@ extension TabBarViewController {
         let navigationPlaylistVc = UINavigationController(rootViewController: playListVc)
         navigationPlaylistVc.tabBarItem.title = "Playlist"
         navigationPlaylistVc.tabBarItem.image = UIImage(systemName: "book")
+        
+        let navigationSearchVc = UINavigationController(rootViewController: searchVC)
+        navigationSearchVc.tabBarItem.title = "Search"
+        navigationSearchVc.tabBarItem.image = UIImage(systemName: "magnifyingglass")
 
-        viewControllers = [navigationPlaylistVc, searchVC, settingsVC]
+        viewControllers = [navigationPlaylistVc, navigationSearchVc, settingsVC]
     }
     
     private func createTabBar<T: UIViewController>(_ type: T.Type, title: String, imageName: String, completion: ((T) -> Void)? = nil) -> T {
