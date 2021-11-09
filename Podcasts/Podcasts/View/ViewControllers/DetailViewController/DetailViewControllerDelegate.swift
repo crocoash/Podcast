@@ -9,4 +9,9 @@ import Foundation
 
 protocol DetailViewControllerDelegate: AnyObject {
     func detailViewController(_ detailViewController: DetailViewController, playButtonDidTouchFor selectedPodcastAtIndex: Int)
+    
+    func detailViewController(_ detailViewController: DetailViewController, addButtonDidTouchFor selectedPodcast: Podcast)
+    
+    func detailViewController(_ detailViewController: DetailViewController, removeButtonDidTouchFor selectedPodcast: Podcast)
 }
+
