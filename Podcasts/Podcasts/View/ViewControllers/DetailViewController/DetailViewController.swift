@@ -24,10 +24,6 @@ class DetailViewController: UIViewController {
         configureGestures()
         setupView()
         self.view.addMyGestureRecognizer(self, type: .tap(), selector: #selector(dismissOnScreenTap))
-        
-        var frame = self.view.frame
-        frame.size.height = self.view.frame.height - 200
-        self.view.frame = frame
     }
     
     func setUp(index: Int, podcast: Podcast) {
