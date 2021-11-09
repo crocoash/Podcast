@@ -321,8 +321,7 @@ extension SearchViewController: URLSessionDownloadDelegate {
         func localFilePath(for url: URL) -> URL {
             return documentsPath.appendingPathComponent(url.lastPathComponent)
         }
-        
-        
+ 
         let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         
         let destinationURL = localFilePath(for: sourceURL)
@@ -338,17 +337,13 @@ extension SearchViewController: URLSessionDownloadDelegate {
         }
         
         DispatchQueue.main.async {
-            print("print sourceURL \(sourceURL)")
+            guard let podcast = self.downloadService.activeDownloads[sourceURL] else { return }
+           
             
-            guard let podcast = self.downloadService.activeDownloads[sourceURL],
-                    let index = PlaylistDocument.shared.playList.firstIndex(matching: podcast) else { return }
-            
-            if let podcastCell = self.podcastTableView.cellForRow(at: IndexPath(row: podcast.index,
-                                                                     section: 0)) as? PodcastCell {
-                podcastCell.podcastFinishDownload()
-          }
-//            self.downloadService.activeDownloads[sourceURL] = nil
-
+            PlaylistDocument.shared.trackIsDownloaded(index: podcast.id!)
+            self.podcastTableView.reloadRows(at: [IndexPath(row: podcast.index,
+                                                      section: 0)], with: .none)
+            self.downloadService.activeDownloads[sourceURL] = nil
         }
     }
     
@@ -356,11 +351,8 @@ extension SearchViewController: URLSessionDownloadDelegate {
                     didWriteData bytesWritten: Int64, totalBytesWritten: Int64,
                     totalBytesExpectedToWrite: Int64) {
         
-        guard
-          let url = downloadTask.originalRequest?.url,
-          var podcast = downloadService.activeDownloads[url] else {
-            return
-        }
+        guard let url = downloadTask.originalRequest?.url,
+          var podcast = downloadService.activeDownloads[url] else { return }
         
         podcast.progress = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite)
         

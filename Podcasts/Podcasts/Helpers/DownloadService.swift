@@ -24,16 +24,3 @@ class DownloadService {
         activeDownloads[url] = podcast
     }
 }
-
-//class Download {
-//
-//    // MARK: - Variables And Properties
-//    var isDownloading = false
-//
-//    var resumeData: Data?
-//
-//    // MARK: - Initialization
-//    init(podcast: Podcast) {
-//        self.podcast = podcast
-//    }
-//}

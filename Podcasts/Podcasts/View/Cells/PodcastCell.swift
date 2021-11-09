@@ -43,13 +43,4 @@ extension PodcastCell {
         downloadProgressView.progress = progress
         progressLabel.text = String(format: "%.1f%% of %@", progress * 100, totalSize)
     }
-    
-    func podcastFinishDownload() {
-        downloadProgressView.isHidden = true
-        progressLabel.isHidden = true
-
-        isDownLoaded.isHidden = false
-        playlistStarImageView.isHidden = false
-        
-    }
 }
