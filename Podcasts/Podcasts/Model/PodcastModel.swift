@@ -67,6 +67,8 @@ struct Podcast: Codable, Equatable, Identifiable {
     }
     
     var isDownLoad = false
-    var isFavorite: Bool { !PlaylistDocument.shared.playList.contains(self) } 
+    var progress: Float = 0
+    var index: Int = 0
+    var task: URLSessionDownloadTask? = nil
 }
 

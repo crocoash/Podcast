@@ -20,11 +20,7 @@ class SearchViewController : UIViewController {
     
     weak var delegate: SearchViewControllerDelegate?
     
-    private var podcasts: [Podcast] = [] {
-        didSet {
-            podcastTableView.reloadData()
-        }
-    }
+    private var podcasts: [Podcast] = []
     
     private var authors: [Author] = [] {
         didSet {
@@ -170,22 +166,22 @@ extension SearchViewController {
                 let view = sender.view as? PodcastCell,
                 let indexPath = podcastTableView.indexPath(for: view) else { return }
             
-            print("print indexPath \(indexPath)")
 
-            let podcast = podcasts[indexPath.row]
-            
-            if PlaylistDocument.shared.playList.contains(podcast) {
-                PlaylistDocument.shared.removeFromPlayList(podcast)
-                MyToast.create(title: (podcast.trackName ?? "podcast") + "is removed to playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
+            if PlaylistDocument.shared.playList.contains(podcasts[indexPath.row]) {
+                podcasts[indexPath.row].isDownLoad = false
+
+                PlaylistDocument.shared.removeFromPlayList(podcasts[indexPath.row])
+                MyToast.create(title: (podcasts[indexPath.row].trackName ?? "podcast") + "is removed to playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
             } else {
-                PlaylistDocument.shared.addToPlayList(podcast)
-                MyToast.create(title: (podcast.trackName ?? "podcast") + "is added to playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
-                
-//                downloadService.startDownload(podcast)
                 podcasts[indexPath.row].isDownLoad = true
+                
+                PlaylistDocument.shared.addToPlayList(podcasts[indexPath.row])
+                MyToast.create(title: (podcasts[indexPath.row].trackName ?? "podcast") + "is added to playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
+                downloadService.startDownload(podcasts[indexPath.row], index: indexPath.row)
             }
+            
             podcastTableView.reloadRows(at: [indexPath], with: .none)
-           
+            
             feedbackGenerator()
         }
     }
@@ -222,6 +218,7 @@ extension SearchViewController {
                 DispatchQueue.main.async {
                     self.processResults(data: info?.results, completion: { podcasts in
                         self.podcasts = podcasts
+                        self.podcastTableView.reloadData()
                     })
                 }
             }
@@ -230,6 +227,7 @@ extension SearchViewController {
                 guard let self = self else { return }
                 self.processResults(data: info?.results, completion: { authors in
                     self.authors = authors
+                    self.podcastTableView.reloadData()
                 })
             }
         }
@@ -323,7 +321,6 @@ extension SearchViewController: URLSessionDownloadDelegate {
             return documentsPath.appendingPathComponent(url.lastPathComponent)
         }
         
-        downloadService.activeDownloads[sourceURL] = nil
         
         let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         
@@ -339,11 +336,43 @@ extension SearchViewController: URLSessionDownloadDelegate {
             print("Could not copy file to disk: \(error.localizedDescription)")
         }
         
-        //TODO: !!!!!!!!!!
         DispatchQueue.main.async {
-            print("podcast download sucsellsfull")
+            print("print sourceURL \(sourceURL)")
+            
+            guard let podcast = self.downloadService.activeDownloads[sourceURL],
+                    let index = PlaylistDocument.shared.playList.firstIndex(matching: podcast) else { return }
+            
+            if let podcastCell = self.podcastTableView.cellForRow(at: IndexPath(row: podcast.index,
+                                                                     section: 0)) as? PodcastCell {
+                podcastCell.podcastFinishDownload()
+          }
+//            self.downloadService.activeDownloads[sourceURL] = nil
+
         }
     }
+    
+    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask,
+                    didWriteData bytesWritten: Int64, totalBytesWritten: Int64,
+                    totalBytesExpectedToWrite: Int64) {
+        
+        guard
+          let url = downloadTask.originalRequest?.url,
+          var podcast = downloadService.activeDownloads[url] else {
+            return
+        }
+        
+        podcast.progress = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite)
+        
+        let totalSize = ByteCountFormatter.string(fromByteCount: totalBytesExpectedToWrite, countStyle: .file)
+                
+        DispatchQueue.main.async {
+            if let podcastCell = self.podcastTableView.cellForRow(at: IndexPath(row: podcast.index,
+                                                                     section: 0)) as? PodcastCell {
+              podcastCell.updateDisplay(progress: podcast.progress, totalSize: totalSize)
+          }
+        }
+    }
+   
 }
 
 extension SearchViewController: URLSessionDelegate {
