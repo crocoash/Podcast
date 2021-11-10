@@ -19,10 +19,9 @@ class PlayerViewController: UIViewController {
     
     private var player: AVPlayer = AVPlayer()
     
-    private var playingFromLikedMoments: Bool?
-    
     lazy private var bigPlayerVC = createBigPlayer()
     
+    private var likedMoments: [LikedMoment] = []
     private var podcasts: [Podcast] = []
     
     private var playStopImage: UIImage? { player.rate == 0 ? playImage : pauseImage }
@@ -64,6 +63,16 @@ class PlayerViewController: UIViewController {
     func play(podcasts: [Podcast], at index: Int) {
         self.podcasts = podcasts
         self.index = index
+    }
+    
+    func playMomentWith(atIndex: Int, from: [LikedMoment]) {
+        likedMoments = from
+        var podcastsArray: [Podcast] = []
+        from.forEach {
+            podcastsArray.append($0.podcast)
+        }
+        podcasts = podcastsArray
+        index = atIndex
     }
     
     // MARK: - Actions
@@ -114,6 +123,9 @@ extension PlayerViewController {
             let item = AVPlayerItem(url: podcast.isDownLoad ? url.locaPath : url)
             self.player.replaceCurrentItem(with: item)
             self.player.play()
+            if !self.likedMoments.isEmpty {
+                self.player.seek(to: CMTime(seconds: self.likedMoments[self.index].moment, preferredTimescale: 60))
+            }
         }
         
         workItem = requestWorkItem
@@ -121,31 +133,6 @@ extension PlayerViewController {
         DispatchQueue.global().asyncAfter(deadline: .now(), execute: requestWorkItem)
         
         self.playPauseButton.setImage(self.pauseImage, for: .normal)
-    }
-    
-    func startPlay(likedMoment: LikedMoment) {
-        
-        let podcast = likedMoment.podcast
-        guard let string = likedMoment.podcast.episodeUrl,
-              let url = URL(string: string) else { return }
-        
-        if observe == nil { addTimeObserve() }
-            
-        workItem?.cancel()
-        
-        let requestWorkItem = DispatchWorkItem {
-            let item = AVPlayerItem(url: podcast.isDownLoad ? url.locaPath : url)
-            self.player.replaceCurrentItem(with: item)
-            self.player.play()
-            self.player.seek(to: CMTime(seconds: likedMoment.moment, preferredTimescale: 60))
-        }
-        
-        workItem = requestWorkItem
-        
-        DispatchQueue.global().asyncAfter(deadline: .now(), execute: requestWorkItem)
-        
-        self.playPauseButton.setImage(self.pauseImage, for: .normal)
-        updateUI(with: likedMoment)
     }
     
     private func addTimeObserve() {
