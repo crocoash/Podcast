@@ -66,11 +66,6 @@ class PlayerViewController: UIViewController {
         self.index = index
     }
     
-    func play(moment: LikedMoment) {
-        playingFromLikedMoments = true
-        startPlay()
-    }
-    
     // MARK: - Actions
     @objc func endTrack() {
         if !isLastPodcast { index += 1 }
@@ -128,9 +123,9 @@ extension PlayerViewController {
         self.playPauseButton.setImage(self.pauseImage, for: .normal)
     }
     
-    private func startPlay(moment: LikedMoment) {
-        let podcast = moment.podcast
-        guard let string = moment.podcast.episodeUrl,
+    func startPlay(likedMoment: LikedMoment) {
+        let podcast = likedMoment.podcast
+        guard let string = likedMoment.podcast.episodeUrl,
               let url = URL(string: string) else { return }
         
         if observe == nil { addTimeObserve() }
@@ -141,6 +136,7 @@ extension PlayerViewController {
             let item = AVPlayerItem(url: podcast.isDownLoad ? url.locaPath : url)
             self.player.replaceCurrentItem(with: item)
             self.player.play()
+            self.player.seek(to: CMTime(seconds: likedMoment.moment, preferredTimescale: 60))
         }
         
         workItem = requestWorkItem
@@ -148,7 +144,7 @@ extension PlayerViewController {
         DispatchQueue.global().asyncAfter(deadline: .now(), execute: requestWorkItem)
         
         self.playPauseButton.setImage(self.pauseImage, for: .normal)
-        updateUI(with: moment)
+        updateUI(with: likedMoment)
     }
     
     private func addTimeObserve() {
