@@ -54,6 +54,7 @@ class SearchViewController : UIViewController {
         super.viewDidLoad()
         configureUI()
         configureGesture()
+        showEmptyImage()
         downloadService.downloadsSession = downloadsSession
     }
     
@@ -95,6 +96,7 @@ class SearchViewController : UIViewController {
         
         let detailViewController = storyboard?.instantiateViewController(identifier: DetailViewController.identifier) as! DetailViewController
         
+        detailViewController.navigationController?.navigationBar.isHidden = true
         detailViewController.delegate = self
         detailViewController.setUp(index: index, podcast: podcast)
         detailViewController.title = "Additional info"
@@ -116,9 +118,8 @@ class SearchViewController : UIViewController {
 //MARK: - Private configure UI Methods
 extension SearchViewController {
     
-    
-    
     private func configureUI() {
+//        navigationController?.navigationBar.isHidden = true
         configureTableView()
         configureCancelLabel()
         configureSegmentalControl()
@@ -235,6 +236,7 @@ extension SearchViewController {
                 DispatchQueue.main.async {
                     self.processResults(data: info?.results, completion: { podcasts in
                         self.podcasts = podcasts
+                        self.podcastTableView.reloadData()
                     })
                 }
             }
@@ -243,6 +245,7 @@ extension SearchViewController {
                 guard let self = self else { return }
                 self.processResults(data: info?.results, completion: { authors in
                     self.authors = authors
+                    self.podcastTableView.reloadData()
                 })
             }
         }
@@ -351,7 +354,6 @@ extension SearchViewController: URLSessionDownloadDelegate {
             print("Could not copy file to disk: \(error.localizedDescription)")
         }
         
-        //TODO: !!!!!!!!!!
         DispatchQueue.main.async {
             guard let podcast = self.downloadService.activeDownloads[sourceURL],
             let index = PlaylistDocument.shared.playList.firstIndex(matching: podcast) else { return }

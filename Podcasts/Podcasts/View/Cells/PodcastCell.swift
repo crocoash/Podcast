@@ -22,7 +22,9 @@ extension PodcastCell {
     func configureCell(with podcast: Podcast) {
         podcastImage.image = nil
         
-        backgroundColor = .white
+        downloadProgressView.isHidden = true
+        progressLabel.isHidden = true  // !podcast.isDownLoad
+        
         podcastName.text = podcast.trackName
         
         DataProvider().downloadImage(string: podcast.artworkUrl160) { [weak self] image in

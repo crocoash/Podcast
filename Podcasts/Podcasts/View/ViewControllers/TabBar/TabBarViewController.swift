@@ -34,12 +34,12 @@ class TabBarViewController: UITabBarController {
 extension TabBarViewController {
     
     private func configureTabBar() {
-        tabBar.backgroundColor = .gray
+
         let searchVC = createTabBar(SearchViewController.self, title: "Search", imageName: "magnifyingglass") {
             $0.delegate = self
         }
 
-        let playListVc = createTabBar(PlaylistTableViewController.self , title: "Playlist", imageName: "magnifyingglass") {
+        let playListVc = createTabBar(PlaylistViewController.self , title: "Playlist", imageName: "magnifyingglass") {
             $0.delegate = self
         }
         
@@ -101,9 +101,9 @@ extension TabBarViewController: SearchViewControllerDelegate {
 }
 
 // MARK: - PlaylistTableViewControllerDelegate
-extension TabBarViewController: PlaylistTableViewControllerDelegate {
+extension TabBarViewController: PlaylistViewControllerDelegate {
     
-    func playlistTableViewController(_ playlistTableViewController: PlaylistTableViewController, _ podcasts: [Podcast], didSelectIndex: Int) {
+    func playlistTableViewController(_ playlistTableViewController: PlaylistViewController, _ podcasts: [Podcast], didSelectIndex: Int) {
         playerVC.view.isHidden = false
         playerVC.play(podcasts: podcasts, at: didSelectIndex)
     }

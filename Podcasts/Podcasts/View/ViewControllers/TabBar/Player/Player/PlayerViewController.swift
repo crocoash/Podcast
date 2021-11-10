@@ -29,11 +29,12 @@ class PlayerViewController: UIViewController {
     private var isLastPodcast: Bool { index == (podcasts.count - 1) }
     private var isFirstPodcast: Bool { index == 0 }
     
-    var workItem: DispatchWorkItem?
+    private var workItem: DispatchWorkItem?
     
     var currentPodcast: Podcast? { !podcasts.isEmpty ? podcasts[index] : nil }
     
     private var observe: Any?
+    
     private var index: Int = 0 {
         didSet {
             activityIndicator.startAnimating()
@@ -55,6 +56,10 @@ class PlayerViewController: UIViewController {
         addObserverForEndTrack()
     }
     
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
     //MARK: - Methods
     func play(podcasts: [Podcast], at index: Int) {
         self.podcasts = podcasts
@@ -63,7 +68,7 @@ class PlayerViewController: UIViewController {
     
     func play(moment: LikedMoment) {
         playingFromLikedMoments = true
-        startPlay(moment: moment)
+        startPlay()
     }
     
     // MARK: - Actions
@@ -108,6 +113,7 @@ extension PlayerViewController {
               let url = URL(string: string) else { return }
         
         workItem?.cancel()
+        if observe == nil { addTimeObserve() }
         
         let requestWorkItem = DispatchWorkItem {
             let item = AVPlayerItem(url: podcast.isDownLoad ? url.locaPath : url)
@@ -117,7 +123,29 @@ extension PlayerViewController {
         
         workItem = requestWorkItem
         
-        DispatchQueue.global().asyncAfter(deadline: .now() + 0.5, execute: requestWorkItem)
+        DispatchQueue.global().asyncAfter(deadline: .now(), execute: requestWorkItem)
+        
+        self.playPauseButton.setImage(self.pauseImage, for: .normal)
+    }
+    
+    private func startPlay(moment: LikedMoment) {
+        let podcast = moment.podcast
+        guard let string = moment.podcast.episodeUrl,
+              let url = URL(string: string) else { return }
+        
+        if observe == nil { addTimeObserve() }
+            
+        workItem?.cancel()
+        
+        let requestWorkItem = DispatchWorkItem {
+            let item = AVPlayerItem(url: podcast.isDownLoad ? url.locaPath : url)
+            self.player.replaceCurrentItem(with: item)
+            self.player.play()
+        }
+        
+        workItem = requestWorkItem
+        
+        DispatchQueue.global().asyncAfter(deadline: .now(), execute: requestWorkItem)
         
         self.playPauseButton.setImage(self.pauseImage, for: .normal)
         updateUI(with: moment)
@@ -139,7 +167,6 @@ extension PlayerViewController {
             self.progressView.progress = Float((CMTimeGetSeconds(time) / duration))
             
             if !self.activityIndicator.isHidden { self.activityIndicator.stopAnimating() }
-
             let currentTime = Float(self.player.currentTime().seconds)
             
             if self.bigPlayerVC.isPresented {
@@ -187,7 +214,6 @@ extension PlayerViewController {
     
     private func addObserverForEndTrack() {
         NotificationCenter.default.addObserver(self, selector: #selector(endTrack), name: .AVPlayerItemDidPlayToEndTime, object: nil)
-        addTimeObserve()
     }
     
     private func configureGesture() {

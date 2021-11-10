@@ -11,7 +11,12 @@ struct PlaylistModel: Codable {
     
     var json: Data? { try? JSONEncoder().encode(self) }
     
-    init() {}
+    private(set) var playList: [Podcast]
+
+    init() {
+        playList = []
+    }
+    
     init? (json: Data?) {
         guard
             let json = json ,
@@ -21,7 +26,6 @@ struct PlaylistModel: Codable {
         self = playList
     }
     
-    private(set) var playList = [Podcast]()
     
     //MARK: - Methods
     mutating func removeFromPlayList(_ podcast: Podcast) {
@@ -34,6 +38,12 @@ struct PlaylistModel: Codable {
         playList.append(podcast)
     }
     
+    mutating func trackIsDownloaded(index: Int) {
+        if let index = playList.firstIndex(matching: index) {
+            playList[index].isDownLoad = true
+        }
+    }
+    
     mutating func removeAllFromPlaylist() {
         playList.removeAll()
     }
@@ -44,6 +54,11 @@ struct PlaylistModel: Codable {
         } else {
             return true
         }
+    }
+    
+    func isPodcastInPlaylist(_ podcast: Podcast) -> Bool {
+        
+        return false
     }
 
 }

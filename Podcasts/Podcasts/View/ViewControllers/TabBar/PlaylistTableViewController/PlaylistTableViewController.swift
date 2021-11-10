@@ -7,13 +7,15 @@
 
 import UIKit
 
-class PlaylistTableViewController: UITableViewController {
+import UIKit
+
+class PlaylistViewController: UIViewController {
     
     @IBOutlet private weak var playListTableView: UITableView!
     @IBOutlet private weak var playerConstraint: NSLayoutConstraint!
     @IBOutlet private weak var emptyTableImageView: UIImageView!
     
-    weak var delegate: PlaylistTableViewControllerDelegate?
+    weak var delegate: PlaylistViewControllerDelegate?
     
     lazy private var detailViewController: DetailViewController = {
         let detailViewController = storyboard?.instantiateViewController(identifier: DetailViewController.identifier) as! DetailViewController
@@ -22,8 +24,6 @@ class PlaylistTableViewController: UITableViewController {
         return detailViewController
     }()
     
-    weak var delegate: PlaylistTableViewControllerDelegate?
-
     // MARK: - View Methods
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -56,30 +56,31 @@ class PlaylistTableViewController: UITableViewController {
 }
 
 //MARK: - Private methods
-extension PlaylistTableViewController {
+extension PlaylistViewController {
     
     private func configureUI() {
         playListTableView.register(PodcastCell.self)
         navigationItem.title = "PlayList"
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(trash))
         playListTableView.rowHeight = 100
         playListTableView.allowsSelection = true
     }
 }
 
 // MARK: - Table View data source
-extension PlaylistTableViewController {
+extension PlaylistViewController: UITableViewDataSource {
     
     private func showEmptyImage() {
         
         if PlaylistDocument.shared.playList.isEmpty {
             playListTableView.isHidden = true
             emptyTableImageView.isHidden = false
+            navigationItem.rightBarButtonItem = nil
         }
         
         if !PlaylistDocument.shared.playList.isEmpty {
             playListTableView.isHidden = false
             emptyTableImageView.isHidden = true
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Remove All", style: .done, target: self, action: #selector(trash))
         }
     }
     
@@ -87,43 +88,25 @@ extension PlaylistTableViewController {
         return PlaylistDocument.shared.playList.count
     }
     
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let podcast = PlaylistDocument.shared.playList[indexPath.row]
-        let cell = tableView.dequeueReusableCell(withIdentifier: PodcastCell.identifier, for: indexPath) as! PodcastCell
+        let cell = playListTableView.dequeueReusableCell(withIdentifier: PodcastCell.identifier, for: indexPath) as! PodcastCell
+        cell.addMyGestureRecognizer(self, type: .tap(1), selector: #selector(tapCell))
         cell.configureCell(with: podcast)
         return cell
     }
     
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             let podcast = PlaylistDocument.shared.playList[indexPath.row]
             PlaylistDocument.shared.removeFromPlayList(podcast)
             tableView.reloadData()
-            
         }
     }
-    
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let podcast = PlaylistDocument.shared.playList[indexPath.row]
-        
-        let detailViewController = storyboard?.instantiateViewController(identifier: DetailViewController.identifier) as! DetailViewController
-        
-        detailViewController.delegate = self
-        detailViewController.setUp(index: indexPath.row, podcast: podcast)
-        detailViewController.title = "Additional info"
-        
-        self.navigationController?.pushViewController(detailViewController, animated: true)
-        
-   }
 }
 
 // MARK: - DetailViewControllerDelegate
-extension PlaylistTableViewController : DetailViewControllerDelegate {
-    
-    func detailViewController(_ detailViewController: DetailViewController, playButtonDidTouchFor didSelectIndex: Int) {
-        delegate?.playlistTableViewController(self, PlaylistDocument.shared.playList, didSelectIndex: didSelectIndex)
-    }
-    
+extension PlaylistViewController : DetailViewControllerDelegate {
     func detailViewController(_ detailViewController: DetailViewController, addButtonDidTouchFor selectedPodcast: Podcast) {
         PlaylistDocument.shared.addToPlayList(selectedPodcast)
     }
@@ -131,10 +114,14 @@ extension PlaylistTableViewController : DetailViewControllerDelegate {
     func detailViewController(_ detailViewController: DetailViewController, removeButtonDidTouchFor selectedPodcast: Podcast) {
         PlaylistDocument.shared.removeFromPlayList(selectedPodcast)
     }
+    
+    func detailViewController(_ detailViewController: DetailViewController, playButtonDidTouchFor didSelectIndex: Int) {
+        delegate?.playlistTableViewController(self, PlaylistDocument.shared.playList, didSelectIndex: didSelectIndex)
+    }
 }
 
 //MARK: - UIViewControllerTransitioningDelegate
-extension PlaylistTableViewController: UIViewControllerTransitioningDelegate {
+extension PlaylistViewController: UIViewControllerTransitioningDelegate {
     
     func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         return PresentTransition()

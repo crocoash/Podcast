@@ -57,6 +57,7 @@ extension DetailViewController {
         DataProvider().downloadImage(string: podcast.artworkUrl600) { [weak self] image in
             self?.episodeImage.image = image
         }
+        
         if PlaylistDocument.shared.isPodcastInPlaylist(podcast){
             addButton.isHidden = true
             addButton.isEnabled = false

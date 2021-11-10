@@ -42,7 +42,7 @@
 		18557D662732BF0100CA08CA /* UserModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18557D652732BF0100CA08CA /* UserModel.swift */; };
 		1855933D27380AA10012BA91 /* BigPlayerViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1855933C27380AA10012BA91 /* BigPlayerViewControllerDelegate.swift */; };
 		1855933F27380B400012BA91 /* SearchViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1855933E27380B400012BA91 /* SearchViewControllerDelegate.swift */; };
-		1855934127380B610012BA91 /* PlaylistTableViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1855934027380B610012BA91 /* PlaylistTableViewControllerDelegate.swift */; };
+		1855934127380B610012BA91 /* PlaylistViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1855934027380B610012BA91 /* PlaylistViewControllerDelegate.swift */; };
 		1855934327380BAF0012BA91 /* SettingsTableViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1855934227380BAF0012BA91 /* SettingsTableViewControllerDelegate.swift */; };
 		1855934527380BDC0012BA91 /* DetailViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1855934427380BDC0012BA91 /* DetailViewControllerDelegate.swift */; };
 		1855934727380C270012BA91 /* AuthManger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1855934627380C270012BA91 /* AuthManger.swift */; };
@@ -108,7 +108,7 @@
 		18557D652732BF0100CA08CA /* UserModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserModel.swift; sourceTree = "<group>"; };
 		1855933C27380AA10012BA91 /* BigPlayerViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BigPlayerViewControllerDelegate.swift; sourceTree = "<group>"; };
 		1855933E27380B400012BA91 /* SearchViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewControllerDelegate.swift; sourceTree = "<group>"; };
-		1855934027380B610012BA91 /* PlaylistTableViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistTableViewControllerDelegate.swift; sourceTree = "<group>"; };
+		1855934027380B610012BA91 /* PlaylistViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistViewControllerDelegate.swift; sourceTree = "<group>"; };
 		1855934227380BAF0012BA91 /* SettingsTableViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTableViewControllerDelegate.swift; sourceTree = "<group>"; };
 		1855934427380BDC0012BA91 /* DetailViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewControllerDelegate.swift; sourceTree = "<group>"; };
 		1855934627380C270012BA91 /* AuthManger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManger.swift; sourceTree = "<group>"; };
@@ -351,7 +351,7 @@
 		18CA6D8F2735E44400F32CE5 /* PlaylistTableViewController */ = {
 			isa = PBXGroup;
 			children = (
-				1855934027380B610012BA91 /* PlaylistTableViewControllerDelegate.swift */,
+				1855934027380B610012BA91 /* PlaylistViewControllerDelegate.swift */,
 				049D480027286D3900B6DA3C /* PlaylistTableViewController.swift */,
 			);
 			path = PlaylistTableViewController;
@@ -378,10 +378,10 @@
 		18CA6D922735E46B00F32CE5 /* TabBar */ = {
 			isa = PBXGroup;
 			children = (
-				047B47A8273B1F27008E844F /* LikedMomentsViewController */,
 				049D47EF2726EAE600B6DA3C /* TabBarViewController.swift */,
 				049D47FF27286CA100B6DA3C /* Player */,
 				18CA6D8E2735E43600F32CE5 /* SearchViewController */,
+				047B47A8273B1F27008E844F /* LikedMomentsViewController */,
 				18CA6D8F2735E44400F32CE5 /* PlaylistTableViewController */,
 				18CA6D902735E44F00F32CE5 /* SettingsTableViewController */,
 			);
@@ -546,7 +546,7 @@
 				3FBCF1C72728482A00B70522 /* PodcastByAuthorCell.swift in Sources */,
 				3FBCF1C2272847F100B70522 /* PodcastCell.swift in Sources */,
 				18557D662732BF0100CA08CA /* UserModel.swift in Sources */,
-				1855934127380B610012BA91 /* PlaylistTableViewControllerDelegate.swift in Sources */,
+				1855934127380B610012BA91 /* PlaylistViewControllerDelegate.swift in Sources */,
 				049D47E02726E05B00B6DA3C /* SearchViewController.swift in Sources */,
 				047B47B0273B1FF6008E844F /* LikedMomentsManager.swift in Sources */,
 				1855934727380C270012BA91 /* AuthManger.swift in Sources */,

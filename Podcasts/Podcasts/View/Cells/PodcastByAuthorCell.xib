@@ -18,7 +18,7 @@
                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                 <subviews>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="duK-Uw-2Mo">
-                        <rect key="frame" x="39" y="44" width="42" height="21"/>
+                        <rect key="frame" x="39.5" y="65.5" width="42" height="21"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
@@ -27,10 +27,8 @@
             </view>
             <viewLayoutGuide key="safeArea" id="ZTg-uK-7eu"/>
             <constraints>
-                <constraint firstItem="duK-Uw-2Mo" firstAttribute="top" secondItem="ZTg-uK-7eu" secondAttribute="top" id="V92-J6-ghv"/>
-                <constraint firstItem="duK-Uw-2Mo" firstAttribute="leading" secondItem="ZTg-uK-7eu" secondAttribute="leading" constant="39" id="sjx-Ha-feM"/>
-                <constraint firstItem="ZTg-uK-7eu" firstAttribute="trailing" secondItem="duK-Uw-2Mo" secondAttribute="trailing" constant="40" id="xBm-5G-RPm"/>
-                <constraint firstItem="ZTg-uK-7eu" firstAttribute="bottom" secondItem="duK-Uw-2Mo" secondAttribute="bottom" constant="43" id="yBu-WZ-M8y"/>
+                <constraint firstItem="duK-Uw-2Mo" firstAttribute="centerY" secondItem="ZTg-uK-7eu" secondAttribute="centerY" id="4Ye-GH-JXW"/>
+                <constraint firstItem="duK-Uw-2Mo" firstAttribute="centerX" secondItem="ZTg-uK-7eu" secondAttribute="centerX" id="obr-gf-emh"/>
             </constraints>
             <size key="customSize" width="121" height="108"/>
             <connections>
