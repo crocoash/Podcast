@@ -110,7 +110,7 @@ extension PlayerViewController {
         
         workItem = requestWorkItem
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: requestWorkItem)
+        DispatchQueue.global().asyncAfter(deadline: .now() + 0.5, execute: requestWorkItem)
         
         self.playPauseButton.setImage(self.pauseImage, for: .normal)
     }
