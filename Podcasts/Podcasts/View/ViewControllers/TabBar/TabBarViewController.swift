@@ -117,8 +117,10 @@ extension TabBarViewController: SettingsTableViewControllerDelegate {
 
 //MARK: - LikedMomentsViewControllerDelegate
 extension TabBarViewController: LikedMomentsViewControllerDelegate {
-    func likedMomentViewController(_ likedMomentViewController: LikedMomentsViewController, didSelect moment: LikedMoment) {
+    func likedMomentViewController(_ likedMomentViewController: LikedMomentsViewController, didSelectMomentAt index: Int) {
+        let allLikedMoments: [LikedMoment] = LikedMomentsManager.shared().getLikedMomentsFromUserDefault()
         playerVC.view.isHidden = false
-        playerVC.startPlay(likedMoment: moment)
+        playerVC.playMomentWith(atIndex: index, from: allLikedMoments)
     }
+    
 }

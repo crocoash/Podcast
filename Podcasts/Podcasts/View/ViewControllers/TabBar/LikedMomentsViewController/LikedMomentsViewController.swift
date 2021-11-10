@@ -8,7 +8,7 @@
 import UIKit
 
 protocol LikedMomentsViewControllerDelegate: AnyObject {
-    func likedMomentViewController(_ likedMomentViewController: LikedMomentsViewController, didSelect moment: LikedMoment)
+    func likedMomentViewController(_ likedMomentViewController: LikedMomentsViewController, didSelectMomentAt index: Int)
 }
 
 class LikedMomentsViewController: UIViewController {
@@ -24,13 +24,13 @@ class LikedMomentsViewController: UIViewController {
         subscribeOnDataSourceAndDelegate()
         likedMomentsTableView.register(PodcastCell.self)
         likedMomentsTableView.rowHeight = cellHeight
-        configurateUI()
+        //configurateUI()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         likedMomentsTableView.reloadData()
-        configurateUI()
+        //configurateUI()
     }
     
     func subscribeOnDataSourceAndDelegate() {
@@ -49,7 +49,7 @@ extension LikedMomentsViewController {
 
 extension LikedMomentsViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        delegate?.likedMomentViewController(self, didSelect: LikedMomentsManager.shared().getLikedMomentsFromUserDefault()[indexPath.row])
+        delegate?.likedMomentViewController(self, didSelectMomentAt: indexPath.row)
     }
     
     func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
