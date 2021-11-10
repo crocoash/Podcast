@@ -123,6 +123,7 @@ extension PlayerViewController {
 
     }
     
+    
     private func startPlay(moment: LikedMoment) {
               let podcast = moment.podcast
         guard let string = moment.podcast.episodeUrl,
@@ -140,7 +141,7 @@ extension PlayerViewController {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: requestWorkItem)
         
         self.playPauseButton.setImage(self.pauseImage, for: .normal)
-        
+        updateUI(with: moment)
     }
     
     private func addTimeObserve() {
