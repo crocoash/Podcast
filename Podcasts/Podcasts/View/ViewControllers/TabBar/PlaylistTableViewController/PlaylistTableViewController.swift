@@ -9,14 +9,26 @@ import UIKit
 
 class PlaylistTableViewController: UITableViewController {
     
-    private let cellHeight : CGFloat = 75.0
+    @IBOutlet private weak var playListTableView: UITableView!
+    @IBOutlet private weak var playerConstraint: NSLayoutConstraint!
+    @IBOutlet private weak var emptyTableImageView: UIImageView!
+    
+    weak var delegate: PlaylistTableViewControllerDelegate?
+    
+    lazy private var detailViewController: DetailViewController = {
+        let detailViewController = storyboard?.instantiateViewController(identifier: DetailViewController.identifier) as! DetailViewController
+        detailViewController.delegate = self
+        detailViewController.transitioningDelegate = self
+        return detailViewController
+    }()
     
     weak var delegate: PlaylistTableViewControllerDelegate?
 
     // MARK: - View Methods
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        tableView.reloadData()
+        playListTableView.reloadData()
+        showEmptyImage()
     }
     
     override func viewDidLoad() {
@@ -27,7 +39,19 @@ class PlaylistTableViewController: UITableViewController {
     //MARK: - Actions
     @objc func trash(sender: UIBarButtonItem) {
         PlaylistDocument.shared.removeAllFromPlaylist()
-        tableView.reloadData()
+        playListTableView.reloadData()
+        showEmptyImage()
+    }
+    
+    @objc func tapCell(sender: UITapGestureRecognizer) {
+        
+        guard let view = sender.view as? UITableViewCell,
+              let indexPath = playListTableView.indexPath(for: view) else { return }
+        
+        let podcast = PlaylistDocument.shared.playList[indexPath.row]
+        detailViewController.setUp(index: indexPath.row, podcast: podcast)
+        detailViewController.modalPresentationStyle = .custom
+        present(detailViewController, animated: true, completion: nil)
     }
 }
 
@@ -35,19 +59,31 @@ class PlaylistTableViewController: UITableViewController {
 extension PlaylistTableViewController {
     
     private func configureUI() {
-        tableView.register(PodcastCell.self)
+        playListTableView.register(PodcastCell.self)
+        navigationItem.title = "PlayList"
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(trash))
+        playListTableView.rowHeight = 100
+        playListTableView.allowsSelection = true
     }
 }
 
 // MARK: - Table View data source
 extension PlaylistTableViewController {
     
-    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return cellHeight
+    private func showEmptyImage() {
+        
+        if PlaylistDocument.shared.playList.isEmpty {
+            playListTableView.isHidden = true
+            emptyTableImageView.isHidden = false
+        }
+        
+        if !PlaylistDocument.shared.playList.isEmpty {
+            playListTableView.isHidden = false
+            emptyTableImageView.isHidden = true
+        }
     }
-
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return PlaylistDocument.shared.playList.count
     }
     

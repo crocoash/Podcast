@@ -13,6 +13,8 @@ class SearchViewController : UIViewController {
     @IBOutlet private weak var podcastTableView: UITableView!
     @IBOutlet private weak var cancelLabel: UILabel!
     @IBOutlet private weak var searchSegmentalControl: UISegmentedControl!
+    @IBOutlet private weak var playerOffSetConstraint: NSLayoutConstraint!
+    @IBOutlet private weak var emptyTableImageView: UIImageView!
     
     private let activityIndicator = UIActivityIndicatorView()
     private var alert = Alert()
@@ -21,13 +23,14 @@ class SearchViewController : UIViewController {
     
     private var podcasts: [Podcast] = [] {
         didSet {
-            podcastTableView.reloadData()
+            showEmptyImage()
         }
     }
     
     private var authors: [Author] = [] {
         didSet {
             podcastTableView.reloadData()
+            showEmptyImage()
         }
     }
     
@@ -164,16 +167,13 @@ extension SearchViewController {
             guard let view = sender.view as? PodcastCell,
                   let indexPath = podcastTableView.indexPath(for: view) else { return }
             
-            var podcast = podcasts[indexPath.row]
-            
-            if PlaylistDocument.shared.playList.contains(podcast) {
-                PlaylistDocument.shared.removeFromPlayList(podcast)
-                MyToast.create(title: (podcast.trackName ?? "podcast") + "is removed to playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
+            if PlaylistDocument.shared.playList.contains(podcasts[indexPath.row]) {
+                PlaylistDocument.shared.removeFromPlayList(podcasts[indexPath.row])
+                MyToast.create(title: (podcasts[indexPath.row].trackName ?? "podcast") + "is removed to playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
             } else {
-                podcast.isDownloaded = true
-                PlaylistDocument.shared.addToPlayList(podcast)
-                MyToast.create(title: (podcast.trackName ?? "podcast") + "is added to playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
-                downloadService.startDownload(podcast)
+                PlaylistDocument.shared.addToPlayList(podcasts[indexPath.row])
+                MyToast.create(title: (podcasts[indexPath.row].trackName ?? "podcast") + "is added to playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
+                downloadService.startDownload(podcasts[indexPath.row], index: indexPath.row)
             }
             podcastTableView.reloadRows(at: [indexPath], with: .none)            
             
@@ -186,6 +186,28 @@ extension SearchViewController {
         authors.removeAll()
         podcasts.removeAll()
         searchSegmentalControl.selectedSegmentIndex = 0
+    }
+    
+    private func showEmptyImage() {
+        if searchSegmentalControl.selectedSegmentIndex == 0, podcasts.isEmpty {
+            podcastTableView.isHidden = true
+            emptyTableImageView.isHidden = false
+        }
+        
+        if searchSegmentalControl.selectedSegmentIndex == 0, !podcasts.isEmpty {
+            podcastTableView.isHidden = false
+            emptyTableImageView.isHidden = true
+        }
+        
+        if searchSegmentalControl.selectedSegmentIndex == 1, authors.isEmpty {
+            podcastTableView.isHidden = true
+            emptyTableImageView.isHidden = false
+        }
+        
+        if searchSegmentalControl.selectedSegmentIndex == 1, !authors.isEmpty {
+            podcastTableView.isHidden = false
+            emptyTableImageView.isHidden = true
+        }
     }
 }
 
@@ -274,7 +296,7 @@ extension SearchViewController: UISearchBarDelegate {
     }
     
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
-        view.addMyGestureRecognizer(view, type: .tap(), selector: #selector(UIView.endEditing(_:)))
+        addMyGestureRecognizer(view, type: .tap(), selector: #selector(UIView.endEditing(_:)))
     }
 }
 
@@ -331,7 +353,31 @@ extension SearchViewController: URLSessionDownloadDelegate {
         
         //TODO: !!!!!!!!!!
         DispatchQueue.main.async {
-            print("podcast download sucsellsfull")
+            guard let podcast = self.downloadService.activeDownloads[sourceURL],
+            let index = PlaylistDocument.shared.playList.firstIndex(matching: podcast) else { return }
+            
+            PlaylistDocument.shared.trackIsDownloaded(index: index)
+
+            self.podcastTableView.reloadRows(at: [IndexPath(row: podcast.index, section: 0)], with: .none)
+            self.downloadService.activeDownloads[sourceURL] = nil
+        }
+    }
+    
+    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask,
+                    didWriteData bytesWritten: Int64, totalBytesWritten: Int64,
+                    totalBytesExpectedToWrite: Int64) {
+        
+        guard let url = downloadTask.originalRequest?.url,
+              var podcast = downloadService.activeDownloads[url] else { return }
+        
+        podcast.progress = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite)
+        
+        let totalSize = ByteCountFormatter.string(fromByteCount: totalBytesExpectedToWrite, countStyle: .file)
+                
+        DispatchQueue.main.async {
+            if let podcastCell = self.podcastTableView.cellForRow(at: IndexPath(row: podcast.index, section: 0)) as? PodcastCell {
+              podcastCell.updateDisplay(progress: podcast.progress, totalSize: totalSize)
+          }
         }
     }
 }
