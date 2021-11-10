@@ -51,4 +51,10 @@ class LikedMomentsManager {
         return moments
     }
     
+    func deleteMoment(at index: Int) {
+        var moments = LikedMomentsManager.shared().getLikedMomentsFromUserDefault()
+        moments.remove(at: index)
+        LikedMomentsManager.shared().writeInUserDefaults(moments)
+    }
+    
 }

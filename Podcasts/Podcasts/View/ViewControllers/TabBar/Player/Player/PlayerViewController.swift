@@ -203,7 +203,6 @@ extension PlayerViewController {
         
         playPauseButton.setImage(pauseImage, for: .normal)
         podcastNameLabel.text = podcast.trackName
-        
     }
     
     private func addObserverForEndTrack() {
