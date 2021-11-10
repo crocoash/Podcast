@@ -13,9 +13,9 @@ class TabBarViewController: UITabBarController {
     ]
 
     private var playerVC = PlayerViewController()
-    private var userViewModel: UserViewModel!
+    private var userViewModel: UserDocument!
     
-    func setUserViewModel(_ userViewModel: UserViewModel) {
+    func setUserViewModel(_ userViewModel: UserDocument) {
         self.userViewModel = userViewModel
     }
     
@@ -129,5 +129,4 @@ extension TabBarViewController: LikedMomentsViewControllerDelegate {
         playerVC.view.isHidden = false
         playerVC.play(moment: moment)
     }
-    
 }

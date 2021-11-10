@@ -36,17 +36,17 @@
 		1847812F272C8F390036B89E /* MyLongPressGestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1847812D272C8F390036B89E /* MyLongPressGestureRecognizer.swift */; };
 		18478131272C8F930036B89E /* Podfile in Resources */ = {isa = PBXBuildFile; fileRef = 18478130272C8F930036B89E /* Podfile */; };
 		184CE18927270C8D0088044C /* ApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184CE18827270C8D0088044C /* ApiService.swift */; };
-		184CE18B272717680088044C /* PodcastModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184CE18A272717680088044C /* PodcastModel.swift */; };
-		184CE18D272717B20088044C /* PodacstData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184CE18C272717B20088044C /* PodacstData.swift */; };
+		184CE18B272717680088044C /* Podcast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184CE18A272717680088044C /* Podcast.swift */; };
+		184CE18D272717B20088044C /* PodcastData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184CE18C272717B20088044C /* PodcastData.swift */; };
 		18557D642732B61D00CA08CA /* IpModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18557D632732B61D00CA08CA /* IpModel.swift */; };
-		18557D662732BF0100CA08CA /* UserModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18557D652732BF0100CA08CA /* UserModel.swift */; };
+		18557D662732BF0100CA08CA /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18557D652732BF0100CA08CA /* User.swift */; };
 		1855933D27380AA10012BA91 /* BigPlayerViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1855933C27380AA10012BA91 /* BigPlayerViewControllerDelegate.swift */; };
 		1855933F27380B400012BA91 /* SearchViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1855933E27380B400012BA91 /* SearchViewControllerDelegate.swift */; };
 		1855934127380B610012BA91 /* PlaylistViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1855934027380B610012BA91 /* PlaylistViewControllerDelegate.swift */; };
 		1855934327380BAF0012BA91 /* SettingsTableViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1855934227380BAF0012BA91 /* SettingsTableViewControllerDelegate.swift */; };
 		1855934527380BDC0012BA91 /* DetailViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1855934427380BDC0012BA91 /* DetailViewControllerDelegate.swift */; };
-		1855934727380C270012BA91 /* AuthManger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1855934627380C270012BA91 /* AuthManger.swift */; };
-		187B2B3E2732C11000C3EFFF /* UserDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187B2B3D2732C11000C3EFFF /* UserDocument.swift */; };
+		1855934727380C270012BA91 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1855934627380C270012BA91 /* AuthService.swift */; };
+		187B2B3E2732C11000C3EFFF /* UserViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187B2B3D2732C11000C3EFFF /* UserViewModel.swift */; };
 		187B2B4227345F6200C3EFFF /* Constant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187B2B4127345F6200C3EFFF /* Constant.swift */; };
 		1888C2AF2739A8D000395B5B /* URL + localPath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1888C2AE2739A8CF00395B5B /* URL + localPath.swift */; };
 		189C1FA8272D333A00A8480E /* UITableViewCell + identifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189C1FA7272D333A00A8480E /* UITableViewCell + identifier.swift */; };
@@ -62,6 +62,7 @@
 		18A5006E27284BA100CD3F0C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 18A5006D27284BA100CD3F0C /* GoogleService-Info.plist */; };
 		18CA6D8927352AF800F32CE5 /* UIViewController + loadFromXib.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA6D8827352AF800F32CE5 /* UIViewController + loadFromXib.swift */; };
 		18CA6D8B2735902000F32CE5 /* MyToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA6D8A2735902000F32CE5 /* MyToast.swift */; };
+		18D13DDC273C407A00495C97 /* UserDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18D13DDB273C407A00495C97 /* UserDocument.swift */; };
 		3FBCF1C2272847F100B70522 /* PodcastCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FBCF1C0272847F100B70522 /* PodcastCell.swift */; };
 		3FBCF1C3272847F100B70522 /* PodcastCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3FBCF1C1272847F100B70522 /* PodcastCell.xib */; };
 		3FBCF1C72728482A00B70522 /* PodcastByAuthorCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FBCF1C52728482A00B70522 /* PodcastByAuthorCell.swift */; };
@@ -102,17 +103,17 @@
 		1847812D272C8F390036B89E /* MyLongPressGestureRecognizer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyLongPressGestureRecognizer.swift; sourceTree = "<group>"; };
 		18478130272C8F930036B89E /* Podfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Podfile; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		184CE18827270C8D0088044C /* ApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiService.swift; sourceTree = "<group>"; };
-		184CE18A272717680088044C /* PodcastModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastModel.swift; sourceTree = "<group>"; };
-		184CE18C272717B20088044C /* PodacstData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodacstData.swift; sourceTree = "<group>"; };
+		184CE18A272717680088044C /* Podcast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Podcast.swift; sourceTree = "<group>"; };
+		184CE18C272717B20088044C /* PodcastData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastData.swift; sourceTree = "<group>"; };
 		18557D632732B61D00CA08CA /* IpModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IpModel.swift; sourceTree = "<group>"; };
-		18557D652732BF0100CA08CA /* UserModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserModel.swift; sourceTree = "<group>"; };
+		18557D652732BF0100CA08CA /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		1855933C27380AA10012BA91 /* BigPlayerViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BigPlayerViewControllerDelegate.swift; sourceTree = "<group>"; };
 		1855933E27380B400012BA91 /* SearchViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewControllerDelegate.swift; sourceTree = "<group>"; };
 		1855934027380B610012BA91 /* PlaylistViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistViewControllerDelegate.swift; sourceTree = "<group>"; };
 		1855934227380BAF0012BA91 /* SettingsTableViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTableViewControllerDelegate.swift; sourceTree = "<group>"; };
 		1855934427380BDC0012BA91 /* DetailViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewControllerDelegate.swift; sourceTree = "<group>"; };
-		1855934627380C270012BA91 /* AuthManger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManger.swift; sourceTree = "<group>"; };
-		187B2B3D2732C11000C3EFFF /* UserDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDocument.swift; sourceTree = "<group>"; };
+		1855934627380C270012BA91 /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
+		187B2B3D2732C11000C3EFFF /* UserViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserViewModel.swift; sourceTree = "<group>"; };
 		187B2B4127345F6200C3EFFF /* Constant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constant.swift; sourceTree = "<group>"; };
 		1888C2AE2739A8CF00395B5B /* URL + localPath.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "URL + localPath.swift"; sourceTree = "<group>"; };
 		189C1FA7272D333A00A8480E /* UITableViewCell + identifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITableViewCell + identifier.swift"; sourceTree = "<group>"; };
@@ -127,6 +128,7 @@
 		18A5006D27284BA100CD3F0C /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		18CA6D8827352AF800F32CE5 /* UIViewController + loadFromXib.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController + loadFromXib.swift"; sourceTree = "<group>"; };
 		18CA6D8A2735902000F32CE5 /* MyToast.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyToast.swift; sourceTree = "<group>"; };
+		18D13DDB273C407A00495C97 /* UserDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDocument.swift; sourceTree = "<group>"; };
 		3FBCF1C0272847F100B70522 /* PodcastCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastCell.swift; sourceTree = "<group>"; };
 		3FBCF1C1272847F100B70522 /* PodcastCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PodcastCell.xib; sourceTree = "<group>"; };
 		3FBCF1C52728482A00B70522 /* PodcastByAuthorCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastByAuthorCell.swift; sourceTree = "<group>"; };
@@ -178,7 +180,11 @@
 		049D47DA2726E05B00B6DA3C /* Podcasts */ = {
 			isa = PBXGroup;
 			children = (
+				049D47DB2726E05B00B6DA3C /* AppDelegate.swift */,
+				049D47DD2726E05B00B6DA3C /* SceneDelegate.swift */,
 				184CE19027271D9D0088044C /* Resourses */,
+				189C1FAB272D337100A8480E /* Extensions */,
+				18D13DDA273C400C00495C97 /* Services */,
 				184CE19127271DAE0088044C /* Helpers */,
 				184CE18E27271D7B0088044C /* Model */,
 				189C1FB0272D84B100A8480E /* ViewModel */,
@@ -231,13 +237,14 @@
 			isa = PBXGroup;
 			children = (
 				047B47B1273B2054008E844F /* LikedMoment.swift */,
-				184CE18C272717B20088044C /* PodacstData.swift */,
-				184CE18A272717680088044C /* PodcastModel.swift */,
+				184CE18C272717B20088044C /* PodcastData.swift */,
+				184CE18A272717680088044C /* Podcast.swift */,
 				189C1FB3272DF67900A8480E /* AuthorData.swift */,
 				189C1FB5272DF68600A8480E /* AuthorModel.swift */,
 				1831DECB27304F5600EC09E2 /* PlayListModel.swift */,
 				18557D632732B61D00CA08CA /* IpModel.swift */,
-				18557D652732BF0100CA08CA /* UserModel.swift */,
+				18557D652732BF0100CA08CA /* User.swift */,
+				18D13DDB273C407A00495C97 /* UserDocument.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -254,8 +261,6 @@
 		184CE19027271D9D0088044C /* Resourses */ = {
 			isa = PBXGroup;
 			children = (
-				049D47DB2726E05B00B6DA3C /* AppDelegate.swift */,
-				049D47DD2726E05B00B6DA3C /* SceneDelegate.swift */,
 				049D47E42726E05F00B6DA3C /* Assets.xcassets */,
 				18A5006D27284BA100CD3F0C /* GoogleService-Info.plist */,
 				049D47E62726E05F00B6DA3C /* LaunchScreen.storyboard */,
@@ -266,15 +271,10 @@
 		184CE19127271DAE0088044C /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
-				189C1FAB272D337100A8480E /* Extensions */,
 				1847811D272C8B450036B89E /* Gestures */,
 				18478122272C8B450036B89E /* Alert */,
 				187B2B3C2732C0BD00C3EFFF /* CustomPresent */,
-				184CE18827270C8D0088044C /* ApiService.swift */,
 				187B2B4127345F6200C3EFFF /* Constant.swift */,
-				1831DED02730560D00EC09E2 /* DownloadService.swift */,
-				1828F9BA2738798F00761CD5 /* DataProvider.swift */,
-				1855934627380C270012BA91 /* AuthManger.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -325,7 +325,7 @@
 		189C1FB0272D84B100A8480E /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
-				187B2B3D2732C11000C3EFFF /* UserDocument.swift */,
+				187B2B3D2732C11000C3EFFF /* UserViewModel.swift */,
 				189C1FAE272D84AB00A8480E /* PlaylistDocument.swift */,
 			);
 			path = ViewModel;
@@ -388,6 +388,35 @@
 			path = TabBar;
 			sourceTree = "<group>";
 		};
+		18D13DDA273C400C00495C97 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				184CE18827270C8D0088044C /* ApiService.swift */,
+				1831DED02730560D00EC09E2 /* DownloadService.swift */,
+				1828F9BA2738798F00761CD5 /* DataProvider.swift */,
+				1855934627380C270012BA91 /* AuthService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		18D13DDD273C410700495C97 /* PodcastCell */ = {
+			isa = PBXGroup;
+			children = (
+				3FBCF1C0272847F100B70522 /* PodcastCell.swift */,
+				3FBCF1C1272847F100B70522 /* PodcastCell.xib */,
+			);
+			path = PodcastCell;
+			sourceTree = "<group>";
+		};
+		18D13DDE273C411000495C97 /* PodcastByAuthorCell */ = {
+			isa = PBXGroup;
+			children = (
+				3FBCF1C52728482A00B70522 /* PodcastByAuthorCell.swift */,
+				3FBCF1C62728482A00B70522 /* PodcastByAuthorCell.xib */,
+			);
+			path = PodcastByAuthorCell;
+			sourceTree = "<group>";
+		};
 		26863FFB79128477A1FFB53A /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -400,10 +429,8 @@
 		3FBCF1BF272847E400B70522 /* Cells */ = {
 			isa = PBXGroup;
 			children = (
-				3FBCF1C0272847F100B70522 /* PodcastCell.swift */,
-				3FBCF1C1272847F100B70522 /* PodcastCell.xib */,
-				3FBCF1C52728482A00B70522 /* PodcastByAuthorCell.swift */,
-				3FBCF1C62728482A00B70522 /* PodcastByAuthorCell.xib */,
+				18D13DDD273C410700495C97 /* PodcastCell */,
+				18D13DDE273C411000495C97 /* PodcastByAuthorCell */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -538,6 +565,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				189C1FB4272DF67A00A8480E /* AuthorData.swift in Sources */,
+				18D13DDC273C407A00495C97 /* UserDocument.swift in Sources */,
 				189C1FB6272DF68600A8480E /* AuthorModel.swift in Sources */,
 				049D480327286D5900B6DA3C /* DetailViewController.swift in Sources */,
 				1855933D27380AA10012BA91 /* BigPlayerViewControllerDelegate.swift in Sources */,
@@ -545,14 +573,14 @@
 				1855934327380BAF0012BA91 /* SettingsTableViewControllerDelegate.swift in Sources */,
 				3FBCF1C72728482A00B70522 /* PodcastByAuthorCell.swift in Sources */,
 				3FBCF1C2272847F100B70522 /* PodcastCell.swift in Sources */,
-				18557D662732BF0100CA08CA /* UserModel.swift in Sources */,
+				18557D662732BF0100CA08CA /* User.swift in Sources */,
 				1855934127380B610012BA91 /* PlaylistViewControllerDelegate.swift in Sources */,
 				049D47E02726E05B00B6DA3C /* SearchViewController.swift in Sources */,
 				047B47B0273B1FF6008E844F /* LikedMomentsManager.swift in Sources */,
-				1855934727380C270012BA91 /* AuthManger.swift in Sources */,
-				187B2B3E2732C11000C3EFFF /* UserDocument.swift in Sources */,
+				1855934727380C270012BA91 /* AuthService.swift in Sources */,
+				187B2B3E2732C11000C3EFFF /* UserViewModel.swift in Sources */,
 				189C1FBC272EE6F100A8480E /* UIView + loadFromNib.swift in Sources */,
-				184CE18D272717B20088044C /* PodacstData.swift in Sources */,
+				184CE18D272717B20088044C /* PodcastData.swift in Sources */,
 				189C1FA8272D333A00A8480E /* UITableViewCell + identifier.swift in Sources */,
 				184CE18927270C8D0088044C /* ApiService.swift in Sources */,
 				1828F9BB2738798F00761CD5 /* DataProvider.swift in Sources */,
@@ -565,7 +593,7 @@
 				18CA6D8B2735902000F32CE5 /* MyToast.swift in Sources */,
 				1831DEDA2731944600EC09E2 /* PresentTransition.swift in Sources */,
 				049D47DC2726E05B00B6DA3C /* AppDelegate.swift in Sources */,
-				184CE18B272717680088044C /* PodcastModel.swift in Sources */,
+				184CE18B272717680088044C /* Podcast.swift in Sources */,
 				1888C2AF2739A8D000395B5B /* URL + localPath.swift in Sources */,
 				18557D642732B61D00CA08CA /* IpModel.swift in Sources */,
 				18CA6D8927352AF800F32CE5 /* UIViewController + loadFromXib.swift in Sources */,

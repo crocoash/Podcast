@@ -9,12 +9,12 @@ import UIKit
 
 class SettingsTableViewController: UITableViewController {
     
-    private var userViewModel: UserViewModel!
+    private var userViewModel: UserDocument!
     private var user: User { userViewModel.userDocument.user }
     
     weak var delegate: SettingsTableViewControllerDelegate?
     
-    func setUser(_ userViewModel: UserViewModel) {
+    func setUser(_ userViewModel: UserDocument) {
         self.userViewModel = userViewModel
     }
     

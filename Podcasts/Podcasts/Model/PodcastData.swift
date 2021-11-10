@@ -1,5 +1,5 @@
 //
-//  PodacstData.swift
+//  PodcastData.swift
 //  Podcasts
 //
 //  Created by Tsvetkov Anton on 25.10.2021.

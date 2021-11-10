@@ -46,8 +46,8 @@ class RegistrationViewController: UIViewController {
     private var firstSegmentedControl: Bool {
         segmentedControl.selectedSegmentIndex == 0
     }
-    private let authManger = AuthManger()
-    private var userViewModel = UserViewModel()
+    private let authManger = AuthService()
+    private var userViewModel = UserDocument()
     private let alert = Alert()
     
     //MARK: - Settings

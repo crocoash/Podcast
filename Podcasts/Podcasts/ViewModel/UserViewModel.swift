@@ -1,5 +1,5 @@
 //
-//  UserDocument.swift
+//  UserViewModel.swift
 //  Podcasts
 //
 //  Created by Tsvetkov Anton on 03.11.2021.

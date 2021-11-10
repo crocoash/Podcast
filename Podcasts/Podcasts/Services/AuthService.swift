@@ -8,7 +8,7 @@
 import Foundation
 import FirebaseAuth
 
-class AuthManger {
+class AuthService {
     
     func signInWithEmail (email: String, password: String, completion: @escaping (Bool, String) -> Void) {
         Auth.auth().signIn(withEmail: email, password: password) { (result, err) in

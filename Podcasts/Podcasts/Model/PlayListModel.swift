@@ -32,6 +32,15 @@ struct PlaylistModel: Codable {
         if let index = playList.firstIndex(matching: podcast) {
             playList.remove(at: index)
         }
+        guard let stringUrl = podcast.previewUrl,
+        let url = URL(string: stringUrl) else { return }
+        
+        do {
+            try FileManager.default.removeItem(at: url)
+        }
+        catch(let err) {
+            print("FAILED DELETEING VIDEO DATA \(err.localizedDescription)")
+        }
     }
     
     mutating func addToPlayList(_ podcast: Podcast) {
@@ -57,8 +66,6 @@ struct PlaylistModel: Codable {
     }
     
     func isPodcastInPlaylist(_ podcast: Podcast) -> Bool {
-        
-        return false
+        return playList.contains(podcast)
     }
-
 }
