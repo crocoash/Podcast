@@ -14,6 +14,7 @@ class PlaylistViewController: UIViewController {
     @IBOutlet private weak var playListTableView: UITableView!
     @IBOutlet private weak var playerConstraint: NSLayoutConstraint!
     @IBOutlet private weak var emptyTableImageView: UIImageView!
+    @IBOutlet private weak var removeAllButton: UIBarButtonItem!
     
     weak var delegate: PlaylistViewControllerDelegate?
     
@@ -30,14 +31,14 @@ class PlaylistViewController: UIViewController {
         playListTableView.reloadData()
         showEmptyImage()
     }
-    
+        
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
     }
     
     //MARK: - Actions
-    @objc func trash(sender: UIBarButtonItem) {
+    @IBAction func removeAllAction(_ sender: UIBarButtonItem) {
         PlaylistDocument.shared.removeAllFromPlaylist()
         playListTableView.reloadData()
         showEmptyImage()
@@ -51,7 +52,8 @@ class PlaylistViewController: UIViewController {
         let podcast = PlaylistDocument.shared.playList[indexPath.row]
         detailViewController.setUp(index: indexPath.row, podcast: podcast)
         detailViewController.modalPresentationStyle = .custom
-        present(detailViewController, animated: true, completion: nil)
+        
+        present(detailViewController, animated: true)
     }
 }
 
@@ -74,13 +76,13 @@ extension PlaylistViewController: UITableViewDataSource {
         if PlaylistDocument.shared.playList.isEmpty {
             playListTableView.isHidden = true
             emptyTableImageView.isHidden = false
-            navigationItem.rightBarButtonItem = nil
+            removeAllButton.isEnabled = false
         }
         
         if !PlaylistDocument.shared.playList.isEmpty {
             playListTableView.isHidden = false
             emptyTableImageView.isHidden = true
-            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Remove All", style: .done, target: self, action: #selector(trash))
+            removeAllButton.isEnabled = true
         }
     }
     

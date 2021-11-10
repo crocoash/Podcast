@@ -183,10 +183,10 @@
 				049D47DB2726E05B00B6DA3C /* AppDelegate.swift */,
 				049D47DD2726E05B00B6DA3C /* SceneDelegate.swift */,
 				184CE19027271D9D0088044C /* Resourses */,
+				184CE18E27271D7B0088044C /* Model */,
 				189C1FAB272D337100A8480E /* Extensions */,
 				18D13DDA273C400C00495C97 /* Services */,
 				184CE19127271DAE0088044C /* Helpers */,
-				184CE18E27271D7B0088044C /* Model */,
 				189C1FB0272D84B100A8480E /* ViewModel */,
 				184CE18F27271D8D0088044C /* View */,
 				049D47E12726E05B00B6DA3C /* Main.storyboard */,
@@ -209,6 +209,7 @@
 			children = (
 				18CA6D8C2735E41C00F32CE5 /* RegistrationViewController */,
 				18CA6D922735E46B00F32CE5 /* TabBar */,
+				049D47FF27286CA100B6DA3C /* Player */,
 				18CA6D912735E45A00F32CE5 /* DetailViewController */,
 			);
 			path = ViewControllers;
@@ -379,10 +380,9 @@
 			isa = PBXGroup;
 			children = (
 				049D47EF2726EAE600B6DA3C /* TabBarViewController.swift */,
-				049D47FF27286CA100B6DA3C /* Player */,
+				18CA6D8F2735E44400F32CE5 /* PlaylistTableViewController */,
 				18CA6D8E2735E43600F32CE5 /* SearchViewController */,
 				047B47A8273B1F27008E844F /* LikedMomentsViewController */,
-				18CA6D8F2735E44400F32CE5 /* PlaylistTableViewController */,
 				18CA6D902735E44F00F32CE5 /* SettingsTableViewController */,
 			);
 			path = TabBar;

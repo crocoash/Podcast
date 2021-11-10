@@ -35,11 +35,11 @@ extension TabBarViewController {
     
     private func configureTabBar() {
 
-        let searchVC = createTabBar(SearchViewController.self, title: "Search", imageName: "magnifyingglass") {
+        let playListVc = createTabBar(PlaylistViewController.self , title: "Playlist", imageName: "folder.fill") {
             $0.delegate = self
         }
-
-        let playListVc = createTabBar(PlaylistViewController.self , title: "Playlist", imageName: "magnifyingglass") {
+        
+        let searchVC = createTabBar(SearchViewController.self, title: "Search", imageName: "magnifyingglass") {
             $0.delegate = self
         }
         
@@ -52,16 +52,8 @@ extension TabBarViewController {
             vc.setUser((self.userViewModel) )
             vc.delegate = self
         }
-        
-        let navigationPlaylistVc = UINavigationController(rootViewController: playListVc)
-        navigationPlaylistVc.tabBarItem.title = "Playlist"
-        navigationPlaylistVc.tabBarItem.image = UIImage(systemName: "book")
-        
-        let navigationSearchVc = UINavigationController(rootViewController: searchVC)
-        navigationSearchVc.tabBarItem.title = "Search"
-        navigationSearchVc.tabBarItem.image = UIImage(systemName: "magnifyingglass")
 
-        viewControllers = [navigationPlaylistVc, navigationSearchVc, likedMoments, settingsVC]
+        viewControllers = [playListVc, searchVC, likedMoments, settingsVC]
     }
     
     private func createTabBar<T: UIViewController>(_ type: T.Type, title: String, imageName: String, completion: ((T) -> Void)? = nil) -> T {

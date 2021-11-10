@@ -36,7 +36,7 @@ struct PlaylistModel: Codable {
         let url = URL(string: stringUrl) else { return }
         
         do {
-            try FileManager.default.removeItem(at: url)
+            try FileManager.default.removeItem(at: url.locaPath)
         }
         catch(let err) {
             print("FAILED DELETEING VIDEO DATA \(err.localizedDescription)")
@@ -54,7 +54,9 @@ struct PlaylistModel: Codable {
     }
     
     mutating func removeAllFromPlaylist() {
-        playList.removeAll()
+        playList.forEach {
+            removeFromPlayList($0)
+        }
     }
     
     mutating func podcastIsDownload(podcast: Podcast) -> Bool {

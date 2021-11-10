@@ -18,7 +18,8 @@ class DetailViewController: UIViewController {
     @IBOutlet private weak var advisoryRatingLabel: UILabel!
     @IBOutlet private weak var dateLabel: UILabel!
     @IBOutlet private weak var addButton: UIButton!
-    @IBOutlet weak var removeButton: UIButton!
+    @IBOutlet private weak var removeButton: UIButton!
+    @IBOutlet private weak var backImageView: UIImageView!
     
     private var index : Int!
     private var podcast : Podcast!
@@ -28,6 +29,7 @@ class DetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupView()
+        configureGestures()
     }
     
     func setUp(index: Int, podcast: Podcast) {
@@ -39,13 +41,19 @@ class DetailViewController: UIViewController {
         delegate?.detailViewController(self, playButtonDidTouchFor: index)
         self.navigationController?.popViewController(animated: true)
     }
+    
     @IBAction func addButtonOnTouchUpInside(_ sender: UIButton) {
         delegate?.detailViewController(self, addButtonDidTouchFor: podcast)
         self.navigationController?.popViewController(animated: true)
     }
+    
     @IBAction func removeButtonOnTouchUpInside(_ sender: UIButton) {
         delegate?.detailViewController(self, removeButtonDidTouchFor: podcast)
         self.navigationController?.popViewController(animated: true)
+    }
+    
+    @objc func backAction(_ sender: UITapGestureRecognizer) {
+        dismiss(animated: true)
     }
 }
 
@@ -94,5 +102,9 @@ extension DetailViewController {
         if let date = dateFormatterGet.date(from: releaseDate) {
             dateLabel.text = dateFormatterSet.string(from: date)
         }
+    }
+    
+    private func configureGestures() {
+        backImageView.addMyGestureRecognizer(self, type: .tap(1), selector: #selector(backAction))
     }
 }

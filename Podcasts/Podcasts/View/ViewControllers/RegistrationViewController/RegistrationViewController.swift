@@ -18,6 +18,8 @@ class RegistrationViewController: UIViewController {
     @IBOutlet private weak var forgotPasswordLabel: UILabel!
     @IBOutlet private weak var secureShowButton: UIButton!
     @IBOutlet private weak var privacyPolicyLabel: UILabel!
+    @IBOutlet private weak var activityIndicator: UIActivityIndicatorView!
+    @IBOutlet private weak var backGroundView: UIView!
     
     lazy var tabBarVC: TabBarViewController = {
         let vc = storyboard?.instantiateViewController(withIdentifier: TabBarViewController.identifier) as! TabBarViewController
@@ -143,6 +145,10 @@ extension RegistrationViewController {
         passwordTextField.attributedPlaceholder = nSAttributedString(message: placeHolderPasswordMessage, color: colorOk)
         setTitleForSignButton()
         alert.delegate = self
+        
+        backGroundView.layer.borderColor = UIColor.white.cgColor
+        backGroundView.layer.cornerRadius = 10
+        backGroundView.layer.borderWidth = 8
     }
     
     private func isSecureTextEntry() {
@@ -166,6 +172,7 @@ extension RegistrationViewController {
     }
     
     private func signButtonDidSelect() {
+        activityIndicator.startAnimating()
         
         if email.isEmpty {
             emailTextField.attributedPlaceholder = nSAttributedString(message: placeHolderEmailMessage, color: colorFails)
@@ -197,7 +204,8 @@ extension RegistrationViewController {
     }
     
     private func signIn(err: String, result: Bool) {
-        
+        activityIndicator.stopAnimating()
+
         let timeInterval: TimeInterval = 2
         
         if !result {

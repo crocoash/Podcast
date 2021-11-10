@@ -13,6 +13,7 @@ protocol LikedMomentsViewControllerDelegate: AnyObject {
 
 class LikedMomentsViewController: UIViewController {
 
+    @IBOutlet private weak var emptyDataImage: UIView!
     @IBOutlet private weak var likedMomentsTableView: UITableView!
     
     private var cellHeight: CGFloat = 75
@@ -23,17 +24,26 @@ class LikedMomentsViewController: UIViewController {
         subscribeOnDataSourceAndDelegate()
         likedMomentsTableView.register(PodcastCell.self)
         likedMomentsTableView.rowHeight = cellHeight
+        configurateUI()
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         likedMomentsTableView.reloadData()
+        configurateUI()
     }
     
     func subscribeOnDataSourceAndDelegate() {
         likedMomentsTableView.delegate = self
         likedMomentsTableView.dataSource = self
     }
+}
 
+extension LikedMomentsViewController {
+    
+    private func configurateUI() {
+        emptyDataImage.isHidden = !LikedMomentsManager.shared().getLikedMomentsFromUserDefault().isEmpty
+    }
 }
 
 extension LikedMomentsViewController: UITableViewDelegate {
@@ -53,7 +63,6 @@ extension LikedMomentsViewController: UITableViewDelegate {
             likedMomentsTableView.endUpdates()
         }
     }
-    
 }
 
 extension LikedMomentsViewController: UITableViewDataSource {
@@ -68,7 +77,4 @@ extension LikedMomentsViewController: UITableViewDataSource {
         cell.configureCell(with: podcast)
         return cell
     }
-
-    
 }
-

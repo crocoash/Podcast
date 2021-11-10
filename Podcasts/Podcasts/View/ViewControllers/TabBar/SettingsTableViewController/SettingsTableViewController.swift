@@ -31,11 +31,10 @@ class SettingsTableViewController: UITableViewController {
             self?.locationLabel.text = ipData.country + " " + ipData.city
         }
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        userNameLabel.text = user.userName
-        autorizationSwitch.isOn = user.isAuthorization
+        setUpUI()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -58,4 +57,13 @@ class SettingsTableViewController: UITableViewController {
     @IBAction func exit(_ sender: UITapGestureRecognizer) {
         dismiss(animated: true)
     }
+}
+
+extension SettingsTableViewController {
+    
+    private func setUpUI() {
+        userNameLabel.text = user.userName
+        autorizationSwitch.isOn = user.isAuthorization
+    }
+    
 }
