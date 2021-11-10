@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19455" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
-    <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19454"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -76,7 +74,7 @@
             </constraints>
             <connections>
                 <outlet property="downloadProgressView" destination="lmc-17-dpi" id="tUb-7Y-rH7"/>
-                <outlet property="isDownLoaded" destination="I1b-lX-Sbp" id="JAx-Eg-JfF"/>
+                <outlet property="isDownLoad" destination="I1b-lX-Sbp" id="JAx-Eg-JfF"/>
                 <outlet property="playlistStarImageView" destination="Eh8-Wt-E35" id="rw3-la-QKd"/>
                 <outlet property="podcastImage" destination="G1I-LD-L1E" id="G92-SI-c9p"/>
                 <outlet property="podcastName" destination="Bip-zs-gV7" id="3zD-VA-Ah9"/>

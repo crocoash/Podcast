@@ -44,7 +44,7 @@ struct PlaylistModel: Codable {
         playList.removeAll()
     }
     
-    mutating func podcastIsDownloaded(podcast: Podcast) -> Bool {
+    mutating func podcastIsDownload(podcast: Podcast) -> Bool {
         if let index = playList.firstIndex(matching: podcast.id) {
             return playList[index].isDownLoad
         } else {

@@ -18,7 +18,7 @@ class DownloadService {
               let url = URL(string: stringUrl) else { return }
         
         var podcast = podcast
-        podcast.index = index 
+        podcast.index = index
         podcast.task = downloadsSession.downloadTask(with: url)
         podcast.task?.resume()
         activeDownloads[url] = podcast

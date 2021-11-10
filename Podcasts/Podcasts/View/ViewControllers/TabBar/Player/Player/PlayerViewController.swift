@@ -102,11 +102,8 @@ extension PlayerViewController {
         
         workItem?.cancel()
         
-        print("print isDownLoad \(podcast.isDownLoad)")
-
-        
         let requestWorkItem = DispatchWorkItem {
-            let item = AVPlayerItem(url: podcast.isDownloaded ? url.locaPath : url)
+            let item = AVPlayerItem(url: podcast.isDownLoad ? url.locaPath : url)
             self.player.replaceCurrentItem(with: item)
             self.player.play()
         }

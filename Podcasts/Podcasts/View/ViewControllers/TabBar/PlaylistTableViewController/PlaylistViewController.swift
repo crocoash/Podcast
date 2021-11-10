@@ -11,7 +11,8 @@ class PlaylistViewController: UIViewController {
     
     @IBOutlet private weak var playListTableView: UITableView!
     @IBOutlet private weak var playerConstraint: NSLayoutConstraint!
-        
+    @IBOutlet private weak var emptyTableImageView: UIImageView!
+    
     weak var delegate: PlaylistTableViewControllerDelegate?
     
     lazy private var detailViewController: DetailViewController = {
@@ -25,6 +26,7 @@ class PlaylistViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         playListTableView.reloadData()
+        showEmptyImage()
     }
     
     override func viewDidLoad() {
@@ -36,6 +38,7 @@ class PlaylistViewController: UIViewController {
     @objc func trash(sender: UIBarButtonItem) {
         PlaylistDocument.shared.removeAllFromPlaylist()
         playListTableView.reloadData()
+        showEmptyImage()
     }
     
     @objc func tapCell(sender: UITapGestureRecognizer) {
@@ -55,14 +58,29 @@ extension PlaylistViewController {
     
     private func configureUI() {
         playListTableView.register(PodcastCell.self)
+        navigationItem.title = "PlayList"
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(trash))
         playListTableView.rowHeight = 100
         playListTableView.allowsSelection = true
+        
     }
 }
 
 // MARK: - Table View data source
 extension PlaylistViewController: UITableViewDataSource {
+    
+    private func showEmptyImage() {
+        
+        if PlaylistDocument.shared.playList.isEmpty {
+            playListTableView.isHidden = true
+            emptyTableImageView.isHidden = false
+        }
+        
+        if !PlaylistDocument.shared.playList.isEmpty {
+            playListTableView.isHidden = false
+            emptyTableImageView.isHidden = true
+        }
+    }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return PlaylistDocument.shared.playList.count

@@ -66,7 +66,6 @@ struct Podcast: Codable, Equatable, Identifiable {
         case wrapperType
     }
     
-    var isDownloaded = false
     var isDownLoad = false
     var progress: Float = 0
     var index: Int = 0

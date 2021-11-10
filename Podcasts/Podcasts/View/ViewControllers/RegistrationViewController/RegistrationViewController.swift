@@ -94,11 +94,11 @@ class RegistrationViewController: UIViewController {
             signButtonDidSelect()
             
         case .right:
-            segmentedControl.selectedSegmentIndex -= 1
+            segmentedControl.selectedSegmentIndex = 0
             setTitleForSignButton()
             
         case .left:
-            segmentedControl.selectedSegmentIndex += 1
+            segmentedControl.selectedSegmentIndex = 1
             setTitleForSignButton()
             
         case .down:
@@ -141,7 +141,7 @@ extension RegistrationViewController {
         if !email.isEmpty { emailTextField.text = email }
     
         passwordTextField.attributedPlaceholder = nSAttributedString(message: placeHolderPasswordMessage, color: colorOk)
-        
+        setTitleForSignButton()
         alert.delegate = self
     }
     
