@@ -14,7 +14,7 @@ class PodcastCell: UITableViewCell {
     @IBOutlet private weak var playlistStarImageView: UIImageView!
     @IBOutlet private weak var progressLabel: UILabel!
     @IBOutlet private weak var downloadProgressView: UIProgressView!
-    @IBOutlet private weak var isDownLoad: UIImageView!
+    @IBOutlet private weak var isDownLoadImageView: UIImageView!
 }
 
 extension PodcastCell {
@@ -23,21 +23,23 @@ extension PodcastCell {
         podcastImage.image = nil
         
         downloadProgressView.isHidden = true
-        progressLabel.isHidden = true  // !podcast.isDownLoad
+        progressLabel.isHidden = true 
         
         podcastName.text = podcast.trackName
         
         DataProvider().downloadImage(string: podcast.artworkUrl160) { [weak self] image in
             self?.podcastImage.image = image
         }
+
+        isDownLoadImageView.isHidden = PlaylistDocument.shared.podcastIsDownload(podcast: podcast)
         
-        isDownLoad.isHidden = PlaylistDocument.shared.podcastIsDownload(podcast: podcast)
         playlistStarImageView.isHidden = !PlaylistDocument.shared.playList.contains(podcast)
     }
     
     func updateDisplay(progress: Float, totalSize : String) {
         if downloadProgressView.isHidden { downloadProgressView.isHidden = false }
         if progressLabel.isHidden { progressLabel.isHidden = false }
+        if !isDownLoadImageView.isHidden { isDownLoadImageView.isHidden = true }
         
         downloadProgressView.progress = progress
         progressLabel.text = String(format: "%.1f%% of %@", progress * 100, totalSize)

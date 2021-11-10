@@ -60,6 +60,7 @@ struct PlaylistModel: Codable {
     }
     
     mutating func podcastIsDownload(podcast: Podcast) -> Bool {
+//        print("print podcast \(podcast.index) \(podcast.isDownLoad)")
         if let index = playList.firstIndex(matching: podcast.id) {
             return playList[index].isDownLoad
         } else {

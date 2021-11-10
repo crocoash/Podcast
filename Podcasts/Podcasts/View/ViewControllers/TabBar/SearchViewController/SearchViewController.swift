@@ -29,7 +29,6 @@ class SearchViewController : UIViewController {
     
     private var authors: [Author] = [] {
         didSet {
-            podcastTableView.reloadData()
             showEmptyImage()
         }
     }
@@ -120,7 +119,6 @@ class SearchViewController : UIViewController {
 extension SearchViewController {
     
     private func configureUI() {
-//        navigationController?.navigationBar.isHidden = true
         configureTableView()
         configureCancelLabel()
         configureSegmentalControl()
@@ -166,18 +164,31 @@ extension SearchViewController {
     
     private func longPressGesture(_ sender: UILongPressGestureRecognizer) {
         MyLongPressGestureRecognizer.createSelector(for: sender) { (cell: PodcastCell) in
+            
             guard let view = sender.view as? PodcastCell,
                   let indexPath = podcastTableView.indexPath(for: view) else { return }
             
+            print("print 1 \(PlaylistDocument.shared.podcastIsDownload(podcast: podcasts[indexPath.row])) ")
+            
             if PlaylistDocument.shared.playList.contains(podcasts[indexPath.row]) {
+                
                 PlaylistDocument.shared.removeFromPlayList(podcasts[indexPath.row])
+                
                 MyToast.create(title: (podcasts[indexPath.row].trackName ?? "podcast") + "is removed to playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
             } else {
+                
                 PlaylistDocument.shared.addToPlayList(podcasts[indexPath.row])
+                
                 MyToast.create(title: (podcasts[indexPath.row].trackName ?? "podcast") + "is added to playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
+                
                 downloadService.startDownload(podcasts[indexPath.row], index: indexPath.row)
             }
-            podcastTableView.reloadRows(at: [indexPath], with: .none)            
+            
+            
+            
+            podcastTableView.reloadRows(at: [indexPath], with: .none)
+            
+            print("print 2 \(PlaylistDocument.shared.podcastIsDownload(podcast: podcasts[indexPath.row])) ")
             
             feedbackGenerator()
         }
@@ -187,6 +198,7 @@ extension SearchViewController {
         searchText = ""
         authors.removeAll()
         podcasts.removeAll()
+        podcastTableView.reloadData()
         searchSegmentalControl.selectedSegmentIndex = 0
     }
     
@@ -338,9 +350,7 @@ extension SearchViewController: URLSessionDownloadDelegate {
         func localFilePath(for url: URL) -> URL {
             return documentsPath.appendingPathComponent(url.lastPathComponent)
         }
-        
-        downloadService.activeDownloads[sourceURL] = nil
-        
+                
         let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         
         let destinationURL = localFilePath(for: sourceURL)
@@ -357,10 +367,16 @@ extension SearchViewController: URLSessionDownloadDelegate {
         
         DispatchQueue.main.async {
             guard let podcast = self.downloadService.activeDownloads[sourceURL],
-            let index = PlaylistDocument.shared.playList.firstIndex(matching: podcast) else { return }
+                  let index = PlaylistDocument.shared.playList.firstIndex(matching: podcast) else { return }
+            
+            print("print count\(self.downloadService.activeDownloads.count)")
+            
+            print("print 3\(PlaylistDocument.shared.podcastIsDownload(podcast: podcast))")
             
             PlaylistDocument.shared.trackIsDownloaded(index: index)
-
+            
+            print("print 4\(PlaylistDocument.shared.podcastIsDownload(podcast: podcast))")
+            
             self.podcastTableView.reloadRows(at: [IndexPath(row: podcast.index, section: 0)], with: .none)
             self.downloadService.activeDownloads[sourceURL] = nil
         }
@@ -380,7 +396,7 @@ extension SearchViewController: URLSessionDownloadDelegate {
         DispatchQueue.main.async {
             if let podcastCell = self.podcastTableView.cellForRow(at: IndexPath(row: podcast.index, section: 0)) as? PodcastCell {
               podcastCell.updateDisplay(progress: podcast.progress, totalSize: totalSize)
-          }
+            }
         }
     }
 }

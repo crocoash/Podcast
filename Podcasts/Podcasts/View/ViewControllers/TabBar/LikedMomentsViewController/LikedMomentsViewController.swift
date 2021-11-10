@@ -43,6 +43,7 @@ extension LikedMomentsViewController {
     
     private func configurateUI() {
         emptyDataImage.isHidden = !LikedMomentsManager.shared().getLikedMomentsFromUserDefault().isEmpty
+        likedMomentsTableView.isHidden = LikedMomentsManager.shared().getLikedMomentsFromUserDefault().isEmpty
     }
 }
 

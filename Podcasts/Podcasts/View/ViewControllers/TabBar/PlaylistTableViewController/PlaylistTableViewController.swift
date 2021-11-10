@@ -38,7 +38,7 @@ class PlaylistViewController: UIViewController {
     }
     
     //MARK: - Actions
-    @IBAction func removeAllAction(_ sender: UIBarButtonItem) {
+    @IBAction func removeAllAction(_ sender: UIButton) {
         PlaylistDocument.shared.removeAllFromPlaylist()
         playListTableView.reloadData()
         showEmptyImage()
@@ -66,25 +66,17 @@ extension PlaylistViewController {
         playListTableView.rowHeight = 100
         playListTableView.allowsSelection = true
     }
+    
+    private func showEmptyImage() {
+        
+        playListTableView.isHidden = PlaylistDocument.shared.playList.isEmpty
+        emptyTableImageView.isHidden = !PlaylistDocument.shared.playList.isEmpty
+        removeAllButton.isEnabled = !PlaylistDocument.shared.playList.isEmpty
+    }
 }
 
 // MARK: - Table View data source
 extension PlaylistViewController: UITableViewDataSource {
-    
-    private func showEmptyImage() {
-        
-        if PlaylistDocument.shared.playList.isEmpty {
-            playListTableView.isHidden = true
-            emptyTableImageView.isHidden = false
-            removeAllButton.isEnabled = false
-        }
-        
-        if !PlaylistDocument.shared.playList.isEmpty {
-            playListTableView.isHidden = false
-            emptyTableImageView.isHidden = true
-            removeAllButton.isEnabled = true
-        }
-    }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return PlaylistDocument.shared.playList.count
@@ -103,6 +95,7 @@ extension PlaylistViewController: UITableViewDataSource {
             let podcast = PlaylistDocument.shared.playList[indexPath.row]
             PlaylistDocument.shared.removeFromPlayList(podcast)
             tableView.reloadData()
+            showEmptyImage()
         }
     }
 }

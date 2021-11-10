@@ -21,8 +21,9 @@
                                 <rect key="frame" x="0.0" y="76" width="414" height="786"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                             </tableView>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="WlQ-hn-OWC">
-                                <rect key="frame" x="0.0" y="76" width="414" height="786"/>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="folder" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="WlQ-hn-OWC">
+                                <rect key="frame" x="0.0" y="77.666666666666629" width="414" height="783"/>
+                                <color key="tintColor" systemColor="systemGray2Color"/>
                             </imageView>
                             <navigationBar contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="5tv-Df-o5U">
                                 <rect key="frame" x="0.0" y="32" width="414" height="44"/>
@@ -513,8 +514,9 @@
                                     <outlet property="delegate" destination="jhL-xr-nb4" id="QKA-X0-2az"/>
                                 </connections>
                             </tableView>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="noFolders" translatesAutoresizingMaskIntoConstraints="NO" id="eKJ-yr-yvz">
-                                <rect key="frame" x="0.0" y="88" width="414" height="774"/>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="tray" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="eKJ-yr-yvz">
+                                <rect key="frame" x="0.0" y="90" width="414" height="770"/>
+                                <color key="tintColor" systemColor="systemGray2Color"/>
                             </imageView>
                             <navigationBar contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vtY-pD-jrk">
                                 <rect key="frame" x="0.0" y="44" width="414" height="44"/>
@@ -526,9 +528,12 @@
                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                 <state key="normal" title="Button"/>
                                                 <buttonConfiguration key="configuration" style="plain" title="Remove All"/>
+                                                <connections>
+                                                    <action selector="removeAllAction:" destination="jhL-xr-nb4" eventType="touchUpInside" id="HUM-Wj-6ef"/>
+                                                </connections>
                                             </button>
                                             <connections>
-                                                <action selector="removeAllAction:" destination="jhL-xr-nb4" id="b3T-Rx-V31"/>
+                                                <action selector="test:" destination="jhL-xr-nb4" id="i5N-du-JdC"/>
                                             </connections>
                                         </barButtonItem>
                                     </navigationItem>
@@ -766,8 +771,9 @@
                                     <outlet property="delegate" destination="EnT-Hf-VQ1" id="sHl-eh-E5z"/>
                                 </connections>
                             </tableView>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" image="noFolders" translatesAutoresizingMaskIntoConstraints="NO" id="F7z-zg-T0y">
-                                <rect key="frame" x="5" y="136" width="404" height="726"/>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" image="doc.text.magnifyingglass" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="F7z-zg-T0y">
+                                <rect key="frame" x="5" y="136.33333333333337" width="404" height="727"/>
+                                <color key="tintColor" systemColor="systemGray2Color"/>
                             </imageView>
                             <segmentedControl opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="252" verticalCompressionResistancePriority="752" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="Sxo-fe-clJ">
                                 <rect key="frame" x="5" y="100" width="404" height="32"/>
@@ -816,8 +822,10 @@
     </scenes>
     <resources>
         <image name="arrow.backward" catalog="system" width="128" height="98"/>
+        <image name="doc.text.magnifyingglass" catalog="system" width="107" height="128"/>
+        <image name="folder" catalog="system" width="128" height="97"/>
         <image name="images" width="122.66666412353516" height="45.666667938232422"/>
-        <image name="noFolders" width="380" height="380"/>
+        <image name="tray" catalog="system" width="128" height="88"/>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
