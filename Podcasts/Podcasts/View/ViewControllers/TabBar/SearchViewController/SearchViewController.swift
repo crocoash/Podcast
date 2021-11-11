@@ -61,6 +61,11 @@ class SearchViewController : UIViewController {
         downloadService.downloadsSession = downloadsSession
     }
     
+    override func motionBegan(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
+        cancelSearchAction()
+        feedbackGenerator()
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         podcastTableView.reloadData()
@@ -102,6 +107,7 @@ class SearchViewController : UIViewController {
         detailViewController.delegate = self
         detailViewController.setUp(index: index, podcast: podcast)
         detailViewController.title = "Additional info"
+        detailViewController.transitioningDelegate = self
         detailViewController.modalPresentationStyle = .custom
 
         present(detailViewController,animated: true)

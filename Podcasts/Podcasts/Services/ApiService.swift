@@ -11,7 +11,7 @@ class ApiService {
     
     static func getData<T: Decodable>(for request: String, completion: @escaping (T?) -> Void) {
         
-        guard let url = URL(string: request) else { completion(nil); return }
+        guard let url = URL(string: request.encodeUrl) else { completion(nil); return }
         
         URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
             guard let data = data, response != nil, error == nil else { print(error!.localizedDescription)

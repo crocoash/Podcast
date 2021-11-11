@@ -17,7 +17,7 @@ class PlayerViewController: UIViewController {
     
     @IBOutlet private weak var progressView: UIProgressView!
     
-    private var player: AVPlayer = AVPlayer()
+    var player: AVPlayer = AVPlayer()
     
     lazy private var bigPlayerVC = createBigPlayer()
     
@@ -120,12 +120,20 @@ extension PlayerViewController {
         workItem?.cancel()
         if observe == nil { addTimeObserve() }
         
+        
+        
         let requestWorkItem = DispatchWorkItem {
             let item = AVPlayerItem(url: podcast.isDownLoad ? url.locaPath : url)
             self.player.replaceCurrentItem(with: item)
             self.player.play()
             if !self.likedMoments.isEmpty {
                 self.player.seek(to: CMTime(seconds: self.likedMoments[self.index].moment, preferredTimescale: 60))
+            }
+            
+            let scene = UIApplication.shared.connectedScenes.first
+            
+            if let sceneDelegate : SceneDelegate = (scene?.delegate as? SceneDelegate) {
+                sceneDelegate.videoViewController = self;
             }
         }
         

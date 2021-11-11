@@ -69,7 +69,6 @@ extension PlaylistViewController {
     }
     
     private func showEmptyImage() {
-        
         playListTableView.isHidden = PlaylistDocument.shared.playList.isEmpty
         emptyTableImageView.isHidden = !PlaylistDocument.shared.playList.isEmpty
         removeAllButton.isEnabled = !PlaylistDocument.shared.playList.isEmpty
