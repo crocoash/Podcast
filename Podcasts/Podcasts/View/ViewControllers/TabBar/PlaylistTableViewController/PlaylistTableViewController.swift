@@ -19,20 +19,10 @@ class PlaylistViewController: UIViewController {
     
     weak var delegate: PlaylistViewControllerDelegate?
     
-<<<<<<< HEAD
-    lazy private var detailViewController: DetailViewController = {
-        let detailViewController = storyboard?.instantiateViewController(identifier: DetailViewController.identifier) as! DetailViewController
-        detailViewController.delegate = self
-        detailViewController.transitioningDelegate = self
-        return detailViewController
-    }()
-    
     func playerIsShow() {
         tableViewBottomConstraint.constant = -50
     }
-    
-=======
->>>>>>> develop
+
     // MARK: - View Methods
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
