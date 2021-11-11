@@ -15,6 +15,7 @@ class PlaylistViewController: UIViewController {
     @IBOutlet private weak var playerConstraint: NSLayoutConstraint!
     @IBOutlet private weak var emptyTableImageView: UIImageView!
     @IBOutlet private weak var removeAllButton: UIBarButtonItem!
+    @IBOutlet private weak var tableViewBottomConstraint: NSLayoutConstraint!
     
     weak var delegate: PlaylistViewControllerDelegate?
     
@@ -24,6 +25,10 @@ class PlaylistViewController: UIViewController {
         detailViewController.transitioningDelegate = self
         return detailViewController
     }()
+    
+    func playerIsShow() {
+        tableViewBottomConstraint.constant = -50
+    }
     
     // MARK: - View Methods
     override func viewWillAppear(_ animated: Bool) {

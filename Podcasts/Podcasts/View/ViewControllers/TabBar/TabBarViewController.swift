@@ -107,6 +107,7 @@ extension TabBarViewController: SearchViewControllerDelegate {
     func searchViewController(_ searchViewController: SearchViewController, _ podcasts: [Podcast], didSelectIndex: Int) {
         playerVC.view.isHidden = false
         playerVC.play(podcasts: podcasts, at: didSelectIndex)
+        searchViewController.playerIsShow()
     }
 }
 
@@ -116,6 +117,7 @@ extension TabBarViewController: PlaylistViewControllerDelegate {
     func playlistTableViewController(_ playlistTableViewController: PlaylistViewController, _ podcasts: [Podcast], didSelectIndex: Int) {
         playerVC.view.isHidden = false
         playerVC.play(podcasts: podcasts, at: didSelectIndex)
+        playlistTableViewController.playerIsShow()
     }
 }
 

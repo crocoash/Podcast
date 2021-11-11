@@ -33,6 +33,10 @@ class SearchViewController : UIViewController {
         }
     }
     
+    func playerIsShow() {
+        playerOffSetConstraint.constant = 300
+    }
+    
     private var searchText = "" {
         didSet {
             if !searchText.isEmpty { getData(by: searchText.conform) }
@@ -169,15 +173,12 @@ extension SearchViewController {
             guard let view = sender.view as? PodcastCell,
                   let indexPath = podcastTableView.indexPath(for: view) else { return }
             
-            print("print 1 \(PlaylistDocument.shared.podcastIsDownload(podcast: podcasts[indexPath.row])) ")
-            
             if PlaylistDocument.shared.playList.contains(podcasts[indexPath.row]) {
                 
                 PlaylistDocument.shared.removeFromPlayList(podcasts[indexPath.row])
                 
                 MyToast.create(title: (podcasts[indexPath.row].trackName ?? "podcast") + "is removed to playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
             } else {
-                
                 PlaylistDocument.shared.addToPlayList(podcasts[indexPath.row])
                 
                 MyToast.create(title: (podcasts[indexPath.row].trackName ?? "podcast") + "is added to playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
@@ -186,9 +187,7 @@ extension SearchViewController {
             }
             
             podcastTableView.reloadRows(at: [indexPath], with: .none)
-            
-            print("print 2 \(PlaylistDocument.shared.podcastIsDownload(podcast: podcasts[indexPath.row])) ")
-            
+                        
             feedbackGenerator()
         }
     }
@@ -369,18 +368,11 @@ extension SearchViewController: URLSessionDownloadDelegate {
         }
         
         DispatchQueue.main.async {
-            guard let podcast = self.downloadService.activeDownloads[sourceURL],
-                  let index = PlaylistDocument.shared.playList.firstIndex(matching: podcast) else { return }
+            guard let podcast = self.downloadService.activeDownloads[sourceURL] else { return }
+
+            PlaylistDocument.shared.trackIsDownloaded(index: podcast.id!)
             
-            print("print count\(self.downloadService.activeDownloads.count)")
-            
-            print("print 3\(PlaylistDocument.shared.podcastIsDownload(podcast: podcast))")
-            
-            PlaylistDocument.shared.trackIsDownloaded(index: index)
-            
-            print("print 4\(PlaylistDocument.shared.podcastIsDownload(podcast: podcast))")
-            
-            self.podcastTableView.reloadRows(at: [IndexPath(row: podcast.index, section: 0)], with: .none)
+            self.podcastTableView.reloadRows(at: [IndexPath(row: podcast.index!, section: 0)], with: .none)
             self.downloadService.activeDownloads[sourceURL] = nil
         }
     }
@@ -397,7 +389,7 @@ extension SearchViewController: URLSessionDownloadDelegate {
         let totalSize = ByteCountFormatter.string(fromByteCount: totalBytesExpectedToWrite, countStyle: .file)
                 
         DispatchQueue.main.async {
-            if let podcastCell = self.podcastTableView.cellForRow(at: IndexPath(row: podcast.index, section: 0)) as? PodcastCell {
+            if let podcastCell = self.podcastTableView.cellForRow(at: IndexPath(row: podcast.index!, section: 0)) as? PodcastCell {
               podcastCell.updateDisplay(progress: podcast.progress, totalSize: totalSize)
             }
         }

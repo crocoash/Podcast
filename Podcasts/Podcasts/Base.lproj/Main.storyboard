@@ -556,6 +556,7 @@
                         <outlet property="playListTableView" destination="UTo-be-6g2" id="iLl-qn-D9J"/>
                         <outlet property="playerConstraint" destination="YAj-Ig-piW" id="xRQ-EY-o51"/>
                         <outlet property="removeAllButton" destination="ECs-ll-Vyt" id="icq-cC-wVg"/>
+                        <outlet property="tableViewBottomConstraint" destination="YAj-Ig-piW" id="63j-qh-C9R"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="saX-dG-ff4" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -566,7 +567,7 @@
         <scene sceneID="DxN-PH-pXs">
             <objects>
                 <tableViewController storyboardIdentifier="SettingsTableViewController" id="ukg-c7-1Un" customClass="SettingsTableViewController" customModule="Podcasts" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" scrollEnabled="NO" dataMode="static" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" id="n0R-xe-c55">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" scrollEnabled="NO" delaysContentTouches="NO" dataMode="static" style="plain" separatorStyle="default" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" id="n0R-xe-c55">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -800,6 +801,7 @@
                             <constraint firstItem="F7z-zg-T0y" firstAttribute="trailing" secondItem="3lm-pE-WaS" secondAttribute="trailing" id="ew7-QP-AMa"/>
                             <constraint firstItem="SUb-vK-IfH" firstAttribute="leading" secondItem="hqc-mv-6ME" secondAttribute="leading" constant="5" id="s0l-Rg-Lcf"/>
                             <constraint firstItem="SUb-vK-IfH" firstAttribute="top" secondItem="hqc-mv-6ME" secondAttribute="top" id="tER-SM-4WG"/>
+                            <constraint firstItem="hqc-mv-6ME" firstAttribute="bottom" secondItem="F7z-zg-T0y" secondAttribute="bottom" id="tY3-cc-xO6"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="dlc-g0-qam"/>

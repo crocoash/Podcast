@@ -51,6 +51,7 @@ struct PlaylistModel: Codable {
         if let index = playList.firstIndex(matching: index) {
             playList[index].isDownLoad = true
         }
+        
     }
     
     mutating func removeAllFromPlaylist() {
@@ -60,12 +61,20 @@ struct PlaylistModel: Codable {
     }
     
     mutating func podcastIsDownload(podcast: Podcast) -> Bool {
-//        print("print podcast \(podcast.index) \(podcast.isDownLoad)")
         if let index = playList.firstIndex(matching: podcast.id) {
             return playList[index].isDownLoad
         } else {
-            return true
+            return false
         }
+    }
+    
+    mutating func podcastIsFavorite(podcast: Podcast) -> Bool {
+        for i in playList {
+            if i.id == podcast.id {
+               return true
+            }
+        }
+        return false
     }
     
     func isPodcastInPlaylist(_ podcast: Podcast) -> Bool {

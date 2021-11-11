@@ -30,16 +30,15 @@ extension PodcastCell {
         DataProvider().downloadImage(string: podcast.artworkUrl160) { [weak self] image in
             self?.podcastImage.image = image
         }
-
-        isDownLoadImageView.isHidden = PlaylistDocument.shared.podcastIsDownload(podcast: podcast)
         
-        playlistStarImageView.isHidden = !PlaylistDocument.shared.playList.contains(podcast)
+        isDownLoadImageView.isHidden = !PlaylistDocument.shared.podcastIsDownload(podcast: podcast)
+        
+        playlistStarImageView.isHidden = !PlaylistDocument.shared.podcastIsFavorite(podcast: podcast)
     }
     
     func updateDisplay(progress: Float, totalSize : String) {
         if downloadProgressView.isHidden { downloadProgressView.isHidden = false }
         if progressLabel.isHidden { progressLabel.isHidden = false }
-        if !isDownLoadImageView.isHidden { isDownLoadImageView.isHidden = true }
         
         downloadProgressView.progress = progress
         progressLabel.text = String(format: "%.1f%% of %@", progress * 100, totalSize)
