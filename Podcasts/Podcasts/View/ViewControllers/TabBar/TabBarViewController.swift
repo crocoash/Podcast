@@ -127,13 +127,13 @@ extension TabBarViewController: SettingsTableViewControllerDelegate {
         self.trailConstraint?.isActive.toggle()
         self.leadConstraint?.isActive.toggle()
          
-        UIView.animate(withDuration: 4, delay: 0, options: [.curveEaseOut], animations: {
+        UIView.animate(withDuration: 2, delay: 0, options: [.curveEaseOut], animations: {
             self.view.layoutIfNeeded()
         }) { _ in
             
             settingsTableViewController.switchDarkMode()
             
-            UIView.animate(withDuration: 1, delay: 0, options: []) {
+            UIView.animate(withDuration: 0.5, delay: 0, options: []) {
                 self.trailConstraint?.isActive.toggle()
                 self.leadConstraint?.isActive.toggle()
                 self.view.layoutIfNeeded()

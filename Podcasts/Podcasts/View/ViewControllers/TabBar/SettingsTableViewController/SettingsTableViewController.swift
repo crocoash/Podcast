@@ -54,7 +54,7 @@ class SettingsTableViewController: UITableViewController {
     
     @IBAction func darkModeValueChanged(_ sender: UISwitch) {
         delegate?.settingsTableViewControllerDarkModeDidSelect(self)
-        darkModeStyle(value: false)
+        darkModeStyle(value: !isDarkTheme)
     }
     
     @IBAction func avtorizationChangeValue(_ sender: UISwitch) {
@@ -62,7 +62,7 @@ class SettingsTableViewController: UITableViewController {
     }
     
     @IBAction func exit(_ sender: UITapGestureRecognizer) {
-        dismiss(animated: true)
+        dismiss(animated: isDarkTheme)
     }
 }
 
@@ -76,7 +76,7 @@ extension SettingsTableViewController {
     
     func switchDarkMode() {
         darkModeSwitch.isOn.toggle()
-        darkModeStyle(value: true)
+        darkModeStyle(value: isDarkTheme)
     }
     
     func darkModeStyle(value: Bool) {
