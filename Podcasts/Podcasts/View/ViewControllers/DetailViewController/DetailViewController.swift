@@ -17,9 +17,10 @@ class DetailViewController: UIViewController {
     @IBOutlet private weak var durationLabel: UILabel!
     @IBOutlet private weak var advisoryRatingLabel: UILabel!
     @IBOutlet private weak var dateLabel: UILabel!
-    @IBOutlet private weak var addButton: UIButton!
-    @IBOutlet private weak var removeButton: UIButton!
     @IBOutlet private weak var backImageView: UIImageView!
+    @IBOutlet weak var removeFromPlaylistBookmark: UIImageView!
+    @IBOutlet weak var addToPlaylistBookmark: UIImageView!
+    @IBOutlet weak var playImageView: UIImageView!
     
     private var index : Int!
     private var podcast : Podcast!
@@ -37,40 +38,44 @@ class DetailViewController: UIViewController {
         self.podcast = podcast
     }
     
-    @IBAction private func listenButtonOnTouchUpInside(_ sender: UIButton) {
+    @objc private func playButtonOnTouchUpInside(_ sender: UIButton) {
         delegate?.detailViewController(self, playButtonDidTouchFor: index)
-        self.navigationController?.popViewController(animated: true)
+        dismiss(animated: true, completion: nil)
     }
     
-    @IBAction func addButtonOnTouchUpInside(_ sender: UIButton) {
+    @objc private func addBookmarkOnTouchUpInside(_ sender: UIButton) {
         delegate?.detailViewController(self, addButtonDidTouchFor: podcast)
-        self.navigationController?.popViewController(animated: true)
+        dismiss(animated: true, completion: nil)
     }
     
-    @IBAction func removeButtonOnTouchUpInside(_ sender: UIButton) {
+    @objc private func removeBookmarkOnTouchUpInside(_ sender: UIButton) {
         delegate?.detailViewController(self, removeButtonDidTouchFor: podcast)
-        self.navigationController?.popViewController(animated: true)
+        dismiss(animated: true, completion: nil)
     }
     
-    @objc func backAction(_ sender: UITapGestureRecognizer) {
+    @objc private func backAction(_ sender: UITapGestureRecognizer) {
         dismiss(animated: true)
+    }
+    
+    deinit {
+        print("12312312321321")
     }
 }
 
 extension DetailViewController {
     
     private func setupView(){
-        removeButton.isHidden = true
-        removeButton.isEnabled = false
+        removeFromPlaylistBookmark.isHidden = true
+        removeFromPlaylistBookmark.isUserInteractionEnabled = false
         DataProvider().downloadImage(string: podcast.artworkUrl600) { [weak self] image in
             self?.episodeImage.image = image
         }
         
         if PlaylistDocument.shared.isPodcastInPlaylist(podcast){
-            addButton.isHidden = true
-            addButton.isEnabled = false
-            removeButton.isHidden = false
-            removeButton.isEnabled = true
+            addToPlaylistBookmark.isHidden = true
+            addToPlaylistBookmark.isUserInteractionEnabled = false
+            removeFromPlaylistBookmark.isHidden = false
+            removeFromPlaylistBookmark.isUserInteractionEnabled = true
         }
 
         episodeName.text = podcast.trackName
@@ -104,7 +109,12 @@ extension DetailViewController {
         }
     }
     
+   
+    
     private func configureGestures() {
         backImageView.addMyGestureRecognizer(self, type: .tap(1), selector: #selector(backAction))
+        removeFromPlaylistBookmark.addMyGestureRecognizer(self, type: .tap(1), selector: #selector(removeBookmarkOnTouchUpInside))
+        addToPlaylistBookmark.addMyGestureRecognizer(self, type: .tap(1), selector: #selector(addBookmarkOnTouchUpInside))
+        playImageView.addMyGestureRecognizer(self, type: .tap(1), selector: #selector(playButtonOnTouchUpInside))
     }
 }

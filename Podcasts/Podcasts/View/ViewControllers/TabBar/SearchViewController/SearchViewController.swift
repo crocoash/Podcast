@@ -177,7 +177,7 @@ extension SearchViewController {
                 
                 PlaylistDocument.shared.removeFromPlayList(podcasts[indexPath.row])
                 
-                MyToast.create(title: (podcasts[indexPath.row].trackName ?? "podcast") + "is removed to playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
+                MyToast.create(title: (podcasts[indexPath.row].trackName ?? "podcast") + "is removed from playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
             } else {
                 PlaylistDocument.shared.addToPlayList(podcasts[indexPath.row])
                 
@@ -415,6 +415,11 @@ extension SearchViewController: DetailViewControllerDelegate {
 
     func detailViewController(_ detailViewController: DetailViewController, addButtonDidTouchFor selectedPodcast: Podcast) {
         PlaylistDocument.shared.addToPlayList(selectedPodcast)
+        guard let index = podcasts.firstIndex(where: {$0 == selectedPodcast}) else {
+            fatalError("No such element in collection while download")
+        }
+        downloadService.startDownload(selectedPodcast, index: index)
+        podcastTableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none )
     }
     
     func detailViewController(_ detailViewController: DetailViewController, removeButtonDidTouchFor selectedPodcast: Podcast) {

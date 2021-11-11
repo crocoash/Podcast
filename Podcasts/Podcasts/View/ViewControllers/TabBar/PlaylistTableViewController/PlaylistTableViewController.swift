@@ -19,6 +19,7 @@ class PlaylistViewController: UIViewController {
     
     weak var delegate: PlaylistViewControllerDelegate?
     
+<<<<<<< HEAD
     lazy private var detailViewController: DetailViewController = {
         let detailViewController = storyboard?.instantiateViewController(identifier: DetailViewController.identifier) as! DetailViewController
         detailViewController.delegate = self
@@ -30,6 +31,8 @@ class PlaylistViewController: UIViewController {
         tableViewBottomConstraint.constant = -50
     }
     
+=======
+>>>>>>> develop
     // MARK: - View Methods
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -55,6 +58,9 @@ class PlaylistViewController: UIViewController {
               let indexPath = playListTableView.indexPath(for: view) else { return }
         
         let podcast = PlaylistDocument.shared.playList[indexPath.row]
+        let detailViewController = storyboard?.instantiateViewController(identifier: DetailViewController.identifier) as! DetailViewController
+        detailViewController.delegate = self
+        detailViewController.transitioningDelegate = self
         detailViewController.setUp(index: indexPath.row, podcast: podcast)
         detailViewController.modalPresentationStyle = .custom
         
@@ -113,6 +119,7 @@ extension PlaylistViewController : DetailViewControllerDelegate {
     
     func detailViewController(_ detailViewController: DetailViewController, removeButtonDidTouchFor selectedPodcast: Podcast) {
         PlaylistDocument.shared.removeFromPlayList(selectedPodcast)
+        playListTableView.reloadData()
     }
     
     func detailViewController(_ detailViewController: DetailViewController, playButtonDidTouchFor didSelectIndex: Int) {
