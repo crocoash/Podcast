@@ -61,6 +61,11 @@ class SearchViewController : UIViewController {
         downloadService.downloadsSession = downloadsSession
     }
     
+    override func motionBegan(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
+        cancelSearchAction()
+        feedbackGenerator()
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         podcastTableView.reloadData()

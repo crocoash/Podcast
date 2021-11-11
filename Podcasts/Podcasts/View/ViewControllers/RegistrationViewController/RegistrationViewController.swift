@@ -172,7 +172,6 @@ extension RegistrationViewController {
     }
     
     private func signButtonDidSelect() {
-        activityIndicator.startAnimating()
         
         if email.isEmpty {
             emailTextField.attributedPlaceholder = nSAttributedString(message: placeHolderEmailMessage, color: colorFails)
@@ -187,6 +186,7 @@ extension RegistrationViewController {
         } else if password.isEmpty {
             passwordTextField.becomeFirstResponder()
         } else {
+            activityIndicator.startAnimating()
             
             //signInWithEmail
             if firstSegmentedControl {
