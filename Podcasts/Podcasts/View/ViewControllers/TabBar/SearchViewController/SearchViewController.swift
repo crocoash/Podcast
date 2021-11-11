@@ -121,7 +121,6 @@ class SearchViewController : UIViewController {
         default: break
         }
         
-        
         if !searchText.isEmpty { getData(by: searchText) }
     }
 }
