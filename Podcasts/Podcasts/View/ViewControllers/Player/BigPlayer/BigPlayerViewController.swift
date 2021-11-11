@@ -97,6 +97,9 @@ class BigPlayerViewController: UIViewController {
     @IBAction func likedButton(_ sender: UIButton) {
         delegate?.bigPlayerViewController(self, didLikeThis: Double(progressSlider.value))
     }
+    @IBAction func dissmisButtonTouchUpInside(_ sender: UIButton) {
+        dismiss(animated: true, completion: nil)
+    }
 }
 
 extension BigPlayerViewController {

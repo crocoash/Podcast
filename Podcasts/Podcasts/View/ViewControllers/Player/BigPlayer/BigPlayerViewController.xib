@@ -147,6 +147,17 @@
                         <action selector="likedButton:" destination="-1" eventType="touchUpInside" id="x9y-uK-lFd"/>
                     </connections>
                 </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4wB-gs-qWY">
+                    <rect key="frame" x="344" y="64" width="50" height="50"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="50" id="1Mg-ff-l3G"/>
+                        <constraint firstAttribute="height" constant="50" id="evg-bU-Fw6"/>
+                    </constraints>
+                    <state key="normal" backgroundImage="chevron-down"/>
+                    <connections>
+                        <action selector="dissmisButtonTouchUpInside:" destination="-1" eventType="touchUpInside" id="MVG-cN-vbI"/>
+                    </connections>
+                </button>
             </subviews>
             <viewLayoutGuide key="safeArea" id="fnl-2z-Ty3"/>
             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -158,6 +169,7 @@
                 <constraint firstItem="s8Y-pZ-k98" firstAttribute="height" secondItem="S9q-Kg-Gm0" secondAttribute="height" multiplier="0.200401" id="5eg-Gn-Z70"/>
                 <constraint firstItem="JSQ-Ks-8p4" firstAttribute="centerX" secondItem="fnl-2z-Ty3" secondAttribute="centerX" id="E4O-0g-EZR"/>
                 <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="YBf-Sa-DCQ" secondAttribute="trailing" constant="20" id="Eox-SO-0op"/>
+                <constraint firstItem="4wB-gs-qWY" firstAttribute="top" secondItem="S9q-Kg-Gm0" secondAttribute="top" id="Gcb-1M-Sjl"/>
                 <constraint firstItem="s8Y-pZ-k98" firstAttribute="width" secondItem="S9q-Kg-Gm0" secondAttribute="width" multiplier="0.13369" id="HH0-n2-JlI"/>
                 <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="cXA-Ai-yFn" secondAttribute="trailing" constant="20" id="M6y-ND-Yr8"/>
                 <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="arR-z9-12W" secondAttribute="trailing" constant="20" id="T9p-ts-w93"/>
@@ -170,6 +182,7 @@
                 <constraint firstItem="arR-z9-12W" firstAttribute="top" secondItem="cXA-Ai-yFn" secondAttribute="bottom" constant="25" id="jAm-Sq-TTW"/>
                 <constraint firstItem="arR-z9-12W" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" constant="20" id="jB7-D9-F9s"/>
                 <constraint firstItem="arR-z9-12W" firstAttribute="top" secondItem="JSQ-Ks-8p4" secondAttribute="bottom" constant="3" id="mJS-hN-t5g"/>
+                <constraint firstItem="4wB-gs-qWY" firstAttribute="trailing" secondItem="S9q-Kg-Gm0" secondAttribute="trailing" id="pE4-jk-0UG"/>
                 <constraint firstItem="s8Y-pZ-k98" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="rBc-vT-93N"/>
                 <constraint firstItem="oqM-Hi-VRJ" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" constant="20" id="uq2-ZD-KfI"/>
                 <constraint firstItem="S9q-Kg-Gm0" firstAttribute="top" secondItem="fnl-2z-Ty3" secondAttribute="top" constant="20" id="zht-tE-0Lw"/>
@@ -178,6 +191,7 @@
         </view>
     </objects>
     <resources>
+        <image name="chevron-down" width="512" height="512"/>
         <image name="like-1" width="640" height="640"/>
         <image name="play.fill" catalog="system" width="116" height="128"/>
         <systemColor name="systemBackgroundColor">
