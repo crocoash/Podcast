@@ -22,7 +22,7 @@ class SplashScreenViewController: UIViewController {
         registationViewController.modalPresentationStyle = .custom
 
         
-        UIView.animate(withDuration: 3.0, delay: 0.2, options: .beginFromCurrentState, animations: {
+        UIView.animate(withDuration: 1.2, delay: 0.0, options: .beginFromCurrentState, animations: {
             self.nixWelcome.frame.origin.y -= (self.view.center.y - self.nixWelcome.frame.height)
         },
         completion: {_ in
