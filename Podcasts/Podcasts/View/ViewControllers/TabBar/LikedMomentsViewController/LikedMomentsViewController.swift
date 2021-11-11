@@ -24,13 +24,12 @@ class LikedMomentsViewController: UIViewController {
         subscribeOnDataSourceAndDelegate()
         likedMomentsTableView.register(PodcastCell.self)
         likedMomentsTableView.rowHeight = cellHeight
-        //configurateUI()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         likedMomentsTableView.reloadData()
-        //configurateUI()
+        configureUI()
     }
     
     func subscribeOnDataSourceAndDelegate() {
@@ -41,9 +40,9 @@ class LikedMomentsViewController: UIViewController {
 
 extension LikedMomentsViewController {
     
-    private func configurateUI() {
-        emptyDataImage.isHidden = !LikedMomentsManager.shared().getLikedMomentsFromUserDefault().isEmpty
-        likedMomentsTableView.isHidden = LikedMomentsManager.shared().getLikedMomentsFromUserDefault().isEmpty
+    private func configureUI() {
+        emptyDataImage.isHidden = LikedMomentsManager.shared().getLikedMomentsFromUserDefault().isEmpty
+        likedMomentsTableView.isHidden = !LikedMomentsManager.shared().getLikedMomentsFromUserDefault().isEmpty
     }
 }
 
