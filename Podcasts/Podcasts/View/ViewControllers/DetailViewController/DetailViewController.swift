@@ -21,6 +21,7 @@ class DetailViewController: UIViewController {
     @IBOutlet weak var removeFromPlaylistBookmark: UIImageView!
     @IBOutlet weak var addToPlaylistBookmark: UIImageView!
     @IBOutlet weak var playImageView: UIImageView!
+    @IBOutlet weak var shareImageView: UIImageView!
     
     private var index : Int!
     private var podcast : Podcast!
@@ -57,8 +58,15 @@ class DetailViewController: UIViewController {
         dismiss(animated: true)
     }
     
-    deinit {
-        print("12312312321321")
+    @objc private func shareButtonOnTouch(_ sender: UITapGestureRecognizer) {
+        let text = "You should definitely listen to this!"
+        let shareVC = UIActivityViewController(activityItems: [text, podcast.trackViewUrl! ,episodeImage.image! ], applicationActivities: [])
+    
+        if let popoverController = shareVC.popoverPresentationController {
+            popoverController.sourceView = self.view
+            popoverController.sourceRect = self.view.bounds
+        }
+        self.present(shareVC, animated: true, completion: nil)
     }
 }
 
@@ -116,5 +124,6 @@ extension DetailViewController {
         removeFromPlaylistBookmark.addMyGestureRecognizer(self, type: .tap(1), selector: #selector(removeBookmarkOnTouchUpInside))
         addToPlaylistBookmark.addMyGestureRecognizer(self, type: .tap(1), selector: #selector(addBookmarkOnTouchUpInside))
         playImageView.addMyGestureRecognizer(self, type: .tap(1), selector: #selector(playButtonOnTouchUpInside))
+        shareImageView.addMyGestureRecognizer(self, type: .tap(1), selector: #selector(shareButtonOnTouch))
     }
 }
