@@ -42,11 +42,11 @@ class BigPlayerViewController: UIViewController {
     }
     
     func upDateProgressSlider(currentTime: Float, currentItem: Float) {
-        currentTimeLabel.text = convertTimeToReadableFormat(currentTime)
+        currentTimeLabel.text = convertToReadableFormat(time: currentTime)
         
         self.progressSlider.value = currentTime
         progressSlider.maximumValue = currentItem
-        durationTrackLabel.text = convertTimeToReadableFormat(currentItem)
+        durationTrackLabel.text = convertToReadableFormat(time: currentItem)
 
         if !activityIndicator.isHidden { activityIndicator.stopAnimating() }
     }
@@ -59,14 +59,7 @@ class BigPlayerViewController: UIViewController {
         configureUI(with: podcast)
     }
     
-//    func updateUI(with moment: LikedMoment) {
-//        isPresented = true
-//        self.isLast = false
-//        self.isFirst = false
-//        progressSlider.value = 0
-//    }
-    
-    
+
     @IBAction func progressSliderValueChanged(_ sender: UISlider) {
         delegate?.bigPlayerViewController(self, didChangeCurrentTime:  Double(sender.value))
     }
@@ -124,16 +117,23 @@ extension BigPlayerViewController {
         view.addMyGestureRecognizer(self, type: .swipe(directions: [.down]), selector: #selector(respondToSwipe))
     }
     
-    private func convertTimeToReadableFormat(_ time: Float) -> String {
-        let timeInt = Int(time)
-        let hours = Int(timeInt/3600)
-        let min = Int(timeInt % 3600 / 60)
-        let sec = Int ((timeInt % 60) % 60)
-        if hours > 0 {
-            return ("\(hours):\(min):\(sec)")
-        } else {
-            return ("\(min):\(sec)")
+    private func convertToReadableFormat(time: Float) -> String {
+
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = [.hour, .minute, .second]
+        formatter.unitsStyle = .positional
+
+        guard let formattedString = formatter.string(from: TimeInterval(time)) else { return "0:0"}
+        
+        switch formattedString.count {
+        case 0..<2:
+            return "0:0\(formattedString)"
+        case 2...4:
+            return "0:\(formattedString)"
+        default:
+            return formattedString
         }
+
     }
     
 }
