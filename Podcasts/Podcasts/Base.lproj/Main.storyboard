@@ -349,8 +349,8 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" ambiguous="YES" image="images" translatesAutoresizingMaskIntoConstraints="NO" id="abJ-Eo-7kG">
-                                <rect key="frame" x="36.666666666666657" y="396" width="341" height="114"/>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" image="images" translatesAutoresizingMaskIntoConstraints="NO" id="abJ-Eo-7kG">
+                                <rect key="frame" x="36.666666666666657" y="81" width="341" height="114"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="341" id="5Yc-gD-VKG"/>
                                     <constraint firstAttribute="height" constant="114" id="7Z2-eA-275"/>
@@ -360,6 +360,7 @@
                         <viewLayoutGuide key="safeArea" id="Qaq-0y-2aK"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
+                            <constraint firstItem="abJ-Eo-7kG" firstAttribute="top" secondItem="Qaq-0y-2aK" secondAttribute="top" constant="37" id="Rcn-Pc-Xxg"/>
                             <constraint firstItem="abJ-Eo-7kG" firstAttribute="centerX" secondItem="Qaq-0y-2aK" secondAttribute="centerX" id="fHs-nJ-xMc"/>
                         </constraints>
                     </view>
@@ -369,7 +370,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="S0Z-Dt-b0A" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-157" y="177"/>
+            <point key="canvasLocation" x="-157.97101449275362" y="176.78571428571428"/>
         </scene>
         <!--Registration View Controller-->
         <scene sceneID="FNX-fx-oGE">
@@ -515,7 +516,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Won-KO-DKh" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="632" y="177"/>
+            <point key="canvasLocation" x="631.8840579710145" y="176.78571428571428"/>
         </scene>
         <!--Playlist View Controller-->
         <scene sceneID="Gjh-PJ-LNZ">
