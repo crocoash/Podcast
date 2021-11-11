@@ -61,6 +61,7 @@ class PlayerViewController: UIViewController {
     
     //MARK: - Methods
     func play(podcasts: [Podcast], at index: Int) {
+        likedMoments = []
         self.podcasts = podcasts
         self.index = index
     }
