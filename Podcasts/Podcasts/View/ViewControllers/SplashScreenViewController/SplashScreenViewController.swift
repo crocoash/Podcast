@@ -10,7 +10,7 @@ import UIKit
 class SplashScreenViewController: UIViewController {
 
 
-    @IBOutlet weak var nixWelcome: UIImageView!
+    @IBOutlet private weak var nixWelcome: UIImageView!
     
     override func viewDidLoad() {
         
@@ -22,10 +22,8 @@ class SplashScreenViewController: UIViewController {
         registationViewController.modalPresentationStyle = .custom
 
         
-        UIView.animate(withDuration: 3.0, delay: 0.2, options: .beginFromCurrentState, animations: {
-            var frame : CGRect = self.nixWelcome.frame
-            frame
-            self.nixWelcome.frame = frame
+        UIView.animate(withDuration: 1.2, delay: 0.0, options: .beginFromCurrentState, animations: {
+            self.nixWelcome.frame.origin.y -= (self.view.center.y - self.nixWelcome.frame.height)
         },
         completion: {_ in
             self.present(registationViewController,animated: false)
