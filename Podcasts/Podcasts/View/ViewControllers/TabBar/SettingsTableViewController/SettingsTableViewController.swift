@@ -7,6 +7,7 @@
 
 import UIKit
 
+
 class SettingsTableViewController: UITableViewController {
     
     private var userViewModel: UserViewModel!
@@ -16,6 +17,10 @@ class SettingsTableViewController: UITableViewController {
     
     func setUser(_ userViewModel: UserViewModel) {
         self.userViewModel = userViewModel
+    }
+    
+    private var isDarkTheme: Bool {
+        self.traitCollection.userInterfaceStyle == .dark
     }
     
     @IBOutlet private weak var userNameLabel: UILabel!
@@ -44,10 +49,12 @@ class SettingsTableViewController: UITableViewController {
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        delegate?.settingsTableViewControllerDidDisapear(self)
+        delegate?.settingsTableViewControllerDidDisappear(self)
     }
     
     @IBAction func darkModeValueChanged(_ sender: UISwitch) {
+        delegate?.settingsTableViewControllerDarkModeDidSelect(self)
+        darkModeStyle(value: false)
     }
     
     @IBAction func avtorizationChangeValue(_ sender: UISwitch) {
@@ -64,7 +71,15 @@ extension SettingsTableViewController {
     private func setUpUI() {
         userNameLabel.text = user.userName
         authorizationSwitch.isOn = user.isAuthorization
-        darkModeSwitch.isOn = self.traitCollection.userInterfaceStyle == .dark
+        darkModeSwitch.isOn = isDarkTheme
     }
     
+    func switchDarkMode() {
+        darkModeSwitch.isOn.toggle()
+        darkModeStyle(value: true)
+    }
+    
+    func darkModeStyle(value: Bool) {
+        view.backgroundColor = value ? .black : .white
+    }
 }

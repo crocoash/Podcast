@@ -19,6 +19,12 @@ class TabBarViewController: UITabBarController {
         self.userViewModel = userViewModel
     }
     
+    lazy var imageView: UIImageView =  {
+        $0.image = UIImage(named: "decree")
+        $0.translatesAutoresizingMaskIntoConstraints = false
+        return $0
+    }(UIImageView())
+    
     private var trailConstraint: NSLayoutConstraint?
     private var leadConstraint: NSLayoutConstraint?
     
@@ -27,6 +33,8 @@ class TabBarViewController: UITabBarController {
         super.viewDidLoad()
         configureTabBar()
         addPlayer()
+        
+        configureImageDarkMode()
     }
 }
 
@@ -81,6 +89,16 @@ extension TabBarViewController {
         playerVC.view.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate(constraintsSmallPlayer)
     }
+    
+    private func configureImageDarkMode() {
+        view.addSubview(imageView)
+        imageView.heightAnchor.constraint(equalToConstant: 200).isActive = true
+        imageView.widthAnchor.constraint(equalToConstant: 200).isActive = true
+        trailConstraint = imageView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -54)
+        leadConstraint = imageView.trailingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0)
+        leadConstraint?.isActive = true
+        imageView.topAnchor.constraint(equalTo: view.topAnchor, constant: 200).isActive = true
+    }
 }
 
 // MARK: - SearchViewControllerDelegate
@@ -104,11 +122,30 @@ extension TabBarViewController: PlaylistViewControllerDelegate {
 // MARK: - SettingsTableViewControllerDelegate
 extension TabBarViewController: SettingsTableViewControllerDelegate {
     
+    func settingsTableViewControllerDarkModeDidSelect(_ settingsTableViewController: SettingsTableViewController) {
+        
+        self.trailConstraint?.isActive.toggle()
+        self.leadConstraint?.isActive.toggle()
+         
+        UIView.animate(withDuration: 4, delay: 0, options: [.curveEaseOut], animations: {
+            self.view.layoutIfNeeded()
+        }) { _ in
+            
+            settingsTableViewController.switchDarkMode()
+            
+            UIView.animate(withDuration: 1, delay: 0, options: []) {
+                self.trailConstraint?.isActive.toggle()
+                self.leadConstraint?.isActive.toggle()
+                self.view.layoutIfNeeded()
+            }
+        }
+    }
+    
     func settingsTableViewControllerDidAppear(_ settingsTableViewController: SettingsTableViewController) {
         self.playerVC.view.isHidden = true
     }
     
-    func settingsTableViewControllerDidDisapear(_ settingsTableViewController: SettingsTableViewController) {
+    func settingsTableViewControllerDidDisappear(_ settingsTableViewController: SettingsTableViewController) {
         if self.playerVC.currentPodcast != nil {
             self.playerVC.view.isHidden = false
         }

@@ -9,5 +9,6 @@ import Foundation
 
 protocol SettingsTableViewControllerDelegate: AnyObject {
     func settingsTableViewControllerDidAppear(_ settingsTableViewController: SettingsTableViewController)
-    func settingsTableViewControllerDidDisapear(_ settingsTableViewController: SettingsTableViewController)
+    func settingsTableViewControllerDidDisappear(_ settingsTableViewController: SettingsTableViewController)
+    func settingsTableViewControllerDarkModeDidSelect(_ settingsTableViewController: SettingsTableViewController)
 }
