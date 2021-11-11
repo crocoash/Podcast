@@ -18,10 +18,10 @@ class DetailViewController: UIViewController {
     @IBOutlet private weak var advisoryRatingLabel: UILabel!
     @IBOutlet private weak var dateLabel: UILabel!
     @IBOutlet private weak var backImageView: UIImageView!
-    @IBOutlet weak var removeFromPlaylistBookmark: UIImageView!
-    @IBOutlet weak var addToPlaylistBookmark: UIImageView!
-    @IBOutlet weak var playImageView: UIImageView!
-    @IBOutlet weak var shareImageView: UIImageView!
+    @IBOutlet private weak var removeFromPlaylistBookmark: UIImageView!
+    @IBOutlet private weak var addToPlaylistBookmark: UIImageView!
+    @IBOutlet private weak var playImageView: UIImageView!
+    @IBOutlet private weak var shareImageView: UIImageView!
     
     private var index : Int!
     private var podcast : Podcast!
@@ -54,7 +54,7 @@ class DetailViewController: UIViewController {
         dismiss(animated: true, completion: nil)
     }
     
-    @objc private func backAction(_ sender: UITapGestureRecognizer) {
+    @objc private func backAction(_ sender: Any) {
         dismiss(animated: true)
     }
     
@@ -79,7 +79,7 @@ extension DetailViewController {
             self?.episodeImage.image = image
         }
         
-        if PlaylistDocument.shared.isPodcastInPlaylist(podcast){
+        if PlaylistDocument.shared.isPodcastInPlaylist(podcast) {
             addToPlaylistBookmark.isHidden = true
             addToPlaylistBookmark.isUserInteractionEnabled = false
             removeFromPlaylistBookmark.isHidden = false
@@ -117,13 +117,12 @@ extension DetailViewController {
         }
     }
     
-   
-    
     private func configureGestures() {
         backImageView.addMyGestureRecognizer(self, type: .tap(1), selector: #selector(backAction))
         removeFromPlaylistBookmark.addMyGestureRecognizer(self, type: .tap(1), selector: #selector(removeBookmarkOnTouchUpInside))
         addToPlaylistBookmark.addMyGestureRecognizer(self, type: .tap(1), selector: #selector(addBookmarkOnTouchUpInside))
         playImageView.addMyGestureRecognizer(self, type: .tap(1), selector: #selector(playButtonOnTouchUpInside))
+        addMyGestureRecognizer(self, type: .screenEdgePanGestureRecognizer(directions: [.left]), selector: #selector(backAction))
         shareImageView.addMyGestureRecognizer(self, type: .tap(1), selector: #selector(shareButtonOnTouch))
     }
 }
