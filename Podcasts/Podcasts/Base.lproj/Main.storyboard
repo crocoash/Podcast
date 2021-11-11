@@ -724,7 +724,7 @@
                         </connections>
                     </tableView>
                     <connections>
-                        <outlet property="autorizationSwitch" destination="ECU-01-T1n" id="Sbk-yG-J9T"/>
+                        <outlet property="authorizationSwitch" destination="ECU-01-T1n" id="Sbk-yG-J9T"/>
                         <outlet property="darkModeSwitch" destination="03k-sD-xBu" id="h1Q-dh-LcQ"/>
                         <outlet property="locationLabel" destination="HGg-0u-sAA" id="zft-DN-HJB"/>
                         <outlet property="userNameLabel" destination="Eae-s5-lad" id="T3I-i0-Qer"/>

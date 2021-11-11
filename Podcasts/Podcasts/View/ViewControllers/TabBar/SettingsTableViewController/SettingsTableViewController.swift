@@ -20,9 +20,9 @@ class SettingsTableViewController: UITableViewController {
     
     @IBOutlet private weak var userNameLabel: UILabel!
     @IBOutlet private weak var locationLabel: UILabel!
-    @IBOutlet weak var darkModeSwitch: UISwitch!
+    @IBOutlet private weak var darkModeSwitch: UISwitch!
     
-    @IBOutlet private weak var autorizationSwitch: UISwitch!
+    @IBOutlet private weak var authorizationSwitch: UISwitch!
     
     override func loadView() {
         super.loadView()
@@ -39,7 +39,7 @@ class SettingsTableViewController: UITableViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        delegate?.settingsTableViewControllerDidApear(self)
+        delegate?.settingsTableViewControllerDidAppear(self)
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -63,8 +63,8 @@ extension SettingsTableViewController {
     
     private func setUpUI() {
         userNameLabel.text = user.userName
-        autorizationSwitch.isOn = user.isAuthorization
-        darkModeSwitch.isOn = !(self.traitCollection.userInterfaceStyle == .dark)
+        authorizationSwitch.isOn = user.isAuthorization
+        darkModeSwitch.isOn = self.traitCollection.userInterfaceStyle == .dark
     }
     
 }

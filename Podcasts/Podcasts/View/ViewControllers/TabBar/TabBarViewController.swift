@@ -104,7 +104,7 @@ extension TabBarViewController: PlaylistViewControllerDelegate {
 // MARK: - SettingsTableViewControllerDelegate
 extension TabBarViewController: SettingsTableViewControllerDelegate {
     
-    func settingsTableViewControllerDidApear(_ settingsTableViewController: SettingsTableViewController) {
+    func settingsTableViewControllerDidAppear(_ settingsTableViewController: SettingsTableViewController) {
         self.playerVC.view.isHidden = true
     }
     

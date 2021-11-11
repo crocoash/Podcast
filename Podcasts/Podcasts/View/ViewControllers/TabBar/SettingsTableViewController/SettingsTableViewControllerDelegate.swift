@@ -8,6 +8,6 @@
 import Foundation
 
 protocol SettingsTableViewControllerDelegate: AnyObject {
-    func settingsTableViewControllerDidApear(_ settingsTableViewController: SettingsTableViewController)
+    func settingsTableViewControllerDidAppear(_ settingsTableViewController: SettingsTableViewController)
     func settingsTableViewControllerDidDisapear(_ settingsTableViewController: SettingsTableViewController)
 }
