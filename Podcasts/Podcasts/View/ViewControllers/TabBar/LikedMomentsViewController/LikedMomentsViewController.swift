@@ -13,7 +13,7 @@ protocol LikedMomentsViewControllerDelegate: AnyObject {
 
 class LikedMomentsViewController: UIViewController {
 
-    @IBOutlet private weak var emptyDataImage: UIView!
+    @IBOutlet private weak var emptyDataImage: UIImageView!
     @IBOutlet private weak var likedMomentsTableView: UITableView!
     
     private var cellHeight: CGFloat = 75
@@ -41,8 +41,8 @@ class LikedMomentsViewController: UIViewController {
 extension LikedMomentsViewController {
     
     private func configureUI() {
-        emptyDataImage.isHidden = LikedMomentsManager.shared().getLikedMomentsFromUserDefault().isEmpty
-        likedMomentsTableView.isHidden = !LikedMomentsManager.shared().getLikedMomentsFromUserDefault().isEmpty
+        emptyDataImage.isHidden = !LikedMomentsManager.shared().getLikedMomentsFromUserDefault().isEmpty
+        likedMomentsTableView.isHidden = LikedMomentsManager.shared().getLikedMomentsFromUserDefault().isEmpty
     }
 }
 
@@ -61,6 +61,7 @@ extension LikedMomentsViewController: UITableViewDelegate {
             LikedMomentsManager.shared().deleteMoment(at: indexPath.row)
             likedMomentsTableView.deleteRows(at: [indexPath], with: .fade)
             likedMomentsTableView.endUpdates()
+            configureUI()
         }
     }
 }

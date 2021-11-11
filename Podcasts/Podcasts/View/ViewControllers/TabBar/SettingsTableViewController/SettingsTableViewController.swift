@@ -64,6 +64,7 @@ extension SettingsTableViewController {
     private func setUpUI() {
         userNameLabel.text = user.userName
         autorizationSwitch.isOn = user.isAuthorization
+        darkModeSwitch.isOn = !(self.traitCollection.userInterfaceStyle == .dark)
     }
     
 }

@@ -47,6 +47,7 @@ class LikedMomentsManager {
                 print("Error in decoding process")
             }
         }
+        
         let moments: [LikedMoment] = []
         return moments
     }

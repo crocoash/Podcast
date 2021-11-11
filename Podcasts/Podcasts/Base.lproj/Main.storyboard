@@ -50,7 +50,7 @@
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="emptyDataImage" destination="k8H-zY-yUX" id="lHd-NJ-3is"/>
+                        <outlet property="emptyDataImage" destination="WlQ-hn-OWC" id="aQ8-07-lfj"/>
                         <outlet property="likedMomentsTableView" destination="nht-3g-eEg" id="hFu-Vi-RAG"/>
                     </connections>
                 </viewController>

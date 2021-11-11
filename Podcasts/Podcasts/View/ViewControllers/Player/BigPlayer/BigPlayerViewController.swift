@@ -80,7 +80,6 @@ class BigPlayerViewController: UIViewController {
         print("print nextPodcastTouchUpInside")
         durationTrackLabel.text = "0:0"
         delegate?.bigPlayerViewControllerDidSelectNextTrackButton(self)
-        
     }
     
     @IBAction func previousPodcastTouchUpInside(_ sender: UIButton) {
@@ -105,7 +104,6 @@ class BigPlayerViewController: UIViewController {
     @IBAction func likedButton(_ sender: UIButton) {
         delegate?.bigPlayerViewController(self, didLikeThis: Double(progressSlider.value))
     }
-    
 }
 
 extension BigPlayerViewController {

@@ -185,8 +185,6 @@ extension SearchViewController {
                 downloadService.startDownload(podcasts[indexPath.row], index: indexPath.row)
             }
             
-            
-            
             podcastTableView.reloadRows(at: [indexPath], with: .none)
             
             print("print 2 \(PlaylistDocument.shared.podcastIsDownload(podcast: podcasts[indexPath.row])) ")
