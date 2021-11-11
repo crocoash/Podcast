@@ -35,7 +35,7 @@ class SearchViewController : UIViewController {
     
     private var searchText = "" {
         didSet {
-            if !searchText.isEmpty { getPodcasts(by: searchText.conform) }
+            if !searchText.isEmpty { getData(by: searchText.conform) }
             searchBar.text = searchText
         }
     }
@@ -69,7 +69,7 @@ class SearchViewController : UIViewController {
     }
     
     @objc func changeTypeOfSearch(sender: UISegmentedControl) {
-        if !searchText.isEmpty { getPodcasts(by: searchText) }
+        if !searchText.isEmpty { getData(by: searchText) }
     }
     
     @objc func handlerLongPs(sender: UILongPressGestureRecognizer) {
@@ -95,7 +95,6 @@ class SearchViewController : UIViewController {
         
         let detailViewController = storyboard?.instantiateViewController(identifier: DetailViewController.identifier) as! DetailViewController
         
-        detailViewController.navigationController?.navigationBar.isHidden = true
         detailViewController.delegate = self
         detailViewController.setUp(index: index, podcast: podcast)
         detailViewController.title = "Additional info"
@@ -111,7 +110,9 @@ class SearchViewController : UIViewController {
         case .right: searchSegmentalControl.selectedSegmentIndex -= 1
         default: break
         }
-        if !searchText.isEmpty { getPodcasts(by: searchText) }
+        
+        
+        if !searchText.isEmpty { getData(by: searchText) }
     }
 }
 
@@ -203,6 +204,7 @@ extension SearchViewController {
     }
     
     private func showEmptyImage() {
+        
         if searchSegmentalControl.selectedSegmentIndex == 0, podcasts.isEmpty {
             podcastTableView.isHidden = true
             emptyTableImageView.isHidden = false
@@ -233,12 +235,16 @@ extension SearchViewController {
         
         if let data = data, !data.isEmpty {
             completion(data)
+            podcastTableView.reloadData()
         } else {
             self.alert.create(title: "Ooops nothing search", withTimeIntervalToDismiss: 2)
+            self.podcasts.removeAll()
+            self.authors.removeAll()
+            podcastTableView.reloadData()
         }
     }
     
-    private func getPodcasts(by request: String) {
+    private func getData(by request: String) {
         let request = request.conform
         activityIndicator.startAnimating()
         
@@ -249,7 +255,6 @@ extension SearchViewController {
                 DispatchQueue.main.async {
                     self.processResults(data: info?.results, completion: { podcasts in
                         self.podcasts = podcasts
-                        self.podcastTableView.reloadData()
                     })
                 }
             }
@@ -258,10 +263,10 @@ extension SearchViewController {
                 guard let self = self else { return }
                 self.processResults(data: info?.results, completion: { authors in
                     self.authors = authors
-                    self.podcastTableView.reloadData()
                 })
             }
         }
+        showEmptyImage()
     }
 }
 
