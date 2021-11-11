@@ -38,10 +38,10 @@
                         <rect key="frame" x="288" y="3.5" width="25" height="25"/>
                         <color key="tintColor" red="0.66799789669999998" green="0.47512125970000002" blue="0.25860109930000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </imageView>
-                    <progressView hidden="YES" opaque="NO" tag="40" contentMode="scaleToFill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jFc-Bc-tCa">
+                    <progressView hidden="YES" opaque="NO" tag="40" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="jFc-Bc-tCa">
                         <rect key="frame" x="58" y="68" width="163" height="4"/>
                     </progressView>
-                    <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="100% of 1.35MB" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Rlk-QC-Yls" userLabel="progressLabel">
+                    <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" text="100% of 1.35MB" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Rlk-QC-Yls" userLabel="progressLabel">
                         <rect key="frame" x="236" y="63" width="78.5" height="12"/>
                         <fontDescription key="fontDescription" type="system" pointSize="10"/>
                         <color key="textColor" red="0.66666666669999997" green="0.66666666669999997" blue="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -64,6 +64,7 @@
                     <constraint firstItem="ZDP-F7-7bG" firstAttribute="width" secondItem="Y6n-gv-nHf" secondAttribute="width" multiplier="0.221875" constant="-23" id="huT-mv-uaz"/>
                     <constraint firstItem="wRd-Ac-IFA" firstAttribute="centerX" secondItem="cSq-aK-NQM" secondAttribute="centerX" id="iMz-dV-nVF"/>
                     <constraint firstItem="ERN-hX-YbI" firstAttribute="top" secondItem="Y6n-gv-nHf" secondAttribute="top" constant="9" id="jg7-wl-ioJ"/>
+                    <constraint firstItem="jFc-Bc-tCa" firstAttribute="width" secondItem="Y6n-gv-nHf" secondAttribute="width" multiplier="0.509375" id="lK3-uh-OFu"/>
                     <constraint firstItem="ERN-hX-YbI" firstAttribute="leading" secondItem="ZDP-F7-7bG" secondAttribute="trailing" constant="10" id="sJI-rn-8ks"/>
                     <constraint firstAttribute="bottom" secondItem="jFc-Bc-tCa" secondAttribute="bottom" constant="3" id="vsh-rA-WsW"/>
                     <constraint firstItem="jFc-Bc-tCa" firstAttribute="leading" secondItem="ERN-hX-YbI" secondAttribute="leading" id="xWm-a9-1kk"/>
