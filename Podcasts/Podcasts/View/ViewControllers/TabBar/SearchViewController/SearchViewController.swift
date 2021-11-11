@@ -34,7 +34,7 @@ class SearchViewController : UIViewController {
     }
     
     func playerIsShow() {
-        playerOffSetConstraint.constant = 300
+        playerOffSetConstraint.constant = 50
     }
     
     private var searchText = "" {
@@ -182,11 +182,11 @@ extension SearchViewController {
                 
                 PlaylistDocument.shared.removeFromPlayList(podcasts[indexPath.row])
                 
-                MyToast.create(title: (podcasts[indexPath.row].trackName ?? "podcast") + "is removed from playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
+                MyToast.create(title: (podcasts[indexPath.row].trackName ?? "podcast") + "is removed from playlist", .bottom, offsetLocation: playerOffSetConstraint.constant, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
             } else {
                 PlaylistDocument.shared.addToPlayList(podcasts[indexPath.row])
                 
-                MyToast.create(title: (podcasts[indexPath.row].trackName ?? "podcast") + "is added to playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
+                MyToast.create(title: (podcasts[indexPath.row].trackName ?? "podcast") + "is added to playlist", .bottom, offsetLocation: playerOffSetConstraint.constant, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
                 
                 downloadService.startDownload(podcasts[indexPath.row], index: indexPath.row)
             }
@@ -373,11 +373,16 @@ extension SearchViewController: URLSessionDownloadDelegate {
         }
         
         DispatchQueue.main.async {
-            guard let podcast = self.downloadService.activeDownloads[sourceURL] else { return }
-
-            PlaylistDocument.shared.trackIsDownloaded(index: podcast.id!)
+            guard let podcast = self.downloadService.activeDownloads[sourceURL],
+                  let id = podcast.id,
+                  let index = podcast.index else { fatalError() }
             
-            self.podcastTableView.reloadRows(at: [IndexPath(row: podcast.index!, section: 0)], with: .none)
+            PlaylistDocument.shared.trackIsDownloaded(index: id)
+            
+            if !self.podcasts.isEmpty {
+                self.podcastTableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
+            }
+            
             self.downloadService.activeDownloads[sourceURL] = nil
         }
     }

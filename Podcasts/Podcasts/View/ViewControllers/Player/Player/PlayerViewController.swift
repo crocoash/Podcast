@@ -120,8 +120,6 @@ extension PlayerViewController {
         workItem?.cancel()
         if observe == nil { addTimeObserve() }
         
-        
-        
         let requestWorkItem = DispatchWorkItem {
             let item = AVPlayerItem(url: podcast.isDownLoad ? url.locaPath : url)
             self.player.replaceCurrentItem(with: item)
@@ -129,12 +127,11 @@ extension PlayerViewController {
             if !self.likedMoments.isEmpty {
                 self.player.seek(to: CMTime(seconds: self.likedMoments[self.index].moment, preferredTimescale: 60))
             }
-            
-            let scene = UIApplication.shared.connectedScenes.first
-            
-            if let sceneDelegate : SceneDelegate = (scene?.delegate as? SceneDelegate) {
-                sceneDelegate.videoViewController = self;
-            }
+        }
+        
+        let scene = UIApplication.shared.connectedScenes.first
+        if let sceneDelegate : SceneDelegate = (scene?.delegate as? SceneDelegate) {
+            sceneDelegate.videoViewController = self;
         }
         
         workItem = requestWorkItem
