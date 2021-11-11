@@ -102,6 +102,7 @@ class SearchViewController : UIViewController {
         detailViewController.delegate = self
         detailViewController.setUp(index: index, podcast: podcast)
         detailViewController.title = "Additional info"
+        detailViewController.transitioningDelegate = self
         detailViewController.modalPresentationStyle = .custom
 
         present(detailViewController,animated: true)
