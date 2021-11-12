@@ -33,8 +33,14 @@ class SearchViewController : UIViewController {
         }
     }
     
-    func playerIsShow() {
-        playerOffSetConstraint.constant = 50
+    private var playerIsShow: Bool = false {
+        didSet {
+            view.layoutIfNeeded()
+        }
+    }
+    
+    func playerIsShow(value: Bool) {
+        playerIsShow = value
     }
     
     private var searchText = "" {
@@ -69,6 +75,7 @@ class SearchViewController : UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         podcastTableView.reloadData()
+        playerOffSetConstraint.constant = playerIsShow ? 50 : 0
         if podcasts.isEmpty { searchBar.becomeFirstResponder() }
     }
     
@@ -375,7 +382,7 @@ extension SearchViewController: URLSessionDownloadDelegate {
         DispatchQueue.main.async {
             guard let podcast = self.downloadService.activeDownloads[sourceURL],
                   let id = podcast.id,
-                  let index = podcast.index else { fatalError() }
+                  let index = podcast.index else { return }
             
             PlaylistDocument.shared.trackIsDownloaded(index: id)
             
@@ -406,6 +413,7 @@ extension SearchViewController: URLSessionDownloadDelegate {
     }
 }
 
+// MARK: - URLSessionDelegate
 extension SearchViewController: URLSessionDelegate {
   func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {
     DispatchQueue.main.async {
@@ -418,8 +426,10 @@ extension SearchViewController: URLSessionDelegate {
   }
 }
 
+// MARK: - DetailViewControllerDelegate
 extension SearchViewController: DetailViewControllerDelegate {
     func detailViewController(_ detailViewController: DetailViewController, playButtonDidTouchFor podcastIndex: Int) {
+        playerOffSetConstraint.constant = 50
         delegate?.searchViewController(self, podcasts, didSelectIndex: podcastIndex)
     }
 

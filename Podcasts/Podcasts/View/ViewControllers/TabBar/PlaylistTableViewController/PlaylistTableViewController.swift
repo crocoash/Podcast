@@ -19,8 +19,10 @@ class PlaylistViewController: UIViewController {
     
     weak var delegate: PlaylistViewControllerDelegate?
     
-    func playerIsShow() {
-        tableViewBottomConstraint.constant = -50
+    private var playerIsShow: Bool = false
+    
+    func playerIsShow(value: Bool) {
+        playerIsShow = value
     }
 
     // MARK: - View Methods
@@ -28,6 +30,7 @@ class PlaylistViewController: UIViewController {
         super.viewWillAppear(animated)
         playListTableView.reloadData()
         showEmptyImage()
+        tableViewBottomConstraint.constant = playerIsShow ? -50 : 0
     }
         
     override func viewDidLoad() {
