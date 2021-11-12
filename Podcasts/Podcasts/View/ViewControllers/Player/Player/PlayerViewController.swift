@@ -34,6 +34,9 @@ class PlayerViewController: UIViewController {
     private var image1: UIImage?
     
     var currentPodcast: Podcast? { !podcasts.isEmpty ? podcasts[index] : nil }
+    private let commandCenter = MPRemoteCommandCenter.shared()
+    private var isCommandCenter = false
+    
     
     private var observe: Any?
     
@@ -103,10 +106,7 @@ class PlayerViewController: UIViewController {
             isLast: isLastPodcast
         )
     }
-    
-    @objc func nextPodcastEvent(_ sender: MPRemoteCommandEvent) {
-        index += 1
-    }
+
 }
 
 //MARK: - Private methods
@@ -127,33 +127,32 @@ extension PlayerViewController {
         workItem?.cancel()
         if observe == nil { addTimeObserve() }
         
-        UIApplication.shared.beginReceivingRemoteControlEvents()
-        
-        let commandCenter = MPRemoteCommandCenter.shared()
-        
-        commandCenter.previousTrackCommand.isEnabled = !isFirstPodcast
-        commandCenter.previousTrackCommand.addTarget { MPRemoteCommandEvent in
-            self.index -= 1
-            return MPRemoteCommandHandlerStatus.init(rawValue: 0)!
-        }
-        
-        commandCenter.nextTrackCommand.isEnabled = !isLastPodcast
-        commandCenter.nextTrackCommand.addTarget { MPRemoteCommandEvent in
-            self.index += 1
-            if self.isLastPodcast { commandCenter.nextTrackCommand.isEnabled = false }
-            return MPRemoteCommandHandlerStatus.init(rawValue: 0)!
-        }
-
+        commandCenter.previousTrackCommand.isEnabled = !self.isFirstPodcast
+        commandCenter.nextTrackCommand.isEnabled = !self.isLastPodcast
         commandCenter.playCommand.isEnabled = true
-        commandCenter.playCommand.addTarget { MPRemoteCommandEvent in
-            self.player.play()
-            return MPRemoteCommandHandlerStatus.init(rawValue: 0)!
-        }
-
         commandCenter.pauseCommand.isEnabled = true
-        commandCenter.pauseCommand.addTarget { MPRemoteCommandEvent in
-            self.player.pause()
-            return MPRemoteCommandHandlerStatus.init(rawValue: 0)!
+
+        if !isCommandCenter {
+            commandCenter.previousTrackCommand.addTarget { MPRemoteCommandEvent in
+                self.index -= 1
+                return .success
+            }
+            
+            commandCenter.nextTrackCommand.addTarget { MPRemoteCommandEvent in
+                self.index += 1
+                return .success
+            }
+
+            commandCenter.playCommand.addTarget { MPRemoteCommandEvent in
+                self.player.play()
+                return .success
+            }
+
+            commandCenter.pauseCommand.addTarget { MPRemoteCommandEvent in
+                self.player.pause()
+                return .success
+            }
+            isCommandCenter = true
         }
         
         let requestWorkItem = DispatchWorkItem {
@@ -225,7 +224,8 @@ extension PlayerViewController {
         bigPlayerVC = BigPlayerViewController.loadFromXib()
         bigPlayerVC.delegate = self
         bigPlayerVC.modalPresentationStyle = .fullScreen
-        
+        UIApplication.shared.beginReceivingRemoteControlEvents()
+
         return bigPlayerVC
     }
     
@@ -269,15 +269,13 @@ extension PlayerViewController {
         view.addMyGestureRecognizer(self, type: .tap(1), selector: #selector(respondToSwipe))
     }
     
-    private func nextPodcast() {
+@objc private func nextPodcast() {
         index += 1
     }
     
-    private func previewsPodcast() {
+    @objc private func previewsPodcast() {
         index -= 1
     }
-    
-    
 }
 
 // MARK: - BigPlayerViewControllerDelegate
