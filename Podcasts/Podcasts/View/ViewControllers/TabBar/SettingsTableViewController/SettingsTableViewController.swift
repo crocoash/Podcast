@@ -62,7 +62,7 @@ class SettingsTableViewController: UITableViewController {
     }
     
     @IBAction func exit(_ sender: UITapGestureRecognizer) {
-        dismiss(animated: isDarkTheme)
+        dismiss(animated: false)
     }
 }
 
