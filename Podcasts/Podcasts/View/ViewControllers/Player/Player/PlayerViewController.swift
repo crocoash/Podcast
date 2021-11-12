@@ -141,13 +141,13 @@ extension PlayerViewController {
         commandCenter.nextTrackCommand.addTarget { MPRemoteCommandEvent in
             self.index += 1
             if self.isLastPodcast { commandCenter.nextTrackCommand.isEnabled = false }
-            return MPRemoteCommandHandlerStatus.init(rawValue: 0)!
+            return .success
         }
 
         commandCenter.playCommand.isEnabled = true
         commandCenter.playCommand.addTarget { MPRemoteCommandEvent in
             self.player.play()
-            return MPRemoteCommandHandlerStatus.init(rawValue: 0)!
+            return .success
         }
 
         commandCenter.pauseCommand.isEnabled = true
