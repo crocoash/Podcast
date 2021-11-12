@@ -19,11 +19,33 @@ class TabBarViewController: UITabBarController {
         self.userViewModel = userViewModel
     }
     
+    private var playerIsShow = false {
+        didSet {
+            playListVc.playerIsShow(value: playerIsShow)
+            searchVC.playerIsShow(value: playerIsShow)
+        }
+    }
+    
     lazy var imageView: UIImageView =  {
         $0.image = UIImage(named: "decree")
         $0.translatesAutoresizingMaskIntoConstraints = false
         return $0
     }(UIImageView())
+    
+    lazy var playListVc: PlaylistViewController = {
+        $0.delegate = self
+        return $0
+    }(createTabBar(PlaylistViewController.self , title: "Playlist", imageName: "folder.fill"))
+    
+    lazy var searchVC: SearchViewController = {
+        $0.delegate = self
+        return $0
+    }(createTabBar(SearchViewController.self, title: "Search", imageName: "magnifyingglass"))
+    
+    lazy var likedMoments: LikedMomentsViewController = {
+        $0.delegate = self
+        return $0
+    }(createTabBar(LikedMomentsViewController.self , title: "Liked", imageName: "heart.fill") )
     
     private var trailConstraint: NSLayoutConstraint?
     private var leadConstraint: NSLayoutConstraint?
@@ -43,17 +65,6 @@ extension TabBarViewController {
     
     private func configureTabBar() {
 
-        let playListVc = createTabBar(PlaylistViewController.self , title: "Playlist", imageName: "folder.fill") {
-            $0.delegate = self
-        }
-        
-        let searchVC = createTabBar(SearchViewController.self, title: "Search", imageName: "magnifyingglass") {
-            $0.delegate = self
-        }
-        
-        let likedMoments = createTabBar(LikedMomentsViewController.self , title: "Liked", imageName: "heart.fill") {
-            $0.delegate = self
-        }
         
         let settingsVC = createTabBar(SettingsTableViewController.self, title: "Settings", imageName: "gear") { [weak self] vc in
             guard let self = self else { return }
@@ -107,7 +118,7 @@ extension TabBarViewController: SearchViewControllerDelegate {
     func searchViewController(_ searchViewController: SearchViewController, _ podcasts: [Podcast], didSelectIndex: Int) {
         playerVC.view.isHidden = false
         playerVC.play(podcasts: podcasts, at: didSelectIndex)
-        searchViewController.playerIsShow()
+        playerIsShow = true
     }
 }
 
@@ -117,7 +128,7 @@ extension TabBarViewController: PlaylistViewControllerDelegate {
     func playlistTableViewController(_ playlistTableViewController: PlaylistViewController, _ podcasts: [Podcast], didSelectIndex: Int) {
         playerVC.view.isHidden = false
         playerVC.play(podcasts: podcasts, at: didSelectIndex)
-        playlistTableViewController.playerIsShow()
+        playerIsShow = true
     }
 }
 

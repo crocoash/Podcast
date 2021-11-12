@@ -21,12 +21,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        let audioSession = AVAudioSession.sharedInstance()
-        do {
-            try audioSession.setCategory(AVAudioSession.Category.playback)
-        } catch {
-            print("Setting category to AVAudioSessionCategoryPlayback failed.")
-        }
+//        let audioSession = AVAudioSession.sharedInstance()
+//        do {
+//            try audioSession.setCategory(AVAudioSession.Category.playback)
+//        } catch {
+//            print("Setting category to AVAudioSessionCategoryPlayback failed.")
+//        }
+        
+//        do {
+//            try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback)
+//            do {
+//                try AVAudioSession.sharedInstance().setActive(true)
+//                print("AVAudioSession is Active")
+//            } catch let error as NSError {
+//                print(error.localizedDescription)
+//            }
+//        } catch let error as NSError {
+//            print(error.localizedDescription)
+//        }
         
         FirebaseApp.configure()
         return true
