@@ -221,7 +221,7 @@ extension RegistrationViewController {
             }
         } else {
             userViewModel.changeUserName(newName: email)
-            present(tabBarVC, animated: true)
+            present(tabBarVC, animated: false)
         }
     }
     
