@@ -128,15 +128,6 @@ extension PlayerViewController {
         if observe == nil { addTimeObserve() }
         
         UIApplication.shared.beginReceivingRemoteControlEvents()
-
-        let item = MPMediaItemArtwork(boundsSize: CGSize(width: 100, height: 100), requestHandler: { size in
-            return self.image1 ?? UIImage(named: "noFolders")!
-        })
-        
-        info[MPMediaItemPropertyArtist] = podcast.kind
-        info[MPMediaItemPropertyArtwork] = item
-
-        MPNowPlayingInfoCenter.default().nowPlayingInfo = info
         
         let commandCenter = MPRemoteCommandCenter.shared()
         
@@ -186,15 +177,22 @@ extension PlayerViewController {
         self.playPauseButton.setImage(self.pauseImage, for: .normal)
     }
     
-    private func updateTime (value: Float)  {
-        info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = value
+    private func updateTime(value: Float, trackDuration: CGFloat)  {
+        guard let currentPodcast = currentPodcast else { return }
         
         let item = MPMediaItemArtwork(boundsSize: CGSize(width: 100, height: 100), requestHandler: { size in
             return self.image1 ?? UIImage(named: "noFolders")!
         })
         
+        info[MPMediaItemPropertyArtist] = currentPodcast.kind
+        info[MPMediaItemPropertyTitle] = currentPodcast.trackName
         info[MPMediaItemPropertyArtwork] = item
+        
+        info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = value
+        info[MPMediaItemPropertyPlaybackDuration] = trackDuration
+        info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = value
 
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = info
     }
     
     private func addTimeObserve() {
@@ -219,7 +217,7 @@ extension PlayerViewController {
                 self.bigPlayerVC.upDateProgressSlider(currentTime: currentTime, currentItem: Float(currentItem.asset.duration.seconds))
             }
             
-            self.updateTime(value: Float(self.player.currentTime().seconds))
+            self.updateTime(value: Float(self.player.currentTime().seconds), trackDuration: CGFloat(duration))
         }
     }
     
