@@ -41,7 +41,7 @@ class RegistrationViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         if userViewModel.userDocument.user.isAuthorization {
-            UIView.animate(withDuration: 10, delay: 5, options: []) {
+            UIView.animate(withDuration: 10, delay: 5) {
                 self.present(self.tabBarVC, animated: true)
             }
         }
