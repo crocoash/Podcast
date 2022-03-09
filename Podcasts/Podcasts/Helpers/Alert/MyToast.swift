@@ -14,9 +14,10 @@ extension UIView {
         removeWithTimeInterval: TimeInterval = 3,
         _ location: LocationOfPost
     ) {
-        MyToast.create(title: title, location, offsetLocation: 0, timeToAppear: animateWithDuration, timerToRemove: removeWithTimeInterval, for: self)
+        MyToast.create(title: title, location, timeToAppear: animateWithDuration, timerToRemove: removeWithTimeInterval, for: self)
     }
 }
+
 
 class MyToast: UITextView {
     
@@ -26,8 +27,8 @@ class MyToast: UITextView {
     private var backgroundColorOfLayer: CGColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
     
     //MARK: - Inits
-     init(title: String, location: LocationOfPost, offsetLocation: CGFloat, for bounds: CGRect) {
-         super.init(frame: location.createCGRect(for: bounds, offsetLocation: offsetLocation), textContainer: nil)
+     init(title: String, location: LocationOfPost,for bounds: CGRect) {
+        super.init(frame: location.createCGRect(for: bounds), textContainer: nil)
         text = title
         textAlignment = .center
         textColor = textOfColor
@@ -40,10 +41,10 @@ class MyToast: UITextView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    
     //create MyToast Method
     static func create (title: String,
                         _ location: LocationOfPost,
-                        offsetLocation: CGFloat,
                         timeToAppear: TimeInterval = 0.3,
                         timerToRemove: TimeInterval = 3,
                         for myView: UIView? = nil)
@@ -59,8 +60,7 @@ class MyToast: UITextView {
             else { return }
             view = myView
         }
-        
-        let toast = MyToast(title: title, location: location, offsetLocation: offsetLocation, for: view.bounds)
+        let toast = MyToast(title: title, location: location, for: view.bounds)
         
         UIView.animate(withDuration: timeToAppear) {
             view.addSubview(toast)
@@ -72,17 +72,18 @@ class MyToast: UITextView {
     }
 }
 
+
 enum LocationOfPost: CGFloat {
     case top = 30
     case center = 2
     case bottom = 150
     
-    func createCGRect(for bounds: CGRect, offsetLocation: CGFloat) -> CGRect {
+    func createCGRect(for bounds: CGRect) -> CGRect {
         var y: CGFloat = 0
         switch self {
         case .top: y = self.rawValue
         case .center: y = bounds.height / self.rawValue
-        case .bottom: y = bounds.height - self.rawValue - offsetLocation
+        case .bottom: y = bounds.height - self.rawValue
         }
         return CGRect(x: 50, y: y, width: bounds.size.width - 100, height: 50)
     }

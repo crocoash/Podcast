@@ -7,7 +7,6 @@
 
 import UIKit
 import AVFoundation
-import MediaPlayer
 
 class PlayerViewController: UIViewController {
     
@@ -30,13 +29,8 @@ class PlayerViewController: UIViewController {
     private var isFirstPodcast: Bool { index == 0 }
     
     private var workItem: DispatchWorkItem?
-    private var info = [String : Any]()
-    private var image1: UIImage?
     
     var currentPodcast: Podcast? { !podcasts.isEmpty ? podcasts[index] : nil }
-    private let commandCenter = MPRemoteCommandCenter.shared()
-    private var isCommandCenter = false
-    
     
     private var observe: Any?
     
@@ -87,7 +81,7 @@ class PlayerViewController: UIViewController {
         if !isLastPodcast { index += 1 }
     }
     
-    @IBAction func playPauseTouchUpInside(_ sender: Any) {
+    @IBAction func playPauseTouchUpInside(_ sender: UIButton) {
         playStopPlayer()
     }
     
@@ -106,7 +100,6 @@ class PlayerViewController: UIViewController {
             isLast: isLastPodcast
         )
     }
-
 }
 
 //MARK: - Private methods
@@ -127,33 +120,7 @@ extension PlayerViewController {
         workItem?.cancel()
         if observe == nil { addTimeObserve() }
         
-        commandCenter.previousTrackCommand.isEnabled = !self.isFirstPodcast
-        commandCenter.nextTrackCommand.isEnabled = !self.isLastPodcast
-        commandCenter.playCommand.isEnabled = true
-        commandCenter.pauseCommand.isEnabled = true
-
-        if !isCommandCenter {
-            commandCenter.previousTrackCommand.addTarget { MPRemoteCommandEvent in
-                self.index -= 1
-                return .success
-            }
-            
-            commandCenter.nextTrackCommand.addTarget { MPRemoteCommandEvent in
-                self.index += 1
-                return .success
-            }
-
-            commandCenter.playCommand.addTarget { MPRemoteCommandEvent in
-                self.player.play()
-                return .success
-            }
-
-            commandCenter.pauseCommand.addTarget { MPRemoteCommandEvent in
-                self.player.pause()
-                return .success
-            }
-            isCommandCenter = true
-        }
+        
         
         let requestWorkItem = DispatchWorkItem {
             let item = AVPlayerItem(url: podcast.isDownLoad ? url.locaPath : url)
@@ -162,11 +129,12 @@ extension PlayerViewController {
             if !self.likedMoments.isEmpty {
                 self.player.seek(to: CMTime(seconds: self.likedMoments[self.index].moment, preferredTimescale: 60))
             }
-        }
-        
-        let scene = UIApplication.shared.connectedScenes.first
-        if let sceneDelegate : SceneDelegate = (scene?.delegate as? SceneDelegate) {
-            sceneDelegate.videoViewController = self;
+            
+            let scene = UIApplication.shared.connectedScenes.first
+            
+            if let sceneDelegate : SceneDelegate = (scene?.delegate as? SceneDelegate) {
+                sceneDelegate.videoViewController = self;
+            }
         }
         
         workItem = requestWorkItem
@@ -174,24 +142,6 @@ extension PlayerViewController {
         DispatchQueue.global().asyncAfter(deadline: .now(), execute: requestWorkItem)
         
         self.playPauseButton.setImage(self.pauseImage, for: .normal)
-    }
-    
-    private func updateTime(value: Float, trackDuration: CGFloat)  {
-        guard let currentPodcast = currentPodcast else { return }
-        
-        let item = MPMediaItemArtwork(boundsSize: CGSize(width: 100, height: 100), requestHandler: { size in
-            return self.image1 ?? UIImage(named: "noFolders")!
-        })
-        
-        info[MPMediaItemPropertyArtist] = currentPodcast.kind
-        info[MPMediaItemPropertyTitle] = currentPodcast.trackName
-        info[MPMediaItemPropertyArtwork] = item
-        
-        info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = value
-        info[MPMediaItemPropertyPlaybackDuration] = trackDuration
-        info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = value
-
-        MPNowPlayingInfoCenter.default().nowPlayingInfo = info
     }
     
     private func addTimeObserve() {
@@ -215,8 +165,6 @@ extension PlayerViewController {
             if self.bigPlayerVC.isPresented {
                 self.bigPlayerVC.upDateProgressSlider(currentTime: currentTime, currentItem: Float(currentItem.asset.duration.seconds))
             }
-            
-            self.updateTime(value: Float(self.player.currentTime().seconds), trackDuration: CGFloat(duration))
         }
     }
     
@@ -224,8 +172,7 @@ extension PlayerViewController {
         bigPlayerVC = BigPlayerViewController.loadFromXib()
         bigPlayerVC.delegate = self
         bigPlayerVC.modalPresentationStyle = .fullScreen
-        UIApplication.shared.beginReceivingRemoteControlEvents()
-
+        
         return bigPlayerVC
     }
     
@@ -234,7 +181,6 @@ extension PlayerViewController {
         
         DataProvider().downloadImage(string: currentPodcast.artworkUrl600) { [weak self] image in
             self?.podcastImageView.image = image
-            self?.image1 = image
         }
         
         playPauseButton.setImage(pauseImage, for: .normal)
@@ -247,7 +193,6 @@ extension PlayerViewController {
             isFirst: isFirstPodcast,
             isLast: isLastPodcast
         )
-        
     }
     
     private func updateUI(with moment: LikedMoment) {
@@ -269,11 +214,11 @@ extension PlayerViewController {
         view.addMyGestureRecognizer(self, type: .tap(1), selector: #selector(respondToSwipe))
     }
     
-@objc private func nextPodcast() {
+    private func nextPodcast() {
         index += 1
     }
     
-    @objc private func previewsPodcast() {
+    private func previewsPodcast() {
         index -= 1
     }
 }

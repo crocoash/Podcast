@@ -7,6 +7,14 @@
 
 import UIKit
 
+protocol SettingsTableViewControllerDelegate: AnyObject {
+    
+    func settingsTableViewControllerDidAppear(_ settingsTableViewController: SettingsTableViewController)
+    
+    func settingsTableViewControllerDidDisappear(_ settingsTableViewController: SettingsTableViewController)
+    
+    func settingsTableViewControllerDarkModeDidSelect(_ settingsTableViewController: SettingsTableViewController)
+}
 
 class SettingsTableViewController: UITableViewController {
     
@@ -62,7 +70,7 @@ class SettingsTableViewController: UITableViewController {
     }
     
     @IBAction func exit(_ sender: UITapGestureRecognizer) {
-        dismiss(animated: false)
+        dismiss(animated: isDarkTheme)
     }
 }
 

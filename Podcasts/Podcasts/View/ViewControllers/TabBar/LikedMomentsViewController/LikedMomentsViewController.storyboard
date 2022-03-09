@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Liked Moments View Controller-->
+        <scene sceneID="wiw-iT-wZo">
+            <objects>
+                <viewController storyboardIdentifier="LikedMomentsViewController" id="kUl-8K-gI8" customClass="LikedMomentsViewController" customModule="Podcasts" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="lqu-WF-Wpd" userLabel="EView">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" keyboardDismissMode="onDrag" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="fEh-zO-EFe">
+                                <rect key="frame" x="0.0" y="76" width="414" height="786"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                            </tableView>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="folder" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="RBS-Gj-oQX">
+                                <rect key="frame" x="0.0" y="77" width="414" height="783.5"/>
+                                <color key="tintColor" systemColor="systemGray2Color"/>
+                            </imageView>
+                            <navigationBar contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="S1B-6Q-U5h">
+                                <rect key="frame" x="0.0" y="32" width="414" height="44"/>
+                                <items>
+                                    <navigationItem title="Liked moment" id="Mga-Yg-hrc"/>
+                                </items>
+                            </navigationBar>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="nn3-9j-Xp7"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="RBS-Gj-oQX" firstAttribute="top" secondItem="fEh-zO-EFe" secondAttribute="top" id="2kP-0A-ZjD"/>
+                            <constraint firstItem="fEh-zO-EFe" firstAttribute="top" secondItem="S1B-6Q-U5h" secondAttribute="bottom" id="5Ms-9X-Dwl"/>
+                            <constraint firstItem="RBS-Gj-oQX" firstAttribute="bottom" secondItem="fEh-zO-EFe" secondAttribute="bottom" id="9ML-hq-qwX"/>
+                            <constraint firstItem="S1B-6Q-U5h" firstAttribute="height" secondItem="lqu-WF-Wpd" secondAttribute="height" multiplier="0.0491071" id="AMT-WR-cjb"/>
+                            <constraint firstItem="fEh-zO-EFe" firstAttribute="leading" secondItem="nn3-9j-Xp7" secondAttribute="leading" id="G3A-eC-ps3"/>
+                            <constraint firstItem="RBS-Gj-oQX" firstAttribute="leading" secondItem="fEh-zO-EFe" secondAttribute="leading" id="HUw-fl-qkz"/>
+                            <constraint firstItem="nn3-9j-Xp7" firstAttribute="bottom" secondItem="fEh-zO-EFe" secondAttribute="bottom" id="Mjc-fB-QjR"/>
+                            <constraint firstItem="nn3-9j-Xp7" firstAttribute="trailing" secondItem="S1B-6Q-U5h" secondAttribute="trailing" id="OAS-2T-dKn"/>
+                            <constraint firstItem="RBS-Gj-oQX" firstAttribute="trailing" secondItem="fEh-zO-EFe" secondAttribute="trailing" id="o3g-Ey-8GL"/>
+                            <constraint firstItem="S1B-6Q-U5h" firstAttribute="leading" secondItem="nn3-9j-Xp7" secondAttribute="leading" id="pgH-sp-dRI"/>
+                            <constraint firstItem="nn3-9j-Xp7" firstAttribute="top" secondItem="S1B-6Q-U5h" secondAttribute="top" constant="12" id="uje-DJ-naV"/>
+                            <constraint firstItem="nn3-9j-Xp7" firstAttribute="trailing" secondItem="fEh-zO-EFe" secondAttribute="trailing" id="xUv-iH-BdR"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="emptyDataImage" destination="RBS-Gj-oQX" id="wWt-n7-rnV"/>
+                        <outlet property="likedMomentsTableView" destination="fEh-zO-EFe" id="Kn8-vy-2hL"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="rt4-WV-9pT" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2105.7971014492755" y="854.46428571428567"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="folder" catalog="system" width="128" height="97"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemGray2Color">
+            <color red="0.68235294117647061" green="0.68235294117647061" blue="0.69803921568627447" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
+</document>
