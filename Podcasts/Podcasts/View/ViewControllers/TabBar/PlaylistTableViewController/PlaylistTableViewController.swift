@@ -7,9 +7,11 @@
 
 import UIKit
 
-import UIKit
+protocol PlaylistViewControllerDelegate : AnyObject {
+    func playlistTableViewController(_ playlistTableViewController: PlaylistTableViewController, _ podcasts: [Podcast], didSelectIndex: Int)
+}
 
-class PlaylistViewController: UIViewController {
+class PlaylistTableViewController: UIViewController {
     
     @IBOutlet private weak var playListTableView: UITableView!
     @IBOutlet private weak var playerConstraint: NSLayoutConstraint!
@@ -19,10 +21,8 @@ class PlaylistViewController: UIViewController {
     
     weak var delegate: PlaylistViewControllerDelegate?
     
-    private var playerIsShow: Bool = false
-    
-    func playerIsShow(value: Bool) {
-        playerIsShow = value
+    func playerIsShow() {
+        tableViewBottomConstraint.constant = -50
     }
 
     // MARK: - View Methods
@@ -30,7 +30,6 @@ class PlaylistViewController: UIViewController {
         super.viewWillAppear(animated)
         playListTableView.reloadData()
         showEmptyImage()
-        tableViewBottomConstraint.constant = playerIsShow ? -50 : 0
     }
         
     override func viewDidLoad() {
@@ -51,18 +50,19 @@ class PlaylistViewController: UIViewController {
               let indexPath = playListTableView.indexPath(for: view) else { return }
         
         let podcast = PlaylistDocument.shared.playList[indexPath.row]
-        let detailViewController = storyboard?.instantiateViewController(identifier: DetailViewController.identifier) as! DetailViewController
-        detailViewController.delegate = self
-        detailViewController.transitioningDelegate = self
-        detailViewController.setUp(index: indexPath.row, podcast: podcast)
-        detailViewController.modalPresentationStyle = .custom
+       
+        let vc = DetailViewController.initVC
+        vc.delegate = self
+        vc.transitioningDelegate = self
+        vc.setUp(index: indexPath.row, podcast: podcast)
+        vc.modalPresentationStyle = .custom
         
-        present(detailViewController, animated: true)
+        present(vc, animated: true)
     }
 }
 
 //MARK: - Private methods
-extension PlaylistViewController {
+extension PlaylistTableViewController {
     
     private func configureUI() {
         playListTableView.register(PodcastCell.self)
@@ -79,7 +79,7 @@ extension PlaylistViewController {
 }
 
 // MARK: - Table View data source
-extension PlaylistViewController: UITableViewDataSource {
+extension PlaylistTableViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return PlaylistDocument.shared.playList.count
@@ -104,7 +104,7 @@ extension PlaylistViewController: UITableViewDataSource {
 }
 
 // MARK: - DetailViewControllerDelegate
-extension PlaylistViewController : DetailViewControllerDelegate {
+extension PlaylistTableViewController : DetailViewControllerDelegate {
     func detailViewController(_ detailViewController: DetailViewController, addButtonDidTouchFor selectedPodcast: Podcast) {
         PlaylistDocument.shared.addToPlayList(selectedPodcast)
     }
@@ -120,7 +120,7 @@ extension PlaylistViewController : DetailViewControllerDelegate {
 }
 
 //MARK: - UIViewControllerTransitioningDelegate
-extension PlaylistViewController: UIViewControllerTransitioningDelegate {
+extension PlaylistTableViewController: UIViewControllerTransitioningDelegate {
     
     func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         return PresentTransition()
