@@ -12,7 +12,6 @@
         <!--Playlist Table View Controller-->
         <scene sceneID="fGh-LJ-8so">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="KIA-kE-Mhd" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
                 <viewController storyboardIdentifier="PlaylistTableViewController" modalTransitionStyle="flipHorizontal" useStoryboardIdentifierAsRestorationIdentifier="YES" id="FVd-um-TW9" customClass="PlaylistTableViewController" customModule="Podcasts" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="H4e-YU-5u8">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
@@ -76,6 +75,7 @@
                         <outlet property="tableViewBottomConstraint" destination="wOa-Le-rvB" id="W8s-UZ-gwD"/>
                     </connections>
                 </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="KIA-kE-Mhd" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2105.7971014492755" y="-490.17857142857139"/>
         </scene>

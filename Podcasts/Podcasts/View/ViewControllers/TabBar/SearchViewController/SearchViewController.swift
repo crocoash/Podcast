@@ -248,13 +248,12 @@ extension SearchViewController {
         
         if searchSegmentalControl.selectedSegmentIndex == 0 {
             ApiService.getData(for: UrlRequest1.getStringUrl(.podcast(request))) { [weak self] (info: PodcastData?) in
+                
                 guard let self = self else { return }
                 
-                DispatchQueue.main.async {
-                    self.processResults(data: info?.results, completion: { podcasts in
-                        self.podcasts = podcasts
-                    })
-                }
+                self.processResults(data: info?.results, completion: { podcasts in
+                    self.podcasts = podcasts
+                })
             }
         } else {
             ApiService.getData(for: UrlRequest1.getStringUrl(.authors(request))) { [weak self] (info: AuthorData?) in
