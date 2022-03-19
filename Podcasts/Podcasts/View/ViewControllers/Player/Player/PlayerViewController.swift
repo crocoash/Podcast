@@ -120,8 +120,6 @@ extension PlayerViewController {
         workItem?.cancel()
         if observe == nil { addTimeObserve() }
         
-        
-        
         let requestWorkItem = DispatchWorkItem {
             let item = AVPlayerItem(url: podcast.isDownLoad ? url.locaPath : url)
             self.player.replaceCurrentItem(with: item)
@@ -132,8 +130,8 @@ extension PlayerViewController {
             
             let scene = UIApplication.shared.connectedScenes.first
             
-            if let sceneDelegate : SceneDelegate = (scene?.delegate as? SceneDelegate) {
-                sceneDelegate.videoViewController = self;
+            if let sceneDelegate = (scene?.delegate as? SceneDelegate) {
+                sceneDelegate.videoViewController = self
             }
         }
         
@@ -152,12 +150,11 @@ extension PlayerViewController {
             
             guard
                 let self = self,
-                let duaration = self.player.currentItem?.duration,
+                let duration = self.player.currentItem?.duration,
                 let currentItem = self.player.currentItem
             else { return }
             
-            let duration = CMTimeGetSeconds(duaration)
-            self.progressView.progress = Float((CMTimeGetSeconds(time) / duration))
+            self.progressView.progress = Float((CMTimeGetSeconds(time) / CMTimeGetSeconds(duration)))
             
             if !self.activityIndicator.isHidden { self.activityIndicator.stopAnimating() }
             let currentTime = Float(self.player.currentTime().seconds)
