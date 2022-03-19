@@ -7,6 +7,10 @@
 
 import UIKit
 
+protocol SearchViewControllerDelegate: AnyObject {
+    func searchViewController(_ searchViewController: SearchViewController,_ podcasts: [Podcast], didSelectIndex: Int)
+}
+
 class SearchViewController : UIViewController {
     
     @IBOutlet private weak var searchBar: UISearchBar!
@@ -46,7 +50,7 @@ class SearchViewController : UIViewController {
     
     private var isPodcast: Bool { searchSegmentalControl.selectedSegmentIndex == 0 }
     private let downloadService = DownloadService()
-
+    
     lazy var downloadsSession: URLSession = {
         let configuration = URLSessionConfiguration.background(withIdentifier: "BackGroundSession")
         return URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
@@ -97,30 +101,28 @@ class SearchViewController : UIViewController {
     
     @objc func handlerTapPodcastCell(sender : UITapGestureRecognizer) {
         guard let view = sender.view as? UITableViewCell,
-        let indexPath = podcastTableView.indexPath(for: view) else { return }
+              let indexPath = podcastTableView.indexPath(for: view) else { return }
         
         let index = indexPath.row
         let podcast = podcasts[index]
         
-        let detailViewController = storyboard?.instantiateViewController(identifier: DetailViewController.identifier) as! DetailViewController
+        let detailViewController = DetailViewController.initVC
         
         detailViewController.delegate = self
         detailViewController.setUp(index: index, podcast: podcast)
         detailViewController.title = "Additional info"
         detailViewController.transitioningDelegate = self
         detailViewController.modalPresentationStyle = .custom
-
+        
         present(detailViewController,animated: true)
     }
     
     @objc func handlerSwipe(sender: UISwipeGestureRecognizer) {
         switch sender.direction {
-        case .left:
-            searchSegmentalControl.selectedSegmentIndex += 1
+        case .left: searchSegmentalControl.selectedSegmentIndex += 1
         case .right: searchSegmentalControl.selectedSegmentIndex -= 1
         default: break
         }
-        
         
         if !searchText.isEmpty { getData(by: searchText) }
     }
@@ -184,16 +186,17 @@ extension SearchViewController {
                 PlaylistDocument.shared.removeFromPlayList(podcasts[indexPath.row])
                 
                 MyToast.create(title: (podcasts[indexPath.row].trackName ?? "podcast") + "is removed from playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
+                
             } else {
+                
                 PlaylistDocument.shared.addToPlayList(podcasts[indexPath.row])
                 
                 MyToast.create(title: (podcasts[indexPath.row].trackName ?? "podcast") + "is added to playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
-                
-                downloadService.startDownload(podcasts[indexPath.row], index: indexPath.row)
             }
             
+            downloadService.startDownload(podcasts[indexPath.row], index: indexPath.row)
             podcastTableView.reloadRows(at: [indexPath], with: .none)
-                        
+            
             feedbackGenerator()
         }
     }
@@ -208,22 +211,14 @@ extension SearchViewController {
     
     private func showEmptyImage() {
         
-        if searchSegmentalControl.selectedSegmentIndex == 0, podcasts.isEmpty {
+        if (searchSegmentalControl.selectedSegmentIndex == 0 && podcasts.isEmpty) ||
+            (searchSegmentalControl.selectedSegmentIndex == 1 && authors.isEmpty) {
             podcastTableView.isHidden = true
             emptyTableImageView.isHidden = false
         }
         
-        if searchSegmentalControl.selectedSegmentIndex == 0, !podcasts.isEmpty {
-            podcastTableView.isHidden = false
-            emptyTableImageView.isHidden = true
-        }
-        
-        if searchSegmentalControl.selectedSegmentIndex == 1, authors.isEmpty {
-            podcastTableView.isHidden = true
-            emptyTableImageView.isHidden = false
-        }
-        
-        if searchSegmentalControl.selectedSegmentIndex == 1, !authors.isEmpty {
+        if (searchSegmentalControl.selectedSegmentIndex == 0 && !podcasts.isEmpty) ||
+            (searchSegmentalControl.selectedSegmentIndex == 1 && !authors.isEmpty) {
             podcastTableView.isHidden = false
             emptyTableImageView.isHidden = true
         }
@@ -238,13 +233,13 @@ extension SearchViewController {
         
         if let data = data, !data.isEmpty {
             completion(data)
-            podcastTableView.reloadData()
         } else {
             self.alert.create(title: "Ooops nothing search", withTimeIntervalToDismiss: 2)
             self.podcasts.removeAll()
             self.authors.removeAll()
-            podcastTableView.reloadData()
         }
+        
+        podcastTableView.reloadData()
     }
     
     private func getData(by request: String) {
@@ -253,13 +248,12 @@ extension SearchViewController {
         
         if searchSegmentalControl.selectedSegmentIndex == 0 {
             ApiService.getData(for: UrlRequest1.getStringUrl(.podcast(request))) { [weak self] (info: PodcastData?) in
+                
                 guard let self = self else { return }
                 
-                DispatchQueue.main.async {
-                    self.processResults(data: info?.results, completion: { podcasts in
-                        self.podcasts = podcasts
-                    })
-                }
+                self.processResults(data: info?.results, completion: { podcasts in
+                    self.podcasts = podcasts
+                })
             }
         } else {
             ApiService.getData(for: UrlRequest1.getStringUrl(.authors(request))) { [weak self] (info: AuthorData?) in
@@ -351,6 +345,7 @@ extension SearchViewController: UIViewControllerTransitioningDelegate {
 
 //MARK: - URLSessionDownloadDelegate
 extension SearchViewController: URLSessionDownloadDelegate {
+    
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         
         guard let sourceURL = downloadTask.originalRequest?.url else { return }
@@ -358,7 +353,7 @@ extension SearchViewController: URLSessionDownloadDelegate {
         func localFilePath(for url: URL) -> URL {
             return documentsPath.appendingPathComponent(url.lastPathComponent)
         }
-                
+        
         let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         
         let destinationURL = localFilePath(for: sourceURL)
@@ -375,7 +370,7 @@ extension SearchViewController: URLSessionDownloadDelegate {
         
         DispatchQueue.main.async {
             guard let podcast = self.downloadService.activeDownloads[sourceURL] else { return }
-
+            
             PlaylistDocument.shared.trackIsDownloaded(index: podcast.id!)
             
             self.podcastTableView.reloadRows(at: [IndexPath(row: podcast.index!, section: 0)], with: .none)
@@ -383,9 +378,11 @@ extension SearchViewController: URLSessionDownloadDelegate {
         }
     }
     
-    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask,
-                    didWriteData bytesWritten: Int64, totalBytesWritten: Int64,
-                    totalBytesExpectedToWrite: Int64) {
+    func urlSession(_ session                   : URLSession,
+                    downloadTask               : URLSessionDownloadTask,
+                    didWriteData bytesWritten  : Int64,
+                    totalBytesWritten          : Int64,
+                    totalBytesExpectedToWrite  : Int64) {
         
         guard let url = downloadTask.originalRequest?.url,
               var podcast = downloadService.activeDownloads[url] else { return }
@@ -393,38 +390,42 @@ extension SearchViewController: URLSessionDownloadDelegate {
         podcast.progress = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite)
         
         let totalSize = ByteCountFormatter.string(fromByteCount: totalBytesExpectedToWrite, countStyle: .file)
-                
+        
         DispatchQueue.main.async {
             if let podcastCell = self.podcastTableView.cellForRow(at: IndexPath(row: podcast.index!, section: 0)) as? PodcastCell {
-              podcastCell.updateDisplay(progress: podcast.progress, totalSize: totalSize)
+                podcastCell.updateDisplay(progress: podcast.progress, totalSize: totalSize)
             }
         }
     }
 }
 
 extension SearchViewController: URLSessionDelegate {
-  func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {
-    DispatchQueue.main.async {
-      if let appDelegate = UIApplication.shared.delegate as? AppDelegate,
-         let completionHandler = appDelegate.backgroundSessionCompletionHandler {
-        appDelegate.backgroundSessionCompletionHandler = nil
-        completionHandler()
-      }
+    func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {
+        DispatchQueue.main.async {
+            if let appDelegate = UIApplication.shared.delegate as? AppDelegate,
+               let completionHandler = appDelegate.backgroundSessionCompletionHandler {
+                appDelegate.backgroundSessionCompletionHandler = nil
+                completionHandler()
+            }
+        }
     }
-  }
 }
 
 extension SearchViewController: DetailViewControllerDelegate {
+    
     func detailViewController(_ detailViewController: DetailViewController, playButtonDidTouchFor podcastIndex: Int) {
         delegate?.searchViewController(self, podcasts, didSelectIndex: podcastIndex)
     }
-
+    
     func detailViewController(_ detailViewController: DetailViewController, addButtonDidTouchFor selectedPodcast: Podcast) {
         PlaylistDocument.shared.addToPlayList(selectedPodcast)
+        
         guard let index = podcasts.firstIndex(where: {$0 == selectedPodcast}) else {
             fatalError("No such element in collection while download")
         }
+        
         downloadService.startDownload(selectedPodcast, index: index)
+        
         podcastTableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none )
     }
     

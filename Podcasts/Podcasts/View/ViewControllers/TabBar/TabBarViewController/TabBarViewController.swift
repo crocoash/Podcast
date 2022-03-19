@@ -43,7 +43,7 @@ extension TabBarViewController {
     
     private func configureTabBar() {
 
-        let playListVc = createTabBar(PlaylistViewController.self , title: "Playlist", imageName: "folder.fill") {
+        let playListVc = createTabBar(PlaylistTableViewController.self , title: "Playlist", imageName: "folder.fill") {
             $0.delegate = self
         }
         
@@ -65,14 +65,12 @@ extension TabBarViewController {
     }
     
     private func createTabBar<T: UIViewController>(_ type: T.Type, title: String, imageName: String, completion: ((T) -> Void)? = nil) -> T {
-        
-        let vc = storyboard?.instantiateViewController(withIdentifier: String(describing: type)) as! T
-
+       
+        let vc = T.initVC
         vc.tabBarItem.title = title
         vc.tabBarItem.image = UIImage(systemName: imageName)
         
-        if let completion = completion { completion(vc) }
-        
+        completion?(vc)
         return vc
     }
     
@@ -114,7 +112,7 @@ extension TabBarViewController: SearchViewControllerDelegate {
 // MARK: - PlaylistTableViewControllerDelegate
 extension TabBarViewController: PlaylistViewControllerDelegate {
     
-    func playlistTableViewController(_ playlistTableViewController: PlaylistViewController, _ podcasts: [Podcast], didSelectIndex: Int) {
+    func playlistTableViewController(_ playlistTableViewController: PlaylistTableViewController, _ podcasts: [Podcast], didSelectIndex: Int) {
         playerVC.view.isHidden = false
         playerVC.play(podcasts: podcasts, at: didSelectIndex)
         playlistTableViewController.playerIsShow()
@@ -135,7 +133,7 @@ extension TabBarViewController: SettingsTableViewControllerDelegate {
             
             settingsTableViewController.switchDarkMode()
             
-            UIView.animate(withDuration: 0.5, delay: 0, options: []) {
+            UIView.animate(withDuration: 0.5) {
                 self.trailConstraint?.isActive.toggle()
                 self.leadConstraint?.isActive.toggle()
                 self.view.layoutIfNeeded()

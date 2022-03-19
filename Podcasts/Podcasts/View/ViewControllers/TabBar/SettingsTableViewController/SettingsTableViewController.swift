@@ -7,6 +7,14 @@
 
 import UIKit
 
+protocol SettingsTableViewControllerDelegate: AnyObject {
+    
+    func settingsTableViewControllerDidAppear(_ settingsTableViewController: SettingsTableViewController)
+    
+    func settingsTableViewControllerDidDisappear(_ settingsTableViewController: SettingsTableViewController)
+    
+    func settingsTableViewControllerDarkModeDidSelect(_ settingsTableViewController: SettingsTableViewController)
+}
 
 class SettingsTableViewController: UITableViewController {
     

@@ -18,7 +18,7 @@
 		049D47DC2726E05B00B6DA3C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049D47DB2726E05B00B6DA3C /* AppDelegate.swift */; };
 		049D47DE2726E05B00B6DA3C /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049D47DD2726E05B00B6DA3C /* SceneDelegate.swift */; };
 		049D47E02726E05B00B6DA3C /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049D47DF2726E05B00B6DA3C /* SearchViewController.swift */; };
-		049D47E32726E05B00B6DA3C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 049D47E12726E05B00B6DA3C /* Main.storyboard */; };
+		049D47E32726E05B00B6DA3C /* RegistrationViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 049D47E12726E05B00B6DA3C /* RegistrationViewController.storyboard */; };
 		049D47E52726E05F00B6DA3C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 049D47E42726E05F00B6DA3C /* Assets.xcassets */; };
 		049D47E82726E05F00B6DA3C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 049D47E62726E05F00B6DA3C /* LaunchScreen.storyboard */; };
 		049D47F02726EAE600B6DA3C /* TabBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049D47EF2726EAE600B6DA3C /* TabBarViewController.swift */; };
@@ -41,10 +41,6 @@
 		18557D642732B61D00CA08CA /* IpModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18557D632732B61D00CA08CA /* IpModel.swift */; };
 		18557D662732BF0100CA08CA /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18557D652732BF0100CA08CA /* User.swift */; };
 		1855933D27380AA10012BA91 /* BigPlayerViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1855933C27380AA10012BA91 /* BigPlayerViewControllerDelegate.swift */; };
-		1855933F27380B400012BA91 /* SearchViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1855933E27380B400012BA91 /* SearchViewControllerDelegate.swift */; };
-		1855934127380B610012BA91 /* PlaylistViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1855934027380B610012BA91 /* PlaylistViewControllerDelegate.swift */; };
-		1855934327380BAF0012BA91 /* SettingsTableViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1855934227380BAF0012BA91 /* SettingsTableViewControllerDelegate.swift */; };
-		1855934527380BDC0012BA91 /* DetailViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1855934427380BDC0012BA91 /* DetailViewControllerDelegate.swift */; };
 		1855934727380C270012BA91 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1855934627380C270012BA91 /* AuthService.swift */; };
 		187B2B3E2732C11000C3EFFF /* UserViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187B2B3D2732C11000C3EFFF /* UserViewModel.swift */; };
 		187B2B4227345F6200C3EFFF /* Constant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187B2B4127345F6200C3EFFF /* Constant.swift */; };
@@ -63,6 +59,15 @@
 		18CA6D8927352AF800F32CE5 /* UIViewController + loadFromXib.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA6D8827352AF800F32CE5 /* UIViewController + loadFromXib.swift */; };
 		18CA6D8B2735902000F32CE5 /* MyToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA6D8A2735902000F32CE5 /* MyToast.swift */; };
 		18D13DDC273C407A00495C97 /* UserDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18D13DDB273C407A00495C97 /* UserDocument.swift */; };
+		18FFCA4827D526590078CB3F /* TabBarViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 18FFCA4727D526590078CB3F /* TabBarViewController.storyboard */; };
+		18FFCA4A27D548AE0078CB3F /* DetailViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 18FFCA4927D548AE0078CB3F /* DetailViewController.storyboard */; };
+		18FFCA4C27D5498D0078CB3F /* PlaylistTableViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 18FFCA4B27D5498D0078CB3F /* PlaylistTableViewController.storyboard */; };
+		18FFCA4E27D549D60078CB3F /* SearchViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 18FFCA4D27D549D60078CB3F /* SearchViewController.storyboard */; };
+		18FFCA5027D54A450078CB3F /* LikedMomentsViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 18FFCA4F27D54A450078CB3F /* LikedMomentsViewController.storyboard */; };
+		18FFCA5227D553B70078CB3F /* SettingsTableViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 18FFCA5127D553B70078CB3F /* SettingsTableViewController.storyboard */; };
+		18FFCA5527D556920078CB3F /* PreLoaderViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FFCA5427D556920078CB3F /* PreLoaderViewController.swift */; };
+		18FFCA5827D556BB0078CB3F /* PreLoaderViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 18FFCA5727D556BB0078CB3F /* PreLoaderViewController.storyboard */; };
+		18FFCA5A27D602EF0078CB3F /* UIStoryboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FFCA5927D602EF0078CB3F /* UIStoryboard.swift */; };
 		3FBCF1C2272847F100B70522 /* PodcastCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FBCF1C0272847F100B70522 /* PodcastCell.swift */; };
 		3FBCF1C3272847F100B70522 /* PodcastCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3FBCF1C1272847F100B70522 /* PodcastCell.xib */; };
 		3FBCF1C72728482A00B70522 /* PodcastByAuthorCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FBCF1C52728482A00B70522 /* PodcastByAuthorCell.swift */; };
@@ -84,7 +89,7 @@
 		049D47DB2726E05B00B6DA3C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		049D47DD2726E05B00B6DA3C /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		049D47DF2726E05B00B6DA3C /* SearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
-		049D47E22726E05B00B6DA3C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		049D47E22726E05B00B6DA3C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/RegistrationViewController.storyboard; sourceTree = "<group>"; };
 		049D47E42726E05F00B6DA3C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		049D47E72726E05F00B6DA3C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		049D47E92726E05F00B6DA3C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -108,10 +113,6 @@
 		18557D632732B61D00CA08CA /* IpModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IpModel.swift; sourceTree = "<group>"; };
 		18557D652732BF0100CA08CA /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		1855933C27380AA10012BA91 /* BigPlayerViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BigPlayerViewControllerDelegate.swift; sourceTree = "<group>"; };
-		1855933E27380B400012BA91 /* SearchViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewControllerDelegate.swift; sourceTree = "<group>"; };
-		1855934027380B610012BA91 /* PlaylistViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistViewControllerDelegate.swift; sourceTree = "<group>"; };
-		1855934227380BAF0012BA91 /* SettingsTableViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTableViewControllerDelegate.swift; sourceTree = "<group>"; };
-		1855934427380BDC0012BA91 /* DetailViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewControllerDelegate.swift; sourceTree = "<group>"; };
 		1855934627380C270012BA91 /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
 		187B2B3D2732C11000C3EFFF /* UserViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserViewModel.swift; sourceTree = "<group>"; };
 		187B2B4127345F6200C3EFFF /* Constant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constant.swift; sourceTree = "<group>"; };
@@ -129,6 +130,15 @@
 		18CA6D8827352AF800F32CE5 /* UIViewController + loadFromXib.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController + loadFromXib.swift"; sourceTree = "<group>"; };
 		18CA6D8A2735902000F32CE5 /* MyToast.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyToast.swift; sourceTree = "<group>"; };
 		18D13DDB273C407A00495C97 /* UserDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDocument.swift; sourceTree = "<group>"; };
+		18FFCA4727D526590078CB3F /* TabBarViewController.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = TabBarViewController.storyboard; sourceTree = "<group>"; };
+		18FFCA4927D548AE0078CB3F /* DetailViewController.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = DetailViewController.storyboard; sourceTree = "<group>"; };
+		18FFCA4B27D5498D0078CB3F /* PlaylistTableViewController.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = PlaylistTableViewController.storyboard; sourceTree = "<group>"; };
+		18FFCA4D27D549D60078CB3F /* SearchViewController.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = SearchViewController.storyboard; sourceTree = "<group>"; };
+		18FFCA4F27D54A450078CB3F /* LikedMomentsViewController.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LikedMomentsViewController.storyboard; sourceTree = "<group>"; };
+		18FFCA5127D553B70078CB3F /* SettingsTableViewController.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = SettingsTableViewController.storyboard; sourceTree = "<group>"; };
+		18FFCA5427D556920078CB3F /* PreLoaderViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreLoaderViewController.swift; sourceTree = "<group>"; };
+		18FFCA5727D556BB0078CB3F /* PreLoaderViewController.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = PreLoaderViewController.storyboard; sourceTree = "<group>"; };
+		18FFCA5927D602EF0078CB3F /* UIStoryboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIStoryboard.swift; sourceTree = "<group>"; };
 		3FBCF1C0272847F100B70522 /* PodcastCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastCell.swift; sourceTree = "<group>"; };
 		3FBCF1C1272847F100B70522 /* PodcastCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PodcastCell.xib; sourceTree = "<group>"; };
 		3FBCF1C52728482A00B70522 /* PodcastByAuthorCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastByAuthorCell.swift; sourceTree = "<group>"; };
@@ -153,6 +163,7 @@
 			isa = PBXGroup;
 			children = (
 				047B47AE273B1FF6008E844F /* LikedMomentsManager.swift */,
+				18FFCA4F27D54A450078CB3F /* LikedMomentsViewController.storyboard */,
 				047B47AD273B1FF6008E844F /* LikedMomentsViewController.swift */,
 			);
 			path = LikedMomentsViewController;
@@ -189,7 +200,6 @@
 				184CE19127271DAE0088044C /* Helpers */,
 				189C1FB0272D84B100A8480E /* ViewModel */,
 				184CE18F27271D8D0088044C /* View */,
-				049D47E12726E05B00B6DA3C /* Main.storyboard */,
 				049D47E92726E05F00B6DA3C /* Info.plist */,
 			);
 			path = Podcasts;
@@ -207,6 +217,7 @@
 		049D480427286D6300B6DA3C /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
+				18FFCA5327D556170078CB3F /* PreLoader */,
 				18CA6D8C2735E41C00F32CE5 /* RegistrationViewController */,
 				18CA6D922735E46B00F32CE5 /* TabBar */,
 				049D47FF27286CA100B6DA3C /* Player */,
@@ -319,6 +330,7 @@
 				189C1FB1272D876B00A8480E /* Collection.swift */,
 				1888C2AE2739A8CF00395B5B /* URL + localPath.swift */,
 				045628242732EA370044878C /* String + conform.swift */,
+				18FFCA5927D602EF0078CB3F /* UIStoryboard.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -335,6 +347,7 @@
 		18CA6D8C2735E41C00F32CE5 /* RegistrationViewController */ = {
 			isa = PBXGroup;
 			children = (
+				049D47E12726E05B00B6DA3C /* RegistrationViewController.storyboard */,
 				18A5005E2727FA3800CD3F0C /* RegistrationViewController.swift */,
 			);
 			path = RegistrationViewController;
@@ -343,8 +356,8 @@
 		18CA6D8E2735E43600F32CE5 /* SearchViewController */ = {
 			isa = PBXGroup;
 			children = (
-				1855933E27380B400012BA91 /* SearchViewControllerDelegate.swift */,
 				049D47DF2726E05B00B6DA3C /* SearchViewController.swift */,
+				18FFCA4D27D549D60078CB3F /* SearchViewController.storyboard */,
 			);
 			path = SearchViewController;
 			sourceTree = "<group>";
@@ -352,8 +365,8 @@
 		18CA6D8F2735E44400F32CE5 /* PlaylistTableViewController */ = {
 			isa = PBXGroup;
 			children = (
-				1855934027380B610012BA91 /* PlaylistViewControllerDelegate.swift */,
 				049D480027286D3900B6DA3C /* PlaylistTableViewController.swift */,
+				18FFCA4B27D5498D0078CB3F /* PlaylistTableViewController.storyboard */,
 			);
 			path = PlaylistTableViewController;
 			sourceTree = "<group>";
@@ -362,7 +375,7 @@
 			isa = PBXGroup;
 			children = (
 				1831DEDC27319E3900EC09E2 /* SettingsTableViewController.swift */,
-				1855934227380BAF0012BA91 /* SettingsTableViewControllerDelegate.swift */,
+				18FFCA5127D553B70078CB3F /* SettingsTableViewController.storyboard */,
 			);
 			path = SettingsTableViewController;
 			sourceTree = "<group>";
@@ -370,7 +383,7 @@
 		18CA6D912735E45A00F32CE5 /* DetailViewController */ = {
 			isa = PBXGroup;
 			children = (
-				1855934427380BDC0012BA91 /* DetailViewControllerDelegate.swift */,
+				18FFCA4927D548AE0078CB3F /* DetailViewController.storyboard */,
 				049D480227286D5900B6DA3C /* DetailViewController.swift */,
 			);
 			path = DetailViewController;
@@ -379,7 +392,7 @@
 		18CA6D922735E46B00F32CE5 /* TabBar */ = {
 			isa = PBXGroup;
 			children = (
-				049D47EF2726EAE600B6DA3C /* TabBarViewController.swift */,
+				18FFCA5B27D61F2F0078CB3F /* TabBarViewController */,
 				18CA6D8F2735E44400F32CE5 /* PlaylistTableViewController */,
 				18CA6D8E2735E43600F32CE5 /* SearchViewController */,
 				047B47A8273B1F27008E844F /* LikedMomentsViewController */,
@@ -415,6 +428,24 @@
 				3FBCF1C62728482A00B70522 /* PodcastByAuthorCell.xib */,
 			);
 			path = PodcastByAuthorCell;
+			sourceTree = "<group>";
+		};
+		18FFCA5327D556170078CB3F /* PreLoader */ = {
+			isa = PBXGroup;
+			children = (
+				18FFCA5427D556920078CB3F /* PreLoaderViewController.swift */,
+				18FFCA5727D556BB0078CB3F /* PreLoaderViewController.storyboard */,
+			);
+			path = PreLoader;
+			sourceTree = "<group>";
+		};
+		18FFCA5B27D61F2F0078CB3F /* TabBarViewController */ = {
+			isa = PBXGroup;
+			children = (
+				18FFCA4727D526590078CB3F /* TabBarViewController.storyboard */,
+				049D47EF2726EAE600B6DA3C /* TabBarViewController.swift */,
+			);
+			path = TabBarViewController;
 			sourceTree = "<group>";
 		};
 		26863FFB79128477A1FFB53A /* Pods */ = {
@@ -503,14 +534,21 @@
 			buildActionMask = 2147483647;
 			files = (
 				18A5006C2728490E00CD3F0C /* (null) in Resources */,
+				18FFCA4827D526590078CB3F /* TabBarViewController.storyboard in Resources */,
 				049D47E82726E05F00B6DA3C /* LaunchScreen.storyboard in Resources */,
+				18FFCA4E27D549D60078CB3F /* SearchViewController.storyboard in Resources */,
+				18FFCA4C27D5498D0078CB3F /* PlaylistTableViewController.storyboard in Resources */,
+				18FFCA5227D553B70078CB3F /* SettingsTableViewController.storyboard in Resources */,
 				0457FB1D272F1ECC00D57280 /* PlayerViewController.xib in Resources */,
+				18FFCA4A27D548AE0078CB3F /* DetailViewController.storyboard in Resources */,
 				049D47E52726E05F00B6DA3C /* Assets.xcassets in Resources */,
+				18FFCA5827D556BB0078CB3F /* PreLoaderViewController.storyboard in Resources */,
+				18FFCA5027D54A450078CB3F /* LikedMomentsViewController.storyboard in Resources */,
 				3FBCF1C82728482A00B70522 /* PodcastByAuthorCell.xib in Resources */,
 				3FBCF1C3272847F100B70522 /* PodcastCell.xib in Resources */,
 				04425A8B273012DA00E897FA /* BigPlayerViewController.xib in Resources */,
 				18478131272C8F930036B89E /* Podfile in Resources */,
-				049D47E32726E05B00B6DA3C /* Main.storyboard in Resources */,
+				049D47E32726E05B00B6DA3C /* RegistrationViewController.storyboard in Resources */,
 				18A5006E27284BA100CD3F0C /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -569,12 +607,11 @@
 				189C1FB6272DF68600A8480E /* AuthorModel.swift in Sources */,
 				049D480327286D5900B6DA3C /* DetailViewController.swift in Sources */,
 				1855933D27380AA10012BA91 /* BigPlayerViewControllerDelegate.swift in Sources */,
+				18FFCA5527D556920078CB3F /* PreLoaderViewController.swift in Sources */,
 				189C1FAF272D84AB00A8480E /* PlaylistDocument.swift in Sources */,
-				1855934327380BAF0012BA91 /* SettingsTableViewControllerDelegate.swift in Sources */,
 				3FBCF1C72728482A00B70522 /* PodcastByAuthorCell.swift in Sources */,
 				3FBCF1C2272847F100B70522 /* PodcastCell.swift in Sources */,
 				18557D662732BF0100CA08CA /* User.swift in Sources */,
-				1855934127380B610012BA91 /* PlaylistViewControllerDelegate.swift in Sources */,
 				049D47E02726E05B00B6DA3C /* SearchViewController.swift in Sources */,
 				047B47B0273B1FF6008E844F /* LikedMomentsManager.swift in Sources */,
 				1855934727380C270012BA91 /* AuthService.swift in Sources */,
@@ -584,10 +621,10 @@
 				189C1FA8272D333A00A8480E /* UITableViewCell + identifier.swift in Sources */,
 				184CE18927270C8D0088044C /* ApiService.swift in Sources */,
 				1828F9BB2738798F00761CD5 /* DataProvider.swift in Sources */,
+				18FFCA5A27D602EF0078CB3F /* UIStoryboard.swift in Sources */,
 				049D47F02726EAE600B6DA3C /* TabBarViewController.swift in Sources */,
 				04425A8A273012DA00E897FA /* BigPlayerViewController.swift in Sources */,
 				047B47B2273B2054008E844F /* LikedMoment.swift in Sources */,
-				1855933F27380B400012BA91 /* SearchViewControllerDelegate.swift in Sources */,
 				047B47AF273B1FF6008E844F /* LikedMomentsViewController.swift in Sources */,
 				049D480127286D3900B6DA3C /* PlaylistTableViewController.swift in Sources */,
 				18CA6D8B2735902000F32CE5 /* MyToast.swift in Sources */,
@@ -607,7 +644,6 @@
 				1831DEDB2731944600EC09E2 /* DismissTransition.swift in Sources */,
 				189C1FAA272D336500A8480E /* UITableView + register.swift in Sources */,
 				1831DED12730560D00EC09E2 /* DownloadService.swift in Sources */,
-				1855934527380BDC0012BA91 /* DetailViewControllerDelegate.swift in Sources */,
 				189C1FB2272D876B00A8480E /* Collection.swift in Sources */,
 				049D47DE2726E05B00B6DA3C /* SceneDelegate.swift in Sources */,
 				187B2B4227345F6200C3EFFF /* Constant.swift in Sources */,
@@ -620,12 +656,12 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		049D47E12726E05B00B6DA3C /* Main.storyboard */ = {
+		049D47E12726E05B00B6DA3C /* RegistrationViewController.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
 				049D47E22726E05B00B6DA3C /* Base */,
 			);
-			name = Main.storyboard;
+			name = RegistrationViewController.storyboard;
 			sourceTree = "<group>";
 		};
 		049D47E62726E05F00B6DA3C /* LaunchScreen.storyboard */ = {
