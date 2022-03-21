@@ -21,7 +21,7 @@ class ApiService {
             case .success(let result):
                 completion(result)
             case .failure(let error):
-                print("print mistake \(String(describing: error.localizedDescription))")
+                print("print mistake \(String(describing: error))")
                 completion(nil)
             }
         }
@@ -29,30 +29,37 @@ class ApiService {
     
     private static func getData<T: Decodable>(for request: String, completion: @escaping (Result<T>) -> Void) {
         
-        guard let url = URL(string: request.encodeUrl), UIApplication.shared.canOpenURL(url) else { fatalError() }
+        guard let url = URL(string: request.encodeUrl) else { fatalError() }
         
         URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
             
-            var obtain: Result<T>
+            var result: Result<T>
             
             defer {
                 DispatchQueue.main.async {
-                    completion(obtain)
+                    completion(result)
                 }
             }
             
             guard let data = data, response != nil, error == nil else {
-                obtain = .failure(error: error!)
+                result = .failure(error: error!)
                 return
             }
             
             do {
-                let model = try JSONDecoder().decode(T.self, from: data)
-                obtain = .success(result: model)
+                let context = DataStoreManager.shared.viewContext
+                let decoder = JSONDecoder(context: context)
+//                let decoder = JSONDecoder()
+                let data = try decoder.decode(T.self, from: data)
+                
+                if let type = T.self as? SaveContextProtocol.Type {
+                    type.save(with: data)
+                }
+                
+                result = .success(result: data)
             } catch let error {
-                obtain = .failure(error: error)
+                result = .failure(error: error)
             }
-            
         }).resume()
     }
 }

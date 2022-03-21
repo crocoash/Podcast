@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CoreData
 
 protocol SearchViewControllerDelegate: AnyObject {
     func searchViewController(_ searchViewController: SearchViewController,_ podcasts: [Podcast], didSelectIndex: Int)
@@ -22,8 +23,11 @@ class SearchViewController : UIViewController {
     
     private let activityIndicator = UIActivityIndicatorView()
     private var alert = Alert()
-    
+   
     weak var delegate: SearchViewControllerDelegate?
+    
+    var fetchResultController: NSFetchedResultsController<AuthorData>!
+    
     
     private var podcasts: [Podcast] = [] {
         didSet {
@@ -63,6 +67,16 @@ class SearchViewController : UIViewController {
         configureGesture()
         showEmptyImage()
         downloadService.downloadsSession = downloadsSession
+        
+        let fetchRequest: NSFetchRequest<AuthorData> = AuthorData.fetchRequest()
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(AuthorData.results), ascending: true)]
+        
+        fetchResultController = NSFetchedResultsController(
+            fetchRequest: fetchRequest,
+            managedObjectContext: DataStoreManager.shared.viewContext,
+            sectionNameKeyPath: nil,
+            cacheName: nil
+        )
     }
     
     override func motionBegan(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
@@ -251,16 +265,37 @@ extension SearchViewController {
                 
                 guard let self = self else { return }
                 
-                self.processResults(data: info?.results, completion: { podcasts in
+                self.processResults(data: info?.results) { podcasts in
                     self.podcasts = podcasts
-                })
+                }
             }
         } else {
             ApiService.getData(for: UrlRequest1.getStringUrl(.authors(request))) { [weak self] (info: AuthorData?) in
+                
+//                let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: AuthorData.description())
+                
+//                if let users = try? viewContext.fetch(fetchRequest) as? [User] {
+//                    guard let mainUser = users.first else { return }
+//                    
+//                    viewContext.delete(mainUser)
+//                    
+//                    try? viewContext.save()
+                //                }
+                
+                
+                let results = info?.results.compactMap { $0 as? Author }
+                
                 guard let self = self else { return }
-                self.processResults(data: info?.results, completion: { authors in
-                    self.authors = authors
-                })
+                //
+                //                if let results = info?.results as? Set<Author> {
+                //
+                //                    let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: Author.description())
+                //
+                
+                self.processResults(data: results) { podcasts in
+//                    Author.save(with: podcasts)
+                    self.authors = podcasts
+                }
             }
         }
         showEmptyImage()
