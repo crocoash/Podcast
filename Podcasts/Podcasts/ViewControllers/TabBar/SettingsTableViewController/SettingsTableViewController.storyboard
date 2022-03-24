@@ -11,12 +11,6 @@
         <!--Settings Table View Controller-->
         <scene sceneID="s9G-29-ok0">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="ciV-Ja-dCD" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-                <tapGestureRecognizer id="apa-cf-jOu">
-                    <connections>
-                        <action selector="exit:" destination="Q14-vm-flJ" id="ggw-JS-WhS"/>
-                    </connections>
-                </tapGestureRecognizer>
                 <tableViewController storyboardIdentifier="SettingsTableViewController" id="Q14-vm-flJ" customClass="SettingsTableViewController" customModule="Podcasts" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" scrollEnabled="NO" delaysContentTouches="NO" dataMode="static" style="plain" separatorStyle="default" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" id="1Xq-LV-V3i">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
@@ -182,6 +176,12 @@
                         <outlet property="userNameLabel" destination="Ntm-Nx-hfX" id="Ifg-og-Jit"/>
                     </connections>
                 </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ciV-Ja-dCD" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <tapGestureRecognizer id="apa-cf-jOu">
+                    <connections>
+                        <action selector="exit:" destination="Q14-vm-flJ" id="ggw-JS-WhS"/>
+                    </connections>
+                </tapGestureRecognizer>
             </objects>
             <point key="canvasLocation" x="2106" y="1566"/>
         </scene>

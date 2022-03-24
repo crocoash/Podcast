@@ -10,6 +10,7 @@ import Foundation
 
 // MARK: - Result
 struct Podcast: Codable, Equatable, Identifiable {
+    
     let previewUrl: String? //podcast
     let episodeFileExtension: String? //mp3
     let artworkUrl160: String? // photo of podcast
@@ -80,14 +81,14 @@ struct Podcast: Codable, Equatable, Identifiable {
         previewUrl = container.contains(.previewUrl) ? try container.decode(String?.self, forKey: .previewUrl) : nil
         episodeFileExtension = container.contains(.episodeFileExtension) ? try container.decode(String?.self, forKey: .episodeFileExtension) : nil
         artworkUrl160 = container.contains(.artworkUrl160) ? try container.decode(String?.self, forKey: .artworkUrl160) : nil
-        episodeContentType = container.contains(.episodeContentType) ? try container.decode(String?.self, forKey: .episodeContentType) : nil
-        artworkUrl600 = container.contains(.artworkUrl600) ? try container.decode(String?.self, forKey: .artworkUrl600) : nil
-        artworkUrl60 = container.contains(.artworkUrl60) ? try container.decode(String?.self, forKey: .artworkUrl60) : nil
-        artistViewUrl = container.contains(.artistViewUrl) ? try container.decode(String?.self, forKey: .artistViewUrl) : nil
+        episodeContentType = container.contains(.episodeContentType) ? try container.decode(String.self, forKey: .episodeContentType) : nil
+        artworkUrl600 = container.contains(.artworkUrl600) ? try container.decode(String.self, forKey: .artworkUrl600) : nil
+        artworkUrl60 = container.contains(.artworkUrl60) ? try container.decode(String.self, forKey: .artworkUrl60) : nil
+        artistViewUrl = container.contains(.artistViewUrl) ? try container.decode(String.self, forKey: .artistViewUrl) : nil
         contentAdvisoryRating = container.contains(.contentAdvisoryRating) ? try container.decode(String?.self, forKey: .contentAdvisoryRating) : nil
-        trackViewUrl = container.contains(.trackViewUrl) ? try container.decode(String?.self, forKey: .trackViewUrl) : nil
-        trackTimeMillis = container.contains(.trackTimeMillis) ? try container.decode(Int?.self, forKey: .trackTimeMillis) : nil
-        collectionViewUrl = container.contains(.collectionViewUrl) ? try container.decode(String?.self, forKey: .collectionViewUrl) : nil
+        trackViewUrl = container.contains(.trackViewUrl) ? try container.decode(String.self, forKey: .trackViewUrl) : nil
+        trackTimeMillis = container.contains(.trackTimeMillis) ? try container.decode(Int.self, forKey: .trackTimeMillis) : nil
+        collectionViewUrl = container.contains(.collectionViewUrl) ? try container.decode(String.self, forKey: .collectionViewUrl) : nil
         episodeUrl = container.contains(.episodeUrl) ? try container.decode(String?.self, forKey: .episodeUrl) : nil
         collectionId = container.contains(.collectionId) ? try container.decode(Int?.self, forKey: .collectionId) : nil
         collectionName = container.contains(.collectionName) ? try container.decode(String?.self, forKey: .collectionName) : nil

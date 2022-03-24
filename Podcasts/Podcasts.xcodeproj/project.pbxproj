@@ -24,6 +24,13 @@
 		049D47F02726EAE600B6DA3C /* TabBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049D47EF2726EAE600B6DA3C /* TabBarViewController.swift */; };
 		049D480127286D3900B6DA3C /* PlaylistTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049D480027286D3900B6DA3C /* PlaylistTableViewController.swift */; };
 		049D480327286D5900B6DA3C /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049D480227286D5900B6DA3C /* DetailViewController.swift */; };
+		181F5BBA27E623D300AC27EB /* CoreData.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 181F5BB827E623D300AC27EB /* CoreData.xcdatamodeld */; };
+		181F5BC427E6718A00AC27EB /* DataStoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181F5BC327E6718A00AC27EB /* DataStoreManager.swift */; };
+		181F5BD627E6850500AC27EB /* Author+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181F5BD527E6850500AC27EB /* Author+CoreDataProperties.swift */; };
+		181F5BDA27E6854B00AC27EB /* Author+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181F5BD927E6854B00AC27EB /* Author+CoreDataClass.swift */; };
+		181F5BDE27E7184600AC27EB /* AuthorData+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181F5BDD27E7184600AC27EB /* AuthorData+CoreDataProperties.swift */; };
+		181F5BDF27E7184600AC27EB /* AuthorData+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181F5BDC27E7184600AC27EB /* AuthorData+CoreDataClass.swift */; };
+		181F5BE227E72E3800AC27EB /* extensionCoreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181F5BE127E72E3700AC27EB /* extensionCoreData.swift */; };
 		1828F9BB2738798F00761CD5 /* DataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1828F9BA2738798F00761CD5 /* DataProvider.swift */; };
 		1831DECC27304F5600EC09E2 /* PlayListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1831DECB27304F5600EC09E2 /* PlayListModel.swift */; };
 		1831DED12730560D00EC09E2 /* DownloadService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1831DED02730560D00EC09E2 /* DownloadService.swift */; };
@@ -96,6 +103,13 @@
 		049D47EF2726EAE600B6DA3C /* TabBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarViewController.swift; sourceTree = "<group>"; };
 		049D480027286D3900B6DA3C /* PlaylistTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistTableViewController.swift; sourceTree = "<group>"; };
 		049D480227286D5900B6DA3C /* DetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
+		181F5BB927E623D300AC27EB /* CoreData.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CoreData.xcdatamodel; sourceTree = "<group>"; };
+		181F5BC327E6718A00AC27EB /* DataStoreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStoreManager.swift; sourceTree = "<group>"; };
+		181F5BD527E6850500AC27EB /* Author+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Author+CoreDataProperties.swift"; path = "/Users/apple/Documents/Xcode/Nix/Podcast/Podcasts/Podcasts/Model/CoreData/Author+CoreDataProperties.swift"; sourceTree = "<absolute>"; };
+		181F5BD927E6854B00AC27EB /* Author+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Author+CoreDataClass.swift"; sourceTree = "<group>"; };
+		181F5BDC27E7184600AC27EB /* AuthorData+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "AuthorData+CoreDataClass.swift"; path = "/Users/apple/Documents/Xcode/Nix/Podcast/Podcasts/Podcasts/Model/CoreData/AuthorData+CoreDataClass.swift"; sourceTree = "<absolute>"; };
+		181F5BDD27E7184600AC27EB /* AuthorData+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "AuthorData+CoreDataProperties.swift"; path = "/Users/apple/Documents/Xcode/Nix/Podcast/Podcasts/Podcasts/Model/CoreData/AuthorData+CoreDataProperties.swift"; sourceTree = "<absolute>"; };
+		181F5BE127E72E3700AC27EB /* extensionCoreData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = extensionCoreData.swift; sourceTree = "<group>"; };
 		1828F9BA2738798F00761CD5 /* DataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataProvider.swift; sourceTree = "<group>"; };
 		1831DECB27304F5600EC09E2 /* PlayListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayListModel.swift; sourceTree = "<group>"; };
 		1831DED02730560D00EC09E2 /* DownloadService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadService.swift; sourceTree = "<group>"; };
@@ -194,11 +208,12 @@
 				049D47DB2726E05B00B6DA3C /* AppDelegate.swift */,
 				049D47DD2726E05B00B6DA3C /* SceneDelegate.swift */,
 				184CE19027271D9D0088044C /* Resourses */,
-				184CE18E27271D7B0088044C /* Model */,
-				189C1FAB272D337100A8480E /* Extensions */,
-				18D13DDA273C400C00495C97 /* Services */,
 				184CE19127271DAE0088044C /* Helpers */,
+				18D13DDA273C400C00495C97 /* Services */,
+				189C1FAB272D337100A8480E /* Extensions */,
 				189C1FB0272D84B100A8480E /* ViewModel */,
+				184CE18E27271D7B0088044C /* Model */,
+				049D480427286D6300B6DA3C /* ViewControllers */,
 				184CE18F27271D8D0088044C /* View */,
 				049D47E92726E05F00B6DA3C /* Info.plist */,
 			);
@@ -226,6 +241,28 @@
 			path = ViewControllers;
 			sourceTree = "<group>";
 		};
+		181F5BDB27E6855B00AC27EB /* CoreData */ = {
+			isa = PBXGroup;
+			children = (
+				181F5BB827E623D300AC27EB /* CoreData.xcdatamodeld */,
+				181F5BE127E72E3700AC27EB /* extensionCoreData.swift */,
+				181F5BDC27E7184600AC27EB /* AuthorData+CoreDataClass.swift */,
+				181F5BDD27E7184600AC27EB /* AuthorData+CoreDataProperties.swift */,
+				181F5BD927E6854B00AC27EB /* Author+CoreDataClass.swift */,
+				181F5BD527E6850500AC27EB /* Author+CoreDataProperties.swift */,
+			);
+			path = CoreData;
+			sourceTree = "<group>";
+		};
+		181F5BE027E7185900AC27EB /* Old */ = {
+			isa = PBXGroup;
+			children = (
+				189C1FB3272DF67900A8480E /* AuthorData.swift */,
+				189C1FB5272DF68600A8480E /* AuthorModel.swift */,
+			);
+			path = Old;
+			sourceTree = "<group>";
+		};
 		1847811D272C8B450036B89E /* Gestures */ = {
 			isa = PBXGroup;
 			children = (
@@ -251,8 +288,8 @@
 				047B47B1273B2054008E844F /* LikedMoment.swift */,
 				184CE18C272717B20088044C /* PodcastData.swift */,
 				184CE18A272717680088044C /* Podcast.swift */,
-				189C1FB3272DF67900A8480E /* AuthorData.swift */,
-				189C1FB5272DF68600A8480E /* AuthorModel.swift */,
+				181F5BDB27E6855B00AC27EB /* CoreData */,
+				181F5BE027E7185900AC27EB /* Old */,
 				1831DECB27304F5600EC09E2 /* PlayListModel.swift */,
 				18557D632732B61D00CA08CA /* IpModel.swift */,
 				18557D652732BF0100CA08CA /* User.swift */,
@@ -265,7 +302,6 @@
 			isa = PBXGroup;
 			children = (
 				3FBCF1BF272847E400B70522 /* Cells */,
-				049D480427286D6300B6DA3C /* ViewControllers */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -405,6 +441,7 @@
 			isa = PBXGroup;
 			children = (
 				184CE18827270C8D0088044C /* ApiService.swift */,
+				181F5BC327E6718A00AC27EB /* DataStoreManager.swift */,
 				1831DED02730560D00EC09E2 /* DownloadService.swift */,
 				1828F9BA2738798F00761CD5 /* DataProvider.swift */,
 				1855934627380C270012BA91 /* AuthService.swift */,
@@ -612,6 +649,7 @@
 				3FBCF1C72728482A00B70522 /* PodcastByAuthorCell.swift in Sources */,
 				3FBCF1C2272847F100B70522 /* PodcastCell.swift in Sources */,
 				18557D662732BF0100CA08CA /* User.swift in Sources */,
+				181F5BDF27E7184600AC27EB /* AuthorData+CoreDataClass.swift in Sources */,
 				049D47E02726E05B00B6DA3C /* SearchViewController.swift in Sources */,
 				047B47B0273B1FF6008E844F /* LikedMomentsManager.swift in Sources */,
 				1855934727380C270012BA91 /* AuthService.swift in Sources */,
@@ -621,10 +659,13 @@
 				189C1FA8272D333A00A8480E /* UITableViewCell + identifier.swift in Sources */,
 				184CE18927270C8D0088044C /* ApiService.swift in Sources */,
 				1828F9BB2738798F00761CD5 /* DataProvider.swift in Sources */,
+				181F5BD627E6850500AC27EB /* Author+CoreDataProperties.swift in Sources */,
+				181F5BDE27E7184600AC27EB /* AuthorData+CoreDataProperties.swift in Sources */,
 				18FFCA5A27D602EF0078CB3F /* UIStoryboard.swift in Sources */,
 				049D47F02726EAE600B6DA3C /* TabBarViewController.swift in Sources */,
 				04425A8A273012DA00E897FA /* BigPlayerViewController.swift in Sources */,
 				047B47B2273B2054008E844F /* LikedMoment.swift in Sources */,
+				181F5BDA27E6854B00AC27EB /* Author+CoreDataClass.swift in Sources */,
 				047B47AF273B1FF6008E844F /* LikedMomentsViewController.swift in Sources */,
 				049D480127286D3900B6DA3C /* PlaylistTableViewController.swift in Sources */,
 				18CA6D8B2735902000F32CE5 /* MyToast.swift in Sources */,
@@ -636,10 +677,13 @@
 				18CA6D8927352AF800F32CE5 /* UIViewController + loadFromXib.swift in Sources */,
 				0457FB1C272F1ECC00D57280 /* PlayerViewController.swift in Sources */,
 				1847812F272C8F390036B89E /* MyLongPressGestureRecognizer.swift in Sources */,
+				181F5BBA27E623D300AC27EB /* CoreData.xcdatamodeld in Sources */,
 				1847812E272C8F390036B89E /* MyAddGestureRecognizer.swift in Sources */,
 				18478128272C8B460036B89E /* Alert.swift in Sources */,
 				1831DEDD27319E3900EC09E2 /* SettingsTableViewController.swift in Sources */,
+				181F5BC427E6718A00AC27EB /* DataStoreManager.swift in Sources */,
 				189C1FAD272D496F00A8480E /* UIViewController + identifier.swift in Sources */,
+				181F5BE227E72E3800AC27EB /* extensionCoreData.swift in Sources */,
 				18A500612727FA3800CD3F0C /* RegistrationViewController.swift in Sources */,
 				1831DEDB2731944600EC09E2 /* DismissTransition.swift in Sources */,
 				189C1FAA272D336500A8480E /* UITableView + register.swift in Sources */,
@@ -859,6 +903,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		181F5BB827E623D300AC27EB /* CoreData.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				181F5BB927E623D300AC27EB /* CoreData.xcdatamodel */,
+			);
+			currentVersion = 181F5BB927E623D300AC27EB /* CoreData.xcdatamodel */;
+			path = CoreData.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 049D47D02726E05B00B6DA3C /* Project object */;
 }

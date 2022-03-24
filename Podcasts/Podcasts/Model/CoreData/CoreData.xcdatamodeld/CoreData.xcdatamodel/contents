@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="19574" systemVersion="21A559" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Author" representedClassName=".Author" syncable="YES">
+        <attribute name="artistID" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="artistLinkURL" optional="YES" attributeType="String"/>
+        <attribute name="artistName" optional="YES" attributeType="String"/>
+        <attribute name="artistType" optional="YES" attributeType="String"/>
+    </entity>
+    <entity name="AuthorData" representedClassName=".AuthorData" syncable="YES">
+        <attribute name="resultCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="results" toMany="YES" deletionRule="Nullify" destinationEntity="Author"/>
+    </entity>
+    <elements>
+        <element name="Author" positionX="-284.5621337890625" positionY="71.82119750976562" width="128" height="89"/>
+        <element name="AuthorData" positionX="-54" positionY="45" width="128" height="59"/>
+    </elements>
+</model>

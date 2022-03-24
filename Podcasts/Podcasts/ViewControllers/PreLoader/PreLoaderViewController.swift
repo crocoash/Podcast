@@ -32,7 +32,21 @@ class PreLoaderViewController: UIViewController {
   
         UIView.animate(withDuration: 0.5, animations: { self.view.layoutIfNeeded() }) { _ in
             let vc = RegistrationViewController.initVC
+            vc.modalPresentationStyle = .custom
+            vc.transitioningDelegate = self
             self.present(vc, animated: false)
         }
+    }
+}
+
+// MARK: - UIViewControllerTransitioningDelegate
+extension PreLoaderViewController: UIViewControllerTransitioningDelegate {
+    
+    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        return PresentTransition()
+    }
+    
+    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        return DismissTransition()
     }
 }
