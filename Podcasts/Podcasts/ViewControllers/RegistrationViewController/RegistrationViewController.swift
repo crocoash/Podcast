@@ -21,7 +21,7 @@ class RegistrationViewController: UIViewController {
     @IBOutlet private weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet private weak var backGroundView: UIView!
     
-    lazy var tabBarVC: TabBarViewController = {
+    lazy private var tabBarVC: TabBarViewController = {
         
         let vc = TabBarViewController.initVC
         vc.modalPresentationStyle = .custom
@@ -333,3 +333,5 @@ extension RegistrationViewController: UIViewControllerTransitioningDelegate {
         return DismissTransition()
     }
 }
+
+

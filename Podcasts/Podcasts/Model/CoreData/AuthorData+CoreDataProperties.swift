@@ -35,19 +35,3 @@ extension AuthorData {
     @NSManaged public func removeFromResults(_ values: NSSet)
 
 }
-
-
-extension AuthorData: SaveContextProtocol {
-    
-    static func save<T>(with value: T) {
-        
-        guard let value = value as? AuthorData else { fatalError() }
-        
-        let authorData = AuthorData(context: DataStoreManager.shared.viewContext)
-        
-        authorData.resultCount = value.resultCount
-        authorData.results = value.results
-        
-        DataStoreManager.shared.saveContext()
-    }
-}

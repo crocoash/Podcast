@@ -208,11 +208,12 @@
 				049D47DB2726E05B00B6DA3C /* AppDelegate.swift */,
 				049D47DD2726E05B00B6DA3C /* SceneDelegate.swift */,
 				184CE19027271D9D0088044C /* Resourses */,
-				184CE18E27271D7B0088044C /* Model */,
-				189C1FAB272D337100A8480E /* Extensions */,
-				18D13DDA273C400C00495C97 /* Services */,
 				184CE19127271DAE0088044C /* Helpers */,
+				18D13DDA273C400C00495C97 /* Services */,
+				189C1FAB272D337100A8480E /* Extensions */,
 				189C1FB0272D84B100A8480E /* ViewModel */,
+				184CE18E27271D7B0088044C /* Model */,
+				049D480427286D6300B6DA3C /* ViewControllers */,
 				184CE18F27271D8D0088044C /* View */,
 				049D47E92726E05F00B6DA3C /* Info.plist */,
 			);
@@ -301,7 +302,6 @@
 			isa = PBXGroup;
 			children = (
 				3FBCF1BF272847E400B70522 /* Cells */,
-				049D480427286D6300B6DA3C /* ViewControllers */,
 			);
 			path = View;
 			sourceTree = "<group>";

@@ -272,33 +272,16 @@ extension SearchViewController {
         } else {
             ApiService.getData(for: UrlRequest1.getStringUrl(.authors(request))) { [weak self] (info: AuthorData?) in
                 
-//                let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: AuthorData.description())
-                
-//                if let users = try? viewContext.fetch(fetchRequest) as? [User] {
-//                    guard let mainUser = users.first else { return }
-//                    
-//                    viewContext.delete(mainUser)
-//                    
-//                    try? viewContext.save()
-                //                }
-                
-                
+                guard let self = self else { return }
+             
                 let results = info?.results.compactMap { $0 as? Author }
                 
-                guard let self = self else { return }
-                //
-                //                if let results = info?.results as? Set<Author> {
-                //
-                //                    let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: Author.description())
-                //
-                
                 self.processResults(data: results) { podcasts in
-//                    Author.save(with: podcasts)
                     self.authors = podcasts
                 }
             }
+            showEmptyImage()
         }
-        showEmptyImage()
     }
 }
 

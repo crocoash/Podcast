@@ -9,7 +9,7 @@
 import Foundation
 import CoreData
 
-//@objc(AuthorData)
+
 public class AuthorData: NSManagedObject, Decodable {
 
     private enum CodingKeys: String, CodingKey {
@@ -30,5 +30,22 @@ public class AuthorData: NSManagedObject, Decodable {
         
         resultCount = try values.decode(Int32.self, forKey: .resultCount)
         results = try values.decode(Set<Author>.self, forKey: .results) as NSSet
+    }
+}
+
+//MARK: - static methods
+extension AuthorData: SaveContextProtocol {
+    
+    static func remove() {
+        
+        let fetchRequest =  AuthorData.fetchRequest()
+        let dataStoreManager = DataStoreManager.shared
+
+        if let data = try? dataStoreManager.viewContext.fetch(fetchRequest), !data.isEmpty {
+            data.forEach { x in
+                dataStoreManager.viewContext.delete(x)
+                try? dataStoreManager.viewContext.save()
+            }
+        }
     }
 }

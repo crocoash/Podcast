@@ -34,7 +34,7 @@ class ApiService {
         URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
             
             var result: Result<T>
-            
+        
             defer {
                 DispatchQueue.main.async {
                     completion(result)
@@ -47,14 +47,15 @@ class ApiService {
             }
             
             do {
+//                if let type = T.self as? SaveContextProtocol.Type {
+//                    type.remove()
+//                    Author.remove()
+//                }
+                
                 let context = DataStoreManager.shared.viewContext
                 let decoder = JSONDecoder(context: context)
-//                let decoder = JSONDecoder()
                 let data = try decoder.decode(T.self, from: data)
-                
-                if let type = T.self as? SaveContextProtocol.Type {
-                    type.save(with: data)
-                }
+//                try? context.save()
                 
                 result = .success(result: data)
             } catch let error {

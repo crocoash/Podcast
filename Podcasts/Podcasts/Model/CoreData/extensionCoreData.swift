@@ -20,5 +20,5 @@ extension JSONDecoder {
 }
 
 protocol SaveContextProtocol {
-    static func save<T>(with value: T)
+    static func remove()
 }

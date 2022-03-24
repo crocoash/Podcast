@@ -10,7 +10,6 @@ import Foundation
 import CoreData
 
 
-//@objc(Author)
 public class Author: NSManagedObject, Decodable {
     
     private enum CodingKeys: String, CodingKey {
@@ -38,4 +37,19 @@ public class Author: NSManagedObject, Decodable {
     }
 }
 
+//MARK: - static methods
+extension Author: SaveContextProtocol {
+    
+    static func remove() {
+        
+        let fetchRequest =  Author.fetchRequest()
+        let dataStoreManager = DataStoreManager.shared
 
+        if let data = try? dataStoreManager.viewContext.fetch(fetchRequest), !data.isEmpty {
+            data.forEach { x in
+                dataStoreManager.viewContext.delete(x)
+                try? dataStoreManager.viewContext.save()
+            }
+        }
+    }
+}
