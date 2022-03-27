@@ -48,9 +48,9 @@ struct PlaylistModel: Codable {
     }
     
     mutating func trackIsDownloaded(index: Int) {
-        if let index = playList.firstIndex(matching: index) {
-            playList[index].isDownLoad = true
-        }
+//        if let index = playList.firstIndex(matching: index) {
+//            playList[index].isDownLoad = true
+//        }
         
     }
     

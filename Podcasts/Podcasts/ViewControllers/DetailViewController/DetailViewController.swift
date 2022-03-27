@@ -94,7 +94,7 @@ extension DetailViewController {
             return
         }
         
-        durationLabel.text = String((milis / 1000) / 60) + " min"
+        durationLabel.text = String((milis.intValue / 1000) / 60) + " min"
     }
     
     private func formatDate() {

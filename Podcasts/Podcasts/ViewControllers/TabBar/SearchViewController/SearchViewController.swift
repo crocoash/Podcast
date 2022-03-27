@@ -389,9 +389,9 @@ extension SearchViewController: URLSessionDownloadDelegate {
         DispatchQueue.main.async {
             guard let podcast = self.downloadService.activeDownloads[sourceURL] else { return }
             
-            PlaylistDocument.shared.trackIsDownloaded(index: podcast.id!)
+            PlaylistDocument.shared.trackIsDownloaded(index: podcast.id!.intValue)
             
-            self.podcastTableView.reloadRows(at: [IndexPath(row: podcast.index!, section: 0)], with: .none)
+            self.podcastTableView.reloadRows(at: [IndexPath(row: podcast.index!.intValue, section: 0)], with: .none)
             self.downloadService.activeDownloads[sourceURL] = nil
         }
     }
@@ -410,7 +410,7 @@ extension SearchViewController: URLSessionDownloadDelegate {
         let totalSize = ByteCountFormatter.string(fromByteCount: totalBytesExpectedToWrite, countStyle: .file)
         
         DispatchQueue.main.async {
-            if let podcastCell = self.podcastTableView.cellForRow(at: IndexPath(row: podcast.index!, section: 0)) as? PodcastCell {
+            if let podcastCell = self.podcastTableView.cellForRow(at: IndexPath(row: podcast.index!.intValue, section: 0)) as? PodcastCell {
                 podcastCell.updateDisplay(progress: podcast.progress, totalSize: totalSize)
             }
         }
