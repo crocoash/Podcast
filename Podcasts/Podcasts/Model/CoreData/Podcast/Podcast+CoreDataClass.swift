@@ -1,43 +1,17 @@
 //
-//  Podcast.swift
+//  Podcast+CoreDataClass.swift
 //  Podcasts
 //
-//  Created by Tsvetkov Anton on 25.10.2021.
+//  Created by Tsvetkov Anton on 27.03.2022.
+//
 //
 
-
 import Foundation
+import CoreData
 
-// MARK: - Result
-struct Podcast: Codable, Equatable, Identifiable {
-    
-    let previewUrl: String? //podcast
-    let episodeFileExtension: String? //mp3
-    let artworkUrl160: String? // photo of podcast
-    let episodeContentType: String? // audio
-    let artworkUrl600: String? // photo of podcast
-    let artworkUrl60: String? //  photo :)
-    let artistViewUrl: String? // podcast in podcast url
-    let contentAdvisoryRating: String? //Explicit
-    let trackViewUrl: String? // podcast in browser
-    let trackTimeMillis: Int? // 8086000
-    let collectionViewUrl: String? // collection in browser
-    let episodeUrl: String? // podcast with episode small
-    let collectionId: Int? // 1236778275
-    let collectionName: String? // VIEWS with David Dobrik & Jason Nash
-    let id: Int?
-    let trackName: String? // David and Natalie Discuss their Relationship
-    let releaseDate: String? // 2019-11-09T22:14:13Z
-    let shortDescription: String? //
-    let feedUrl: String? // feedburner.com
-    let artistIds: [Int]?  //[1310874139]
-    let closedCaptioning: String? // none
-    let country: String? // USA
-    let description: String? // text
-    let episodeGuid: String? // 69fa220d-ba11-4238-a1f8-a87038fee528
-    let kind : String? // podcast-episode
-    let wrapperType: String? // podcastEpisode
-    
+@objc(Podcast)
+public class Podcast: NSManagedObject, Codable {
+
     private enum CodingKeys: String, CodingKey {
         case previewUrl
         case episodeFileExtension
@@ -56,12 +30,12 @@ struct Podcast: Codable, Equatable, Identifiable {
         case id = "trackId"
         case trackName
         case releaseDate
-        case shortDescription
+        case shortDescriptionMy = "shortDescription"
         case feedUrl
         case artistIds
         case closedCaptioning
         case country
-        case description
+        case descriptionMy = "description"
         case episodeGuid
         case kind
         case wrapperType
@@ -69,15 +43,19 @@ struct Podcast: Codable, Equatable, Identifiable {
         case progress
         case index
     }
-    
-    var isDownLoad: Bool
-    var progress: Float
-    var index: Int?
-    var task: URLSessionDownloadTask? = nil
-    
-    init(from decoder: Decoder) throws {
+
+
+    required convenience public init(from decoder: Decoder) throws {
+
+        guard let context = decoder.userInfo[.context] as? NSManagedObjectContext else {
+            fatalError("mistake")
+        }
+
+        let entity = NSEntityDescription.entity(forEntityName: Podcast.description(), in: context)!
+        self.init(entity: entity, insertInto: context)
+
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        
+
         previewUrl = container.contains(.previewUrl) ? try container.decode(String?.self, forKey: .previewUrl) : nil
         episodeFileExtension = container.contains(.episodeFileExtension) ? try container.decode(String?.self, forKey: .episodeFileExtension) : nil
         artworkUrl160 = container.contains(.artworkUrl160) ? try container.decode(String?.self, forKey: .artworkUrl160) : nil
@@ -87,26 +65,62 @@ struct Podcast: Codable, Equatable, Identifiable {
         artistViewUrl = container.contains(.artistViewUrl) ? try container.decode(String.self, forKey: .artistViewUrl) : nil
         contentAdvisoryRating = container.contains(.contentAdvisoryRating) ? try container.decode(String?.self, forKey: .contentAdvisoryRating) : nil
         trackViewUrl = container.contains(.trackViewUrl) ? try container.decode(String.self, forKey: .trackViewUrl) : nil
-        trackTimeMillis = container.contains(.trackTimeMillis) ? try container.decode(Int.self, forKey: .trackTimeMillis) : nil
+        
+        trackTimeMillis = container.contains(.trackTimeMillis) ? try container.decode(Int.self, forKey: .trackTimeMillis) as NSNumber : nil
+        
         collectionViewUrl = container.contains(.collectionViewUrl) ? try container.decode(String.self, forKey: .collectionViewUrl) : nil
         episodeUrl = container.contains(.episodeUrl) ? try container.decode(String?.self, forKey: .episodeUrl) : nil
-        collectionId = container.contains(.collectionId) ? try container.decode(Int?.self, forKey: .collectionId) : nil
+        collectionId = container.contains(.collectionId) ? try container.decode(Int.self, forKey: .collectionId) as NSNumber : nil
         collectionName = container.contains(.collectionName) ? try container.decode(String?.self, forKey: .collectionName) : nil
-        id = container.contains(.id) ? try container.decode(Int?.self, forKey: .id) : nil
-        trackName = container.contains(.trackName) ? try container.decode(String?.self, forKey: .trackName) : nil
+        id = container.contains(.id) ? try container.decode(Int.self, forKey: .id) as NSNumber : nil
+        trackName = container.contains(.trackName) ? try container.decode(String.self, forKey: .trackName) : nil
         releaseDate = container.contains(.releaseDate) ? try container.decode(String?.self, forKey: .releaseDate) : nil
-        shortDescription = container.contains(.shortDescription) ? try container.decode(String?.self, forKey: .shortDescription) : nil
+        shortDescriptionMy = container.contains(.shortDescriptionMy) ? try container.decode(String?.self, forKey: .shortDescriptionMy) : nil
         feedUrl = container.contains(.feedUrl) ? try container.decode(String?.self, forKey: .feedUrl) : nil
         artistIds = container.contains(.artistIds) ? try container.decode([Int]?.self, forKey: .artistIds) : nil
         closedCaptioning = container.contains(.closedCaptioning) ? try container.decode(String?.self, forKey: .closedCaptioning) : nil
         country = container.contains(.country) ? try container.decode(String?.self, forKey: .country) : nil
-        description = container.contains(.description) ? try container.decode(String?.self, forKey: .description) : nil
+        descriptionMy = container.contains(.descriptionMy) ? try container.decode(String?.self, forKey: .descriptionMy) : nil
         episodeGuid = container.contains(.episodeGuid) ? try container.decode(String?.self, forKey: .episodeGuid) : nil
         kind = container.contains(.kind) ? try container.decode(String?.self, forKey: .kind) : nil
         wrapperType = container.contains(.wrapperType) ? try container.decode(String?.self, forKey: .wrapperType) : nil
-        
         isDownLoad = container.contains(.isDownLoad) ? try container.decode(Bool.self, forKey: .isDownLoad) : false
         progress = container.contains(.progress) ? try container.decode(Float.self, forKey: .progress) : 0
-        index = container.contains(.index) ? try container.decode(Int?.self, forKey: .index) : nil
+        index = container.contains(.index) ? try container.decode(Int.self, forKey: .index) as NSNumber : nil
+    }
+    
+    
+    public func encode(to encoder: Encoder) throws {
+        
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        ///
+        try container.encode(previewUrl, forKey: .previewUrl)
+        try container.encode(episodeFileExtension, forKey: .episodeFileExtension )
+        try container.encode(artworkUrl160, forKey: .artworkUrl160 )
+        try container.encode(episodeContentType, forKey: .episodeContentType )
+        try container.encode(artworkUrl600, forKey: .artworkUrl600 )
+        try container.encode(artworkUrl60, forKey: .artworkUrl60 )
+        try container.encode(artistViewUrl, forKey: .artistViewUrl )
+        try container.encode(contentAdvisoryRating, forKey: .contentAdvisoryRating )
+        try container.encode(trackViewUrl, forKey: .trackViewUrl )
+        try container.encode(trackTimeMillis?.intValue, forKey: .trackTimeMillis )
+        try container.encode(collectionViewUrl, forKey: .collectionViewUrl )
+        try container.encode(episodeUrl, forKey: .episodeUrl )
+        try container.encode(collectionId?.intValue, forKey: .collectionId )
+        try container.encode(collectionName, forKey: .collectionName )
+        try container.encode(id?.intValue, forKey: .id )
+        try container.encode(trackName, forKey: .trackName )
+        try container.encode(releaseDate, forKey: .releaseDate )
+        try container.encode(shortDescriptionMy, forKey: .shortDescriptionMy )
+        try container.encode(feedUrl, forKey: .feedUrl )
+        try container.encode(artistIds, forKey: .artistIds )
+        try container.encode(closedCaptioning, forKey: .closedCaptioning )
+        try container.encode(country, forKey: .country )
+        try container.encode(descriptionMy, forKey: .descriptionMy )
+        try container.encode(episodeGuid, forKey: .episodeGuid )
+        try container.encode(wrapperType, forKey: .wrapperType )
+        try container.encode(isDownLoad, forKey: .isDownLoad )
+        try container.encode(progress, forKey: .progress )
+        try container.encode(index?.intValue, forKey: .index )
     }
 }

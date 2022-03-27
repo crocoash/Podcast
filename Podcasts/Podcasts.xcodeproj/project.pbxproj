@@ -27,7 +27,6 @@
 		181F5BBA27E623D300AC27EB /* CoreData.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 181F5BB827E623D300AC27EB /* CoreData.xcdatamodeld */; };
 		181F5BC427E6718A00AC27EB /* DataStoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181F5BC327E6718A00AC27EB /* DataStoreManager.swift */; };
 		181F5BD627E6850500AC27EB /* Author+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181F5BD527E6850500AC27EB /* Author+CoreDataProperties.swift */; };
-		181F5BDA27E6854B00AC27EB /* Author+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181F5BD927E6854B00AC27EB /* Author+CoreDataClass.swift */; };
 		181F5BDE27E7184600AC27EB /* AuthorData+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181F5BDD27E7184600AC27EB /* AuthorData+CoreDataProperties.swift */; };
 		181F5BDF27E7184600AC27EB /* AuthorData+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181F5BDC27E7184600AC27EB /* AuthorData+CoreDataClass.swift */; };
 		181F5BE227E72E3800AC27EB /* extensionCoreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181F5BE127E72E3700AC27EB /* extensionCoreData.swift */; };
@@ -49,6 +48,8 @@
 		18557D662732BF0100CA08CA /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18557D652732BF0100CA08CA /* User.swift */; };
 		1855933D27380AA10012BA91 /* BigPlayerViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1855933C27380AA10012BA91 /* BigPlayerViewControllerDelegate.swift */; };
 		1855934727380C270012BA91 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1855934627380C270012BA91 /* AuthService.swift */; };
+		185A7B1E27F0EB390096E094 /* Podcast+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185A7B1C27F0EB390096E094 /* Podcast+CoreDataProperties.swift */; };
+		185A7B1F27F0EB390096E094 /* Podcast+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185A7B1D27F0EB390096E094 /* Podcast+CoreDataClass.swift */; };
 		187B2B3E2732C11000C3EFFF /* UserViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187B2B3D2732C11000C3EFFF /* UserViewModel.swift */; };
 		187B2B4227345F6200C3EFFF /* Constant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187B2B4127345F6200C3EFFF /* Constant.swift */; };
 		1888C2AF2739A8D000395B5B /* URL + localPath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1888C2AE2739A8CF00395B5B /* URL + localPath.swift */; };
@@ -65,6 +66,7 @@
 		18A5006E27284BA100CD3F0C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 18A5006D27284BA100CD3F0C /* GoogleService-Info.plist */; };
 		18CA6D8927352AF800F32CE5 /* UIViewController + loadFromXib.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA6D8827352AF800F32CE5 /* UIViewController + loadFromXib.swift */; };
 		18CA6D8B2735902000F32CE5 /* MyToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA6D8A2735902000F32CE5 /* MyToast.swift */; };
+		18D0EAA227F0FF8900941A0D /* Author+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18D0EAA127F0FF8900941A0D /* Author+CoreDataClass.swift */; };
 		18D13DDC273C407A00495C97 /* UserDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18D13DDB273C407A00495C97 /* UserDocument.swift */; };
 		18FFCA4827D526590078CB3F /* TabBarViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 18FFCA4727D526590078CB3F /* TabBarViewController.storyboard */; };
 		18FFCA4A27D548AE0078CB3F /* DetailViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 18FFCA4927D548AE0078CB3F /* DetailViewController.storyboard */; };
@@ -105,10 +107,9 @@
 		049D480227286D5900B6DA3C /* DetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
 		181F5BB927E623D300AC27EB /* CoreData.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CoreData.xcdatamodel; sourceTree = "<group>"; };
 		181F5BC327E6718A00AC27EB /* DataStoreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStoreManager.swift; sourceTree = "<group>"; };
-		181F5BD527E6850500AC27EB /* Author+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Author+CoreDataProperties.swift"; path = "/Users/apple/Documents/Xcode/Nix/Podcast/Podcasts/Podcasts/Model/CoreData/Author+CoreDataProperties.swift"; sourceTree = "<absolute>"; };
-		181F5BD927E6854B00AC27EB /* Author+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Author+CoreDataClass.swift"; sourceTree = "<group>"; };
-		181F5BDC27E7184600AC27EB /* AuthorData+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "AuthorData+CoreDataClass.swift"; path = "/Users/apple/Documents/Xcode/Nix/Podcast/Podcasts/Podcasts/Model/CoreData/AuthorData+CoreDataClass.swift"; sourceTree = "<absolute>"; };
-		181F5BDD27E7184600AC27EB /* AuthorData+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "AuthorData+CoreDataProperties.swift"; path = "/Users/apple/Documents/Xcode/Nix/Podcast/Podcasts/Podcasts/Model/CoreData/AuthorData+CoreDataProperties.swift"; sourceTree = "<absolute>"; };
+		181F5BD527E6850500AC27EB /* Author+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Author+CoreDataProperties.swift"; path = "/Users/apple/Documents/Xcode/Nix/Podcast/Podcasts/Podcasts/Model/CoreData/Author/Author+CoreDataProperties.swift"; sourceTree = "<absolute>"; };
+		181F5BDC27E7184600AC27EB /* AuthorData+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "AuthorData+CoreDataClass.swift"; path = "/Users/apple/Documents/Xcode/Nix/Podcast/Podcasts/Podcasts/Model/CoreData/AuthorData/AuthorData+CoreDataClass.swift"; sourceTree = "<absolute>"; };
+		181F5BDD27E7184600AC27EB /* AuthorData+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "AuthorData+CoreDataProperties.swift"; path = "/Users/apple/Documents/Xcode/Nix/Podcast/Podcasts/Podcasts/Model/CoreData/AuthorData/AuthorData+CoreDataProperties.swift"; sourceTree = "<absolute>"; };
 		181F5BE127E72E3700AC27EB /* extensionCoreData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = extensionCoreData.swift; sourceTree = "<group>"; };
 		1828F9BA2738798F00761CD5 /* DataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataProvider.swift; sourceTree = "<group>"; };
 		1831DECB27304F5600EC09E2 /* PlayListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayListModel.swift; sourceTree = "<group>"; };
@@ -128,6 +129,8 @@
 		18557D652732BF0100CA08CA /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		1855933C27380AA10012BA91 /* BigPlayerViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BigPlayerViewControllerDelegate.swift; sourceTree = "<group>"; };
 		1855934627380C270012BA91 /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
+		185A7B1C27F0EB390096E094 /* Podcast+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Podcast+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		185A7B1D27F0EB390096E094 /* Podcast+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Podcast+CoreDataClass.swift"; sourceTree = "<group>"; };
 		187B2B3D2732C11000C3EFFF /* UserViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserViewModel.swift; sourceTree = "<group>"; };
 		187B2B4127345F6200C3EFFF /* Constant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constant.swift; sourceTree = "<group>"; };
 		1888C2AE2739A8CF00395B5B /* URL + localPath.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "URL + localPath.swift"; sourceTree = "<group>"; };
@@ -143,6 +146,7 @@
 		18A5006D27284BA100CD3F0C /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		18CA6D8827352AF800F32CE5 /* UIViewController + loadFromXib.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController + loadFromXib.swift"; sourceTree = "<group>"; };
 		18CA6D8A2735902000F32CE5 /* MyToast.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyToast.swift; sourceTree = "<group>"; };
+		18D0EAA127F0FF8900941A0D /* Author+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Author+CoreDataClass.swift"; sourceTree = "<group>"; };
 		18D13DDB273C407A00495C97 /* UserDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDocument.swift; sourceTree = "<group>"; };
 		18FFCA4727D526590078CB3F /* TabBarViewController.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = TabBarViewController.storyboard; sourceTree = "<group>"; };
 		18FFCA4927D548AE0078CB3F /* DetailViewController.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = DetailViewController.storyboard; sourceTree = "<group>"; };
@@ -246,10 +250,9 @@
 			children = (
 				181F5BB827E623D300AC27EB /* CoreData.xcdatamodeld */,
 				181F5BE127E72E3700AC27EB /* extensionCoreData.swift */,
-				181F5BDC27E7184600AC27EB /* AuthorData+CoreDataClass.swift */,
-				181F5BDD27E7184600AC27EB /* AuthorData+CoreDataProperties.swift */,
-				181F5BD927E6854B00AC27EB /* Author+CoreDataClass.swift */,
-				181F5BD527E6850500AC27EB /* Author+CoreDataProperties.swift */,
+				185A7B1927F0E9620096E094 /* AuthorData */,
+				185A7B1A27F0E9710096E094 /* Author */,
+				185A7B1B27F0E97D0096E094 /* Podcast */,
 			);
 			path = CoreData;
 			sourceTree = "<group>";
@@ -257,6 +260,7 @@
 		181F5BE027E7185900AC27EB /* Old */ = {
 			isa = PBXGroup;
 			children = (
+				184CE18A272717680088044C /* Podcast.swift */,
 				189C1FB3272DF67900A8480E /* AuthorData.swift */,
 				189C1FB5272DF68600A8480E /* AuthorModel.swift */,
 			);
@@ -287,7 +291,6 @@
 			children = (
 				047B47B1273B2054008E844F /* LikedMoment.swift */,
 				184CE18C272717B20088044C /* PodcastData.swift */,
-				184CE18A272717680088044C /* Podcast.swift */,
 				181F5BDB27E6855B00AC27EB /* CoreData */,
 				181F5BE027E7185900AC27EB /* Old */,
 				1831DECB27304F5600EC09E2 /* PlayListModel.swift */,
@@ -344,6 +347,33 @@
 				0457FB1B272F1ECB00D57280 /* PlayerViewController.xib */,
 			);
 			path = Player;
+			sourceTree = "<group>";
+		};
+		185A7B1927F0E9620096E094 /* AuthorData */ = {
+			isa = PBXGroup;
+			children = (
+				181F5BDC27E7184600AC27EB /* AuthorData+CoreDataClass.swift */,
+				181F5BDD27E7184600AC27EB /* AuthorData+CoreDataProperties.swift */,
+			);
+			path = AuthorData;
+			sourceTree = "<group>";
+		};
+		185A7B1A27F0E9710096E094 /* Author */ = {
+			isa = PBXGroup;
+			children = (
+				18D0EAA127F0FF8900941A0D /* Author+CoreDataClass.swift */,
+				181F5BD527E6850500AC27EB /* Author+CoreDataProperties.swift */,
+			);
+			path = Author;
+			sourceTree = "<group>";
+		};
+		185A7B1B27F0E97D0096E094 /* Podcast */ = {
+			isa = PBXGroup;
+			children = (
+				185A7B1D27F0EB390096E094 /* Podcast+CoreDataClass.swift */,
+				185A7B1C27F0EB390096E094 /* Podcast+CoreDataProperties.swift */,
+			);
+			path = Podcast;
 			sourceTree = "<group>";
 		};
 		187B2B3C2732C0BD00C3EFFF /* CustomPresent */ = {
@@ -639,9 +669,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				185A7B1F27F0EB390096E094 /* Podcast+CoreDataClass.swift in Sources */,
 				189C1FB4272DF67A00A8480E /* AuthorData.swift in Sources */,
 				18D13DDC273C407A00495C97 /* UserDocument.swift in Sources */,
 				189C1FB6272DF68600A8480E /* AuthorModel.swift in Sources */,
+				18D0EAA227F0FF8900941A0D /* Author+CoreDataClass.swift in Sources */,
 				049D480327286D5900B6DA3C /* DetailViewController.swift in Sources */,
 				1855933D27380AA10012BA91 /* BigPlayerViewControllerDelegate.swift in Sources */,
 				18FFCA5527D556920078CB3F /* PreLoaderViewController.swift in Sources */,
@@ -663,9 +695,9 @@
 				181F5BDE27E7184600AC27EB /* AuthorData+CoreDataProperties.swift in Sources */,
 				18FFCA5A27D602EF0078CB3F /* UIStoryboard.swift in Sources */,
 				049D47F02726EAE600B6DA3C /* TabBarViewController.swift in Sources */,
+				185A7B1E27F0EB390096E094 /* Podcast+CoreDataProperties.swift in Sources */,
 				04425A8A273012DA00E897FA /* BigPlayerViewController.swift in Sources */,
 				047B47B2273B2054008E844F /* LikedMoment.swift in Sources */,
-				181F5BDA27E6854B00AC27EB /* Author+CoreDataClass.swift in Sources */,
 				047B47AF273B1FF6008E844F /* LikedMomentsViewController.swift in Sources */,
 				049D480127286D3900B6DA3C /* PlaylistTableViewController.swift in Sources */,
 				18CA6D8B2735902000F32CE5 /* MyToast.swift in Sources */,

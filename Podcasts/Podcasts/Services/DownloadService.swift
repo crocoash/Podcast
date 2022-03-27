@@ -20,12 +20,12 @@ class DownloadService {
         var podcast = podcast
         
         if activeDownloads[url] == nil {
-            podcast.index = index
-            podcast.task = downloadsSession.downloadTask(with: url)
-            podcast.task?.resume()
+//            podcast.index = index
+//            podcast.task = downloadsSession.downloadTask(with: url)
+//            podcast.task?.resume()
             activeDownloads[url] = podcast
         } else {
-            activeDownloads[url]?.task?.cancel()
+//            activeDownloads[url]?.task?.cancel()
             activeDownloads[url] = nil
         }
     }
