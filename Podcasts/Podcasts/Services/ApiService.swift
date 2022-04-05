@@ -54,10 +54,10 @@ class ApiService {
                 
                 let context = DataStoreManager.shared.viewContext
                 let decoder = JSONDecoder(context: context)
-                let data = try decoder.decode(T.self, from: data)
+                let res = try decoder.decode(T.self, from: data)
 //                try? context.save()
                 
-                result = .success(result: data)
+                result = .success(result: res)
             } catch let error {
                 result = .failure(error: error)
             }

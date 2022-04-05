@@ -265,8 +265,12 @@ extension SearchViewController {
                 
                 guard let self = self else { return }
                 
-                self.processResults(data: info?.results) { podcasts in
-                    self.podcasts = podcasts
+                self.processResults(data: info?.results) { _ in
+                    let fetchRequest = Podcast.fetchRequest()
+                    fetchRequest.returnsObjectsAsFaults = false
+                    if let res = try? DataStoreManager.shared.viewContext.fetch(fetchRequest) {
+                        self.podcasts = res
+                    }
                 }
             }
         } else {
