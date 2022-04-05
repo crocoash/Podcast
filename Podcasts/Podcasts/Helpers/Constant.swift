@@ -16,8 +16,7 @@ enum UrlRequest1 {
         case .podcast(let string):
             return "https://itunes.apple.com/search?term=\(string)&entity=podcastEpisode"
         case .authors(let string):
-
-            return "\(adress) + \(string) +"&media=podcast&entity=podcastAuthor"
+            return "https://itunes.apple.com/search?term=\(string)&media=podcast&entity=podcastAuthor"
         }
     }
 }
