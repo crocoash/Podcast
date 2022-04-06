@@ -47,15 +47,10 @@ class ApiService {
             }
             
             do {
-//                if let type = T.self as? SaveContextProtocol.Type {
-//                    type.remove()
-//                    Author.remove()
-//                }
-                
-                let context = DataStoreManager.shared.viewContext
+                let context = DataStoreManager.shared.searchViewContext
                 let decoder = JSONDecoder(context: context)
                 let data = try decoder.decode(T.self, from: data)
-//                try? context.save()
+                DataStoreManager.shared.save(context: context)
                 
                 result = .success(result: data)
             } catch let error {

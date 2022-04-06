@@ -41,12 +41,11 @@ class DataStoreManager {
     }()
     
     // MARK: - Core Data Saving support
-    func saveContext() {
-        
-        let context = persistentContainer.viewContext
+    func save(context: NSManagedObjectContext) {
         if context.hasChanges {
             do {
                 try context.save()
+                try context.parent?.save()
             } catch {
                 let nserror = error as NSError
                 fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
@@ -54,7 +53,33 @@ class DataStoreManager {
         }
     }
     
-    lazy var viewContext: NSManagedObjectContext = persistentContainer.viewContext
-    lazy var backgroundContext: NSManagedObjectContext = persistentContainer.newBackgroundContext()
+    lazy var mainViewContext: NSManagedObjectContext = persistentContainer.viewContext
+    
+    lazy var searchViewContext: NSManagedObjectContext = {
+        let viewContext = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
+        viewContext.parent = mainViewContext
+        return viewContext
+    }()
+    
+    lazy var playListViewContext: NSManagedObjectContext = {
+        let viewContext = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
+        viewContext.parent = mainViewContext
+        return viewContext
+    }()
+    
+    lazy var likeMomentViewContext: NSManagedObjectContext = {
+        let viewContext = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
+        viewContext.parent = mainViewContext
+        return viewContext
+    }()
+    
+    func removeAll<T: NSManagedObject>(viewContext: NSManagedObjectContext, fetchRequest: NSFetchRequest<T>) {
+            if let data = try? viewContext.fetch(fetchRequest), !data.isEmpty {
+            data.forEach {
+                viewContext.delete($0)
+                save(context: viewContext)
+            }
+        }
+    }
 }
 

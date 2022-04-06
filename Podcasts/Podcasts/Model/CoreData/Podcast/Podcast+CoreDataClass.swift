@@ -124,3 +124,11 @@ public class Podcast: NSManagedObject, Codable {
         try container.encode(index?.intValue, forKey: .index )
     }
 }
+
+extension Podcast {
+    static var podcasts: [Podcast]? { try? DataStoreManager.shared.searchViewContext.fetch(Podcast.fetchRequest()) }
+    
+    static func remove(viewContext: NSManagedObjectContext) {
+        DataStoreManager.shared.removeAll(viewContext: viewContext, fetchRequest: Podcast.fetchRequest())
+    }
+}

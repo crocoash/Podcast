@@ -34,18 +34,9 @@ public class AuthorData: NSManagedObject, Decodable {
 }
 
 //MARK: - static methods
-extension AuthorData: SaveContextProtocol {
+extension AuthorData {
     
-    static func remove() {
-        
-        let fetchRequest =  AuthorData.fetchRequest()
-        let dataStoreManager = DataStoreManager.shared
-
-        if let data = try? dataStoreManager.viewContext.fetch(fetchRequest), !data.isEmpty {
-            data.forEach { x in
-                dataStoreManager.viewContext.delete(x)
-                try? dataStoreManager.viewContext.save()
-            }
-        }
+    static func remove(viewContext: NSManagedObjectContext) {
+        DataStoreManager.shared.removeAll(viewContext: viewContext, fetchRequest: AuthorData.fetchRequest())
     }
 }

@@ -26,7 +26,6 @@ public class Author: NSManagedObject, Decodable {
         
         let entity = NSEntityDescription.entity(forEntityName: "Author", in: context)!
         self.init(entity: entity, insertInto: context)
-//        self.init(context: context)
         
         let values = try decoder.container(keyedBy: CodingKeys.self)
         
@@ -38,18 +37,10 @@ public class Author: NSManagedObject, Decodable {
 }
 
 //MARK: - static methods
-extension Author: SaveContextProtocol {
+extension Author {
+    static var authors: [Author]? { try? DataStoreManager.shared.searchViewContext.fetch(Author.fetchRequest()) }
     
-    static func remove() {
-        
-        let fetchRequest =  Author.fetchRequest()
-        let dataStoreManager = DataStoreManager.shared
-
-        if let data = try? dataStoreManager.viewContext.fetch(fetchRequest), !data.isEmpty {
-            data.forEach { x in
-                dataStoreManager.viewContext.delete(x)
-                try? dataStoreManager.viewContext.save()
-            }
-        }
+    static func remove(viewContext: NSManagedObjectContext) {
+        DataStoreManager.shared.removeAll(viewContext: viewContext, fetchRequest: Author.fetchRequest())
     }
 }

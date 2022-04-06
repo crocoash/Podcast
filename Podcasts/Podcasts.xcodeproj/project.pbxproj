@@ -413,8 +413,8 @@
 		18CA6D8C2735E41C00F32CE5 /* RegistrationViewController */ = {
 			isa = PBXGroup;
 			children = (
-				049D47E12726E05B00B6DA3C /* RegistrationViewController.storyboard */,
 				18A5005E2727FA3800CD3F0C /* RegistrationViewController.swift */,
+				049D47E12726E05B00B6DA3C /* RegistrationViewController.storyboard */,
 			);
 			path = RegistrationViewController;
 			sourceTree = "<group>";
@@ -509,8 +509,8 @@
 		18FFCA5B27D61F2F0078CB3F /* TabBarViewController */ = {
 			isa = PBXGroup;
 			children = (
-				18FFCA4727D526590078CB3F /* TabBarViewController.storyboard */,
 				049D47EF2726EAE600B6DA3C /* TabBarViewController.swift */,
+				18FFCA4727D526590078CB3F /* TabBarViewController.storyboard */,
 			);
 			path = TabBarViewController;
 			sourceTree = "<group>";

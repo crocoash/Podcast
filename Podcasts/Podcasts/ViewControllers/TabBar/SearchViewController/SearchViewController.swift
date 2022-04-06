@@ -28,14 +28,13 @@ class SearchViewController : UIViewController {
     
     var fetchResultController: NSFetchedResultsController<AuthorData>!
     
-    
-    private var podcasts: [Podcast] = [] {
+    private var podcasts: [Podcast] = Podcast.podcasts ?? [] {
         didSet {
             showEmptyImage()
         }
     }
     
-    private var authors: [Author] = [] {
+    private var authors: [Author] = Author.authors ?? [] {
         didSet {
             showEmptyImage()
         }
@@ -73,7 +72,7 @@ class SearchViewController : UIViewController {
         
         fetchResultController = NSFetchedResultsController(
             fetchRequest: fetchRequest,
-            managedObjectContext: DataStoreManager.shared.viewContext,
+            managedObjectContext: DataStoreManager.shared.mainViewContext,
             sectionNameKeyPath: nil,
             cacheName: nil
         )
@@ -97,6 +96,7 @@ class SearchViewController : UIViewController {
     
     @objc func changeTypeOfSearch(sender: UISegmentedControl) {
         if !searchText.isEmpty { getData(by: searchText) }
+        podcastTableView.reloadData()
     }
     
     @objc func handlerLongPs(sender: UILongPressGestureRecognizer) {
@@ -217,20 +217,22 @@ extension SearchViewController {
     
     private func cancelSearchAction() {
         searchText = ""
-        authors.removeAll()
-        podcasts.removeAll()
+        let viewContext = DataStoreManager.shared.searchViewContext
+        authors = []
+        podcasts = []
+        Author.remove(viewContext: viewContext)
+        Podcast.remove(viewContext: viewContext)
+        AuthorData.remove(viewContext: viewContext)
         podcastTableView.reloadData()
         searchSegmentalControl.selectedSegmentIndex = 0
     }
     
     private func showEmptyImage() {
-        
         if (searchSegmentalControl.selectedSegmentIndex == 0 && podcasts.isEmpty) ||
             (searchSegmentalControl.selectedSegmentIndex == 1 && authors.isEmpty) {
             podcastTableView.isHidden = true
             emptyTableImageView.isHidden = false
         }
-        
         if (searchSegmentalControl.selectedSegmentIndex == 0 && !podcasts.isEmpty) ||
             (searchSegmentalControl.selectedSegmentIndex == 1 && !authors.isEmpty) {
             podcastTableView.isHidden = false
@@ -262,20 +264,15 @@ extension SearchViewController {
         
         if searchSegmentalControl.selectedSegmentIndex == 0 {
             ApiService.getData(for: UrlRequest1.getStringUrl(.podcast(request))) { [weak self] (info: PodcastData?) in
-                
                 guard let self = self else { return }
-                
                 self.processResults(data: info?.results) { podcasts in
                     self.podcasts = podcasts
                 }
             }
         } else {
             ApiService.getData(for: UrlRequest1.getStringUrl(.authors(request))) { [weak self] (info: AuthorData?) in
-                
                 guard let self = self else { return }
-             
                 let results = info?.results.compactMap { $0 as? Author }
-                
                 self.processResults(data: results) { podcasts in
                     self.authors = podcasts
                 }
