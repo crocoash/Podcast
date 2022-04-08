@@ -1,8 +1,8 @@
 //
 //  AuthorData+CoreDataProperties.swift
-//  
+//  Podcasts
 //
-//  Created by Tsvetkov Anton on 20.03.2022.
+//  Created by Tsvetkov Anton on 02.04.2022.
 //
 //
 
@@ -17,16 +17,17 @@ extension AuthorData {
 
     @NSManaged public var resultCount: Int32
     @NSManaged public var results: NSSet
+
 }
 
 // MARK: Generated accessors for results
 extension AuthorData {
 
     @objc(addResultsObject:)
-    @NSManaged public func addToResults(_ value: AuthorData)
+    @NSManaged public func addToResults(_ value: Author)
 
     @objc(removeResultsObject:)
-    @NSManaged public func removeFromResults(_ value: AuthorData)
+    @NSManaged public func removeFromResults(_ value: Author)
 
     @objc(addResults:)
     @NSManaged public func addToResults(_ values: NSSet)
@@ -35,3 +36,4 @@ extension AuthorData {
     @NSManaged public func removeFromResults(_ values: NSSet)
 
 }
+

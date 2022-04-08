@@ -42,8 +42,8 @@
         <attribute name="wrapperType" optional="YES" attributeType="String"/>
     </entity>
     <elements>
-        <element name="Author" positionX="-284.5621337890625" positionY="71.82119750976562" width="128" height="89"/>
-        <element name="AuthorData" positionX="-54" positionY="45" width="128" height="59"/>
-        <element name="Podcast" positionX="-171" positionY="90" width="128" height="464"/>
+        <element name="Author" positionX="230.0902099609375" positionY="154.2001037597656" width="128" height="89"/>
+        <element name="AuthorData" positionX="88.09765625" positionY="6.51171875" width="128" height="59"/>
+        <element name="Podcast" positionX="-253.359375" positionY="231.23046875" width="128" height="478"/>
     </elements>
 </model>
