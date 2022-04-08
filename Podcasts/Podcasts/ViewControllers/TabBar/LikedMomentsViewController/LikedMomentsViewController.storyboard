@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -22,11 +22,11 @@
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                             </tableView>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="folder" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="RBS-Gj-oQX">
-                                <rect key="frame" x="0.0" y="77" width="414" height="783.5"/>
+                                <rect key="frame" x="0.0" y="89" width="414" height="771.5"/>
                                 <color key="tintColor" systemColor="systemGray2Color"/>
                             </imageView>
                             <navigationBar contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="S1B-6Q-U5h">
-                                <rect key="frame" x="0.0" y="32" width="414" height="44"/>
+                                <rect key="frame" x="0.0" y="44" width="414" height="44"/>
                                 <items>
                                     <navigationItem title="Liked moment" id="Mga-Yg-hrc"/>
                                 </items>
@@ -35,8 +35,8 @@
                         <viewLayoutGuide key="safeArea" id="nn3-9j-Xp7"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="RBS-Gj-oQX" firstAttribute="top" secondItem="fEh-zO-EFe" secondAttribute="top" id="2kP-0A-ZjD"/>
-                            <constraint firstItem="fEh-zO-EFe" firstAttribute="top" secondItem="S1B-6Q-U5h" secondAttribute="bottom" id="5Ms-9X-Dwl"/>
+                            <constraint firstItem="RBS-Gj-oQX" firstAttribute="top" secondItem="fEh-zO-EFe" secondAttribute="top" constant="12" id="2kP-0A-ZjD"/>
+                            <constraint firstItem="fEh-zO-EFe" firstAttribute="top" secondItem="S1B-6Q-U5h" secondAttribute="bottom" constant="-12" id="5Ms-9X-Dwl"/>
                             <constraint firstItem="RBS-Gj-oQX" firstAttribute="bottom" secondItem="fEh-zO-EFe" secondAttribute="bottom" id="9ML-hq-qwX"/>
                             <constraint firstItem="S1B-6Q-U5h" firstAttribute="height" secondItem="lqu-WF-Wpd" secondAttribute="height" multiplier="0.0491071" id="AMT-WR-cjb"/>
                             <constraint firstItem="fEh-zO-EFe" firstAttribute="leading" secondItem="nn3-9j-Xp7" secondAttribute="leading" id="G3A-eC-ps3"/>
@@ -45,7 +45,7 @@
                             <constraint firstItem="nn3-9j-Xp7" firstAttribute="trailing" secondItem="S1B-6Q-U5h" secondAttribute="trailing" id="OAS-2T-dKn"/>
                             <constraint firstItem="RBS-Gj-oQX" firstAttribute="trailing" secondItem="fEh-zO-EFe" secondAttribute="trailing" id="o3g-Ey-8GL"/>
                             <constraint firstItem="S1B-6Q-U5h" firstAttribute="leading" secondItem="nn3-9j-Xp7" secondAttribute="leading" id="pgH-sp-dRI"/>
-                            <constraint firstItem="nn3-9j-Xp7" firstAttribute="top" secondItem="S1B-6Q-U5h" secondAttribute="top" constant="12" id="uje-DJ-naV"/>
+                            <constraint firstItem="nn3-9j-Xp7" firstAttribute="top" secondItem="S1B-6Q-U5h" secondAttribute="top" id="uje-DJ-naV"/>
                             <constraint firstItem="nn3-9j-Xp7" firstAttribute="trailing" secondItem="fEh-zO-EFe" secondAttribute="trailing" id="xUv-iH-BdR"/>
                         </constraints>
                     </view>

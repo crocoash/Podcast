@@ -18,3 +18,7 @@ extension JSONDecoder {
         self.userInfo[.context] = context
     }
 }
+
+protocol SearchProtocol {
+    static func removeAll(from viewContext: NSManagedObjectContext)
+}

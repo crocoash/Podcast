@@ -80,7 +80,7 @@ public class Podcast: NSManagedObject, Codable {
         artistIds = container.contains(.artistIds) ? try container.decode([Int]?.self, forKey: .artistIds) : nil
         closedCaptioning = container.contains(.closedCaptioning) ? try container.decode(String?.self, forKey: .closedCaptioning) : nil
         country = container.contains(.country) ? try container.decode(String?.self, forKey: .country) : nil
-        descriptionMy = container.contains(.descriptionMy) ? try container.decode(String?.self, forKey: .descriptionMy) : nil
+        descriptionMy = container.contains(.descriptionMy) ? try container.decode(String.self, forKey: .descriptionMy) : nil
         episodeGuid = container.contains(.episodeGuid) ? try container.decode(String?.self, forKey: .episodeGuid) : nil
         kind = container.contains(.kind) ? try container.decode(String?.self, forKey: .kind) : nil
         wrapperType = container.contains(.wrapperType) ? try container.decode(String?.self, forKey: .wrapperType) : nil
@@ -125,10 +125,59 @@ public class Podcast: NSManagedObject, Codable {
     }
 }
 
-extension Podcast {
-    static var podcasts: [Podcast]? { try? DataStoreManager.shared.searchViewContext.fetch(Podcast.fetchRequest()) }
+extension Podcast: SearchProtocol {
     
-    static func remove(viewContext: NSManagedObjectContext) {
+    static var searchViewContext = DataStoreManager.shared.mainViewContext
+    static var favoriteViewContext = DataStoreManager.shared.mainViewContext
+    
+    static var searchPodcastFetchResultController = DataStoreManager.shared.searchPodcastFetchResultController
+    static var favoritePodcastFetchResultController = DataStoreManager.shared.favoritePodcastFetchResultController
+    
+    static var searchPodcasts: [Podcast] { (try? searchViewContext.fetch(Podcast.fetchRequest())) ?? [] }
+    static var favoritePodcasts: [Podcast] { (try? favoriteViewContext.fetch(Podcast.fetchRequest())) ?? [] }
+    
+    
+    static func removeAll(from viewContext: NSManagedObjectContext) {
         DataStoreManager.shared.removeAll(viewContext: viewContext, fetchRequest: Podcast.fetchRequest())
+    }
+    
+    static func podcastIsInPlaylist(podcast: Podcast) -> Bool {
+        return searchPodcasts.contains(podcast)
+    }
+    
+    static func getSearchPodcast(for indexPath: IndexPath) -> Podcast {
+        return searchPodcastFetchResultController.object(at: indexPath)
+    }
+    
+    static func getfavoritePodcast(for indexPath: IndexPath) -> Podcast {
+        return favoritePodcastFetchResultController.object(at: indexPath)
+    }
+    
+    static func removeFromFavorites(podcast: Podcast) {
+        searchViewContext.delete(podcast)
+        searchViewContext.mySave()
+    }
+    
+    static func addToFavorites(podcast: Podcast) {
+        var newPodcast = Podcast(context: DataStoreManager.shared.mainViewContext)
+        newPodcast.id = podcast.id
+        newPodcast = podcast
+        searchViewContext.mySave()
+    }
+    
+    static func podcastIsDownload(podcast: Podcast) -> Bool {
+        if let index = searchPodcasts.firstIndex(matching: podcast.id) {
+            return searchPodcasts[index].isDownLoad == true
+        }
+        return false
+    }
+    
+    static func downloadPodcast(podcast: Podcast) {
+        /// TO DO:- Проверить кол-во и откуда
+//        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: User.description())
+        if let podcast = searchViewContext.object(with: podcast.objectID) as? Podcast {
+            podcast.isDownLoad = true
+            searchViewContext.mySave()
+        }
     }
 }

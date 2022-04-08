@@ -75,7 +75,7 @@ extension DetailViewController {
             self?.episodeImage.image = image
         }
         
-        if PlaylistDocument.shared.isPodcastInPlaylist(podcast) {
+        if Podcast.podcastIsInPlaylist(podcast: podcast) {
             addToPlaylistBookmark.isHidden = true
             addToPlaylistBookmark.isUserInteractionEnabled = false
             removeFromPlaylistBookmark.isHidden = false

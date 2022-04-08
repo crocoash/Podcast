@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="19574" systemVersion="21A559" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="20086" systemVersion="21E258" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="Author" representedClassName=".Author" syncable="YES">
         <attribute name="artistID" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="artistLinkURL" optional="YES" attributeType="String"/>
@@ -11,7 +11,7 @@
         <relationship name="results" toMany="YES" deletionRule="Nullify" destinationEntity="Author"/>
     </entity>
     <entity name="Podcast" representedClassName=".Podcast" syncable="YES">
-        <attribute name="artistIds" optional="YES" attributeType="Transformable" customClassName="[Int]"/>
+        <attribute name="artistIds" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Int]"/>
         <attribute name="artistViewUrl" optional="YES" attributeType="String"/>
         <attribute name="artworkUrl60" optional="YES" attributeType="String"/>
         <attribute name="artworkUrl160" optional="YES" attributeType="String"/>

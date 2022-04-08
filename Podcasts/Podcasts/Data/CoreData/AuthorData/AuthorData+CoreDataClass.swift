@@ -34,9 +34,13 @@ public class AuthorData: NSManagedObject, Decodable {
 }
 
 //MARK: - static methods
-extension AuthorData {
+extension AuthorData: SearchProtocol {
     
     static func remove(viewContext: NSManagedObjectContext) {
+        DataStoreManager.shared.removeAll(viewContext: viewContext, fetchRequest: AuthorData.fetchRequest())
+    }
+    
+    static func removeAll(from viewContext: NSManagedObjectContext) {
         DataStoreManager.shared.removeAll(viewContext: viewContext, fetchRequest: AuthorData.fetchRequest())
     }
 }

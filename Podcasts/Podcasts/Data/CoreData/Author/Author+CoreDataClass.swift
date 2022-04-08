@@ -32,15 +32,22 @@ public class Author: NSManagedObject, Decodable {
         artistID = try values.decode(Int32.self, forKey: .artistID)
         artistLinkURL = try values.decode(String.self, forKey: .artistLinkURL)
         artistName = try values.decode(String.self, forKey: .artistName)
+//        artistType = try values.decodeIfPresent(String.self, forKey: .artistType)
         artistType = try values.decode(String.self, forKey: .artistType)
     }
 }
 
 //MARK: - static methods
-extension Author {
-    static var authors: [Author]? { try? DataStoreManager.shared.searchViewContext.fetch(Author.fetchRequest()) }
+extension Author: SearchProtocol {
+    static var searchAuthors: [Author] { (try? DataStoreManager.shared.mainViewContext.fetch(Author.fetchRequest())) ?? [] }
     
-    static func remove(viewContext: NSManagedObjectContext) {
+    static var searchAuthorFetchResultController = DataStoreManager.shared.searchAuthorFetchResultController
+    
+    static func removeAll(from viewContext: NSManagedObjectContext) {
         DataStoreManager.shared.removeAll(viewContext: viewContext, fetchRequest: Author.fetchRequest())
+    }
+    
+    static func getSearchPodcast(for indexPath: IndexPath) -> Author {
+        return searchAuthorFetchResultController.object(at: indexPath)
     }
 }
