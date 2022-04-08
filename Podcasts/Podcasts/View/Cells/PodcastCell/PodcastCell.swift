@@ -30,10 +30,10 @@ extension PodcastCell {
         DataProvider().downloadImage(string: podcast.artworkUrl160) { [weak self] image in
             self?.podcastImage.image = image
         }
+        let podcastIsDownload = !Podcast.podcastIsDownload(podcast: podcast)
         
-        isDownLoadImageView.isHidden = !PlaylistDocument.shared.podcastIsDownload(podcast: podcast)
-        
-        playlistStarImageView.isHidden = !PlaylistDocument.shared.podcastIsFavorite(podcast: podcast)
+        isDownLoadImageView.isHidden = podcastIsDownload
+        playlistStarImageView.isHidden = podcastIsDownload
     }
     
     func updateDisplay(progress: Float, totalSize : String) {

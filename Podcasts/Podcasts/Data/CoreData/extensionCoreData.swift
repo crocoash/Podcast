@@ -19,6 +19,7 @@ extension JSONDecoder {
     }
 }
 
-protocol SaveContextProtocol {
-    static func remove()
+protocol SearchProtocol {
+    static func removeAll()
+    static func newSearch()
 }

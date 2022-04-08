@@ -1,6 +1,6 @@
 //
 //  AuthorData+CoreDataClass.swift
-//
+//  
 //
 //  Created by Tsvetkov Anton on 20.03.2022.
 //
@@ -8,6 +8,7 @@
 
 import Foundation
 import CoreData
+
 
 public class AuthorData: NSManagedObject, Decodable {
 
@@ -25,26 +26,25 @@ public class AuthorData: NSManagedObject, Decodable {
         
         self.init(entity: entity, insertInto: context)
 
-        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let values = try decoder.container(keyedBy: CodingKeys.self)
         
-        resultCount = try container.decode(Int32.self, forKey: .resultCount)
-        results = try container.decode(Set<Author>.self, forKey: .results) as NSSet
+        resultCount = try values.decode(Int32.self, forKey: .resultCount)
+        results = try values.decode(Set<Author>.self, forKey: .results) as NSSet
     }
 }
 
 //MARK: - static methods
-extension AuthorData {
+extension AuthorData: SearchProtocol {
+    
+    static func newSearch() {
+        Author.newSearch()
+    }
+    
+    static func remove(viewContext: NSManagedObjectContext) {
+        DataStoreManager.shared.removeAll(fetchRequest: AuthorData.fetchRequest())
+    }
     
     static func removeAll() {
-        
-        let fetchRequest =  AuthorData.fetchRequest()
-        let dataStoreManager = DataStoreManager.shared
-
-        if let data = try? dataStoreManager.viewContext.fetch(fetchRequest), !data.isEmpty {
-            data.forEach { x in
-                dataStoreManager.viewContext.delete(x)
-                try? dataStoreManager.viewContext.save()
-            }
-        }
+        DataStoreManager.shared.removeAll(fetchRequest: AuthorData.fetchRequest())
     }
 }

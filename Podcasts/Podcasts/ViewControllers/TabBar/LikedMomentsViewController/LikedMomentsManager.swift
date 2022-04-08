@@ -27,13 +27,13 @@ class LikedMomentsManager {
     }
     
     private func writeInUserDefaults(_ array: [LikedMoment]) {
-        do {
-            let encoder = JSONEncoder()
-            let data = try encoder.encode(array)
-            UserDefaults.standard.setValue(data, forKey: "LikedMoments")
-        } catch {
-            print("error of encoding")
-        }
+//        do {
+//            let encoder = JSONEncoder()
+//            let data = try encoder.encode(array)
+//            UserDefaults.standard.setValue(data, forKey: "LikedMoments")
+//        } catch {
+//            print("error of encoding")
+//        }
     }
     
     func getLikedMomentsFromUserDefault() -> [LikedMoment] {

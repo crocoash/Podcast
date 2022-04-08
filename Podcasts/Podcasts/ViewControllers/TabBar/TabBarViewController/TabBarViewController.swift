@@ -21,6 +21,7 @@ class TabBarViewController: UITabBarController {
     
     lazy var imageView: UIImageView =  {
         $0.image = UIImage(named: "decree")
+        $0.isHidden = true
         $0.translatesAutoresizingMaskIntoConstraints = false
         return $0
     }(UIImageView())

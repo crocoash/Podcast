@@ -7,6 +7,7 @@
 
 import Foundation
 import UIKit
+import CoreData
 
 enum Result<T> {
     case success(result: T)
@@ -28,39 +29,34 @@ class ApiService {
     }
     
     private static func getData<T: Decodable>(for request: String, completion: @escaping (Result<T>) -> Void) {
-        
         guard let url = URL(string: request.encodeUrl) else { fatalError() }
         
-        URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
-            
-            var result: Result<T>
+        let viewContext = DataStoreManager.shared.viewContext
         
+        if let type = T.self as? SearchProtocol.Type {
+            type.newSearch()
+        }
+        
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            var result: Result<T>
             defer {
                 DispatchQueue.main.async {
+                    viewContext.mySave()
                     completion(result)
                 }
             }
-            
             guard let data = data, response != nil, error == nil else {
                 result = .failure(error: error!)
                 return
             }
-            
             do {
-//                if let type = T.self as? SaveContextProtocol.Type {
-//                    type.remove()
-//                    Author.remove()
-//                }
+                let decoder = JSONDecoder(context: viewContext)
+                let data = try decoder.decode(T.self, from: data)
+                result = .success(result: data)
                 
-                let context = DataStoreManager.shared.viewContext
-                let decoder = JSONDecoder(context: context)
-                let res = try decoder.decode(T.self, from: data)
-//                try? context.save()
-                
-                result = .success(result: res)
             } catch let error {
                 result = .failure(error: error)
             }
-        }).resume()
+        }.resume()
     }
 }

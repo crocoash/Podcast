@@ -11,7 +11,7 @@
         <relationship name="results" toMany="YES" deletionRule="Nullify" destinationEntity="Author"/>
     </entity>
     <entity name="Podcast" representedClassName=".Podcast" syncable="YES">
-        <attribute name="artistIds" optional="YES" attributeType="Transformable" customClassName="[Int]"/>
+        <attribute name="artistIds" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[Int]"/>
         <attribute name="artistViewUrl" optional="YES" attributeType="String"/>
         <attribute name="artworkUrl60" optional="YES" attributeType="String"/>
         <attribute name="artworkUrl160" optional="YES" attributeType="String"/>
@@ -31,6 +31,8 @@
         <attribute name="id" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="NO"/>
         <attribute name="index" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="NO"/>
         <attribute name="isDownLoad" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="isFavorite" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="isSearched" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="kind" optional="YES" attributeType="String"/>
         <attribute name="previewUrl" optional="YES" attributeType="String"/>
         <attribute name="progress" optional="YES" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES"/>
@@ -44,6 +46,6 @@
     <elements>
         <element name="Author" positionX="230.0902099609375" positionY="154.2001037597656" width="128" height="89"/>
         <element name="AuthorData" positionX="88.09765625" positionY="6.51171875" width="128" height="59"/>
-        <element name="Podcast" positionX="-253.359375" positionY="231.23046875" width="128" height="478"/>
+        <element name="Podcast" positionX="-253.359375" positionY="231.23046875" width="128" height="494"/>
     </elements>
 </model>

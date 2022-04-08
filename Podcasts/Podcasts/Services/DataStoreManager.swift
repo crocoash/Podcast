@@ -5,15 +5,6 @@
 //  Created by Tsvetkov Anton on 19.03.2022.
 //
 
-import Foundation
-//
-//  DataStoreManager.swift
-//  CoreDataLesson
-//
-//  Created by Tsvetkov Anton on 09.03.2022.
-//
-
-import Foundation
 import CoreData
 
 // MARK: - Core Data stack
@@ -28,9 +19,76 @@ class DataStoreManager {
         }
         return dataStoreManager
     }
-    
-    var persistentContainer: NSPersistentContainer = {
+    ///----------------------------------------------------------------------------------------------------------
+    lazy var searchPodcastFetchResultController: NSFetchedResultsController<Podcast> = {
+        let fetchRequest: NSFetchRequest<Podcast> = Podcast.fetchRequest()
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(Podcast.trackName), ascending: true)]
         
+        fetchRequest.predicate = NSPredicate(format: "isSearched = true")
+        
+        let fetchResultController = NSFetchedResultsController(
+            fetchRequest: fetchRequest,
+            managedObjectContext: viewContext,
+            sectionNameKeyPath: nil,
+            cacheName: nil
+        )
+        
+        do {
+            try fetchResultController.performFetch()
+        } catch {
+            let nserror = error as NSError
+            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+        }
+        
+        return fetchResultController
+    }()
+    
+    lazy var searchAuthorFetchResultController: NSFetchedResultsController<Author> = {
+        let fetchRequest: NSFetchRequest<Author> = Author.fetchRequest()
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(Author.artistID), ascending: true)]
+        
+        let fetchResultController = NSFetchedResultsController(
+            fetchRequest: fetchRequest,
+            managedObjectContext: viewContext,
+            sectionNameKeyPath: nil,
+            cacheName: nil
+        )
+        
+        do {
+            try fetchResultController.performFetch()
+        } catch {
+            let nserror = error as NSError
+            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+        }
+        
+        return fetchResultController
+    }()
+    
+    lazy var favoritePodcastFetchResultController: NSFetchedResultsController<Podcast> = {
+        let fetchRequest: NSFetchRequest<Podcast> = Podcast.fetchRequest()
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(Podcast.trackName), ascending: true)]
+        fetchRequest.predicate = NSPredicate(format: "isFavorite = true")
+        fetchRequest.fetchLimit = 1000
+        fetchRequest.returnsObjectsAsFaults = false
+        
+        let fetchResultController = NSFetchedResultsController(
+            fetchRequest: fetchRequest,
+            managedObjectContext: viewContext,
+            sectionNameKeyPath: nil,
+            cacheName: nil
+        )
+        
+        do {
+            try fetchResultController.performFetch()
+        } catch {
+            let nserror = error as NSError
+            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+        }
+        
+        return fetchResultController
+    }()
+    ///----------------------------------------------------------------------------------------------------------
+    var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "CoreData")
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
             if let error = error as NSError? {
@@ -39,20 +97,30 @@ class DataStoreManager {
         })
         return container
     }()
-    
-    // MARK: - Core Data Saving support
-    func saveContext() {
-        if viewContext.hasChanges {
+    ///----------------------------------------------------------------------------------------------------------
+    lazy var viewContext: NSManagedObjectContext = persistentContainer.viewContext
+}
+
+extension DataStoreManager {
+    func removeAll<T: NSManagedObject>(fetchRequest: NSFetchRequest<T>) {
+        if let data = try? viewContext.fetch(fetchRequest), !data.isEmpty {
+            data.forEach {
+                viewContext.delete($0)
+            }
+            viewContext.mySave()
+        }
+    }
+}
+
+extension NSManagedObjectContext {
+    func mySave() {
+        if self.hasChanges {
             do {
-                try viewContext.save()
+                try self.save()
             } catch {
                 let nserror = error as NSError
                 fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
             }
         }
     }
-    
-    lazy var viewContext: NSManagedObjectContext = persistentContainer.viewContext
-    lazy var backgroundContext: NSManagedObjectContext = persistentContainer.newBackgroundContext()
 }
-
