@@ -308,7 +308,7 @@ extension SearchViewController: UISearchBarDelegate {
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         guard let text = searchBar.text, !text.isEmpty else { return }
-        searchText = text
+        searchText = text   
         view.endEditing(true)
     }
     

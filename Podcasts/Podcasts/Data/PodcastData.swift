@@ -11,3 +11,13 @@ struct PodcastData: Decodable {
     let resultCount: Int
     let results: [Podcast]
 }
+
+extension PodcastData: SearchProtocol {
+    static func removeAll() {
+        
+    }
+    
+    static func newSearch() {
+        Podcast.newSearch()
+    }
+}

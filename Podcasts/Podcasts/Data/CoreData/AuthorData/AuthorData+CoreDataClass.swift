@@ -37,7 +37,7 @@ public class AuthorData: NSManagedObject, Decodable {
 extension AuthorData: SearchProtocol {
     
     static func newSearch() {
-        Podcast.newSearch()
+        Author.newSearch()
     }
     
     static func remove(viewContext: NSManagedObjectContext) {

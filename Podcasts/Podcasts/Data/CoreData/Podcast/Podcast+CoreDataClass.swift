@@ -132,13 +132,13 @@ public class Podcast: NSManagedObject, Decodable {
 
 extension Podcast {
     
-    static var mainViewContext = DataStoreManager.shared.viewContext
+    static var viewContext = DataStoreManager.shared.viewContext
     
     static var searchPodcastFetchResultController = DataStoreManager.shared.searchPodcastFetchResultController
     static var favoritePodcastFetchResultController = DataStoreManager.shared.favoritePodcastFetchResultController
     
-    static var searchPodcasts: [Podcast] { (try? mainViewContext.fetch(Podcast.fetchRequest())) ?? [] }
-    static var favoritePodcasts: [Podcast] { (try? mainViewContext.fetch(Podcast.fetchRequest())) ?? [] }
+    static var searchPodcasts: [Podcast] { searchPodcastFetchResultController.fetchedObjects ?? [] }
+    static var favoritePodcasts: [Podcast] { (try? viewContext.fetch(Podcast.fetchRequest())) ?? [] }
     
     
     static func removeAll() {
@@ -160,20 +160,20 @@ extension Podcast {
     static func newSearch() {
         searchPodcastFetchResultController.fetchedObjects?.forEach {
             $0.isSearched = false
-            DataStoreManager.shared.viewContext.mySave()
         }
+        viewContext.mySave()
     }
     
     static func removeFromFavorites(podcast: Podcast) {
-        mainViewContext.delete(podcast)
-        mainViewContext.mySave()
+        viewContext.delete(podcast)
+        viewContext.mySave()
     }
     
     static func addToFavorites(podcast: Podcast) {
         var newPodcast = Podcast(context: DataStoreManager.shared.viewContext)
         newPodcast.id = podcast.id
         newPodcast = podcast
-        mainViewContext.mySave()
+        viewContext.mySave()
     }
     
     static func podcastIsDownload(podcast: Podcast) -> Bool {
@@ -186,9 +186,9 @@ extension Podcast {
     static func downloadPodcast(podcast: Podcast) {
         /// TO DO:- Проверить кол-во и откуда
 //        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: User.description())
-        if let podcast = mainViewContext.object(with: podcast.objectID) as? Podcast {
+        if let podcast = viewContext.object(with: podcast.objectID) as? Podcast {
             podcast.isDownLoad = true
-            mainViewContext.mySave()
+            viewContext.mySave()
         }
     }
 }

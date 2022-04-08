@@ -33,7 +33,9 @@ class ApiService {
         
         let viewContext = DataStoreManager.shared.viewContext
         
-        
+        if let type = T.self as? SearchProtocol.Type {
+            type.newSearch()
+        }
         
         URLSession.shared.dataTask(with: url) { data, response, error in
             var result: Result<T>
