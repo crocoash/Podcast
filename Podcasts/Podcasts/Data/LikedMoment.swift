@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct LikedMoment: Codable {
+struct LikedMoment: Decodable {
     let podcast: Podcast
     let moment: Double
 }

@@ -10,7 +10,7 @@ import Foundation
 import CoreData
 
 @objc(Podcast)
-public class Podcast: NSManagedObject, Codable {
+public class Podcast: NSManagedObject, Decodable {
 
     private enum CodingKeys: String, CodingKey {
         case previewUrl
@@ -42,6 +42,8 @@ public class Podcast: NSManagedObject, Codable {
         case isDownLoad
         case progress
         case index
+        case isFavorite
+        case isSearched
     }
 
 
@@ -56,89 +58,91 @@ public class Podcast: NSManagedObject, Codable {
 
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        previewUrl = container.contains(.previewUrl) ? try container.decode(String?.self, forKey: .previewUrl) : nil
-        episodeFileExtension = container.contains(.episodeFileExtension) ? try container.decode(String?.self, forKey: .episodeFileExtension) : nil
-        artworkUrl160 = container.contains(.artworkUrl160) ? try container.decode(String?.self, forKey: .artworkUrl160) : nil
-        episodeContentType = container.contains(.episodeContentType) ? try container.decode(String.self, forKey: .episodeContentType) : nil
-        artworkUrl600 = container.contains(.artworkUrl600) ? try container.decode(String.self, forKey: .artworkUrl600) : nil
-        artworkUrl60 = container.contains(.artworkUrl60) ? try container.decode(String.self, forKey: .artworkUrl60) : nil
-        artistViewUrl = container.contains(.artistViewUrl) ? try container.decode(String.self, forKey: .artistViewUrl) : nil
-        contentAdvisoryRating = container.contains(.contentAdvisoryRating) ? try container.decode(String?.self, forKey: .contentAdvisoryRating) : nil
-        trackViewUrl = container.contains(.trackViewUrl) ? try container.decode(String.self, forKey: .trackViewUrl) : nil
+        previewUrl = try container.decodeIfPresent(String.self, forKey: .previewUrl)
+        episodeFileExtension = try container.decodeIfPresent(String.self, forKey: .episodeFileExtension)
+        artworkUrl160 = try container.decodeIfPresent(String.self, forKey: .artworkUrl160)
+        episodeContentType = try container.decodeIfPresent(String.self, forKey: .episodeContentType)
+        artworkUrl600 = try container.decodeIfPresent(String.self, forKey: .artworkUrl600)
+        artworkUrl60 = try container.decodeIfPresent(String.self, forKey: .artworkUrl60)
+        artistViewUrl = try container.decodeIfPresent(String.self, forKey: .artistViewUrl)
+        contentAdvisoryRating = try container.decodeIfPresent(String.self, forKey: .contentAdvisoryRating)
+        trackViewUrl = try container.decodeIfPresent(String.self, forKey: .trackViewUrl)
         
-        trackTimeMillis = container.contains(.trackTimeMillis) ? try container.decode(Int.self, forKey: .trackTimeMillis) as NSNumber : nil
+        trackTimeMillis = try container.decodeIfPresent(Int.self, forKey: .trackTimeMillis) as? NSNumber
         
-        collectionViewUrl = container.contains(.collectionViewUrl) ? try container.decode(String.self, forKey: .collectionViewUrl) : nil
-        episodeUrl = container.contains(.episodeUrl) ? try container.decode(String?.self, forKey: .episodeUrl) : nil
-        collectionId = container.contains(.collectionId) ? try container.decode(Int.self, forKey: .collectionId) as NSNumber : nil
-        collectionName = container.contains(.collectionName) ? try container.decode(String?.self, forKey: .collectionName) : nil
-        id = container.contains(.id) ? try container.decode(Int.self, forKey: .id) as NSNumber : nil
-        trackName = container.contains(.trackName) ? try container.decode(String.self, forKey: .trackName) : nil
-        releaseDate = container.contains(.releaseDate) ? try container.decode(String?.self, forKey: .releaseDate) : nil
-        shortDescriptionMy = container.contains(.shortDescriptionMy) ? try container.decode(String?.self, forKey: .shortDescriptionMy) : nil
-        feedUrl = container.contains(.feedUrl) ? try container.decode(String?.self, forKey: .feedUrl) : nil
-        artistIds = container.contains(.artistIds) ? try container.decode([Int]?.self, forKey: .artistIds) : nil
-        closedCaptioning = container.contains(.closedCaptioning) ? try container.decode(String?.self, forKey: .closedCaptioning) : nil
-        country = container.contains(.country) ? try container.decode(String?.self, forKey: .country) : nil
-        descriptionMy = container.contains(.descriptionMy) ? try container.decode(String.self, forKey: .descriptionMy) : nil
-        episodeGuid = container.contains(.episodeGuid) ? try container.decode(String?.self, forKey: .episodeGuid) : nil
-        kind = container.contains(.kind) ? try container.decode(String?.self, forKey: .kind) : nil
-        wrapperType = container.contains(.wrapperType) ? try container.decode(String?.self, forKey: .wrapperType) : nil
-        isDownLoad = container.contains(.isDownLoad) ? try container.decode(Bool.self, forKey: .isDownLoad) : false
-        progress = container.contains(.progress) ? try container.decode(Float.self, forKey: .progress) : 0
-        index = container.contains(.index) ? try container.decode(Int.self, forKey: .index) as NSNumber : nil
+        collectionViewUrl = try container.decodeIfPresent(String.self, forKey: .collectionViewUrl)
+        episodeUrl = try container.decodeIfPresent(String.self, forKey: .episodeUrl)
+        collectionId = try container.decodeIfPresent(Int.self, forKey: .collectionId) as? NSNumber
+        collectionName = try container.decodeIfPresent(String.self, forKey: .collectionName)
+        id = try container.decodeIfPresent(Int.self, forKey: .id) as? NSNumber
+        trackName = try container.decodeIfPresent(String.self, forKey: .trackName)
+        releaseDate = try container.decodeIfPresent(String.self, forKey: .releaseDate)
+        shortDescriptionMy = try container.decodeIfPresent(String.self, forKey: .shortDescriptionMy)
+        feedUrl = try container.decodeIfPresent(String.self, forKey: .feedUrl)
+        artistIds = try container.decodeIfPresent([Int].self, forKey: .artistIds)
+        closedCaptioning = try container.decodeIfPresent(String.self, forKey: .closedCaptioning)
+        country = try container.decodeIfPresent(String.self, forKey: .country)
+        descriptionMy = try container.decodeIfPresent(String.self, forKey: .descriptionMy)
+        episodeGuid = try container.decodeIfPresent(String.self, forKey: .episodeGuid)
+        kind = try container.decodeIfPresent(String.self, forKey: .kind)
+        wrapperType = try container.decodeIfPresent(String.self, forKey: .wrapperType)
+        isDownLoad = try container.decodeIfPresent(Bool.self, forKey: .isDownLoad) ?? false
+        progress = try container.decodeIfPresent(Float.self, forKey: .progress) ?? 0
+        index = try container.decodeIfPresent(Int.self, forKey: .index) as? NSNumber
+        
+        isFavorite = try container.decodeIfPresent(Bool.self, forKey: .isFavorite) ?? false
+        isSearched = try container.decodeIfPresent(Bool.self, forKey: .isSearched) ?? true
     }
     
     
-    public func encode(to encoder: Encoder) throws {
-        
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        ///
-        try container.encode(previewUrl, forKey: .previewUrl)
-        try container.encode(episodeFileExtension, forKey: .episodeFileExtension )
-        try container.encode(artworkUrl160, forKey: .artworkUrl160 )
-        try container.encode(episodeContentType, forKey: .episodeContentType )
-        try container.encode(artworkUrl600, forKey: .artworkUrl600 )
-        try container.encode(artworkUrl60, forKey: .artworkUrl60 )
-        try container.encode(artistViewUrl, forKey: .artistViewUrl )
-        try container.encode(contentAdvisoryRating, forKey: .contentAdvisoryRating )
-        try container.encode(trackViewUrl, forKey: .trackViewUrl )
-        try container.encode(trackTimeMillis?.intValue, forKey: .trackTimeMillis )
-        try container.encode(collectionViewUrl, forKey: .collectionViewUrl )
-        try container.encode(episodeUrl, forKey: .episodeUrl )
-        try container.encode(collectionId?.intValue, forKey: .collectionId )
-        try container.encode(collectionName, forKey: .collectionName )
-        try container.encode(id?.intValue, forKey: .id )
-        try container.encode(trackName, forKey: .trackName )
-        try container.encode(releaseDate, forKey: .releaseDate )
-        try container.encode(shortDescriptionMy, forKey: .shortDescriptionMy )
-        try container.encode(feedUrl, forKey: .feedUrl )
-        try container.encode(artistIds, forKey: .artistIds )
-        try container.encode(closedCaptioning, forKey: .closedCaptioning )
-        try container.encode(country, forKey: .country )
-        try container.encode(descriptionMy, forKey: .descriptionMy )
-        try container.encode(episodeGuid, forKey: .episodeGuid )
-        try container.encode(wrapperType, forKey: .wrapperType )
-        try container.encode(isDownLoad, forKey: .isDownLoad )
-        try container.encode(progress, forKey: .progress )
-        try container.encode(index?.intValue, forKey: .index )
-    }
+//    public func encode(to encoder: Encoder) throws {
+//
+//        var container = encoder.container(keyedBy: CodingKeys.self)
+//        ///
+//        try container.encode(previewUrl, forKey: .previewUrl)
+//        try container.encode(episodeFileExtension, forKey: .episodeFileExtension )
+//        try container.encode(artworkUrl160, forKey: .artworkUrl160 )
+//        try container.encode(episodeContentType, forKey: .episodeContentType )
+//        try container.encode(artworkUrl600, forKey: .artworkUrl600 )
+//        try container.encode(artworkUrl60, forKey: .artworkUrl60 )
+//        try container.encode(artistViewUrl, forKey: .artistViewUrl )
+//        try container.encode(contentAdvisoryRating, forKey: .contentAdvisoryRating )
+//        try container.encode(trackViewUrl, forKey: .trackViewUrl )
+//        try container.encode(trackTimeMillis?.intValue, forKey: .trackTimeMillis )
+//        try container.encode(collectionViewUrl, forKey: .collectionViewUrl )
+//        try container.encode(episodeUrl, forKey: .episodeUrl )
+//        try container.encode(collectionId?.intValue, forKey: .collectionId )
+//        try container.encode(collectionName, forKey: .collectionName )
+//        try container.encode(id?.intValue, forKey: .id )
+//        try container.encode(trackName, forKey: .trackName )
+//        try container.encode(releaseDate, forKey: .releaseDate )
+//        try container.encode(shortDescriptionMy, forKey: .shortDescriptionMy )
+//        try container.encode(feedUrl, forKey: .feedUrl )
+//        try container.encode(artistIds, forKey: .artistIds )
+//        try container.encode(closedCaptioning, forKey: .closedCaptioning )
+//        try container.encode(country, forKey: .country )
+//        try container.encode(descriptionMy, forKey: .descriptionMy )
+//        try container.encode(episodeGuid, forKey: .episodeGuid )
+//        try container.encode(wrapperType, forKey: .wrapperType )
+//        try container.encode(isDownLoad, forKey: .isDownLoad )
+//        try container.encode(progress, forKey: .progress )
+//        try container.encode(index?.intValue, forKey: .index )
+//    }
 }
 
-extension Podcast: SearchProtocol {
+extension Podcast {
     
-    static var searchViewContext = DataStoreManager.shared.mainViewContext
-    static var favoriteViewContext = DataStoreManager.shared.mainViewContext
+    static var mainViewContext = DataStoreManager.shared.viewContext
     
     static var searchPodcastFetchResultController = DataStoreManager.shared.searchPodcastFetchResultController
     static var favoritePodcastFetchResultController = DataStoreManager.shared.favoritePodcastFetchResultController
     
-    static var searchPodcasts: [Podcast] { (try? searchViewContext.fetch(Podcast.fetchRequest())) ?? [] }
-    static var favoritePodcasts: [Podcast] { (try? favoriteViewContext.fetch(Podcast.fetchRequest())) ?? [] }
+    static var searchPodcasts: [Podcast] { (try? mainViewContext.fetch(Podcast.fetchRequest())) ?? [] }
+    static var favoritePodcasts: [Podcast] { (try? mainViewContext.fetch(Podcast.fetchRequest())) ?? [] }
     
     
-    static func removeAll(from viewContext: NSManagedObjectContext) {
-        DataStoreManager.shared.removeAll(viewContext: viewContext, fetchRequest: Podcast.fetchRequest())
+    static func removeAll() {
+        DataStoreManager.shared.removeAll(fetchRequest: Podcast.fetchRequest())
     }
     
     static func podcastIsInPlaylist(podcast: Podcast) -> Bool {
@@ -153,16 +157,23 @@ extension Podcast: SearchProtocol {
         return favoritePodcastFetchResultController.object(at: indexPath)
     }
     
+    static func newSearch() {
+        searchPodcastFetchResultController.fetchedObjects?.forEach {
+            $0.isSearched = false
+            DataStoreManager.shared.viewContext.mySave()
+        }
+    }
+    
     static func removeFromFavorites(podcast: Podcast) {
-        searchViewContext.delete(podcast)
-        searchViewContext.mySave()
+        mainViewContext.delete(podcast)
+        mainViewContext.mySave()
     }
     
     static func addToFavorites(podcast: Podcast) {
-        var newPodcast = Podcast(context: DataStoreManager.shared.mainViewContext)
+        var newPodcast = Podcast(context: DataStoreManager.shared.viewContext)
         newPodcast.id = podcast.id
         newPodcast = podcast
-        searchViewContext.mySave()
+        mainViewContext.mySave()
     }
     
     static func podcastIsDownload(podcast: Podcast) -> Bool {
@@ -175,9 +186,9 @@ extension Podcast: SearchProtocol {
     static func downloadPodcast(podcast: Podcast) {
         /// TO DO:- Проверить кол-во и откуда
 //        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: User.description())
-        if let podcast = searchViewContext.object(with: podcast.objectID) as? Podcast {
+        if let podcast = mainViewContext.object(with: podcast.objectID) as? Podcast {
             podcast.isDownLoad = true
-            searchViewContext.mySave()
+            mainViewContext.mySave()
         }
     }
 }

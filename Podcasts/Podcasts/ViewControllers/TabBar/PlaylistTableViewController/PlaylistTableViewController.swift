@@ -39,7 +39,7 @@ class PlaylistTableViewController: UIViewController {
     
     //MARK: - Actions
     @IBAction func removeAllAction(_ sender: UIButton) {
-        Podcast.removeAll(from: DataStoreManager.shared.mainViewContext)
+        Podcast.removeAll()
         playListTableView.reloadData()
         showEmptyImage()
     }

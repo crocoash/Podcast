@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct PodcastData: Codable {
+struct PodcastData: Decodable {
     let resultCount: Int
     let results: [Podcast]
 }

@@ -2,7 +2,7 @@
 //  Podcast+CoreDataProperties.swift
 //  Podcasts
 //
-//  Created by Tsvetkov Anton on 27.03.2022.
+//  Created by Anton on 08.04.2022.
 //
 //
 
@@ -34,17 +34,19 @@ extension Podcast {
     @NSManaged public var episodeUrl: String?
     @NSManaged public var feedUrl: String?
     @NSManaged public var id: NSNumber?
+    @NSManaged public var index: NSNumber?
+    @NSManaged public var isDownLoad: Bool
     @NSManaged public var kind: String?
     @NSManaged public var previewUrl: String?
+    @NSManaged public var progress: Float
     @NSManaged public var releaseDate: String?
     @NSManaged public var shortDescriptionMy: String?
     @NSManaged public var trackName: String?
     @NSManaged public var trackTimeMillis: NSNumber?
     @NSManaged public var trackViewUrl: String?
     @NSManaged public var wrapperType: String?
-    @NSManaged public var isDownLoad: Bool
-    @NSManaged public var progress: Float
-    @NSManaged public var index: NSNumber?
+    @NSManaged public var isFavorite: Bool
+    @NSManaged public var isSearched: Bool
 
 }
 

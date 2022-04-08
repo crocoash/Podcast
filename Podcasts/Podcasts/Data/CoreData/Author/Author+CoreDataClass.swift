@@ -39,12 +39,16 @@ public class Author: NSManagedObject, Decodable {
 
 //MARK: - static methods
 extension Author: SearchProtocol {
-    static var searchAuthors: [Author] { (try? DataStoreManager.shared.mainViewContext.fetch(Author.fetchRequest())) ?? [] }
+    static func newSearch() {
+//        <#code#>
+    }
+    
+    static var searchAuthors: [Author] { (try? DataStoreManager.shared.viewContext.fetch(Author.fetchRequest())) ?? [] }
     
     static var searchAuthorFetchResultController = DataStoreManager.shared.searchAuthorFetchResultController
     
-    static func removeAll(from viewContext: NSManagedObjectContext) {
-        DataStoreManager.shared.removeAll(viewContext: viewContext, fetchRequest: Author.fetchRequest())
+    static func removeAll() {
+        DataStoreManager.shared.removeAll(fetchRequest: Author.fetchRequest())
     }
     
     static func getSearchPodcast(for indexPath: IndexPath) -> Author {

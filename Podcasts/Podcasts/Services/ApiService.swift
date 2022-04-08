@@ -31,18 +31,15 @@ class ApiService {
     private static func getData<T: Decodable>(for request: String, completion: @escaping (Result<T>) -> Void) {
         guard let url = URL(string: request.encodeUrl) else { fatalError() }
         
-        let mainViewContext = DataStoreManager.shared.mainViewContext
-//        if let type = T.self as? SearchProtocol.Type {
-//            type.removeAll(from: mainViewContext)
-//        }
-        AuthorData.removeAll(from: mainViewContext)
-        Podcast.removeAll(from: mainViewContext)
-        Author.removeAll(from: mainViewContext)
+        let viewContext = DataStoreManager.shared.viewContext
+        
+        
         
         URLSession.shared.dataTask(with: url) { data, response, error in
             var result: Result<T>
             defer {
                 DispatchQueue.main.async {
+                    viewContext.mySave()
                     completion(result)
                 }
             }
@@ -51,9 +48,10 @@ class ApiService {
                 return
             }
             do {
-                let decoder = JSONDecoder(context: mainViewContext)
+                let decoder = JSONDecoder(context: viewContext)
                 let data = try decoder.decode(T.self, from: data)
                 result = .success(result: data)
+                
             } catch let error {
                 result = .failure(error: error)
             }

@@ -20,5 +20,6 @@ extension JSONDecoder {
 }
 
 protocol SearchProtocol {
-    static func removeAll(from viewContext: NSManagedObjectContext)
+    static func removeAll()
+    static func newSearch()
 }
