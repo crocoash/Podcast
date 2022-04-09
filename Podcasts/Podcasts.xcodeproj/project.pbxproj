@@ -76,6 +76,8 @@
 		18FFCA5527D556920078CB3F /* PreLoaderViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FFCA5427D556920078CB3F /* PreLoaderViewController.swift */; };
 		18FFCA5827D556BB0078CB3F /* PreLoaderViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 18FFCA5727D556BB0078CB3F /* PreLoaderViewController.storyboard */; };
 		18FFCA5A27D602EF0078CB3F /* UIStoryboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FFCA5927D602EF0078CB3F /* UIStoryboard.swift */; };
+		3A4A3757280164DC000C80E4 /* PodcastData+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4A3755280164DC000C80E4 /* PodcastData+CoreDataClass.swift */; };
+		3A4A3758280164DC000C80E4 /* PodcastData+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4A3756280164DC000C80E4 /* PodcastData+CoreDataProperties.swift */; };
 		3ABCCC3427FD71CC00862AF2 /* AuthorData+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ABCCC3327FD71CC00862AF2 /* AuthorData+CoreDataClass.swift */; };
 		3FBCF1C2272847F100B70522 /* PodcastCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FBCF1C0272847F100B70522 /* PodcastCell.swift */; };
 		3FBCF1C3272847F100B70522 /* PodcastCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3FBCF1C1272847F100B70522 /* PodcastCell.xib */; };
@@ -156,6 +158,8 @@
 		18FFCA5427D556920078CB3F /* PreLoaderViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreLoaderViewController.swift; sourceTree = "<group>"; };
 		18FFCA5727D556BB0078CB3F /* PreLoaderViewController.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = PreLoaderViewController.storyboard; sourceTree = "<group>"; };
 		18FFCA5927D602EF0078CB3F /* UIStoryboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIStoryboard.swift; sourceTree = "<group>"; };
+		3A4A3755280164DC000C80E4 /* PodcastData+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PodcastData+CoreDataClass.swift"; sourceTree = "<group>"; };
+		3A4A3756280164DC000C80E4 /* PodcastData+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PodcastData+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		3ABCCC3327FD71CC00862AF2 /* AuthorData+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AuthorData+CoreDataClass.swift"; sourceTree = "<group>"; };
 		3FBCF1C0272847F100B70522 /* PodcastCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastCell.swift; sourceTree = "<group>"; };
 		3FBCF1C1272847F100B70522 /* PodcastCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PodcastCell.xib; sourceTree = "<group>"; };
@@ -252,6 +256,7 @@
 				181F5BE127E72E3700AC27EB /* extensionCoreData.swift */,
 				185A7B1927F0E9620096E094 /* AuthorData */,
 				185A7B1A27F0E9710096E094 /* Author */,
+				3A4A3759280164E2000C80E4 /* PodcastData */,
 				185A7B1B27F0E97D0096E094 /* Podcast */,
 			);
 			path = CoreData;
@@ -265,6 +270,7 @@
 				189C1FB3272DF67900A8480E /* AuthorData.swift */,
 				189C1FB5272DF68600A8480E /* AuthorModel.swift */,
 				1831DECB27304F5600EC09E2 /* PlayListModel.swift */,
+				184CE18C272717B20088044C /* PodcastData.swift */,
 			);
 			path = Old;
 			sourceTree = "<group>";
@@ -293,7 +299,6 @@
 			children = (
 				181F5BE027E7185900AC27EB /* Old */,
 				047B47B1273B2054008E844F /* LikedMoment.swift */,
-				184CE18C272717B20088044C /* PodcastData.swift */,
 				181F5BDB27E6855B00AC27EB /* CoreData */,
 				18557D632732B61D00CA08CA /* IpModel.swift */,
 				18557D652732BF0100CA08CA /* User.swift */,
@@ -524,6 +529,15 @@
 			path = Pods;
 			sourceTree = "<group>";
 		};
+		3A4A3759280164E2000C80E4 /* PodcastData */ = {
+			isa = PBXGroup;
+			children = (
+				3A4A3755280164DC000C80E4 /* PodcastData+CoreDataClass.swift */,
+				3A4A3756280164DC000C80E4 /* PodcastData+CoreDataProperties.swift */,
+			);
+			path = PodcastData;
+			sourceTree = "<group>";
+		};
 		3FBCF1BF272847E400B70522 /* Cells */ = {
 			isa = PBXGroup;
 			children = (
@@ -674,6 +688,7 @@
 				18D13DDC273C407A00495C97 /* UserDocument.swift in Sources */,
 				189C1FB6272DF68600A8480E /* AuthorModel.swift in Sources */,
 				18D0EAA227F0FF8900941A0D /* Author+CoreDataClass.swift in Sources */,
+				3A4A3758280164DC000C80E4 /* PodcastData+CoreDataProperties.swift in Sources */,
 				049D480327286D5900B6DA3C /* DetailViewController.swift in Sources */,
 				1855933D27380AA10012BA91 /* BigPlayerViewControllerDelegate.swift in Sources */,
 				18FFCA5527D556920078CB3F /* PreLoaderViewController.swift in Sources */,
@@ -703,6 +718,7 @@
 				1831DEDA2731944600EC09E2 /* PresentTransition.swift in Sources */,
 				049D47DC2726E05B00B6DA3C /* AppDelegate.swift in Sources */,
 				184CE18B272717680088044C /* Podcast.swift in Sources */,
+				3A4A3757280164DC000C80E4 /* PodcastData+CoreDataClass.swift in Sources */,
 				1888C2AF2739A8D000395B5B /* URL + localPath.swift in Sources */,
 				18557D642732B61D00CA08CA /* IpModel.swift in Sources */,
 				18CA6D8927352AF800F32CE5 /* UIViewController + loadFromXib.swift in Sources */,

@@ -26,15 +26,11 @@ class SearchViewController : UIViewController {
     
     private let activityIndicator = UIActivityIndicatorView()
     private var alert = Alert()
-   
     weak var delegate: SearchViewControllerDelegate?
-
-    let viewContext = DataStoreManager.shared.viewContext
-    
+    private let viewContext = DataStoreManager.shared.viewContext
     private var podcasts: [Podcast] { Podcast.searchPodcasts }
     private var authors: [Author] { Author.searchAuthors }
-    
-    let searchPodcastFetchResultController = DataStoreManager.shared.searchPodcastFetchResultController
+    private let searchPodcastFetchResultController = DataStoreManager.shared.searchPodcastFetchResultController
     
     func playerIsShow() {
         playerOffSetConstraint.constant = 300
@@ -209,7 +205,8 @@ extension SearchViewController {
         searchText = ""
         Author.removeAll()
         Podcast.removeAll()
-        AuthorData.remove(viewContext: viewContext)
+        AuthorData.removeAll()
+        PodcastData.removeAll()
         
         podcastTableView.reloadData()
         showEmptyImage()
@@ -254,7 +251,8 @@ extension SearchViewController {
         if searchSegmentalControl.selectedSegmentIndex == 0 {
             ApiService.getData(for: UrlRequest1.getStringUrl(.podcast(request))) { [weak self] (info: PodcastData?) in
                 guard let self = self else { return }
-                self.processResults(data: info?.results) { _ in }
+                let results = info?.results.compactMap { $0 as? Podcast }
+                self.processResults(data: results) { _ in }
             }
         } else {
             ApiService.getData(for: UrlRequest1.getStringUrl(.authors(request))) { [weak self] (info: AuthorData?) in
@@ -423,7 +421,7 @@ extension SearchViewController: DetailViewControllerDelegate {
             fatalError("No such element in collection while download")
         }
         downloadService.startDownload(selectedPodcast, index: index)
-        podcastTableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none )
+        podcastTableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
     }
     
     func detailViewController(_ detailViewController: DetailViewController, removeButtonDidTouchFor selectedPodcast: Podcast) {
@@ -435,8 +433,4 @@ extension SearchViewController: DetailViewControllerDelegate {
 extension SearchViewController: NSFetchedResultsControllerDelegate {
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
     }
-    
-    
-    
-    
 }

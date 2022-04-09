@@ -68,8 +68,6 @@ class DataStoreManager {
         let fetchRequest: NSFetchRequest<Podcast> = Podcast.fetchRequest()
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(Podcast.trackName), ascending: true)]
         fetchRequest.predicate = NSPredicate(format: "isFavorite = true")
-        fetchRequest.fetchLimit = 1000
-        fetchRequest.returnsObjectsAsFaults = false
         
         let fetchResultController = NSFetchedResultsController(
             fetchRequest: fetchRequest,

@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CoreData
 
 protocol PlaylistViewControllerDelegate : AnyObject {
     func playlistTableViewController(_ playlistTableViewController: PlaylistTableViewController, _ podcasts: [Podcast], didSelectIndex: Int)
@@ -20,7 +21,7 @@ class PlaylistTableViewController: UIViewController {
     @IBOutlet private weak var tableViewBottomConstraint: NSLayoutConstraint!
     
     weak var delegate: PlaylistViewControllerDelegate?
-    
+    private let favoritePodcastFetchResultController = DataStoreManager.shared.favoritePodcastFetchResultController
     func playerIsShow() {
         tableViewBottomConstraint.constant = -50
     }
@@ -35,6 +36,7 @@ class PlaylistTableViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
+        favoritePodcastFetchResultController.delegate = self
     }
     
     //MARK: - Actions
@@ -82,7 +84,7 @@ extension PlaylistTableViewController {
 extension PlaylistTableViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let sectionInfo = DataStoreManager.shared.favoritePodcastFetchResultController.sections?[section]
+        let sectionInfo = favoritePodcastFetchResultController.sections?[section]
         return sectionInfo?.numberOfObjects ?? 0
     }
     
@@ -129,5 +131,11 @@ extension PlaylistTableViewController: UIViewControllerTransitioningDelegate {
     
     func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         return DismissTransition()
+    }
+}
+
+//MARK: - NSFetchedResultsControllerDelegate
+extension PlaylistTableViewController: NSFetchedResultsControllerDelegate {
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
     }
 }

@@ -1,8 +1,8 @@
 //
-//  AuthorData+CoreDataClass.swift
-//  
+//  PodcastData+CoreDataClass.swift
+//  Podcasts
 //
-//  Created by Tsvetkov Anton on 20.03.2022.
+//  Created by Anton on 09.04.2022.
 //
 //
 
@@ -10,8 +10,8 @@ import Foundation
 import CoreData
 
 
-public class AuthorData: NSManagedObject, Decodable {
-
+public class PodcastData: NSManagedObject, Decodable {
+    
     private enum CodingKeys: String, CodingKey {
         case resultCount, results
     }
@@ -22,29 +22,28 @@ public class AuthorData: NSManagedObject, Decodable {
             fatalError("mistake")
         }
         
-        let entity = NSEntityDescription.entity(forEntityName: "AuthorData", in: context)!
+        let entity = NSEntityDescription.entity(forEntityName: "PodcastData", in: context)!
         
         self.init(entity: entity, insertInto: context)
 
         let values = try decoder.container(keyedBy: CodingKeys.self)
         
         resultCount = try values.decode(Int32.self, forKey: .resultCount)
-        results = try values.decode(Set<Author>.self, forKey: .results) as NSSet
+        results = try values.decode(Set<Podcast>.self, forKey: .results) as NSSet
     }
 }
 
 //MARK: - static methods
-extension AuthorData: SearchProtocol {
+extension PodcastData: SearchProtocol {
     
     static func newSearch() {
-        Author.newSearch()
+        Podcast.newSearch()
     }
     
     static func removeAll() {
-        
         let viewContext = DataStoreManager.shared.viewContext
         
-        if let podcastData = try? viewContext.fetch(AuthorData.fetchRequest()) {
+        if let podcastData = try? viewContext.fetch(PodcastData.fetchRequest()) {
             podcastData.forEach { podcasts in
                 podcasts.results.forEach {
                     viewContext.delete($0 as! NSManagedObject)
@@ -53,6 +52,6 @@ extension AuthorData: SearchProtocol {
             }
         }
         
-        DataStoreManager.shared.removeAll(fetchRequest: AuthorData.fetchRequest())
+        DataStoreManager.shared.removeAll(fetchRequest: PodcastData.fetchRequest())
     }
 }
