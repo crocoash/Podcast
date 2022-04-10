@@ -36,15 +36,20 @@ public class AuthorData: NSManagedObject, Decodable {
 //MARK: - static methods
 extension AuthorData: SearchProtocol {
     
-    static func newSearch() {
-        Author.newSearch()
-    }
     
-    static func remove(viewContext: NSManagedObjectContext) {
-        DataStoreManager.shared.removeAll(fetchRequest: AuthorData.fetchRequest())
-    }
-    
-    static func removeAll() {
+    static func cancellSearch() {
+        
+        let viewContext = DataStoreManager.shared.viewContext
+        
+        if let authoreDatas = try? viewContext.fetch(AuthorData.fetchRequest()) {
+            authoreDatas.forEach { authoreData in
+                authoreData.results.forEach { authors in
+                    viewContext.delete(authors as! NSManagedObject)
+                }
+                viewContext.mySave()
+            }
+        }
+        
         DataStoreManager.shared.removeAll(fetchRequest: AuthorData.fetchRequest())
     }
 }

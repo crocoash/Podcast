@@ -26,15 +26,46 @@ class SearchViewController : UIViewController {
     
     private let activityIndicator = UIActivityIndicatorView()
     private var alert = Alert()
-   
     weak var delegate: SearchViewControllerDelegate?
-
-    let viewContext = DataStoreManager.shared.viewContext
     
-    private var podcasts: [Podcast] { Podcast.searchPodcasts }
+    private let viewContext = DataStoreManager.shared.viewContext
+    
+    private var podcasts: [Podcast] { searchPodcastFetchResultController.fetchedObjects ?? [] }
     private var authors: [Author] { Author.searchAuthors }
     
-    let searchPodcastFetchResultController = DataStoreManager.shared.searchPodcastFetchResultController
+    
+    ///--------------------------------------------------------------------------------------------------------------------
+    lazy var searchPodcastFetchResultController: NSFetchedResultsController<Podcast> = {
+        let fetchRequest: NSFetchRequest<Podcast> = Podcast.fetchRequest()
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(Podcast.trackName), ascending: true)]
+        
+        fetchRequest.predicate = NSPredicate(format: "isSearched = true")
+        
+        let fetchResultController = NSFetchedResultsController(
+            fetchRequest: fetchRequest,
+            managedObjectContext: viewContext,
+            sectionNameKeyPath: nil,
+            cacheName: nil
+        )
+        try! fetchResultController.performFetch()
+        return fetchResultController
+    }()
+    
+    lazy var searchAuthorFetchResultController: NSFetchedResultsController<Author> = {
+        let fetchRequest: NSFetchRequest<Author> = Author.fetchRequest()
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(Author.artistID), ascending: true)]
+        
+        let fetchResultController = NSFetchedResultsController(
+            fetchRequest: fetchRequest,
+            managedObjectContext: viewContext,
+            sectionNameKeyPath: nil,
+            cacheName: nil
+        )
+        try! fetchResultController.performFetch()
+        return fetchResultController
+    }()
+    ///--------------------------------------------------------------------------------------------------------------------
+    
     
     func playerIsShow() {
         playerOffSetConstraint.constant = 300
@@ -68,7 +99,6 @@ class SearchViewController : UIViewController {
         configureGesture()
         showEmptyImage()
         downloadService.downloadsSession = downloadsSession
-        searchPodcastFetchResultController.delegate = self
     }
     
     override func motionBegan(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
@@ -91,14 +121,10 @@ class SearchViewController : UIViewController {
         podcastTableView.reloadData()
     }
     
-    @objc func handlerLongPs(sender: UILongPressGestureRecognizer) {
-        longPressGesture(sender)
-    }
-    
     @objc func handlerTapAuthorCell(sender: UITapGestureRecognizer) {
         guard let view = sender.view as? UITableViewCell,
               let indexPath = podcastTableView.indexPath(for: view),
-              let request = authors[indexPath.row].artistName else { return }
+              let request = searchAuthorFetchResultController.object(at: indexPath).artistName else { return }
         
         searchSegmentalControl.selectedSegmentIndex = 0
         searchText = request
@@ -142,6 +168,7 @@ extension SearchViewController {
         configureSegmentalControl()
         configureAlert()
         configureActivityIndicator()
+        searchPodcastFetchResultController.delegate = self
     }
     
     private func configureTableView() {
@@ -169,7 +196,7 @@ extension SearchViewController {
     }
     
     private func getPodcast(for indexPath: IndexPath) -> Podcast {
-        return Podcast.getSearchPodcast(for: indexPath)
+        return searchPodcastFetchResultController.object(at: indexPath)
     }
     
     private func configureActivityIndicator() {
@@ -186,34 +213,29 @@ extension SearchViewController {
         feedbackGenerator.impactOccurred()
     }
     
-    private func longPressGesture(_ sender: UILongPressGestureRecognizer) {
-        MyLongPressGestureRecognizer.createSelector(for: sender) { (cell: PodcastCell) in
-            guard let view = sender.view as? PodcastCell,
-                  let indexPath = podcastTableView.indexPath(for: view) else { return }
-            let podcast = getPodcast(for: indexPath)
+    private func addOrRemoveFromFavorite(for indexPath: IndexPath) {
+
+        let podcast = getPodcast(for: indexPath)
             
-            if Podcast.podcastIsInPlaylist(podcast: podcast) {
-                Podcast.removeFromFavorites(podcast: podcast)
-                MyToast.create(title: (podcasts[indexPath.row].trackName ?? "podcast") + "is removed from playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
-            } else {
-                Podcast.addToFavorites(podcast: podcast)
-                MyToast.create(title: (podcasts[indexPath.row].trackName ?? "podcast") + "is added to playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
-            }
-            downloadService.startDownload(podcasts[indexPath.row], index: indexPath.row)
-            podcastTableView.reloadRows(at: [indexPath], with: .none)
-            feedbackGenerator()
+        if podcast.isFavorite {
+            podcast.isFavorite = false
+            viewContext.mySave()
+            
+            MyToast.create(title: (podcasts[indexPath.row].trackName ?? "podcast") + "is removed from playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
+        } else {
+            podcast.isFavorite = true
+            MyToast.create(title: (podcasts[indexPath.row].trackName ?? "podcast") + "is added to playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
         }
+        podcastTableView.reloadRows(at: [indexPath], with: .none)
+        feedbackGenerator()
     }
     
     private func cancelSearchAction() {
         searchText = ""
-        Author.removeAll()
-        Podcast.removeAll()
-        AuthorData.remove(viewContext: viewContext)
-        
+        AuthorData.cancellSearch()
+        PodcastData.cancellSearch()
         podcastTableView.reloadData()
         showEmptyImage()
-        searchSegmentalControl.selectedSegmentIndex = 0
     }
     
     private func showEmptyImage() {
@@ -227,6 +249,13 @@ extension SearchViewController {
             podcastTableView.isHidden = false
             emptyTableImageView.isHidden = true
         }
+    }
+    
+    func podcastIsDownload(podcast: Podcast) -> Bool {
+        if let index = podcasts.firstIndex(matching: podcast.id) {
+            return podcasts[index].isDownLoad == true
+        }
+        return false
     }
 }
 
@@ -254,7 +283,8 @@ extension SearchViewController {
         if searchSegmentalControl.selectedSegmentIndex == 0 {
             ApiService.getData(for: UrlRequest1.getStringUrl(.podcast(request))) { [weak self] (info: PodcastData?) in
                 guard let self = self else { return }
-                self.processResults(data: info?.results) { _ in }
+                let results = info?.results.compactMap { $0 as? Podcast }
+                self.processResults(data: results) { _ in }
             }
         } else {
             ApiService.getData(for: UrlRequest1.getStringUrl(.authors(request))) { [weak self] (info: AuthorData?) in
@@ -266,6 +296,23 @@ extension SearchViewController {
     }
 }
 
+// MARK: - PodcastCellDelegate
+extension SearchViewController: PodcastCellDelegate {
+    func podcastCellDidSelectStar(_ podcastCell: PodcastCell) {
+        guard let indexPath = podcastTableView.indexPath(for: podcastCell) else { return }
+        addOrRemoveFromFavorite(for: indexPath)
+        podcastTableView.reloadRows(at: [indexPath], with: .none)
+    }
+    
+    func podcastCellDidSelectDownLoadImage(_ podcastCell: PodcastCell) {
+        guard let indexPath = podcastTableView.indexPath(for: podcastCell) else { return }
+        let podcast = getPodcast(for: indexPath)
+        downloadService.startDownload(podcast, index: indexPath.row)
+        podcastTableView.reloadRows(at: [indexPath], with: .none)
+        feedbackGenerator()
+    }
+}
+
 // MARK: - TableView Data Source
 extension SearchViewController: UITableViewDataSource {
     
@@ -273,7 +320,7 @@ extension SearchViewController: UITableViewDataSource {
         if isPodcast {
             return searchPodcastFetchResultController.sections?[section].numberOfObjects ?? 0
         } else {
-            return Author.searchAuthors.count
+            return authors.count
         }
     }
     
@@ -285,15 +332,15 @@ extension SearchViewController: UITableViewDataSource {
         let podcast = getPodcast(for: indexPath)
         let cell = tableView.dequeueReusableCell(withIdentifier: PodcastCell.identifier) as! PodcastCell
         
+        cell.delegate = self
         cell.configureCell(with: podcast)
-        cell.addMyGestureRecognizer(self, type: .longPressGesture(minimumPressDuration: 0.3), selector: #selector(handlerLongPs))
         cell.addMyGestureRecognizer(self, type: .tap(), selector: #selector(handlerTapPodcastCell))
         
         return cell
     }
     
     private func configureAuthorCell(_ indexPath: IndexPath,for tableView: UITableView) -> UITableViewCell {
-        let author = Author.searchAuthors[indexPath.row]
+        let author = searchAuthorFetchResultController.object(at: indexPath)
         let cell = tableView.dequeueReusableCell(withIdentifier: PodcastByAuthorCell.identifier) as! PodcastByAuthorCell
         
         cell.configureCell(with: author, indexPath)
@@ -368,7 +415,7 @@ extension SearchViewController: URLSessionDownloadDelegate {
         }
         
         DispatchQueue.main.async {
-            guard let podcast = self.downloadService.activeDownloads[sourceURL] else { return }
+            guard let podcast = self.downloadService.activeDownloads[sourceURL]?.podcast else { return }
             
             Podcast.downloadPodcast(podcast: podcast)
             
@@ -384,7 +431,7 @@ extension SearchViewController: URLSessionDownloadDelegate {
                     totalBytesExpectedToWrite  : Int64) {
         
         guard let url = downloadTask.originalRequest?.url,
-              let podcast = downloadService.activeDownloads[url] else { return }
+              let podcast = downloadService.activeDownloads[url]?.podcast else { return }
         
         podcast.progress = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite)
         
@@ -417,17 +464,18 @@ extension SearchViewController: DetailViewControllerDelegate {
         delegate?.searchViewController(self, podcasts, didSelectIndex: podcastIndex)
     }
     
-    func detailViewController(_ detailViewController: DetailViewController, addButtonDidTouchFor selectedPodcast: Podcast) {
+    func detailViewController(_ detailViewController: DetailViewController, addToFavoriteButtonDidTouchFor selectedPodcast: Podcast) {
         Podcast.addToFavorites(podcast: selectedPodcast)
         guard let index = podcasts.firstIndex(where: {$0 == selectedPodcast}) else {
             fatalError("No such element in collection while download")
         }
         downloadService.startDownload(selectedPodcast, index: index)
-        podcastTableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none )
+        podcastTableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
     }
     
-    func detailViewController(_ detailViewController: DetailViewController, removeButtonDidTouchFor selectedPodcast: Podcast) {
-        Podcast.removeFromFavorites(podcast: selectedPodcast)
+    func detailViewController(_ detailViewController: DetailViewController, removeFromFavoriteButtonDidTouchFor selectedPodcast: Podcast) {
+        selectedPodcast.isFavorite = false
+        DataStoreManager.shared.viewContext.mySave()
     }
 }
 
@@ -435,8 +483,4 @@ extension SearchViewController: DetailViewControllerDelegate {
 extension SearchViewController: NSFetchedResultsControllerDelegate {
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
     }
-    
-    
-    
-    
 }

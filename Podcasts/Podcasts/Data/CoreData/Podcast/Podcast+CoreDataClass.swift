@@ -93,99 +93,51 @@ public class Podcast: NSManagedObject, Decodable {
         isFavorite = try container.decodeIfPresent(Bool.self, forKey: .isFavorite) ?? false
         isSearched = try container.decodeIfPresent(Bool.self, forKey: .isSearched) ?? true
     }
-    
-    
-//    public func encode(to encoder: Encoder) throws {
-//
-//        var container = encoder.container(keyedBy: CodingKeys.self)
-//        ///
-//        try container.encode(previewUrl, forKey: .previewUrl)
-//        try container.encode(episodeFileExtension, forKey: .episodeFileExtension )
-//        try container.encode(artworkUrl160, forKey: .artworkUrl160 )
-//        try container.encode(episodeContentType, forKey: .episodeContentType )
-//        try container.encode(artworkUrl600, forKey: .artworkUrl600 )
-//        try container.encode(artworkUrl60, forKey: .artworkUrl60 )
-//        try container.encode(artistViewUrl, forKey: .artistViewUrl )
-//        try container.encode(contentAdvisoryRating, forKey: .contentAdvisoryRating )
-//        try container.encode(trackViewUrl, forKey: .trackViewUrl )
-//        try container.encode(trackTimeMillis?.intValue, forKey: .trackTimeMillis )
-//        try container.encode(collectionViewUrl, forKey: .collectionViewUrl )
-//        try container.encode(episodeUrl, forKey: .episodeUrl )
-//        try container.encode(collectionId?.intValue, forKey: .collectionId )
-//        try container.encode(collectionName, forKey: .collectionName )
-//        try container.encode(id?.intValue, forKey: .id )
-//        try container.encode(trackName, forKey: .trackName )
-//        try container.encode(releaseDate, forKey: .releaseDate )
-//        try container.encode(shortDescriptionMy, forKey: .shortDescriptionMy )
-//        try container.encode(feedUrl, forKey: .feedUrl )
-//        try container.encode(artistIds, forKey: .artistIds )
-//        try container.encode(closedCaptioning, forKey: .closedCaptioning )
-//        try container.encode(country, forKey: .country )
-//        try container.encode(descriptionMy, forKey: .descriptionMy )
-//        try container.encode(episodeGuid, forKey: .episodeGuid )
-//        try container.encode(wrapperType, forKey: .wrapperType )
-//        try container.encode(isDownLoad, forKey: .isDownLoad )
-//        try container.encode(progress, forKey: .progress )
-//        try container.encode(index?.intValue, forKey: .index )
-//    }
 }
 
 extension Podcast {
     
     static var viewContext = DataStoreManager.shared.viewContext
     
-    static var searchPodcastFetchResultController = DataStoreManager.shared.searchPodcastFetchResultController
+    //MARK: - Search
+
+    
+    //MARK: - Favorite
     static var favoritePodcastFetchResultController = DataStoreManager.shared.favoritePodcastFetchResultController
-    
-    static var searchPodcasts: [Podcast] { searchPodcastFetchResultController.fetchedObjects ?? [] }
     static var favoritePodcasts: [Podcast] { (try? viewContext.fetch(Podcast.fetchRequest())) ?? [] }
-    
-    
-    static func removeAll() {
-        DataStoreManager.shared.removeAll(fetchRequest: Podcast.fetchRequest())
-    }
-    
-    static func podcastIsInPlaylist(podcast: Podcast) -> Bool {
-        return searchPodcasts.contains(podcast)
-    }
-    
-    static func getSearchPodcast(for indexPath: IndexPath) -> Podcast {
-        return searchPodcastFetchResultController.object(at: indexPath)
-    }
     
     static func getfavoritePodcast(for indexPath: IndexPath) -> Podcast {
         return favoritePodcastFetchResultController.object(at: indexPath)
     }
     
-    static func newSearch() {
-        searchPodcastFetchResultController.fetchedObjects?.forEach {
-            $0.isSearched = false
+    static func removaAllFavorites() {
+        favoritePodcastFetchResultController.fetchedObjects?.forEach {
+            viewContext.delete($0)
         }
         viewContext.mySave()
     }
     
-    static func removeFromFavorites(podcast: Podcast) {
-        viewContext.delete(podcast)
+    static func removeFromFavorites(indexPath: IndexPath) {
+        let podcast = Podcast.getfavoritePodcast(for: indexPath)
+        podcast.isFavorite = false
         viewContext.mySave()
     }
     
     static func addToFavorites(podcast: Podcast) {
         var newPodcast = Podcast(context: DataStoreManager.shared.viewContext)
         newPodcast.id = podcast.id
+        newPodcast.isSearched = false
+        newPodcast.isFavorite = true
         newPodcast = podcast
         viewContext.mySave()
     }
     
-    static func podcastIsDownload(podcast: Podcast) -> Bool {
-        if let index = searchPodcasts.firstIndex(matching: podcast.id) {
-            return searchPodcasts[index].isDownLoad == true
-        }
-        return false
+    //MARK: - Common
+    static func removeAll() {
+        DataStoreManager.shared.removeAll(fetchRequest: Podcast.fetchRequest())
     }
-    
+
     static func downloadPodcast(podcast: Podcast) {
-        /// TO DO:- Проверить кол-во и откуда
-//        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: User.description())
         if let podcast = viewContext.object(with: podcast.objectID) as? Podcast {
             podcast.isDownLoad = true
             viewContext.mySave()

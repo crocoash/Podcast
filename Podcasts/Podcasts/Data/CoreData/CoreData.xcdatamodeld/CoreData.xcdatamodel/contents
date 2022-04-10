@@ -43,9 +43,14 @@
         <attribute name="trackViewUrl" optional="YES" attributeType="String"/>
         <attribute name="wrapperType" optional="YES" attributeType="String"/>
     </entity>
+    <entity name="PodcastData" representedClassName=".PodcastData" syncable="YES">
+        <attribute name="resultCount" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="results" toMany="YES" deletionRule="Nullify" destinationEntity="Podcast"/>
+    </entity>
     <elements>
         <element name="Author" positionX="230.0902099609375" positionY="154.2001037597656" width="128" height="89"/>
         <element name="AuthorData" positionX="88.09765625" positionY="6.51171875" width="128" height="59"/>
         <element name="Podcast" positionX="-253.359375" positionY="231.23046875" width="128" height="494"/>
+        <element name="PodcastData" positionX="-45" positionY="171" width="128" height="59"/>
     </elements>
 </model>

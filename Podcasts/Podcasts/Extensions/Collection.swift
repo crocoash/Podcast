@@ -10,17 +10,20 @@ import SwiftUI
 extension Collection where Element: Identifiable {
     
     func firstIndex(matching element: Element) -> Self.Index? {
-        firstIndex { $0.id == element.id }
+        return firstIndex { $0.id == element.id }
     }
     
     func firstIndex(matching id: Element.ID) -> Self.Index? {
-        firstIndex { $0.id == id }
+        return firstIndex { $0.id == id }
     }
     
     func firstIndex(matching id: Element.ID?) -> Bool {
-        guard id != nil else { return false }
+        guard let id = id else { return false }
+        
         for item in self {
-            return item.id == id
+            if item.id == id {
+                return true
+            }
         }
         return false
     }

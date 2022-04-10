@@ -92,8 +92,8 @@
                                         <color key="textColor" systemColor="systemGrayColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="large" translatesAutoresizingMaskIntoConstraints="NO" id="aLy-Xb-zG4">
-                                        <rect key="frame" x="157" y="170.66666666666666" width="37" height="37"/>
+                                    <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" misplaced="YES" hidesWhenStopped="YES" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="aLy-Xb-zG4">
+                                        <rect key="frame" x="207" y="319" width="19" height="21"/>
                                         <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     </activityIndicatorView>
                                 </subviews>
@@ -115,15 +115,15 @@
                                     <constraint firstItem="aEq-aa-PX8" firstAttribute="trailing" secondItem="sW1-Px-2oS" secondAttribute="trailing" id="VKu-rd-kAW"/>
                                     <constraint firstItem="aEq-aa-PX8" firstAttribute="leading" secondItem="sW1-Px-2oS" secondAttribute="leading" id="Vsy-Tu-bPT"/>
                                     <constraint firstItem="sW1-Px-2oS" firstAttribute="trailing" secondItem="evq-rh-sp0" secondAttribute="trailing" id="bIi-sH-pkT"/>
+                                    <constraint firstItem="aLy-Xb-zG4" firstAttribute="centerY" secondItem="ewb-tZ-aBJ" secondAttribute="centerY" id="gbS-Ft-UiY"/>
                                     <constraint firstAttribute="height" constant="378" id="h3b-mb-8Ao"/>
                                     <constraint firstItem="evq-rh-sp0" firstAttribute="top" secondItem="0UR-tF-vZY" secondAttribute="bottom" constant="20" id="nh1-RW-SeQ"/>
-                                    <constraint firstItem="aLy-Xb-zG4" firstAttribute="centerY" secondItem="WDQ-WY-Klc" secondAttribute="centerY" id="o7q-7D-Daf"/>
                                     <constraint firstItem="ewb-tZ-aBJ" firstAttribute="trailing" secondItem="aEq-aa-PX8" secondAttribute="trailing" id="oYB-Rm-TV2"/>
-                                    <constraint firstItem="aLy-Xb-zG4" firstAttribute="centerX" secondItem="WDQ-WY-Klc" secondAttribute="centerX" id="rWn-u5-IZn"/>
                                     <constraint firstItem="evq-rh-sp0" firstAttribute="leading" secondItem="0UR-tF-vZY" secondAttribute="leading" constant="17" id="s97-DV-PY7"/>
                                     <constraint firstItem="gh6-cH-yq8" firstAttribute="leading" secondItem="aEq-aa-PX8" secondAttribute="leading" id="toa-Qc-gf9"/>
                                     <constraint firstItem="gh6-cH-yq8" firstAttribute="centerY" secondItem="jVt-qF-ljb" secondAttribute="centerY" id="wpQ-9S-s7r"/>
                                     <constraint firstItem="sW1-Px-2oS" firstAttribute="leading" secondItem="evq-rh-sp0" secondAttribute="leading" id="xGM-PQ-q0E"/>
+                                    <constraint firstItem="aLy-Xb-zG4" firstAttribute="centerX" secondItem="ewb-tZ-aBJ" secondAttribute="centerX" constant="42.5" id="xZw-hO-JWK"/>
                                 </constraints>
                             </view>
                         </subviews>
@@ -153,7 +153,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="6QB-oi-22a" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="620" y="177"/>
+            <point key="canvasLocation" x="618.84057971014499" y="176.78571428571428"/>
         </scene>
     </scenes>
     <color key="tintColor" systemColor="tintColor"/>
