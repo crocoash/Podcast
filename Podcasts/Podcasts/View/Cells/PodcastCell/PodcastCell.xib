@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19455" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19454"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -34,9 +34,10 @@
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
-                    <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="star.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="cSq-aK-NQM">
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="star.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="cSq-aK-NQM">
                         <rect key="frame" x="288" y="3.5" width="25" height="25"/>
                         <color key="tintColor" red="0.66799789669999998" green="0.47512125970000002" blue="0.25860109930000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <gestureRecognizers/>
                     </imageView>
                     <progressView hidden="YES" opaque="NO" tag="40" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="jFc-Bc-tCa">
                         <rect key="frame" x="58" y="68" width="163" height="4"/>
@@ -76,14 +77,14 @@
                 <constraint firstItem="cSq-aK-NQM" firstAttribute="top" secondItem="ezM-cI-4gb" secondAttribute="top" constant="4" id="9yw-M1-uzm"/>
             </constraints>
             <connections>
+                <outlet property="downLoadImageView" destination="wRd-Ac-IFA" id="a4B-5T-FTi"/>
                 <outlet property="downloadProgressView" destination="jFc-Bc-tCa" id="7M3-tS-8NP"/>
-                <outlet property="isDownLoadImageView" destination="wRd-Ac-IFA" id="a4B-5T-FTi"/>
-                <outlet property="playlistStarImageView" destination="cSq-aK-NQM" id="p23-69-bjt"/>
+                <outlet property="favoriteStarImageView" destination="cSq-aK-NQM" id="p23-69-bjt"/>
                 <outlet property="podcastImage" destination="ZDP-F7-7bG" id="qZL-Vn-GCg"/>
                 <outlet property="podcastName" destination="ERN-hX-YbI" id="1bQ-j1-UOH"/>
                 <outlet property="progressLabel" destination="Rlk-QC-Yls" id="mtz-uy-Hdq"/>
             </connections>
-            <point key="canvasLocation" x="63.768115942028992" y="89.397321428571431"/>
+            <point key="canvasLocation" x="61" y="93"/>
         </tableViewCell>
     </objects>
     <resources>

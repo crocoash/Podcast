@@ -20,49 +20,7 @@ class DataStoreManager {
         return dataStoreManager
     }
     ///----------------------------------------------------------------------------------------------------------
-    lazy var searchPodcastFetchResultController: NSFetchedResultsController<Podcast> = {
-        let fetchRequest: NSFetchRequest<Podcast> = Podcast.fetchRequest()
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(Podcast.trackName), ascending: true)]
-        
-        fetchRequest.predicate = NSPredicate(format: "isSearched = true")
-        
-        let fetchResultController = NSFetchedResultsController(
-            fetchRequest: fetchRequest,
-            managedObjectContext: viewContext,
-            sectionNameKeyPath: nil,
-            cacheName: nil
-        )
-        
-        do {
-            try fetchResultController.performFetch()
-        } catch {
-            let nserror = error as NSError
-            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
-        }
-        
-        return fetchResultController
-    }()
-    
-    lazy var searchAuthorFetchResultController: NSFetchedResultsController<Author> = {
-        let fetchRequest: NSFetchRequest<Author> = Author.fetchRequest()
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(Author.artistID), ascending: true)]
-        
-        let fetchResultController = NSFetchedResultsController(
-            fetchRequest: fetchRequest,
-            managedObjectContext: viewContext,
-            sectionNameKeyPath: nil,
-            cacheName: nil
-        )
-        
-        do {
-            try fetchResultController.performFetch()
-        } catch {
-            let nserror = error as NSError
-            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
-        }
-        
-        return fetchResultController
-    }()
+
     
     lazy var favoritePodcastFetchResultController: NSFetchedResultsController<Podcast> = {
         let fetchRequest: NSFetchRequest<Podcast> = Podcast.fetchRequest()

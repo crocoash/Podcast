@@ -35,23 +35,27 @@ public class PodcastData: NSManagedObject, Decodable {
 
 //MARK: - static methods
 extension PodcastData: SearchProtocol {
+
+    static let viewContext = DataStoreManager.shared.viewContext
     
-    static func newSearch() {
-        Podcast.newSearch()
-    }
+
     
-    static func removeAll() {
-        let viewContext = DataStoreManager.shared.viewContext
+    static func cancellSearch() {
         
         if let podcastData = try? viewContext.fetch(PodcastData.fetchRequest()) {
             podcastData.forEach { podcasts in
-                podcasts.results.forEach {
-                    viewContext.delete($0 as! NSManagedObject)
+                podcasts.results.forEach { podcast in
+                    if let podcast = podcast as? Podcast {
+                        if podcast.isFavorite {
+                            podcast.isSearched = false
+                        } else {
+                            viewContext.delete(podcast)
+                        }
+                    }
                 }
                 viewContext.mySave()
             }
         }
-        
         DataStoreManager.shared.removeAll(fetchRequest: PodcastData.fetchRequest())
     }
 }

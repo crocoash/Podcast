@@ -20,6 +20,5 @@ extension JSONDecoder {
 }
 
 protocol SearchProtocol {
-    static func removeAll()
-    static func newSearch()
+    static func cancellSearch()
 }

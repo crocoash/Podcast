@@ -75,6 +75,7 @@ extension LikedMomentsViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let podcast = LikedMomentsManager.shared().getLikedMomentsFromUserDefault()[indexPath.row].podcast
         let cell = likedMomentsTableView.dequeueReusableCell(withIdentifier: PodcastCell.identifier, for: indexPath) as! PodcastCell
+
         cell.configureCell(with: podcast)
         return cell
     }

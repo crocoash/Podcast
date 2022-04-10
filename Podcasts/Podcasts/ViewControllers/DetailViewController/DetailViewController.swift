@@ -8,11 +8,10 @@
 import UIKit
 
 protocol DetailViewControllerDelegate: AnyObject {
+    
     func detailViewController(_ detailViewController: DetailViewController, playButtonDidTouchFor selectedPodcastAtIndex: Int)
-    
-    func detailViewController(_ detailViewController: DetailViewController, addButtonDidTouchFor selectedPodcast: Podcast)
-    
-    func detailViewController(_ detailViewController: DetailViewController, removeButtonDidTouchFor selectedPodcast: Podcast)
+    func detailViewController(_ detailViewController: DetailViewController, addToFavoriteButtonDidTouchFor selectedPodcast: Podcast)
+    func detailViewController(_ detailViewController: DetailViewController, removeFromFavoriteButtonDidTouchFor selectedPodcast: Podcast)
 }
 
 class DetailViewController: UIViewController {
@@ -48,17 +47,17 @@ class DetailViewController: UIViewController {
     
     @objc private func playButtonOnTouchUpInside(_ sender: UIButton) {
         delegate?.detailViewController(self, playButtonDidTouchFor: index)
-        dismiss(animated: true, completion: nil)
+        dismiss(animated: true)
     }
     
     @objc private func addBookmarkOnTouchUpInside(_ sender: UIButton) {
-        delegate?.detailViewController(self, addButtonDidTouchFor: podcast)
-        dismiss(animated: true, completion: nil)
+        delegate?.detailViewController(self, addToFavoriteButtonDidTouchFor: podcast)
+        dismiss(animated: true)
     }
     
     @objc private func removeBookmarkOnTouchUpInside(_ sender: UIButton) {
-        delegate?.detailViewController(self, removeButtonDidTouchFor: podcast)
-        dismiss(animated: true, completion: nil)
+        delegate?.detailViewController(self, removeFromFavoriteButtonDidTouchFor: podcast)
+        dismiss(animated: true)
     }
     
     @objc private func backAction(_ sender: Any) {
@@ -75,7 +74,7 @@ extension DetailViewController {
             self?.episodeImage.image = image
         }
         
-        if Podcast.podcastIsInPlaylist(podcast: podcast) {
+        if podcast.isFavorite {
             addToPlaylistBookmark.isHidden = true
             addToPlaylistBookmark.isUserInteractionEnabled = false
             removeFromPlaylistBookmark.isHidden = false
@@ -87,37 +86,20 @@ extension DetailViewController {
         descriptionTextView.text = podcast.description
         countryLabel.text = podcast.country
         advisoryRatingLabel.text = podcast.contentAdvisoryRating
-        formatDate()
+        dateLabel.text = podcast.releaseDate
         
-        guard let milis = podcast.trackTimeMillis else {
+        if let milis = podcast.trackTimeMillis {
+            durationLabel.text = String((milis.intValue / 1000) / 60) + " min"
+        } else {
             durationLabel.text = "Unknown"
-            return
-        }
-        
-        durationLabel.text = String((milis.intValue / 1000) / 60) + " min"
-    }
-    
-    private func formatDate() {
-        let dateFormatterGet = DateFormatter()
-        dateFormatterGet.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
-        
-        let dateFormatterSet = DateFormatter()
-        dateFormatterSet.dateFormat = "MMM d, yyyy"
-        
-        guard let releaseDate = podcast.releaseDate else {
-            fatalError("Invalid date in DetailViewController")
-        }
-        
-        if let date = dateFormatterGet.date(from: releaseDate) {
-            dateLabel.text = dateFormatterSet.string(from: date)
         }
     }
     
     private func configureGestures() {
-        backImageView.addMyGestureRecognizer(self, type: .tap(1), selector: #selector(backAction))
-        removeFromPlaylistBookmark.addMyGestureRecognizer(self, type: .tap(1), selector: #selector(removeBookmarkOnTouchUpInside))
-        addToPlaylistBookmark.addMyGestureRecognizer(self, type: .tap(1), selector: #selector(addBookmarkOnTouchUpInside))
-        playImageView.addMyGestureRecognizer(self, type: .tap(1), selector: #selector(playButtonOnTouchUpInside))
+        backImageView.addMyGestureRecognizer(self, type: .tap(), selector: #selector(backAction))
+        removeFromPlaylistBookmark.addMyGestureRecognizer(self, type: .tap(), selector: #selector(removeBookmarkOnTouchUpInside))
+        addToPlaylistBookmark.addMyGestureRecognizer(self, type: .tap(), selector: #selector(addBookmarkOnTouchUpInside))
+        playImageView.addMyGestureRecognizer(self, type: .tap(), selector: #selector(playButtonOnTouchUpInside))
         addMyGestureRecognizer(self, type: .screenEdgePanGestureRecognizer(directions: [.left]), selector: #selector(backAction))
     }
 }
