@@ -34,7 +34,6 @@ extension Podcast {
     @NSManaged public var episodeUrl: String?
     @NSManaged public var feedUrl: String?
     @NSManaged public var id: NSNumber?
-    @NSManaged public var index: NSNumber?
     @NSManaged public var isDownLoad: Bool
     @NSManaged public var kind: String?
     @NSManaged public var previewUrl: String?

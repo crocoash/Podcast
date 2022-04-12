@@ -9,7 +9,7 @@ import UIKit
 
 protocol PodcastCellDelegate: AnyObject {
     func podcastCellDidSelectStar(_ podcastCell: PodcastCell)
-    func podcastCellDidSelectDownLoadImage(_ podcastCell: PodcastCell)
+    func podcastCellDidSelectDownLoadImage(_ podcastCell: PodcastCell, podcast: Podcast)
 }
 
 class PodcastCell: UITableViewCell {
@@ -23,13 +23,7 @@ class PodcastCell: UITableViewCell {
     
     weak var delegate: PodcastCellDelegate?
     
-    @objc func handlerTapFavoriteStar(_ sender: UITapGestureRecognizer) {
-        delegate?.podcastCellDidSelectStar(self)
-    }
-    
-    @objc func handlerTapDownloadImage(_ sender: UITapGestureRecognizer) {
-        delegate?.podcastCellDidSelectDownLoadImage(self)
-    }
+    var podcast: Podcast!
     
     override func prepareForReuse() {
         super.prepareForReuse()
@@ -37,20 +31,30 @@ class PodcastCell: UITableViewCell {
         downloadProgressView.isHidden = true
         progressLabel.isHidden = true
     }
+    
+    @objc func handlerTapFavoriteStar(_ sender: UITapGestureRecognizer) {
+        delegate?.podcastCellDidSelectStar(self)
+    }
+    
+    @objc func handlerTapDownloadImage(_ sender: UITapGestureRecognizer) {
+        delegate?.podcastCellDidSelectDownLoadImage(self, podcast: podcast)
+    }
 }
 
 extension PodcastCell {
     
     func configureCell(with podcast: Podcast) {
+        self.podcast = podcast
         favoriteStarImageView.addMyGestureRecognizer(self, type: .tap(), selector: #selector(handlerTapFavoriteStar))
         downLoadImageView.addMyGestureRecognizer(self, type: .tap(), selector: #selector(handlerTapDownloadImage))
         
         downLoadImageView.isHidden = !podcast.isFavorite
-       
         
         downLoadImageView.image = UIImage(systemName: podcast.isDownLoad ? "checkmark.icloud.fill" : "icloud.and.arrow.down")
        
-        favoriteStarImageView.image = UIImage(systemName: podcast.isFavorite ? "star.fill" : "star")
+        
+        let isFavorite = Podcast.podcastIsFavorite(podcast: podcast)
+        favoriteStarImageView.image = UIImage(systemName: isFavorite || podcast.isFavorite ? "star.fill" : "star")
 
         podcastName.text = podcast.trackName
         

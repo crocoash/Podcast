@@ -9,7 +9,8 @@ import UIKit
 import CoreData
 
 protocol PlaylistViewControllerDelegate : AnyObject {
-    func playlistTableViewController(_ playlistTableViewController: PlaylistTableViewController, _ podcasts: [Podcast], didSelectIndex: Int)
+    func playlistTableViewController(_ playlistTableViewController: PlaylistTableViewController, podcasts: [Podcast], didSelectIndex: Int)
+    func playlistTableViewControllerDidSelectDownLoadButton(_ playlistTableViewController: PlaylistTableViewController, podcast: Podcast)
 }
 
 class PlaylistTableViewController: UIViewController {
@@ -25,6 +26,10 @@ class PlaylistTableViewController: UIViewController {
     
     func playerIsShow() {
         tableViewBottomConstraint.constant = -50
+    }
+    
+    func getIndexPath(for podcast: Podcast) -> IndexPath? {
+        return favoritePodcastFetchResultController.indexPath(forObject: podcast)
     }
 
     // MARK: - View Methods
@@ -124,7 +129,7 @@ extension PlaylistTableViewController : DetailViewControllerDelegate {
     }
     
     func detailViewController(_ detailViewController: DetailViewController, playButtonDidTouchFor didSelectIndex: Int) {
-        delegate?.playlistTableViewController(self, Podcast.favoritePodcasts, didSelectIndex: didSelectIndex)
+        delegate?.playlistTableViewController(self,podcasts: Podcast.favoritePodcasts, didSelectIndex: didSelectIndex)
     }
 }
 
@@ -152,11 +157,10 @@ extension PlaylistTableViewController: PodcastCellDelegate {
         guard let indexPath = playListTableView.indexPath(for: podcastCell) else { return }
         Podcast.removeFromFavorites(indexPath: indexPath)
         playListTableView.reloadData()
+        showEmptyImage()
     }
     
-    func podcastCellDidSelectDownLoadImage(_ podcastCell: PodcastCell) {
-        
+    func podcastCellDidSelectDownLoadImage(_ podcastCell: PodcastCell, podcast: Podcast) {
+        delegate?.playlistTableViewControllerDidSelectDownLoadButton(self, podcast: podcast)
     }
-    
-    
 }

@@ -79,7 +79,7 @@ class SearchViewController : UIViewController {
     }
     
     private var isPodcast: Bool { searchSegmentalControl.selectedSegmentIndex == 0 }
-    private let downloadService = DownloadService()
+    let downloadService = DownloadService()
     
     lazy var downloadsSession: URLSession = {
         let configuration = URLSessionConfiguration.background(withIdentifier: "BackGroundSession")
@@ -304,10 +304,9 @@ extension SearchViewController: PodcastCellDelegate {
         podcastTableView.reloadRows(at: [indexPath], with: .none)
     }
     
-    func podcastCellDidSelectDownLoadImage(_ podcastCell: PodcastCell) {
+    func podcastCellDidSelectDownLoadImage(_ podcastCell: PodcastCell, podcast: Podcast) {
         guard let indexPath = podcastTableView.indexPath(for: podcastCell) else { return }
-        let podcast = getPodcast(for: indexPath)
-        downloadService.startDownload(podcast, index: indexPath.row)
+        downloadService.startDownload(podcast, indexPath: indexPath)
         podcastTableView.reloadRows(at: [indexPath], with: .none)
         feedbackGenerator()
     }
@@ -415,11 +414,11 @@ extension SearchViewController: URLSessionDownloadDelegate {
         }
         
         DispatchQueue.main.async {
-            guard let podcast = self.downloadService.activeDownloads[sourceURL]?.podcast else { return }
-            
+            guard let podcastDownload = self.downloadService.activeDownloads[sourceURL] else { return }
+            let podcast = podcastDownload.podcast
+            let indexPath = podcastDownload.indexPath
             Podcast.downloadPodcast(podcast: podcast)
-            
-            self.podcastTableView.reloadRows(at: [IndexPath(row: podcast.index!.intValue, section: 0)], with: .none)
+            self.podcastTableView.reloadRows(at: [indexPath], with: .none)
             self.downloadService.activeDownloads[sourceURL] = nil
         }
     }
@@ -431,14 +430,15 @@ extension SearchViewController: URLSessionDownloadDelegate {
                     totalBytesExpectedToWrite  : Int64) {
         
         guard let url = downloadTask.originalRequest?.url,
-              let podcast = downloadService.activeDownloads[url]?.podcast else { return }
+              let podcastDownload = downloadService.activeDownloads[url] else { return }
+        let podcast = podcastDownload.podcast
         
         podcast.progress = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite)
         
         let totalSize = ByteCountFormatter.string(fromByteCount: totalBytesExpectedToWrite, countStyle: .file)
         
         DispatchQueue.main.async {
-            if let podcastCell = self.podcastTableView.cellForRow(at: IndexPath(row: podcast.index!.intValue, section: 0)) as? PodcastCell {
+            if let podcastCell = self.podcastTableView.cellForRow(at: podcastDownload.indexPath) as? PodcastCell {
                 podcastCell.updateDisplay(progress: podcast.progress, totalSize: totalSize)
             }
         }
@@ -466,11 +466,12 @@ extension SearchViewController: DetailViewControllerDelegate {
     
     func detailViewController(_ detailViewController: DetailViewController, addToFavoriteButtonDidTouchFor selectedPodcast: Podcast) {
         Podcast.addToFavorites(podcast: selectedPodcast)
-        guard let index = podcasts.firstIndex(where: {$0 == selectedPodcast}) else {
+
+        guard let indexPath = searchPodcastFetchResultController.indexPath(forObject: selectedPodcast) else {
             fatalError("No such element in collection while download")
         }
-        downloadService.startDownload(selectedPodcast, index: index)
-        podcastTableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
+        downloadService.startDownload(selectedPodcast, indexPath: indexPath)
+        podcastTableView.reloadRows(at: [indexPath], with: .none)
     }
     
     func detailViewController(_ detailViewController: DetailViewController, removeFromFavoriteButtonDidTouchFor selectedPodcast: Podcast) {

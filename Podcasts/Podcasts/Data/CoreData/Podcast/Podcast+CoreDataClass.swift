@@ -41,7 +41,6 @@ public class Podcast: NSManagedObject, Decodable {
         case wrapperType
         case isDownLoad
         case progress
-        case index
         case isFavorite
         case isSearched
     }
@@ -88,8 +87,6 @@ public class Podcast: NSManagedObject, Decodable {
         wrapperType = try container.decodeIfPresent(String.self, forKey: .wrapperType)
         isDownLoad = try container.decodeIfPresent(Bool.self, forKey: .isDownLoad) ?? false
         progress = try container.decodeIfPresent(Float.self, forKey: .progress) ?? 0
-        index = try container.decodeIfPresent(Int.self, forKey: .index) as? NSNumber
-        
         isFavorite = try container.decodeIfPresent(Bool.self, forKey: .isFavorite) ?? false
         isSearched = try container.decodeIfPresent(Bool.self, forKey: .isSearched) ?? true
     }
@@ -142,5 +139,12 @@ extension Podcast {
             podcast.isDownLoad = true
             viewContext.mySave()
         }
+    }
+    
+    static func podcastIsFavorite(podcast: Podcast) -> Bool {
+        if let podcasts = DataStoreManager.shared.favoritePodcastFetchResultController.fetchedObjects {
+            return podcasts.contains { $0.id == podcast.id }
+        }
+        return false
     }
 }

@@ -15,6 +15,24 @@ class TabBarViewController: UITabBarController {
     private var playerVC = PlayerViewController()
     private var userViewModel: UserViewModel!
     
+    lazy var playListVc = createTabBar(PlaylistTableViewController.self , title: "Playlist", imageName: "folder.fill") {
+        $0.delegate = self
+    }
+    
+    lazy var searchVC = createTabBar(SearchViewController.self, title: "Search", imageName: "magnifyingglass") {
+        $0.delegate = self
+    }
+    
+    lazy var likedMoments = createTabBar(LikedMomentsViewController.self , title: "Liked", imageName: "heart.fill") {
+        $0.delegate = self
+    }
+    
+    lazy var settingsVC = createTabBar(SettingsTableViewController.self, title: "Settings", imageName: "gear") { [weak self] vc in
+        guard let self = self else { return }
+        vc.setUser((self.userViewModel) )
+        vc.delegate = self
+    }
+    
     func setUserViewModel(_ userViewModel: UserViewModel) {
         self.userViewModel = userViewModel
     }
@@ -34,7 +52,6 @@ class TabBarViewController: UITabBarController {
         super.viewDidLoad()
         configureTabBar()
         addPlayer()
-        
         configureImageDarkMode()
     }
 }
@@ -43,25 +60,6 @@ class TabBarViewController: UITabBarController {
 extension TabBarViewController {
     
     private func configureTabBar() {
-
-        let playListVc = createTabBar(PlaylistTableViewController.self , title: "Playlist", imageName: "folder.fill") {
-            $0.delegate = self
-        }
-        
-        let searchVC = createTabBar(SearchViewController.self, title: "Search", imageName: "magnifyingglass") {
-            $0.delegate = self
-        }
-        
-        let likedMoments = createTabBar(LikedMomentsViewController.self , title: "Liked", imageName: "heart.fill") {
-            $0.delegate = self
-        }
-        
-        let settingsVC = createTabBar(SettingsTableViewController.self, title: "Settings", imageName: "gear") { [weak self] vc in
-            guard let self = self else { return }
-            vc.setUser((self.userViewModel) )
-            vc.delegate = self
-        }
-
         viewControllers = [playListVc, searchVC, likedMoments, settingsVC]
     }
     
@@ -113,7 +111,12 @@ extension TabBarViewController: SearchViewControllerDelegate {
 // MARK: - PlaylistTableViewControllerDelegate
 extension TabBarViewController: PlaylistViewControllerDelegate {
     
-    func playlistTableViewController(_ playlistTableViewController: PlaylistTableViewController, _ podcasts: [Podcast], didSelectIndex: Int) {
+    func playlistTableViewControllerDidSelectDownLoadButton(_ playlistTableViewController: PlaylistTableViewController, podcast: Podcast) {
+        guard let indexPath = playlistTableViewController.getIndexPath(for: podcast) else { return }
+        searchVC.downloadService.startDownload(podcast, indexPath: indexPath)
+    }
+    
+    func playlistTableViewController(_ playlistTableViewController: PlaylistTableViewController, podcasts: [Podcast], didSelectIndex: Int) {
         playerVC.view.isHidden = false
         playerVC.play(podcasts: podcasts, at: didSelectIndex)
         playlistTableViewController.playerIsShow()

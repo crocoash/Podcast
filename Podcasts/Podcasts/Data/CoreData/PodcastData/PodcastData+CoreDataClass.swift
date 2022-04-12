@@ -41,7 +41,6 @@ extension PodcastData: SearchProtocol {
 
     
     static func cancellSearch() {
-        
         if let podcastData = try? viewContext.fetch(PodcastData.fetchRequest()) {
             podcastData.forEach { podcasts in
                 podcasts.results.forEach { podcast in
@@ -56,6 +55,16 @@ extension PodcastData: SearchProtocol {
                 viewContext.mySave()
             }
         }
+        
+        if let podcasts = try? DataStoreManager.shared.viewContext.fetch(Podcast.fetchRequest()) {
+            podcasts.forEach {
+                if !$0.isFavorite && !$0.isSearched {
+                    viewContext.delete($0)
+                }
+            }
+            viewContext.mySave()
+        }
+        
         DataStoreManager.shared.removeAll(fetchRequest: PodcastData.fetchRequest())
     }
 }
