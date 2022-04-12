@@ -37,7 +37,7 @@ extension Podcast {
     @NSManaged public var isDownLoad: Bool
     @NSManaged public var kind: String?
     @NSManaged public var previewUrl: String?
-    @NSManaged public var progress: Float
+//    @NSManaged public var progress: Float
     @NSManaged public var releaseDate: String?
     @NSManaged public var shortDescriptionMy: String?
     @NSManaged public var trackName: String?
