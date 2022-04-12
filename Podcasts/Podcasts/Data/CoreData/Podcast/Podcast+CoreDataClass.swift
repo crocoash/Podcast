@@ -45,7 +45,6 @@ public class Podcast: NSManagedObject, Decodable {
         case isSearched
     }
 
-
     required convenience public init(from decoder: Decoder) throws {
 
         guard let context = decoder.userInfo[.context] as? NSManagedObjectContext else {
@@ -57,47 +56,41 @@ public class Podcast: NSManagedObject, Decodable {
 
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        previewUrl = try container.decodeIfPresent(String.self, forKey: .previewUrl)
-        episodeFileExtension = try container.decodeIfPresent(String.self, forKey: .episodeFileExtension)
-        artworkUrl160 = try container.decodeIfPresent(String.self, forKey: .artworkUrl160)
-        episodeContentType = try container.decodeIfPresent(String.self, forKey: .episodeContentType)
-        artworkUrl600 = try container.decodeIfPresent(String.self, forKey: .artworkUrl600)
-        artworkUrl60 = try container.decodeIfPresent(String.self, forKey: .artworkUrl60)
-        artistViewUrl = try container.decodeIfPresent(String.self, forKey: .artistViewUrl)
+        previewUrl =            try container.decodeIfPresent(String.self, forKey: .previewUrl)
+        episodeFileExtension =  try container.decodeIfPresent(String.self, forKey: .episodeFileExtension)
+        artworkUrl160 =         try container.decodeIfPresent(String.self, forKey: .artworkUrl160)
+        episodeContentType =    try container.decodeIfPresent(String.self, forKey: .episodeContentType)
+        artworkUrl600 =         try container.decodeIfPresent(String.self, forKey: .artworkUrl600)
+        artworkUrl60 =          try container.decodeIfPresent(String.self, forKey: .artworkUrl60)
+        artistViewUrl =         try container.decodeIfPresent(String.self, forKey: .artistViewUrl)
         contentAdvisoryRating = try container.decodeIfPresent(String.self, forKey: .contentAdvisoryRating)
-        trackViewUrl = try container.decodeIfPresent(String.self, forKey: .trackViewUrl)
-        
-        trackTimeMillis = try container.decodeIfPresent(Int.self, forKey: .trackTimeMillis) as? NSNumber
-        
-        collectionViewUrl = try container.decodeIfPresent(String.self, forKey: .collectionViewUrl)
-        episodeUrl = try container.decodeIfPresent(String.self, forKey: .episodeUrl)
-        collectionId = try container.decodeIfPresent(Int.self, forKey: .collectionId) as? NSNumber
-        collectionName = try container.decodeIfPresent(String.self, forKey: .collectionName)
-        id = try container.decodeIfPresent(Int.self, forKey: .id) as? NSNumber
-        trackName = try container.decodeIfPresent(String.self, forKey: .trackName)
-        releaseDate = try container.decodeIfPresent(String.self, forKey: .releaseDate)
-        shortDescriptionMy = try container.decodeIfPresent(String.self, forKey: .shortDescriptionMy)
-        feedUrl = try container.decodeIfPresent(String.self, forKey: .feedUrl)
-        artistIds = try container.decodeIfPresent([Int].self, forKey: .artistIds)
-        closedCaptioning = try container.decodeIfPresent(String.self, forKey: .closedCaptioning)
-        country = try container.decodeIfPresent(String.self, forKey: .country)
-        descriptionMy = try container.decodeIfPresent(String.self, forKey: .descriptionMy)
-        episodeGuid = try container.decodeIfPresent(String.self, forKey: .episodeGuid)
-        kind = try container.decodeIfPresent(String.self, forKey: .kind)
-        wrapperType = try container.decodeIfPresent(String.self, forKey: .wrapperType)
-        isDownLoad = try container.decodeIfPresent(Bool.self, forKey: .isDownLoad) ?? false
-//        progress = try container.decodeIfPresent(Float.self, forKey: .progress) ?? 0
-        isFavorite = try container.decodeIfPresent(Bool.self, forKey: .isFavorite) ?? false
-        isSearched = try container.decodeIfPresent(Bool.self, forKey: .isSearched) ?? true
+        trackViewUrl =          try container.decodeIfPresent(String.self, forKey: .trackViewUrl)
+        trackTimeMillis =       try container.decodeIfPresent(Int   .self, forKey: .trackTimeMillis) as? NSNumber
+        collectionViewUrl =     try container.decodeIfPresent(String.self, forKey: .collectionViewUrl)
+        episodeUrl =            try container.decodeIfPresent(String.self, forKey: .episodeUrl)
+        collectionId =          try container.decodeIfPresent(Int   .self, forKey: .collectionId) as? NSNumber
+        collectionName =        try container.decodeIfPresent(String.self, forKey: .collectionName)
+        id =                    try container.decodeIfPresent(Int   .self, forKey: .id) as? NSNumber
+        trackName =             try container.decodeIfPresent(String.self, forKey: .trackName)
+        releaseDate =           try container.decodeIfPresent(String.self, forKey: .releaseDate)
+        shortDescriptionMy =    try container.decodeIfPresent(String.self, forKey: .shortDescriptionMy)
+        feedUrl =               try container.decodeIfPresent(String.self, forKey: .feedUrl)
+        artistIds =             try container.decodeIfPresent([Int] .self, forKey: .artistIds)
+        closedCaptioning =      try container.decodeIfPresent(String.self, forKey: .closedCaptioning)
+        country =               try container.decodeIfPresent(String.self, forKey: .country)
+        descriptionMy =         try container.decodeIfPresent(String.self, forKey: .descriptionMy)
+        episodeGuid =           try container.decodeIfPresent(String.self, forKey: .episodeGuid)
+        kind =                  try container.decodeIfPresent(String.self, forKey: .kind)
+        wrapperType =           try container.decodeIfPresent(String.self, forKey: .wrapperType)
+        isDownLoad =            try container.decodeIfPresent(Bool  .self, forKey: .isDownLoad) ?? false
+        isFavorite =            try container.decodeIfPresent(Bool  .self, forKey: .isFavorite) ?? false
+        isSearched =            try container.decodeIfPresent(Bool  .self, forKey: .isSearched) ?? true
     }
 }
 
 extension Podcast {
     
     static var viewContext = DataStoreManager.shared.viewContext
-    
-    //MARK: - Search
-
     
     //MARK: - Favorite
     static var favoritePodcastFetchResultController = DataStoreManager.shared.favoritePodcastFetchResultController
