@@ -208,7 +208,7 @@ extension PlayerViewController {
     
     private func configureGesture() {
         view.addMyGestureRecognizer(self, type: .swipe(directions: [.up]), selector: #selector(respondToSwipe))
-        view.addMyGestureRecognizer(self, type: .tap(1), selector: #selector(respondToSwipe))
+        view.addMyGestureRecognizer(self, type: .tap(), selector: #selector(respondToSwipe))
     }
     
     private func nextPodcast() {

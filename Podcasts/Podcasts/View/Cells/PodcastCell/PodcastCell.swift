@@ -48,12 +48,14 @@ extension PodcastCell {
         favoriteStarImageView.addMyGestureRecognizer(self, type: .tap(), selector: #selector(handlerTapFavoriteStar))
         downLoadImageView.addMyGestureRecognizer(self, type: .tap(), selector: #selector(handlerTapDownloadImage))
         
-        downLoadImageView.isHidden = !podcast.isFavorite
         
-        downLoadImageView.image = UIImage(systemName: podcast.isDownLoad ? "checkmark.icloud.fill" : "icloud.and.arrow.down")
+        /// information from favorite tab
+        let isDownload = Podcast.isDownload(podcast: podcast)
+        let isFavorite = Podcast.podcastIsFavorite(podcast: podcast)
+        downLoadImageView.isHidden = !(isDownload || podcast.isDownLoad || isFavorite)
        
         
-        let isFavorite = Podcast.podcastIsFavorite(podcast: podcast)
+        downLoadImageView.image = UIImage(systemName: podcast.isDownLoad || isDownload ? "checkmark.icloud.fill" : "icloud.and.arrow.down")
         favoriteStarImageView.image = UIImage(systemName: isFavorite || podcast.isFavorite ? "star.fill" : "star")
 
         podcastName.text = podcast.trackName
@@ -64,6 +66,7 @@ extension PodcastCell {
     }
     
     func updateDisplay(progress: Float, totalSize : String) {
+        downLoadImageView.image = UIImage(systemName: podcast.isDownLoad ? "checkmark.icloud.fill" : "icloud.and.arrow.down")
         if downloadProgressView.isHidden { downloadProgressView.isHidden = false }
         if progressLabel.isHidden { progressLabel.isHidden = false }
         

@@ -86,7 +86,7 @@ public class Podcast: NSManagedObject, Decodable {
         kind = try container.decodeIfPresent(String.self, forKey: .kind)
         wrapperType = try container.decodeIfPresent(String.self, forKey: .wrapperType)
         isDownLoad = try container.decodeIfPresent(Bool.self, forKey: .isDownLoad) ?? false
-        progress = try container.decodeIfPresent(Float.self, forKey: .progress) ?? 0
+//        progress = try container.decodeIfPresent(Float.self, forKey: .progress) ?? 0
         isFavorite = try container.decodeIfPresent(Bool.self, forKey: .isFavorite) ?? false
         isSearched = try container.decodeIfPresent(Bool.self, forKey: .isSearched) ?? true
     }
@@ -120,15 +120,6 @@ extension Podcast {
         viewContext.mySave()
     }
     
-    static func addToFavorites(podcast: Podcast) {
-        var newPodcast = Podcast(context: DataStoreManager.shared.viewContext)
-        newPodcast.id = podcast.id
-        newPodcast.isSearched = false
-        newPodcast.isFavorite = true
-        newPodcast = podcast
-        viewContext.mySave()
-    }
-    
     //MARK: - Common
     static func removeAll() {
         DataStoreManager.shared.removeAll(fetchRequest: Podcast.fetchRequest())
@@ -139,6 +130,14 @@ extension Podcast {
             podcast.isDownLoad = true
             viewContext.mySave()
         }
+    }
+    
+    static func isDownload(podcast: Podcast) -> Bool {
+        guard let favoritePodcasts = DataStoreManager.shared.favoritePodcastFetchResultController.fetchedObjects else { return false }
+        if let podcast = favoritePodcasts.firstPodcast(matching: podcast.id) {
+            return podcast.isDownLoad
+        }
+        return false
     }
     
     static func podcastIsFavorite(podcast: Podcast) -> Bool {

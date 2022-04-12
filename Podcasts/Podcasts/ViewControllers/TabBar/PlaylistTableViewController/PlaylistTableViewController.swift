@@ -118,7 +118,8 @@ extension PlaylistTableViewController: UITableViewDataSource {
 // MARK: - DetailViewControllerDelegate
 extension PlaylistTableViewController : DetailViewControllerDelegate {
     func detailViewController(_ detailViewController: DetailViewController, addToFavoriteButtonDidTouchFor selectedPodcast: Podcast) {
-        Podcast.addToFavorites(podcast: selectedPodcast)
+        selectedPodcast.isFavorite = true
+        DataStoreManager.shared.viewContext.mySave()
     }
     
     func detailViewController(_ detailViewController: DetailViewController, removeFromFavoriteButtonDidTouchFor selectedPodcast: Podcast) {
@@ -151,7 +152,7 @@ extension PlaylistTableViewController: NSFetchedResultsControllerDelegate {
     }
 }
 
-//MARK: - PlaylistTableViewController
+//MARK: - PodcastCellDelegate
 extension PlaylistTableViewController: PodcastCellDelegate {
     func podcastCellDidSelectStar(_ podcastCell: PodcastCell) {
         guard let indexPath = playListTableView.indexPath(for: podcastCell) else { return }

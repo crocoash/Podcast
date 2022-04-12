@@ -27,6 +27,18 @@ extension Collection where Element: Identifiable {
         }
         return false
     }
+    
+    func firstPodcast(matching id: Element.ID?) -> Element? {
+        guard let id = id else { return nil }
+        
+        for item in self {
+            if item.id == id {
+                return item
+            }
+        }
+        return nil
+    }
+    
 }
 
 
