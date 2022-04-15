@@ -128,10 +128,10 @@ extension PlayerViewController {
                 self.player.seek(to: CMTime(seconds: self.likedMoments[self.index].moment, preferredTimescale: 60))
             }
             
-            let scene = UIApplication.shared.connectedScenes.first
-            
-            if let sceneDelegate = (scene?.delegate as? SceneDelegate) {
-                sceneDelegate.videoViewController = self
+            DispatchQueue.main.async {
+                if let sceneDelegate = UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate  {
+                    sceneDelegate.videoViewController = self
+                }
             }
         }
         

@@ -18,27 +18,12 @@ extension Collection where Element: Identifiable {
     }
     
     func firstIndex(matching id: Element.ID?) -> Bool {
-        guard let id = id else { return false }
-        
-        for item in self {
-            if item.id == id {
-                return true
-            }
-        }
-        return false
+        return self.contains { $0.id == id}
     }
     
     func firstPodcast(matching id: Element.ID?) -> Element? {
-        guard let id = id else { return nil }
-        
-        for item in self {
-            if item.id == id {
-                return item
-            }
-        }
-        return nil
+        return self.filter { $0.id == id }.first
     }
-    
 }
 
 

@@ -31,29 +31,32 @@ class PlaylistTableViewController: UIViewController {
     func getIndexPath(for podcast: Podcast) -> IndexPath? {
         return favoritePodcastFetchResultController.indexPath(forObject: podcast)
     }
+    
+    func updateDisplay(progress: Float, totalSize: String, podcast: Podcast) {
+        guard let indexPath = favoritePodcastFetchResultController.indexPath(forObject: podcast) else { return }
+        if let podcastCell = self.playListTableView?.cellForRow(at: indexPath) as? PodcastCell {
+            podcastCell.updateDisplay(progress: progress, totalSize: totalSize)
+        }
+    }
 
     // MARK: - View Methods
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        playListTableView.reloadData()
         showEmptyImage()
     }
         
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
-        favoritePodcastFetchResultController.delegate = self
     }
     
     //MARK: - Actions
     @IBAction func removeAllAction(_ sender: UIButton) {
         Podcast.removaAllFavorites()
-        playListTableView.reloadData()
         showEmptyImage()
     }
     
     @objc func tapCell(sender: UITapGestureRecognizer) {
-        
         guard let view = sender.view as? UITableViewCell,
               let indexPath = playListTableView.indexPath(for: view) else { return }
         
@@ -71,8 +74,8 @@ class PlaylistTableViewController: UIViewController {
 
 //MARK: - Private methods
 extension PlaylistTableViewController {
-    
     private func configureUI() {
+        favoritePodcastFetchResultController.delegate = self
         playListTableView.register(PodcastCell.self)
         navigationItem.title = "PlayList"
         playListTableView.rowHeight = 100
@@ -81,16 +84,15 @@ extension PlaylistTableViewController {
     
     private func showEmptyImage() {
         let favoritePodcastsIsEmpty = favoritePodcastFetchResultController.fetchedObjects?.isEmpty ?? true
-        
         playListTableView.isHidden = favoritePodcastsIsEmpty
         emptyTableImageView.isHidden = !favoritePodcastsIsEmpty
         removeAllButton.isEnabled = !favoritePodcastsIsEmpty
+        playListTableView.reloadData()
     }
 }
 
 // MARK: - Table View data source
 extension PlaylistTableViewController: UITableViewDataSource {
-    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let sectionInfo = favoritePodcastFetchResultController.sections?[section]
         return sectionInfo?.numberOfObjects ?? 0
@@ -99,7 +101,7 @@ extension PlaylistTableViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let podcast = Podcast.getfavoritePodcast(for: indexPath)
         let cell = playListTableView.dequeueReusableCell(withIdentifier: PodcastCell.identifier, for: indexPath) as! PodcastCell
-        cell.addMyGestureRecognizer(self, type: .tap(1), selector: #selector(tapCell))
+        cell.addMyGestureRecognizer(self, type: .tap(), selector: #selector(tapCell))
         cell.configureCell(with: podcast)
         cell.delegate = self
         
@@ -108,9 +110,12 @@ extension PlaylistTableViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            Podcast.removeFromFavorites(indexPath: indexPath)
+            let podcast = favoritePodcastFetchResultController.object(at: indexPath)
+            Podcast.removeFromFavorites(podcast: podcast)
             tableView.reloadData()
             showEmptyImage()
+        } else if editingStyle == .insert {
+            tableView.insertRows(at: [indexPath], with: .automatic)
         }
     }
 }
@@ -123,10 +128,8 @@ extension PlaylistTableViewController : DetailViewControllerDelegate {
     }
     
     func detailViewController(_ detailViewController: DetailViewController, removeFromFavoriteButtonDidTouchFor selectedPodcast: Podcast) {
-        if let indexPath = favoritePodcastFetchResultController.indexPath(forObject: selectedPodcast) {
-            Podcast.removeFromFavorites(indexPath: indexPath)
-            playListTableView.reloadData()
-        }
+            Podcast.removeFromFavorites(podcast: selectedPodcast)
+            showEmptyImage()
     }
     
     func detailViewController(_ detailViewController: DetailViewController, playButtonDidTouchFor didSelectIndex: Int) {
@@ -136,7 +139,6 @@ extension PlaylistTableViewController : DetailViewControllerDelegate {
 
 //MARK: - UIViewControllerTransitioningDelegate
 extension PlaylistTableViewController: UIViewControllerTransitioningDelegate {
-    
     func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         return PresentTransition()
     }
@@ -149,15 +151,23 @@ extension PlaylistTableViewController: UIViewControllerTransitioningDelegate {
 //MARK: - NSFetchedResultsControllerDelegate
 extension PlaylistTableViewController: NSFetchedResultsControllerDelegate {
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        //TODO: -
+        guard let indexPath = indexPath else { return }
+        
+        switch type {
+        case .insert:
+            playListTableView.insertRows(at: [indexPath], with: .none)
+        case .delete:
+            playListTableView.deleteRows(at: [indexPath], with: .none)
+        default: break
+        }
     }
 }
 
 //MARK: - PodcastCellDelegate
 extension PlaylistTableViewController: PodcastCellDelegate {
-    func podcastCellDidSelectStar(_ podcastCell: PodcastCell) {
-        guard let indexPath = playListTableView.indexPath(for: podcastCell) else { return }
-        Podcast.removeFromFavorites(indexPath: indexPath)
-        playListTableView.reloadData()
+    func podcastCellDidSelectStar(_ podcastCell: PodcastCell, podcast: Podcast) {
+        Podcast.removeFromFavorites(podcast: podcast)
         showEmptyImage()
     }
     

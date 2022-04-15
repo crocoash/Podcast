@@ -14,12 +14,10 @@ class DownloadService {
     
     func startDownload(_ podcast: Podcast, indexPath: IndexPath) {
         
-        guard let stringUrl = podcast.previewUrl,
-              let url = URL(string: stringUrl) else { return }
+        guard let url = podcast.previewUrl.url else { return }
         
         if activeDownloads[url] == nil {
             let podcastDownload = PodcastDownload(podcast: podcast,indexPath: indexPath, task: downloadsSession.downloadTask(with: url))
-        
             podcastDownload.task?.resume()
             activeDownloads[url] = podcastDownload
         } else {

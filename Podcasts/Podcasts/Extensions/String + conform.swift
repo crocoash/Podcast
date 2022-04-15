@@ -23,3 +23,11 @@ extension String {
         return self.removingPercentEncoding!
     }
 }
+
+extension Optional where Wrapped == String  {
+    var url: URL? {
+        guard let stringUrl = self,
+              let url = URL(string: stringUrl) else { return nil }
+        return url
+    }
+}
