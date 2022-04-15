@@ -25,9 +25,8 @@ class DataProvider {
                 guard error == nil,
                       let response = response as? HTTPURLResponse,
                       response.statusCode == 200,
-                      let data = data else { return }
-                
-                guard let image = UIImage(data: data) else { return }
+                      let data = data,
+                      let image = UIImage(data: data) else { return }
                 
                 self?.imageCache.setObject(image, forKey: url.absoluteString as NSString)
                 

@@ -8,7 +8,7 @@
 import UIKit
 
 protocol PodcastCellDelegate: AnyObject {
-    func podcastCellDidSelectStar(_ podcastCell: PodcastCell)
+    func podcastCellDidSelectStar(_ podcastCell: PodcastCell, podcast: Podcast)
     func podcastCellDidSelectDownLoadImage(_ podcastCell: PodcastCell, podcast: Podcast)
 }
 
@@ -18,25 +18,35 @@ class PodcastCell: UITableViewCell {
     @IBOutlet private weak var podcastName: UILabel!
     @IBOutlet private weak var favoriteStarImageView: UIImageView!
     @IBOutlet private weak var progressLabel: UILabel!
+    @IBOutlet private weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet private weak var downloadProgressView: UIProgressView!
     @IBOutlet private weak var downLoadImageView: UIImageView!
     
     weak var delegate: PodcastCellDelegate?
+    private var podcast: Podcast!
+    private var isDownLoad: Bool!
+    private var isFavorite: Bool!
     
-    var podcast: Podcast!
+    lazy var podcastInFavoriteIsDownload = Podcast.isDownload(podcast: podcast)
     
     override func prepareForReuse() {
         super.prepareForReuse()
         podcastImage.image = nil
-        downloadProgressView.isHidden = true
+        downLoadImageView.image = nil
+        downloadProgressView?.isHidden = true
         progressLabel.isHidden = true
     }
     
     @objc func handlerTapFavoriteStar(_ sender: UITapGestureRecognizer) {
-        delegate?.podcastCellDidSelectStar(self)
+        delegate?.podcastCellDidSelectStar(self, podcast: podcast)
     }
     
     @objc func handlerTapDownloadImage(_ sender: UITapGestureRecognizer) {
+        if !isDownLoad {
+            activityIndicator.isHidden = false
+            activityIndicator.startAnimating()
+            downLoadImageView.isHidden = true
+        }
         delegate?.podcastCellDidSelectDownLoadImage(self, podcast: podcast)
     }
 }
@@ -47,15 +57,15 @@ extension PodcastCell {
         self.podcast = podcast
         favoriteStarImageView.addMyGestureRecognizer(self, type: .tap(), selector: #selector(handlerTapFavoriteStar))
         downLoadImageView.addMyGestureRecognizer(self, type: .tap(), selector: #selector(handlerTapDownloadImage))
-        
+                
         /// information from favorite tab
-        let isDownload = Podcast.isDownload(podcast: podcast)
-        let isFavorite = Podcast.podcastIsFavorite(podcast: podcast)
-        downLoadImageView.isHidden = !(isDownload || podcast.isDownLoad || isFavorite)
-       
+        isFavorite = Podcast.podcastIsFavorite(podcast: podcast) || podcast.isFavorite
+        isDownLoad = podcastInFavoriteIsDownload || podcast.isDownLoad
         
-        downLoadImageView.image = UIImage(systemName: podcast.isDownLoad || isDownload ? "checkmark.icloud.fill" : "icloud.and.arrow.down")
-        favoriteStarImageView.image = UIImage(systemName: isFavorite || podcast.isFavorite ? "star.fill" : "star")
+        downLoadImageView.isHidden = !isFavorite
+        
+        downLoadImageView.image = UIImage(systemName: isDownLoad ? "checkmark.icloud.fill" : "icloud.and.arrow.down")
+        favoriteStarImageView.image = UIImage(systemName: isFavorite ? "star.fill" : "star")
 
         podcastName.text = podcast.trackName
         
@@ -65,7 +75,10 @@ extension PodcastCell {
     }
     
     func updateDisplay(progress: Float, totalSize : String) {
-        downLoadImageView.image = UIImage(systemName: podcast.isDownLoad ? "checkmark.icloud.fill" : "icloud.and.arrow.down")
+        
+        activityIndicator.isHidden = true
+        downLoadImageView.isHidden = false
+        
         if downloadProgressView.isHidden { downloadProgressView.isHidden = false }
         if progressLabel.isHidden { progressLabel.isHidden = false }
         

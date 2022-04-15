@@ -107,10 +107,18 @@ extension Podcast {
         viewContext.mySave()
     }
     
-    static func removeFromFavorites(indexPath: IndexPath) {
-        let podcast = Podcast.getfavoritePodcast(for: indexPath)
+    static func removeFromFavorites(podcast: Podcast) {
         podcast.isFavorite = false
         viewContext.mySave()
+      
+        guard let stringUrl = podcast.previewUrl,
+              let url = URL(string: stringUrl) else { return }
+
+        do {
+            try FileManager.default.removeItem(at: url.locaPath)
+        } catch (let err) {
+            print("FAILED DELETEING VIDEO DATA \(err.localizedDescription)")
+        }
     }
     
     //MARK: - Common

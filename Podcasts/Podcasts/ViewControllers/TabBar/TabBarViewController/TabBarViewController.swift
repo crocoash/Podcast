@@ -5,7 +5,13 @@ import UIKit
 class TabBarViewController: UITabBarController {
     
     // MARK: - View
-    //constraintsSmallPlayer
+    
+    let downloadService = DownloadService()
+    lazy var downloadsSession: URLSession = {
+        let configuration = URLSessionConfiguration.background(withIdentifier: "BackGroundSession")
+        return URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
+    }()
+    
     lazy var constraintsSmallPlayer: [NSLayoutConstraint] = [
         playerVC.view.heightAnchor.constraint(equalToConstant: 50),
         playerVC.view.widthAnchor.constraint(equalTo: view.widthAnchor),
@@ -53,6 +59,7 @@ class TabBarViewController: UITabBarController {
         configureTabBar()
         addPlayer()
         configureImageDarkMode()
+        downloadService.downloadsSession = downloadsSession
     }
 }
 
@@ -96,15 +103,57 @@ extension TabBarViewController {
         leadConstraint?.isActive = true
         imageView.topAnchor.constraint(equalTo: view.topAnchor, constant: 200).isActive = true
     }
+    
+    private func feedbackGenerator() {
+        let feedbackGenerator = UIImpactFeedbackGenerator()
+        feedbackGenerator.prepare()
+        feedbackGenerator.impactOccurred()
+    }
+    
+    func addOrRemoveFromFavorite(podcast: Podcast) {
+
+        let viewContext = DataStoreManager.shared.viewContext
+        
+        if podcast.isFavorite {
+            podcast.isFavorite = false
+            
+            MyToast.create(title: (podcast.trackName ?? "podcast") + "is removed from playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
+        } else {
+            podcast.isFavorite = true
+            MyToast.create(title: (podcast.trackName ?? "podcast") + "is added to playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
+        }
+        viewContext.mySave()
+        feedbackGenerator()
+    }
 }
 
 // MARK: - SearchViewControllerDelegate
 extension TabBarViewController: SearchViewControllerDelegate {
+    func searchViewControllerDidSelectDownLoadImage(_ searchViewController: SearchViewController, podcast: Podcast, indexPath: IndexPath) {
+        if podcast.isDownLoad {
+            guard let url = podcast.previewUrl.url else { return }
+            downloadService.activeDownloads[url]?.task?.cancel()
+            downloadService.activeDownloads[url] = nil
+            podcast.isDownLoad = false
+            try? FileManager.default.removeItem(at: url)
+            searchViewController.reloadRows(indexPath: indexPath)
+        } else {
+            downloadService.startDownload(podcast, indexPath: indexPath)
+            podcast.isDownLoad = true
+        }
+        DataStoreManager.shared.viewContext.mySave()
+        feedbackGenerator()
+    }
+    
     
     func searchViewController(_ searchViewController: SearchViewController, _ podcasts: [Podcast], didSelectIndex: Int) {
         playerVC.view.isHidden = false
         playerVC.play(podcasts: podcasts, at: didSelectIndex)
         searchViewController.playerIsShow()
+    }
+  
+    func podcastCellDidSelectStar(podcast: Podcast) {
+        addOrRemoveFromFavorite(podcast: podcast)
     }
 }
 
@@ -113,7 +162,7 @@ extension TabBarViewController: PlaylistViewControllerDelegate {
     
     func playlistTableViewControllerDidSelectDownLoadButton(_ playlistTableViewController: PlaylistTableViewController, podcast: Podcast) {
         guard let indexPath = playlistTableViewController.getIndexPath(for: podcast) else { return }
-        searchVC.downloadService.startDownload(podcast, indexPath: indexPath)
+        downloadService.startDownload(podcast, indexPath: indexPath)
     }
     
     func playlistTableViewController(_ playlistTableViewController: PlaylistTableViewController, podcasts: [Podcast], didSelectIndex: Int) {
@@ -163,5 +212,68 @@ extension TabBarViewController: LikedMomentsViewControllerDelegate {
         playerVC.view.isHidden = false
         playerVC.playMomentWith(atIndex: index, from: allLikedMoments)
     }
+}
+
+//MARK: - URLSessionDownloadDelegate
+extension TabBarViewController: URLSessionDownloadDelegate {
+    func urlSession(_ session                  : URLSession,
+                    downloadTask               : URLSessionDownloadTask,
+                    didWriteData bytesWritten  : Int64,
+                    totalBytesWritten          : Int64,
+                    totalBytesExpectedToWrite  : Int64) {
+        
+        guard let url = downloadTask.originalRequest?.url,
+              let podcastDownload = downloadService.activeDownloads[url] else { return }
+        
+        let progress = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite)
+        let totalSize = ByteCountFormatter.string(fromByteCount: totalBytesExpectedToWrite, countStyle: .file)
+        let podcast = podcastDownload.podcast
+        
+        DispatchQueue.main.async {
+            self.searchVC.updateDisplay(progress: progress, totalSize: totalSize, podcast: podcast)
+            self.playListVc.updateDisplay(progress: progress, totalSize: totalSize, podcast: podcast)
+        }
+    }
     
+    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+        let fileManager = FileManager.default
+        guard
+            let sourceURL = downloadTask.originalRequest?.url,
+            let documentsPath = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first
+        else { return }
+        
+        let localPath = documentsPath.appendingPathComponent(sourceURL.lastPathComponent)
+        
+        try? fileManager.removeItem(at: localPath)
+        
+        do {
+            try fileManager.copyItem(at: location, to: localPath)
+        } catch let error {
+            print("Could not copy file to disk: \(error.localizedDescription)")
+        }
+        guard let podcastDownload = self.downloadService.activeDownloads[sourceURL] else { return }
+        let podcast = podcastDownload.podcast
+        let indexPath = podcastDownload.indexPath
+        let viewContext = DataStoreManager.shared.viewContext
+        downloadService.activeDownloads[sourceURL] = nil
+        
+        DispatchQueue.main.async {
+            podcast.isDownLoad = true
+            viewContext.mySave()
+            self.searchVC.reloadRows(indexPath: indexPath)
+        }
+    }
+}
+
+//MARK: - URLSessionDelegate
+extension TabBarViewController: URLSessionDelegate {
+    func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {
+        DispatchQueue.main.async {
+            if let appDelegate = UIApplication.shared.delegate as? AppDelegate,
+               let completionHandler = appDelegate.backgroundSessionCompletionHandler {
+                appDelegate.backgroundSessionCompletionHandler = nil
+                completionHandler()
+            }
+        }
+    }
 }

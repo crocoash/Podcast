@@ -11,6 +11,8 @@ import SwiftUI
 
 protocol SearchViewControllerDelegate: AnyObject {
     func searchViewController(_ searchViewController: SearchViewController,_ podcasts: [Podcast], didSelectIndex: Int)
+    func searchViewControllerDidSelectDownLoadImage(_ searchViewController: SearchViewController, podcast: Podcast, indexPath: IndexPath)
+    func podcastCellDidSelectStar(podcast: Podcast)
 }
 
 class SearchViewController : UIViewController {
@@ -33,7 +35,6 @@ class SearchViewController : UIViewController {
     private var podcasts: [Podcast] { searchPodcastFetchResultController.fetchedObjects ?? [] }
     private var authors: [Author] { Author.searchAuthors }
     
-    ///--------------------------------------------------------------------------------------------------------------------
     lazy var searchPodcastFetchResultController: NSFetchedResultsController<Podcast> = {
         let fetchRequest: NSFetchRequest<Podcast> = Podcast.fetchRequest()
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(Podcast.trackName), ascending: true)]
@@ -64,17 +65,20 @@ class SearchViewController : UIViewController {
         return fetchResultController
     }()
     
-    func playerIsShow() {
-        playerOffSetConstraint.constant = 300
+    func playerIsShow() { playerOffSetConstraint.constant = 300  }
+    
+    func updateDisplay(progress: Float, totalSize: String, podcast: Podcast) {
+        guard let indexPath = searchPodcastFetchResultController.indexPath(forObject: podcast) else { return }
+        if let podcastCell = self.podcastTableView?.cellForRow(at: indexPath) as? PodcastCell {
+            podcastCell.updateDisplay(progress: progress, totalSize: totalSize)
+        }
+    }
+    
+    func reloadRows(indexPath: IndexPath) {
+        self.podcastTableView.reloadRows(at: [indexPath], with: .none)
     }
     
     private var isPodcast: Bool { searchSegmentalControl.selectedSegmentIndex == 0 }
-    let downloadService = DownloadService()
-    
-    lazy var downloadsSession: URLSession = {
-        let configuration = URLSessionConfiguration.background(withIdentifier: "BackGroundSession")
-        return URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
-    }()
     
     // MARK: - View Methods
     override func viewWillAppear(_ animated: Bool) {
@@ -88,7 +92,6 @@ class SearchViewController : UIViewController {
         configureUI()
         configureGesture()
         showEmptyImage()
-        downloadService.downloadsSession = downloadsSession
     }
     
     override func motionBegan(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
@@ -189,30 +192,6 @@ extension SearchViewController {
         view.addSubview(activityIndicator)
     }
     
-    private func feedbackGenerator() {
-        let feedbackGenerator = UIImpactFeedbackGenerator()
-        feedbackGenerator.prepare()
-        feedbackGenerator.impactOccurred()
-    }
-    
-    private func addOrRemoveFromFavorite(for indexPath: IndexPath) {
-
-        let podcast = searchPodcastFetchResultController.object(at: indexPath)
-            
-        if podcast.isFavorite {
-            podcast.isFavorite = false
-            viewContext.mySave()
-            
-            MyToast.create(title: (podcasts[indexPath.row].trackName ?? "podcast") + "is removed from playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
-        } else {
-            podcast.isFavorite = true
-            MyToast.create(title: (podcasts[indexPath.row].trackName ?? "podcast") + "is added to playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
-        }
-        viewContext.mySave()
-        podcastTableView.reloadRows(at: [indexPath], with: .none)
-        feedbackGenerator()
-    }
-    
     private func cancelSearchAction() {
         AuthorData.cancellSearch()
         PodcastData.cancellSearch()
@@ -232,6 +211,12 @@ extension SearchViewController {
             emptyTableImageView.isHidden = true
             podcastTableView.reloadData()
         }
+    }
+    
+    private func feedbackGenerator() {
+        let feedbackGenerator = UIImpactFeedbackGenerator()
+        feedbackGenerator.prepare()
+        feedbackGenerator.impactOccurred()
     }
 }
 
@@ -269,21 +254,15 @@ extension SearchViewController {
 
 // MARK: - PodcastCellDelegate
 extension SearchViewController: PodcastCellDelegate {
-    func podcastCellDidSelectStar(_ podcastCell: PodcastCell) {
+    func podcastCellDidSelectStar(_ podcastCell: PodcastCell, podcast: Podcast) {
         guard let indexPath = podcastTableView.indexPath(for: podcastCell) else { return }
-        addOrRemoveFromFavorite(for: indexPath)
+        delegate?.podcastCellDidSelectStar(podcast: podcast)
         podcastTableView.reloadRows(at: [indexPath], with: .none)
     }
     
     func podcastCellDidSelectDownLoadImage(_ podcastCell: PodcastCell, podcast: Podcast) {
         guard let indexPath = podcastTableView.indexPath(for: podcastCell) else { return }
-        if podcast.isDownLoad {
-            
-        } else {
-            downloadService.startDownload(podcast, indexPath: indexPath)
-        }
-        podcastTableView.reloadRows(at: [indexPath], with: .none)
-        feedbackGenerator()
+        delegate?.searchViewControllerDidSelectDownLoadImage(self, podcast: podcast, indexPath: indexPath)
     }
 }
 
@@ -359,66 +338,6 @@ extension SearchViewController: UIViewControllerTransitioningDelegate {
     }
 }
 
-//MARK: - URLSessionDownloadDelegate
-extension SearchViewController: URLSessionDownloadDelegate {
-    func urlSession(_ session                   : URLSession,
-                    downloadTask               : URLSessionDownloadTask,
-                    didWriteData bytesWritten  : Int64,
-                    totalBytesWritten          : Int64,
-                    totalBytesExpectedToWrite  : Int64) {
-        
-        guard let url = downloadTask.originalRequest?.url,
-              let podcastDownload = downloadService.activeDownloads[url],
-              let podcastCell = podcastTableView.cellForRow(at: podcastDownload.indexPath) as? PodcastCell else { return }
-        
-        podcastDownload.podcast.isDownLoad = true
-        DataStoreManager.shared.viewContext.mySave()
-        let progress = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite)
-        let totalSize = ByteCountFormatter.string(fromByteCount: totalBytesExpectedToWrite, countStyle: .file)
-        
-        DispatchQueue.main.async {
-            podcastCell.updateDisplay(progress: progress, totalSize: totalSize)
-        }
-    }
-    
-    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
-        let fileManager = FileManager.default
-        guard
-            let sourceURL = downloadTask.originalRequest?.url,
-            let documentsPath = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first
-        else { return }
-        
-        let localPath = documentsPath.appendingPathComponent(sourceURL.lastPathComponent)
-        
-        try? fileManager.removeItem(at: localPath)
-        
-        do {
-            try fileManager.copyItem(at: location, to: localPath)
-        } catch let error {
-            print("Could not copy file to disk: \(error.localizedDescription)")
-        }
-        guard let podcastDownload = self.downloadService.activeDownloads[sourceURL] else { return }
-        let indexPath = podcastDownload.indexPath
-        downloadService.activeDownloads[sourceURL] = nil
-        
-        DispatchQueue.main.async {
-            self.podcastTableView.reloadRows(at: [indexPath], with: .none)
-        }
-    }
-}
-
-//MARK: - URLSessionDelegate
-extension SearchViewController: URLSessionDelegate {
-    func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {
-        DispatchQueue.main.async {
-            if let appDelegate = UIApplication.shared.delegate as? AppDelegate,
-               let completionHandler = appDelegate.backgroundSessionCompletionHandler {
-                appDelegate.backgroundSessionCompletionHandler = nil
-                completionHandler()
-            }
-        }
-    }
-}
 
 //MARK: - DetailViewControllerDelegate
 extension SearchViewController: DetailViewControllerDelegate {
@@ -427,19 +346,13 @@ extension SearchViewController: DetailViewControllerDelegate {
     }
     
     func detailViewController(_ detailViewController: DetailViewController, addToFavoriteButtonDidTouchFor selectedPodcast: Podcast) {
-        selectedPodcast.isFavorite = true
-        viewContext.mySave()
-
-        guard let indexPath = searchPodcastFetchResultController.indexPath(forObject: selectedPodcast) else {
-            fatalError("No such element in collection while download")
-        }
-        downloadService.startDownload(selectedPodcast, indexPath: indexPath)
-        podcastTableView.reloadRows(at: [indexPath], with: .none)
+        delegate?.podcastCellDidSelectStar(podcast: selectedPodcast)
+//        podcastTableView.reloadRows(at: [indexPath], with: .none)
     }
     
     func detailViewController(_ detailViewController: DetailViewController, removeFromFavoriteButtonDidTouchFor selectedPodcast: Podcast) {
-        selectedPodcast.isFavorite = false
-        DataStoreManager.shared.viewContext.mySave()
+        delegate?.podcastCellDidSelectStar(podcast: selectedPodcast)
+//        podcastTableView.reloadRows(at: [indexPath], with: .none)
     }
 }
 
