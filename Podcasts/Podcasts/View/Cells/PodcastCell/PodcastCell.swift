@@ -48,7 +48,6 @@ extension PodcastCell {
         favoriteStarImageView.addMyGestureRecognizer(self, type: .tap(), selector: #selector(handlerTapFavoriteStar))
         downLoadImageView.addMyGestureRecognizer(self, type: .tap(), selector: #selector(handlerTapDownloadImage))
         
-        
         /// information from favorite tab
         let isDownload = Podcast.isDownload(podcast: podcast)
         let isFavorite = Podcast.podcastIsFavorite(podcast: podcast)
