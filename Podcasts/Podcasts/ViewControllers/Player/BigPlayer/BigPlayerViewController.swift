@@ -8,6 +8,15 @@
 import UIKit
 import AVFoundation
 
+protocol BigPlayerViewControllerDelegate: AnyObject {
+    func bigPlayerViewControllerDidSelectStopButton (_ bigPlayerViewController: BigPlayerViewController)
+    func bigPlayerViewControllerDidSelectNextTrackButton (_ bigPlayerViewController: BigPlayerViewController)
+    func bigPlayerViewControllerDidSelectPreviewsTrackButton (_ bigPlayerViewController: BigPlayerViewController)
+    func bigPlayerViewController(_ bigPlayerViewController: BigPlayerViewController, didChangeCurrentTime  value: Double)
+    func bigPlayerViewController(_ bigPlayerViewController: BigPlayerViewController, didAddCurrentTimeBy value: Double)
+    func bigPlayerViewController(_ bigPlayerViewController: BigPlayerViewController, didLikeThis moment: Double)
+}
+
 class BigPlayerViewController: UIViewController {
     
     @IBOutlet private weak var playStopButton: UIButton!
@@ -15,9 +24,7 @@ class BigPlayerViewController: UIViewController {
     @IBOutlet private weak var podcastNameLabel: UILabel!
     @IBOutlet private weak var currentTimeLabel: UILabel!
     @IBOutlet private weak var durationTrackLabel: UILabel!
-    
     @IBOutlet private weak var progressSlider: UISlider!
-    
     @IBOutlet private weak var previousPodcastButton: UIButton!
     @IBOutlet private weak var nextPodcastButton: UIButton!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
@@ -97,6 +104,7 @@ class BigPlayerViewController: UIViewController {
     @IBAction func likedButton(_ sender: UIButton) {
         delegate?.bigPlayerViewController(self, didLikeThis: Double(progressSlider.value))
     }
+    
     @IBAction func dissmisButtonTouchUpInside(_ sender: UIButton) {
         dismiss(animated: true, completion: nil)
     }

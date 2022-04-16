@@ -100,7 +100,7 @@ extension PlaylistTableViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let podcast = Podcast.getfavoritePodcast(for: indexPath)
-        let cell = playListTableView.dequeueReusableCell(withIdentifier: PodcastCell.identifier, for: indexPath) as! PodcastCell
+        let cell = playListTableView.getCell(cell: PodcastCell.self, indexPath: indexPath)
         cell.addMyGestureRecognizer(self, type: .tap(), selector: #selector(tapCell))
         cell.configureCell(with: podcast)
         cell.delegate = self

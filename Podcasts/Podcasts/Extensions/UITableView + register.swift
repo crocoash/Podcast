@@ -15,4 +15,8 @@ extension UITableView {
     static var identifier: String {
         return "\(Self.self)"
     }
+
+    func getCell<T: UITableViewCell>(cell: T.Type, indexPath: IndexPath) -> T {
+        return self.dequeueReusableCell(withIdentifier: cell.identifier, for: indexPath) as! T
+    }
 }

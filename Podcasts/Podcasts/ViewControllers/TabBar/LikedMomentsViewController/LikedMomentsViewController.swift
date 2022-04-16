@@ -8,7 +8,7 @@
 import UIKit
 
 protocol LikedMomentsViewControllerDelegate: AnyObject {
-    func likedMomentViewController(_ likedMomentViewController: LikedMomentsViewController, didSelectMomentAt index: Int)
+    func likedMomentViewController(_ likedMomentViewController: LikedMomentsViewController, didSelectMomentAt index: Int, likedMoments: [LikedMoment])
 }
 
 class LikedMomentsViewController: UIViewController {
@@ -21,7 +21,6 @@ class LikedMomentsViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        subscribeOnDataSourceAndDelegate()
         likedMomentsTableView.register(PodcastCell.self)
         likedMomentsTableView.rowHeight = cellHeight
     }
@@ -31,24 +30,20 @@ class LikedMomentsViewController: UIViewController {
         likedMomentsTableView.reloadData()
         configureUI()
     }
-    
-    func subscribeOnDataSourceAndDelegate() {
-        likedMomentsTableView.delegate = self
-        likedMomentsTableView.dataSource = self
-    }
 }
 
 extension LikedMomentsViewController {
     
     private func configureUI() {
-        emptyDataImage.isHidden = !LikedMomentsManager.shared().getLikedMomentsFromUserDefault().isEmpty
-        likedMomentsTableView.isHidden = LikedMomentsManager.shared().getLikedMomentsFromUserDefault().isEmpty
+        let likeMomentsIsEmpty = LikedMomentsManager.shared.likeMoments.isEmpty
+        emptyDataImage.isHidden = !likeMomentsIsEmpty
+        likedMomentsTableView.isHidden = likeMomentsIsEmpty
     }
 }
 
 extension LikedMomentsViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        delegate?.likedMomentViewController(self, didSelectMomentAt: indexPath.row)
+        delegate?.likedMomentViewController(self, didSelectMomentAt: indexPath.row, likedMoments: LikedMomentsManager.shared.likeMoments)
     }
     
     func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
@@ -57,8 +52,9 @@ extension LikedMomentsViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
+            //TODO: - beginUpdates()
             likedMomentsTableView.beginUpdates()
-            LikedMomentsManager.shared().deleteMoment(at: indexPath.row)
+            LikedMomentsManager.shared.deleteMoment(at: indexPath)
             likedMomentsTableView.deleteRows(at: [indexPath], with: .fade)
             likedMomentsTableView.endUpdates()
             configureUI()
@@ -69,14 +65,14 @@ extension LikedMomentsViewController: UITableViewDelegate {
 extension LikedMomentsViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return LikedMomentsManager.shared().getLikedMomentsFromUserDefault().count
+        return LikedMomentsManager.shared.countOfLikeMoments
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let podcast = LikedMomentsManager.shared().getLikedMomentsFromUserDefault()[indexPath.row].podcast
-        let cell = likedMomentsTableView.dequeueReusableCell(withIdentifier: PodcastCell.identifier, for: indexPath) as! PodcastCell
-
-        cell.configureCell(with: podcast)
+        let likedMoment = LikedMomentsManager.shared.getLikeMoment(at: indexPath)
+        let cell = likedMomentsTableView.getCell(cell: PodcastCell.self, indexPath: indexPath)
+        
+        cell.configureCell(with: likedMoment.podcast)
         return cell
     }
 }

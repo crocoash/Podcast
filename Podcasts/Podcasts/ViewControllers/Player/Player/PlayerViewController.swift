@@ -7,6 +7,7 @@
 
 import UIKit
 import AVFoundation
+import CoreData
 
 class PlayerViewController: UIViewController {
     
@@ -225,7 +226,15 @@ extension PlayerViewController: BigPlayerViewControllerDelegate {
     
     func bigPlayerViewController(_ bigPlayerViewController: BigPlayerViewController, didLikeThis moment: Double) {
         guard let podcast = currentPodcast else { return }
-        LikedMomentsManager.shared().saveThis(LikedMoment(podcast: podcast, moment: moment))
+        //TODO: - Check
+//        let context = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
+//        DataStoreManager.shared.viewContext.parent = context
+        
+        let context = DataStoreManager.shared.viewContext
+        let likedMoment = LikedMoment(context: context)
+        likedMoment.podcast = podcast
+        likedMoment.moment = moment
+        context.mySave()
     }
     
     func bigPlayerViewController(_ bigPlayerViewController: BigPlayerViewController, didChangeCurrentTime value: Double) {

@@ -282,7 +282,7 @@ extension SearchViewController: UITableViewDataSource {
     
     private func configurePodcastCell(_ indexPath: IndexPath,for tableView: UITableView) -> UITableViewCell {
         let podcast = searchPodcastFetchResultController.object(at: indexPath)
-        let cell = tableView.dequeueReusableCell(withIdentifier: PodcastCell.identifier) as! PodcastCell
+        let cell = tableView.getCell(cell: PodcastCell.self, indexPath: indexPath)
         
         cell.delegate = self
         cell.configureCell(with: podcast)
@@ -293,8 +293,7 @@ extension SearchViewController: UITableViewDataSource {
     
     private func configureAuthorCell(_ indexPath: IndexPath,for tableView: UITableView) -> UITableViewCell {
         let author = searchAuthorFetchResultController.object(at: indexPath)
-        let cell = tableView.dequeueReusableCell(withIdentifier: PodcastByAuthorCell.identifier) as! PodcastByAuthorCell
-        
+        let cell = tableView.getCell(cell: PodcastByAuthorCell.self, indexPath: indexPath)
         cell.configureCell(with: author, indexPath)
         cell.addMyGestureRecognizer(self, type: .tap(), selector: #selector(handlerTapAuthorCell))
         
