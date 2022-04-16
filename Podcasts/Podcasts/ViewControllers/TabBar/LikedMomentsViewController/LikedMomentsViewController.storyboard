@@ -18,8 +18,12 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" keyboardDismissMode="onDrag" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="fEh-zO-EFe">
-                                <rect key="frame" x="0.0" y="76" width="414" height="786"/>
+                                <rect key="frame" x="0.0" y="88" width="414" height="774"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <connections>
+                                    <outlet property="dataSource" destination="kUl-8K-gI8" id="v3l-Jb-3Wk"/>
+                                    <outlet property="delegate" destination="kUl-8K-gI8" id="0TH-N7-Qdo"/>
+                                </connections>
                             </tableView>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="folder" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="RBS-Gj-oQX">
                                 <rect key="frame" x="0.0" y="89" width="414" height="771.5"/>
@@ -35,8 +39,8 @@
                         <viewLayoutGuide key="safeArea" id="nn3-9j-Xp7"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="RBS-Gj-oQX" firstAttribute="top" secondItem="fEh-zO-EFe" secondAttribute="top" constant="12" id="2kP-0A-ZjD"/>
-                            <constraint firstItem="fEh-zO-EFe" firstAttribute="top" secondItem="S1B-6Q-U5h" secondAttribute="bottom" constant="-12" id="5Ms-9X-Dwl"/>
+                            <constraint firstItem="RBS-Gj-oQX" firstAttribute="top" secondItem="fEh-zO-EFe" secondAttribute="top" id="2kP-0A-ZjD"/>
+                            <constraint firstItem="fEh-zO-EFe" firstAttribute="top" secondItem="S1B-6Q-U5h" secondAttribute="bottom" id="5Ms-9X-Dwl"/>
                             <constraint firstItem="RBS-Gj-oQX" firstAttribute="bottom" secondItem="fEh-zO-EFe" secondAttribute="bottom" id="9ML-hq-qwX"/>
                             <constraint firstItem="S1B-6Q-U5h" firstAttribute="height" secondItem="lqu-WF-Wpd" secondAttribute="height" multiplier="0.0491071" id="AMT-WR-cjb"/>
                             <constraint firstItem="fEh-zO-EFe" firstAttribute="leading" secondItem="nn3-9j-Xp7" secondAttribute="leading" id="G3A-eC-ps3"/>

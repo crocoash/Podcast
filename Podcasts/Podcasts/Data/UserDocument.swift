@@ -14,14 +14,9 @@ struct UserDocument: Codable {
     var json: Data? { try? JSONEncoder().encode(self) }
 
     init() {}
-    
     init? (json: Data?) {
-        guard
-            let json = json,
-            let userDocument = try? JSONDecoder().decode(UserDocument.self, from: json)
-        else {
-            return nil
-        }
+        guard let json = json,
+              let userDocument = try? JSONDecoder().decode(UserDocument.self, from: json) else { return nil }
         
         self = userDocument
     }

@@ -6,56 +6,49 @@
 //
 
 import Foundation
+import CoreData
 
 class LikedMomentsManager {
     
-    private static var uniqueInstance: LikedMomentsManager?
-    
     private init() {}
+    private static var uniqueInstance: LikedMomentsManager?
+    static var shared: LikedMomentsManager { uniqueInstance ?? LikedMomentsManager() }
     
-    static func shared() -> LikedMomentsManager {
-        if uniqueInstance == nil {
-            uniqueInstance = LikedMomentsManager()
-        }
-        return uniqueInstance!
-    }
+    private var viewContext = DataStoreManager.shared.viewContext
     
-    func saveThis(_ moment: LikedMoment) {
-        var likedMoments = LikedMomentsManager.shared().getLikedMomentsFromUserDefault()
-        likedMoments.append(moment)
-        writeInUserDefaults(likedMoments)
-    }
-    
-    private func writeInUserDefaults(_ array: [LikedMoment]) {
-//        do {
-//            let encoder = JSONEncoder()
-//            let data = try encoder.encode(array)
-//            UserDefaults.standard.setValue(data, forKey: "LikedMoments")
-//        } catch {
-//            print("error of encoding")
-//        }
-    }
-    
-    func getLikedMomentsFromUserDefault() -> [LikedMoment] {
+    private lazy var likedMomentFetchResultController: NSFetchedResultsController<LikedMoment> = {
+        let fetchRequest: NSFetchRequest<LikedMoment> = LikedMoment.fetchRequest()
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(LikedMoment.moment), ascending: true)]
         
-        if let data = UserDefaults.standard.data(forKey: "LikedMoments") {
-            do {
-                let decode = JSONDecoder()
-                let moments = try decode.decode([LikedMoment].self, from: data)
-                return moments
-            } catch {
-                print("Error in decoding process")
-            }
+        let fetchResultController = NSFetchedResultsController(
+            fetchRequest: fetchRequest,
+            managedObjectContext: viewContext,
+            sectionNameKeyPath: nil,
+            cacheName: nil
+        )
+        
+        do {
+            try fetchResultController.performFetch()
+        } catch {
+            let nserror = error as NSError
+            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
         }
         
-        let moments: [LikedMoment] = []
-        return moments
+        return fetchResultController
+    }()
+}
+
+extension LikedMomentsManager {
+    var likeMoments: [LikedMoment] { LikedMomentsManager.shared.likedMomentFetchResultController.fetchedObjects ?? [] }
+    var countOfLikeMoments: Int { likeMoments.count }
+    
+    func deleteMoment(at indexPath: IndexPath) {
+        let moment = likedMomentFetchResultController.object(at: indexPath)
+        viewContext.delete(moment)
+        viewContext.mySave()
     }
     
-    func deleteMoment(at index: Int) {
-        var moments = LikedMomentsManager.shared().getLikedMomentsFromUserDefault()
-        moments.remove(at: index)
-        LikedMomentsManager.shared().writeInUserDefaults(moments)
+    func getLikeMoment(at indexPath: IndexPath) -> LikedMoment {
+        return likedMomentFetchResultController.object(at: indexPath)
     }
-    
 }

@@ -5,7 +5,6 @@ import UIKit
 class TabBarViewController: UITabBarController {
     
     // MARK: - View
-    
     let downloadService = DownloadService()
     lazy var downloadsSession: URLSession = {
         let configuration = URLSessionConfiguration.background(withIdentifier: "BackGroundSession")
@@ -35,7 +34,7 @@ class TabBarViewController: UITabBarController {
     
     lazy var settingsVC = createTabBar(SettingsTableViewController.self, title: "Settings", imageName: "gear") { [weak self] vc in
         guard let self = self else { return }
-        vc.setUser((self.userViewModel) )
+        vc.setUser((self.userViewModel))
         vc.delegate = self
     }
     
@@ -60,6 +59,7 @@ class TabBarViewController: UITabBarController {
         addPlayer()
         configureImageDarkMode()
         downloadService.downloadsSession = downloadsSession
+        
     }
 }
 
@@ -207,10 +207,9 @@ extension TabBarViewController: SettingsTableViewControllerDelegate {
 
 //MARK: - LikedMomentsViewControllerDelegate
 extension TabBarViewController: LikedMomentsViewControllerDelegate {
-    func likedMomentViewController(_ likedMomentViewController: LikedMomentsViewController, didSelectMomentAt index: Int) {
-        let allLikedMoments: [LikedMoment] = LikedMomentsManager.shared().getLikedMomentsFromUserDefault()
+    func likedMomentViewController(_ likedMomentViewController: LikedMomentsViewController, didSelectMomentAt index: Int, likedMoments: [LikedMoment]) {
         playerVC.view.isHidden = false
-        playerVC.playMomentWith(atIndex: index, from: allLikedMoments)
+        playerVC.playMomentWith(atIndex: index, from: likedMoments)
     }
 }
 
