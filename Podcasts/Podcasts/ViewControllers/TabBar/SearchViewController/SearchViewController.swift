@@ -24,51 +24,20 @@ class SearchViewController : UIViewController {
     @IBOutlet private weak var playerOffSetConstraint: NSLayoutConstraint!
     @IBOutlet private weak var emptyTableImageView: UIImageView!
     
-    let refreshControll = UIRefreshControl()
+    private let refreshControll = UIRefreshControl()
+    private let podcastDocument = SearchPodcastDocument()
+    private let authorDocument = SearchAuthorsDocument()
+    private let favoriteDocument = FavoriteDocument()
     
     private let activityIndicator = UIActivityIndicatorView()
     private var alert = Alert()
     weak var delegate: SearchViewControllerDelegate?
-    
-    private let viewContext = DataStoreManager.shared.viewContext
-    
-    private var podcasts: [Podcast] { searchPodcastFetchResultController.fetchedObjects ?? [] }
-    private var authors: [Author] { Author.searchAuthors }
-    
-    lazy var searchPodcastFetchResultController: NSFetchedResultsController<Podcast> = {
-        let fetchRequest: NSFetchRequest<Podcast> = Podcast.fetchRequest()
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(Podcast.trackName), ascending: true)]
-        
-        fetchRequest.predicate = NSPredicate(format: "isSearched = true")
-        
-        let fetchResultController = NSFetchedResultsController(
-            fetchRequest: fetchRequest,
-            managedObjectContext: viewContext,
-            sectionNameKeyPath: nil,
-            cacheName: nil
-        )
-        try! fetchResultController.performFetch()
-        return fetchResultController
-    }()
-    
-    lazy var searchAuthorFetchResultController: NSFetchedResultsController<Author> = {
-        let fetchRequest: NSFetchRequest<Author> = Author.fetchRequest()
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(Author.artistID), ascending: true)]
-        
-        let fetchResultController = NSFetchedResultsController(
-            fetchRequest: fetchRequest,
-            managedObjectContext: viewContext,
-            sectionNameKeyPath: nil,
-            cacheName: nil
-        )
-        try! fetchResultController.performFetch()
-        return fetchResultController
-    }()
-    
+   
+    //MARK: - Methods
     func playerIsShow() { playerOffSetConstraint.constant = 300  }
     
     func updateDisplay(progress: Float, totalSize: String, podcast: Podcast) {
-        guard let indexPath = searchPodcastFetchResultController.indexPath(forObject: podcast) else { return }
+        guard let indexPath = podcastDocument.indexPath(for: podcast) else { return }
         if let podcastCell = self.podcastTableView?.cellForRow(at: indexPath) as? PodcastCell {
             podcastCell.updateDisplay(progress: progress, totalSize: totalSize)
         }
@@ -84,7 +53,7 @@ class SearchViewController : UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         podcastTableView.reloadData()
-        if podcasts.isEmpty { searchBar.becomeFirstResponder() }
+        if podcastDocument.podcastsIsEmpty { searchBar.becomeFirstResponder() }
     }
     
     override func viewDidLoad() {
@@ -116,7 +85,7 @@ class SearchViewController : UIViewController {
     @objc func handlerTapAuthorCell(sender: UITapGestureRecognizer) {
         guard let view = sender.view as? UITableViewCell,
               let indexPath = podcastTableView.indexPath(for: view),
-              let request = searchAuthorFetchResultController.object(at: indexPath).artistName else { return }
+              let request = authorDocument.getAuthor(at: indexPath).artistName else { return }
         
         searchSegmentalControl.selectedSegmentIndex = 0
         getData(with: request)
@@ -127,7 +96,7 @@ class SearchViewController : UIViewController {
         guard let view = sender.view as? UITableViewCell,
               let indexPath = podcastTableView.indexPath(for: view) else { return }
         
-        let podcast = searchPodcastFetchResultController.object(at: indexPath)
+        let podcast = podcastDocument.getPodcast(at: indexPath)
         let detailViewController = DetailViewController.initVC
         
         detailViewController.delegate = self
@@ -157,7 +126,8 @@ extension SearchViewController {
         configureSegmentalControl()
         configureAlert()
         configureActivityIndicator()
-        searchPodcastFetchResultController.delegate = self
+        podcastDocument.searchResController.delegate = self
+        authorDocument.searchResController.delegate = self
     }
     
     private func configureTableView() {
@@ -200,13 +170,16 @@ extension SearchViewController {
     }
     
     private func showEmptyImage() {
-        if (searchSegmentalControl.selectedSegmentIndex == 0 && podcasts.isEmpty) ||
-            (searchSegmentalControl.selectedSegmentIndex == 1 && authors.isEmpty) {
+        let podcastsIsEmpty = podcastDocument.podcastsIsEmpty
+        let authorsIsEmpty = authorDocument.authorsIsEmpty
+        
+        if (searchSegmentalControl.selectedSegmentIndex == 0 && podcastsIsEmpty) ||
+            (searchSegmentalControl.selectedSegmentIndex == 1 && authorsIsEmpty) {
             podcastTableView.isHidden = true
             emptyTableImageView.isHidden = false
         }
-        if (searchSegmentalControl.selectedSegmentIndex == 0 && !podcasts.isEmpty) ||
-            (searchSegmentalControl.selectedSegmentIndex == 1 && !authors.isEmpty) {
+        if (searchSegmentalControl.selectedSegmentIndex == 0 && !podcastsIsEmpty ||
+            (searchSegmentalControl.selectedSegmentIndex == 1 && !authorsIsEmpty)) {
             podcastTableView.isHidden = false
             emptyTableImageView.isHidden = true
             podcastTableView.reloadData()
@@ -217,6 +190,12 @@ extension SearchViewController {
         let feedbackGenerator = UIImpactFeedbackGenerator()
         feedbackGenerator.prepare()
         feedbackGenerator.impactOccurred()
+    }
+    
+    private func upDateInformation(podcast: Podcast) {
+        podcast.isDownLoad = favoriteDocument.isDownload(podcast: podcast)
+        podcast.isFavorite = favoriteDocument.podcastIsFavorite(podcast: podcast)
+        DataStoreManager.shared.viewContext.mySave()
     }
 }
 
@@ -270,9 +249,9 @@ extension SearchViewController: PodcastCellDelegate {
 extension SearchViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if isPodcast {
-            return searchPodcastFetchResultController.sections?[section].numberOfObjects ?? 0
+            return podcastDocument.numberOfRowsInSection(section: section)
         } else {
-            return authors.count
+            return authorDocument.numberOfRowsInSection(section: section)
         }
     }
     
@@ -281,9 +260,10 @@ extension SearchViewController: UITableViewDataSource {
     }
     
     private func configurePodcastCell(_ indexPath: IndexPath,for tableView: UITableView) -> UITableViewCell {
-        let podcast = searchPodcastFetchResultController.object(at: indexPath)
+        let podcast = podcastDocument.getPodcast(at: indexPath)
         let cell = tableView.getCell(cell: PodcastCell.self, indexPath: indexPath)
         
+        upDateInformation(podcast: podcast)
         cell.delegate = self
         cell.configureCell(with: podcast)
         cell.addMyGestureRecognizer(self, type: .tap(), selector: #selector(handlerTapPodcastCell))
@@ -292,7 +272,7 @@ extension SearchViewController: UITableViewDataSource {
     }
     
     private func configureAuthorCell(_ indexPath: IndexPath,for tableView: UITableView) -> UITableViewCell {
-        let author = searchAuthorFetchResultController.object(at: indexPath)
+        let author = authorDocument.getAuthor(at: indexPath)
         let cell = tableView.getCell(cell: PodcastByAuthorCell.self, indexPath: indexPath)
         cell.configureCell(with: author, indexPath)
         cell.addMyGestureRecognizer(self, type: .tap(), selector: #selector(handlerTapAuthorCell))
@@ -341,7 +321,7 @@ extension SearchViewController: UIViewControllerTransitioningDelegate {
 //MARK: - DetailViewControllerDelegate
 extension SearchViewController: DetailViewControllerDelegate {
     func detailViewController(_ detailViewController: DetailViewController, playButtonDidTouchFor podcastIndex: Int) {
-        delegate?.searchViewController(self, podcasts, didSelectIndex: podcastIndex)
+        delegate?.searchViewController(self, podcastDocument.podcasts, didSelectIndex: podcastIndex)
     }
     
     func detailViewController(_ detailViewController: DetailViewController, addToFavoriteButtonDidTouchFor selectedPodcast: Podcast) {

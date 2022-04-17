@@ -19,31 +19,7 @@ class DataStoreManager {
         }
         return dataStoreManager
     }
-    ///----------------------------------------------------------------------------------------------------------
 
-    
-    lazy var favoritePodcastFetchResultController: NSFetchedResultsController<Podcast> = {
-        let fetchRequest: NSFetchRequest<Podcast> = Podcast.fetchRequest()
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(Podcast.trackName), ascending: true)]
-        fetchRequest.predicate = NSPredicate(format: "isFavorite = true")
-        
-        let fetchResultController = NSFetchedResultsController(
-            fetchRequest: fetchRequest,
-            managedObjectContext: viewContext,
-            sectionNameKeyPath: nil,
-            cacheName: nil
-        )
-        
-        do {
-            try fetchResultController.performFetch()
-        } catch {
-            let nserror = error as NSError
-            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
-        }
-        
-        return fetchResultController
-    }()
-    ///----------------------------------------------------------------------------------------------------------
     var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "CoreData")
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
@@ -53,7 +29,7 @@ class DataStoreManager {
         })
         return container
     }()
-    ///----------------------------------------------------------------------------------------------------------
+
     lazy var viewContext: NSManagedObjectContext = persistentContainer.viewContext
 }
 

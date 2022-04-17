@@ -22,12 +22,10 @@ class RegistrationViewController: UIViewController {
     @IBOutlet private weak var backGroundView: UIView!
     
     lazy private var tabBarVC: TabBarViewController = {
-        
         let vc = TabBarViewController.initVC
         vc.modalPresentationStyle = .custom
         vc.setUserViewModel(userViewModel)
         vc.transitioningDelegate = self
-        
         return vc
     }()
     
@@ -38,6 +36,7 @@ class RegistrationViewController: UIViewController {
         configureView()
     }
     
+    private var userViewModel = UserViewModel()
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         if userViewModel.userDocument.user.isAuthorization {
@@ -52,7 +51,7 @@ class RegistrationViewController: UIViewController {
         segmentedControl.selectedSegmentIndex == 0
     }
     private let authManger = AuthService()
-    private var userViewModel = UserViewModel()
+
     private let alert = Alert()
     
     //MARK: - Settings
@@ -92,30 +91,19 @@ class RegistrationViewController: UIViewController {
     
     //UISwipeGestureRecognizer
     @objc private func swipeDirection(sender: UISwipeGestureRecognizer) {
-        
         switch sender.direction {
-            
         case .up :
             signButtonDidSelect()
-            
         case .right:
             segmentedControl.selectedSegmentIndex = 0
             setTitleForSignButton()
-            
         case .left:
             segmentedControl.selectedSegmentIndex = 1
             setTitleForSignButton()
-            
         case .down:
             view.endEditing(true)
-            
         default: break
         }
-    }
-    
-    //tap for dissmiss keyboard
-    @objc func handlerTap(sender: UITapGestureRecognizer) {
-        view.endEditing(true)
     }
     
     //Privacy Infor
@@ -164,8 +152,8 @@ extension RegistrationViewController {
     }
     
     private func configureGestures() {
-        view.addMyGestureRecognizer(self, type: .swipe(), selector: #selector(swipeDirection))
-        view.addMyGestureRecognizer(self, type: .tap(), selector:  #selector(handlerTap))
+        addMyGestureRecognizer(self, type: .swipe(), selector: #selector(swipeDirection))
+        addMyGestureRecognizer(view, type: .tap(), selector:  #selector(view.endEditing(_:)))
         privacyPolicyLabel.addMyGestureRecognizer(self, type: .tap(), selector: #selector(showPrivacyInfo))
         forgotPasswordLabel.addMyGestureRecognizer(self, type: .tap(), selector: #selector(forgotPasswordTap))
     }
@@ -196,8 +184,7 @@ extension RegistrationViewController {
                 authManger.signInWithEmail(email: email, password: password) { [weak self] (result, err) in
                     self?.signIn(err: err, result: result)
                 }
-                
-                //signUpWithEmail
+            //signUpWithEmail
             } else  {
                 authManger.signUpWithEmail(email: email, password: password) { [weak self] (result, err) in
                     self?.signIn(err: err, result: result)
