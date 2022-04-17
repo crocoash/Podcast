@@ -22,21 +22,19 @@ class PlaylistTableViewController: UIViewController {
     @IBOutlet private weak var tableViewBottomConstraint: NSLayoutConstraint!
     
     weak var delegate: PlaylistViewControllerDelegate?
-    private let favoritePodcastFetchResultController = DataStoreManager.shared.favoritePodcastFetchResultController
     
+    let favoriteDocument = FavoriteDocument()
+    
+    //MARK: - Methods
     func playerIsShow() {
         tableViewBottomConstraint.constant = -50
     }
     
-    func getIndexPath(for podcast: Podcast) -> IndexPath? {
-        return favoritePodcastFetchResultController.indexPath(forObject: podcast)
-    }
-    
     func updateDisplay(progress: Float, totalSize: String, podcast: Podcast) {
-        guard let indexPath = favoritePodcastFetchResultController.indexPath(forObject: podcast) else { return }
-        if let podcastCell = self.playListTableView?.cellForRow(at: indexPath) as? PodcastCell {
-            podcastCell.updateDisplay(progress: progress, totalSize: totalSize)
-        }
+        guard let indexPath = favoriteDocument.getIndexPath(for: podcast),
+              let podcastCell = self.playListTableView?.cellForRow(at: indexPath) as? PodcastCell else { return }
+      
+        podcastCell.updateDisplay(progress: progress, totalSize: totalSize)
     }
 
     // MARK: - View Methods
@@ -52,7 +50,7 @@ class PlaylistTableViewController: UIViewController {
     
     //MARK: - Actions
     @IBAction func removeAllAction(_ sender: UIButton) {
-        Podcast.removaAllFavorites()
+        favoriteDocument.removaAllFavorites()
         showEmptyImage()
     }
     
@@ -60,7 +58,7 @@ class PlaylistTableViewController: UIViewController {
         guard let view = sender.view as? UITableViewCell,
               let indexPath = playListTableView.indexPath(for: view) else { return }
         
-        let podcast = Podcast.getfavoritePodcast(for: indexPath)
+        let podcast = favoriteDocument.getfavoritePodcast(for: indexPath)
        
         let vc = DetailViewController.initVC
         vc.delegate = self
@@ -75,7 +73,7 @@ class PlaylistTableViewController: UIViewController {
 //MARK: - Private methods
 extension PlaylistTableViewController {
     private func configureUI() {
-        favoritePodcastFetchResultController.delegate = self
+        favoriteDocument.favoritePodcastFetchResultController.delegate = self
         playListTableView.register(PodcastCell.self)
         navigationItem.title = "PlayList"
         playListTableView.rowHeight = 100
@@ -83,7 +81,7 @@ extension PlaylistTableViewController {
     }
     
     private func showEmptyImage() {
-        let favoritePodcastsIsEmpty = favoritePodcastFetchResultController.fetchedObjects?.isEmpty ?? true
+        let favoritePodcastsIsEmpty = favoriteDocument.favoritePodcastIsEmpty
         playListTableView.isHidden = favoritePodcastsIsEmpty
         emptyTableImageView.isHidden = !favoritePodcastsIsEmpty
         removeAllButton.isEnabled = !favoritePodcastsIsEmpty
@@ -94,12 +92,11 @@ extension PlaylistTableViewController {
 // MARK: - Table View data source
 extension PlaylistTableViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let sectionInfo = favoritePodcastFetchResultController.sections?[section]
-        return sectionInfo?.numberOfObjects ?? 0
+        return favoriteDocument.favoritePodcasts.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let podcast = Podcast.getfavoritePodcast(for: indexPath)
+        let podcast = favoriteDocument.getfavoritePodcast(for: indexPath)
         let cell = playListTableView.getCell(cell: PodcastCell.self, indexPath: indexPath)
         cell.addMyGestureRecognizer(self, type: .tap(), selector: #selector(tapCell))
         cell.configureCell(with: podcast)
@@ -110,8 +107,8 @@ extension PlaylistTableViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            let podcast = favoritePodcastFetchResultController.object(at: indexPath)
-            Podcast.removeFromFavorites(podcast: podcast)
+            let podcast = favoriteDocument.getfavoritePodcast(for: indexPath)
+            favoriteDocument.removeFromFavorites(podcast: podcast)
             tableView.reloadData()
             showEmptyImage()
         } else if editingStyle == .insert {
@@ -128,12 +125,12 @@ extension PlaylistTableViewController : DetailViewControllerDelegate {
     }
     
     func detailViewController(_ detailViewController: DetailViewController, removeFromFavoriteButtonDidTouchFor selectedPodcast: Podcast) {
-            Podcast.removeFromFavorites(podcast: selectedPodcast)
-            showEmptyImage()
+        favoriteDocument.removeFromFavorites(podcast: selectedPodcast)
+        showEmptyImage()
     }
     
     func detailViewController(_ detailViewController: DetailViewController, playButtonDidTouchFor didSelectIndex: Int) {
-        delegate?.playlistTableViewController(self,podcasts: Podcast.favoritePodcasts, didSelectIndex: didSelectIndex)
+        delegate?.playlistTableViewController(self,podcasts: favoriteDocument.favoritePodcasts, didSelectIndex: didSelectIndex)
     }
 }
 
@@ -167,7 +164,7 @@ extension PlaylistTableViewController: NSFetchedResultsControllerDelegate {
 //MARK: - PodcastCellDelegate
 extension PlaylistTableViewController: PodcastCellDelegate {
     func podcastCellDidSelectStar(_ podcastCell: PodcastCell, podcast: Podcast) {
-        Podcast.removeFromFavorites(podcast: podcast)
+        favoriteDocument.removeFromFavorites(podcast: podcast)
         showEmptyImage()
     }
     

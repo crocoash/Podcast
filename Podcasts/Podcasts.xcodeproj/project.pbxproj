@@ -70,6 +70,9 @@
 		18FFCA5A27D602EF0078CB3F /* UIStoryboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FFCA5927D602EF0078CB3F /* UIStoryboard.swift */; };
 		3A1FB251280A067B00C3091C /* LikedMoment+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A1FB24F280A067B00C3091C /* LikedMoment+CoreDataClass.swift */; };
 		3A1FB252280A067B00C3091C /* LikedMoment+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A1FB250280A067B00C3091C /* LikedMoment+CoreDataProperties.swift */; };
+		3A1FB256280C7CA300C3091C /* SearchDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A1FB255280C7CA300C3091C /* SearchDocument.swift */; };
+		3A1FB25B280C85A700C3091C /* SearchAuthorsDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A1FB259280C85A600C3091C /* SearchAuthorsDocument.swift */; };
+		3A1FB25C280C85A700C3091C /* FavoriteDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A1FB25A280C85A600C3091C /* FavoriteDocument.swift */; };
 		3A4A3757280164DC000C80E4 /* PodcastData+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4A3755280164DC000C80E4 /* PodcastData+CoreDataClass.swift */; };
 		3A4A3758280164DC000C80E4 /* PodcastData+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4A3756280164DC000C80E4 /* PodcastData+CoreDataProperties.swift */; };
 		3AB5ECEA2803650300EB445A /* String+FormaterDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AB5ECE92803650300EB445A /* String+FormaterDate.swift */; };
@@ -147,6 +150,9 @@
 		18FFCA5927D602EF0078CB3F /* UIStoryboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIStoryboard.swift; sourceTree = "<group>"; };
 		3A1FB24F280A067B00C3091C /* LikedMoment+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LikedMoment+CoreDataClass.swift"; sourceTree = "<group>"; };
 		3A1FB250280A067B00C3091C /* LikedMoment+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LikedMoment+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		3A1FB255280C7CA300C3091C /* SearchDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchDocument.swift; sourceTree = "<group>"; };
+		3A1FB259280C85A600C3091C /* SearchAuthorsDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchAuthorsDocument.swift; sourceTree = "<group>"; };
+		3A1FB25A280C85A600C3091C /* FavoriteDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteDocument.swift; sourceTree = "<group>"; };
 		3A4A3755280164DC000C80E4 /* PodcastData+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PodcastData+CoreDataClass.swift"; sourceTree = "<group>"; };
 		3A4A3756280164DC000C80E4 /* PodcastData+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PodcastData+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		3AB5ECE92803650300EB445A /* String+FormaterDate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+FormaterDate.swift"; sourceTree = "<group>"; };
@@ -387,6 +393,9 @@
 			isa = PBXGroup;
 			children = (
 				187B2B3D2732C11000C3EFFF /* UserViewModel.swift */,
+				3A1FB255280C7CA300C3091C /* SearchDocument.swift */,
+				3A1FB259280C85A600C3091C /* SearchAuthorsDocument.swift */,
+				3A1FB25A280C85A600C3091C /* FavoriteDocument.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -676,6 +685,7 @@
 				049D480327286D5900B6DA3C /* DetailViewController.swift in Sources */,
 				18FFCA5527D556920078CB3F /* PreLoaderViewController.swift in Sources */,
 				3FBCF1C72728482A00B70522 /* PodcastByAuthorCell.swift in Sources */,
+				3A1FB256280C7CA300C3091C /* SearchDocument.swift in Sources */,
 				3FBCF1C2272847F100B70522 /* PodcastCell.swift in Sources */,
 				18557D662732BF0100CA08CA /* User.swift in Sources */,
 				049D47E02726E05B00B6DA3C /* SearchViewController.swift in Sources */,
@@ -694,6 +704,7 @@
 				04425A8A273012DA00E897FA /* BigPlayerViewController.swift in Sources */,
 				047B47AF273B1FF6008E844F /* LikedMomentsViewController.swift in Sources */,
 				049D480127286D3900B6DA3C /* PlaylistTableViewController.swift in Sources */,
+				3A1FB25C280C85A700C3091C /* FavoriteDocument.swift in Sources */,
 				18CA6D8B2735902000F32CE5 /* MyToast.swift in Sources */,
 				1831DEDA2731944600EC09E2 /* PresentTransition.swift in Sources */,
 				049D47DC2726E05B00B6DA3C /* AppDelegate.swift in Sources */,
@@ -708,6 +719,7 @@
 				1847812E272C8F390036B89E /* MyAddGestureRecognizer.swift in Sources */,
 				18478128272C8B460036B89E /* Alert.swift in Sources */,
 				1831DEDD27319E3900EC09E2 /* SettingsTableViewController.swift in Sources */,
+				3A1FB25B280C85A700C3091C /* SearchAuthorsDocument.swift in Sources */,
 				181F5BC427E6718A00AC27EB /* DataStoreManager.swift in Sources */,
 				189C1FAD272D496F00A8480E /* UIViewController + identifier.swift in Sources */,
 				3A1FB252280A067B00C3091C /* LikedMoment+CoreDataProperties.swift in Sources */,

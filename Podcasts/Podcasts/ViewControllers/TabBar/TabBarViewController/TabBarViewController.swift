@@ -111,17 +111,10 @@ extension TabBarViewController {
     }
     
     func addOrRemoveFromFavorite(podcast: Podcast) {
-
+        let title = podcast.trackName ?? "podcast" + (podcast.isFavorite ? "is removed from playlist" : "is added to playlist")
+        MyToast.create(title: title,.bottom,timeToAppear: 0.2,timerToRemove: 2,for: view)
+        podcast.isFavorite = !podcast.isFavorite
         let viewContext = DataStoreManager.shared.viewContext
-        
-        if podcast.isFavorite {
-            podcast.isFavorite = false
-            
-            MyToast.create(title: (podcast.trackName ?? "podcast") + "is removed from playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
-        } else {
-            podcast.isFavorite = true
-            MyToast.create(title: (podcast.trackName ?? "podcast") + "is added to playlist", .bottom, timeToAppear: 0.2, timerToRemove: 2, for: self.view)
-        }
         viewContext.mySave()
         feedbackGenerator()
     }
@@ -161,7 +154,7 @@ extension TabBarViewController: SearchViewControllerDelegate {
 extension TabBarViewController: PlaylistViewControllerDelegate {
     
     func playlistTableViewControllerDidSelectDownLoadButton(_ playlistTableViewController: PlaylistTableViewController, podcast: Podcast) {
-        guard let indexPath = playlistTableViewController.getIndexPath(for: podcast) else { return }
+        guard let indexPath = playlistTableViewController.favoriteDocument.getIndexPath(for: podcast) else { return }
         downloadService.startDownload(podcast, indexPath: indexPath)
     }
     

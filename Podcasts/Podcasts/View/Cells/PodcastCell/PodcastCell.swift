@@ -27,8 +27,6 @@ class PodcastCell: UITableViewCell {
     private var isDownLoad: Bool!
     private var isFavorite: Bool!
     
-    lazy var podcastInFavoriteIsDownload = Podcast.isDownload(podcast: podcast)
-    
     override func prepareForReuse() {
         super.prepareForReuse()
         podcastImage.image = nil
@@ -59,8 +57,8 @@ extension PodcastCell {
         downLoadImageView.addMyGestureRecognizer(self, type: .tap(), selector: #selector(handlerTapDownloadImage))
                 
         /// information from favorite tab
-        isFavorite = Podcast.podcastIsFavorite(podcast: podcast) || podcast.isFavorite
-        isDownLoad = podcastInFavoriteIsDownload || podcast.isDownLoad
+        isFavorite = podcast.isFavorite
+        isDownLoad =  podcast.isDownLoad
         
         downLoadImageView.isHidden = !isFavorite
         
