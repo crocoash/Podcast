@@ -10,7 +10,7 @@ import Foundation
 import CoreData
 
 @objc(Podcast)
-public class Podcast: NSManagedObject, Decodable {
+public class Podcast: NSManagedObject, Codable {
 
     private enum CodingKeys: String, CodingKey {
         case previewUrl
@@ -86,4 +86,38 @@ public class Podcast: NSManagedObject, Decodable {
         isFavorite =            try container.decodeIfPresent(Bool  .self, forKey: .isFavorite) ?? false
         isSearched =            try container.decodeIfPresent(Bool  .self, forKey: .isSearched) ?? true
     }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(previewUrl, forKey: .previewUrl)
+        try container.encode(episodeFileExtension, forKey: .episodeFileExtension)
+        try container.encode(artworkUrl160, forKey: .artworkUrl160)
+        try container.encode(episodeContentType, forKey: .episodeContentType)
+        try container.encode(artworkUrl600, forKey: .artworkUrl600)
+        try container.encode(artworkUrl60, forKey: .artworkUrl60)
+        try container.encode(artistViewUrl, forKey: .artistViewUrl)
+        try container.encode(contentAdvisoryRating, forKey: .contentAdvisoryRating)
+        try container.encode(trackViewUrl, forKey: .trackViewUrl)
+        try container.encode(trackTimeMillis?.intValue, forKey: .trackTimeMillis)
+        try container.encode(collectionViewUrl, forKey: .collectionViewUrl)
+        try container.encode(episodeUrl, forKey: .episodeUrl)
+        try container.encode(collectionId?.intValue, forKey: .collectionId)
+        try container.encode(collectionName, forKey: .collectionName)
+        try container.encode(id?.intValue, forKey: .id)
+        try container.encode(trackName, forKey: .trackName)
+        try container.encode(releaseDate, forKey: .releaseDate)
+        try container.encode(shortDescriptionMy, forKey: .shortDescriptionMy)
+        try container.encode(feedUrl, forKey: .feedUrl)
+        try container.encode(artistIds, forKey: .artistIds)
+        try container.encode(closedCaptioning, forKey: .closedCaptioning)
+        try container.encode(country, forKey: .country)
+        try container.encode(descriptionMy, forKey: .descriptionMy)
+        try container.encode(episodeGuid, forKey: .episodeGuid)
+        try container.encode(kind, forKey: .kind)
+        try container.encode(wrapperType, forKey: .wrapperType)
+        try container.encode(isDownLoad, forKey: .isDownLoad)
+        try container.encode(isFavorite, forKey: .isFavorite)
+        try container.encode(isSearched, forKey: .isSearched)
+}
+    
 }

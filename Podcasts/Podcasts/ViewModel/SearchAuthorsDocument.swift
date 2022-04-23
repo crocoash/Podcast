@@ -10,6 +10,9 @@ import CoreData
 
 class SearchAuthorsDocument {
     
+    static var shared = SearchAuthorsDocument()
+    private init(){}
+    
     private let viewContext = DataStoreManager.shared.viewContext
     private var authors: [Author] { Author.searchAuthors }
     

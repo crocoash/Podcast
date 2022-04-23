@@ -9,6 +9,10 @@ import Foundation
 import CoreData
 
 class FavoriteDocument {
+    
+    static var shared = FavoriteDocument()
+    private init(){}
+    
     private let viewContext = DataStoreManager.shared.viewContext
     private var favorite: [Podcast] { favoritePodcastFetchResultController.fetchedObjects ?? [] }
     
@@ -38,7 +42,6 @@ class FavoriteDocument {
 
 extension FavoriteDocument {
     
-    
     //MARK: - Favorite
     
     var favoritePodcasts: [Podcast] { favoritePodcastFetchResultController.fetchedObjects ?? [] }
@@ -57,41 +60,26 @@ extension FavoriteDocument {
         favoritePodcastFetchResultController.fetchedObjects?.forEach {
             viewContext.delete($0)
         }
-        viewContext.mySave()
+        DataStoreManager.shared.mySave()
     }
     
-    func removeFromFavorites(podcast: Podcast) {
-        podcast.isFavorite = false
-        viewContext.mySave()
-        
-        guard let stringUrl = podcast.previewUrl,
-              let url = URL(string: stringUrl) else { return }
-        
-        do {
-            try FileManager.default.removeItem(at: url.locaPath)
-        } catch (let err) {
-            print("FAILED DELETEING VIDEO DATA \(err.localizedDescription)")
-        }
+    func addOrRemoveToFavorite(podcast: Podcast) {
+        podcast.isFavorite = !podcast.isFavorite
+        DataStoreManager.shared.mySave()
     }
     
     //MARK: - Common
-    func removeAll() {
-        DataStoreManager.shared.removeAll(fetchRequest: Podcast.fetchRequest())
-    }
     
     func downloadPodcast(podcast: Podcast) {
         if let podcast = viewContext.object(with: podcast.objectID) as? Podcast {
             podcast.isDownLoad = true
-            viewContext.mySave()
+            DataStoreManager.shared.mySave()
         }
     }
-   
+    
     func isDownload(podcast: Podcast) -> Bool {
-        guard let favoritePodcasts = favoritePodcastFetchResultController.fetchedObjects else { return false }
-        if let podcast = favoritePodcasts.firstPodcast(matching: podcast.id) {
-            return podcast.isDownLoad
-        }
-        return false
+        guard let url = podcast.previewUrl.localPath else { return false }
+        return FileManager.default.fileExists(atPath: url.path)
     }
    
     func podcastIsFavorite(podcast: Podcast) -> Bool {

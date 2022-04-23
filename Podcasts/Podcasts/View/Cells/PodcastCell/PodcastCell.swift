@@ -58,7 +58,7 @@ extension PodcastCell {
                 
         /// information from favorite tab
         isFavorite = podcast.isFavorite
-        isDownLoad =  podcast.isDownLoad
+        isDownLoad =  FavoriteDocument.shared.isDownload(podcast: podcast)
         
         downLoadImageView.isHidden = !isFavorite
         

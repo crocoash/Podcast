@@ -1,56 +1,56 @@
 
 
 import UIKit
+import CoreData
 
 class TabBarViewController: UITabBarController {
     
     // MARK: - View
-    let downloadService = DownloadService()
-    lazy var downloadsSession: URLSession = {
+    private let downloadService = DownloadService()
+    private lazy var downloadsSession: URLSession = {
         let configuration = URLSessionConfiguration.background(withIdentifier: "BackGroundSession")
         return URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
     }()
     
-    lazy var constraintsSmallPlayer: [NSLayoutConstraint] = [
+    private var trailConstraint: NSLayoutConstraint?
+    private var leadConstraint: NSLayoutConstraint?
+    
+    private lazy var constraintsSmallPlayer: [NSLayoutConstraint] = [
         playerVC.view.heightAnchor.constraint(equalToConstant: 50),
         playerVC.view.widthAnchor.constraint(equalTo: view.widthAnchor),
         playerVC.view.bottomAnchor.constraint(equalTo: tabBar.topAnchor)
     ]
-
-    private var playerVC = PlayerViewController()
-    private var userViewModel: UserViewModel!
     
-    lazy var playListVc = createTabBar(PlaylistTableViewController.self , title: "Playlist", imageName: "folder.fill") {
-        $0.delegate = self
-    }
-    
-    lazy var searchVC = createTabBar(SearchViewController.self, title: "Search", imageName: "magnifyingglass") {
-        $0.delegate = self
-    }
-    
-    lazy var likedMoments = createTabBar(LikedMomentsViewController.self , title: "Liked", imageName: "heart.fill") {
-        $0.delegate = self
-    }
-    
-    lazy var settingsVC = createTabBar(SettingsTableViewController.self, title: "Settings", imageName: "gear") { [weak self] vc in
-        guard let self = self else { return }
-        vc.setUser((self.userViewModel))
-        vc.delegate = self
-    }
-    
-    func setUserViewModel(_ userViewModel: UserViewModel) {
-        self.userViewModel = userViewModel
-    }
-    
-    lazy var imageView: UIImageView =  {
+    private lazy var imageView: UIImageView =  {
         $0.image = UIImage(named: "decree")
         $0.isHidden = true
         $0.translatesAutoresizingMaskIntoConstraints = false
         return $0
     }(UIImageView())
     
-    private var trailConstraint: NSLayoutConstraint?
-    private var leadConstraint: NSLayoutConstraint?
+    private var playerVC = PlayerViewController()
+    private var userViewModel: UserViewModel!
+    private let firestorageDatabase = FirestorageDatabase()
+    
+    private lazy var playListVc = createTabBar(PlaylistTableViewController.self , title: "Playlist", imageName: "folder.fill") {
+        $0.delegate = self
+    }
+    private lazy var searchVC = createTabBar(SearchViewController.self, title: "Search", imageName: "magnifyingglass") {
+        $0.delegate = self
+    }
+    private lazy var likedMomentVc = createTabBar(LikedMomentsViewController.self , title: "Liked", imageName: "heart.fill") {
+        $0.delegate = self
+    }
+    private lazy var settingsVC = createTabBar(SettingsTableViewController.self, title: "Settings", imageName: "gear") { [weak self] vc in
+        guard let self = self else { return }
+        vc.setUser((self.userViewModel))
+        vc.delegate = self
+    }
+    
+    //MARK: - METHODS
+    func setUserViewModel(_ userViewModel: UserViewModel) {
+        self.userViewModel = userViewModel
+    }
     
     // MARK: - View Methods
     override func viewDidLoad() {
@@ -59,7 +59,8 @@ class TabBarViewController: UITabBarController {
         addPlayer()
         configureImageDarkMode()
         downloadService.downloadsSession = downloadsSession
-        
+        FirebaseDatabase.shared.observe()
+        FirebaseDatabase.shared.delegate = self
     }
 }
 
@@ -67,7 +68,7 @@ class TabBarViewController: UITabBarController {
 extension TabBarViewController {
     
     private func configureTabBar() {
-        viewControllers = [playListVc, searchVC, likedMoments, settingsVC]
+        viewControllers = [playListVc, searchVC, likedMomentVc, settingsVC]
     }
     
     private func createTabBar<T: UIViewController>(_ type: T.Type, title: String, imageName: String, completion: ((T) -> Void)? = nil) -> T {
@@ -110,57 +111,71 @@ extension TabBarViewController {
         feedbackGenerator.impactOccurred()
     }
     
-    func addOrRemoveFromFavorite(podcast: Podcast) {
-        let title = podcast.trackName ?? "podcast" + (podcast.isFavorite ? "is removed from playlist" : "is added to playlist")
+    private func addOrRemoveFromFavorite(podcast: Podcast) {
+        let title = (podcast.trackName ?? "podcast") + (podcast.isFavorite ? "is removed from playlist" : "is added to playlist")
         MyToast.create(title: title,.bottom,timeToAppear: 0.2,timerToRemove: 2,for: view)
-        podcast.isFavorite = !podcast.isFavorite
-        let viewContext = DataStoreManager.shared.viewContext
-        viewContext.mySave()
+        FavoriteDocument.shared.addOrRemoveToFavorite(podcast: podcast)
+        FirebaseDatabase.shared.save()
         feedbackGenerator()
+    }
+    
+    private func downloadOrRemovePodcast(_ podcast: Podcast, _ indexPath: IndexPath) {
+        if podcast.isDownLoad {
+            downloadService.cancelDownload(podcast: podcast)
+        } else {
+            downloadService.startDownload(podcast, indexPath: indexPath)
+        }
+        feedbackGenerator()
+    }
+    
+    private func startPlay(_ podcasts: [Podcast], _ didSelectIndex: Int) {
+        playerVC.view.isHidden = false
+        playerVC.play(podcasts: podcasts, at: didSelectIndex)
     }
 }
 
 // MARK: - SearchViewControllerDelegate
 extension TabBarViewController: SearchViewControllerDelegate {
-    func searchViewControllerDidSelectDownLoadImage(_ searchViewController: SearchViewController, podcast: Podcast, indexPath: IndexPath) {
-        if podcast.isDownLoad {
-            guard let url = podcast.previewUrl.url else { return }
-            downloadService.activeDownloads[url]?.task?.cancel()
-            downloadService.activeDownloads[url] = nil
-            podcast.isDownLoad = false
-            try? FileManager.default.removeItem(at: url)
-            searchViewController.reloadRows(indexPath: indexPath)
-        } else {
-            downloadService.startDownload(podcast, indexPath: indexPath)
-            podcast.isDownLoad = true
-        }
-        DataStoreManager.shared.viewContext.mySave()
-        feedbackGenerator()
+    func searchViewControllerDidSelectFavoriteStar(_ searchViewController: SearchViewController, podcast: Podcast) {
+        addOrRemoveFromFavorite(podcast: podcast)
     }
     
+    func searchViewControllerDidRefreshTableView(_ searchViewController: SearchViewController, completion: @escaping () -> Void) {
+        ///
+    }
+    
+    
+    func searchViewControllerDidSelectDownLoadImage(_ searchViewController: SearchViewController, podcast: Podcast, indexPath: IndexPath) {
+        downloadOrRemovePodcast(podcast, indexPath)
+    }
     
     func searchViewController(_ searchViewController: SearchViewController, _ podcasts: [Podcast], didSelectIndex: Int) {
-        playerVC.view.isHidden = false
-        playerVC.play(podcasts: podcasts, at: didSelectIndex)
+        startPlay(podcasts, didSelectIndex)
         searchViewController.playerIsShow()
-    }
-  
-    func podcastCellDidSelectStar(podcast: Podcast) {
-        addOrRemoveFromFavorite(podcast: podcast)
     }
 }
 
 // MARK: - PlaylistTableViewControllerDelegate
 extension TabBarViewController: PlaylistViewControllerDelegate {
     
-    func playlistTableViewControllerDidSelectDownLoadButton(_ playlistTableViewController: PlaylistTableViewController, podcast: Podcast) {
-        guard let indexPath = playlistTableViewController.favoriteDocument.getIndexPath(for: podcast) else { return }
-        downloadService.startDownload(podcast, indexPath: indexPath)
+    func playlistTableViewControllerDidRefreshTableView(_ playlistTableViewController: PlaylistTableViewController, completion: @escaping () -> Void) {
+        DataStoreManager.shared.removeAll(fetchRequest: Podcast.fetchRequest())
+        FirebaseDatabase.shared.getPodcast { _ in
+            completion()
+        }
+    }
+    
+    func playlistTableViewControllerDidSelectStar(_ playlistTableViewController: PlaylistTableViewController, podcast: Podcast) {
+        addOrRemoveFromFavorite(podcast: podcast)
+    }
+    
+    func playlistTableViewControllerDidSelectDownLoadImage(_ playlistTableViewController: PlaylistTableViewController, podcast: Podcast) {
+        guard let indexPath = FavoriteDocument.shared.getIndexPath(for: podcast) else { return }
+        downloadOrRemovePodcast(podcast, indexPath)
     }
     
     func playlistTableViewController(_ playlistTableViewController: PlaylistTableViewController, podcasts: [Podcast], didSelectIndex: Int) {
-        playerVC.view.isHidden = false
-        playerVC.play(podcasts: podcasts, at: didSelectIndex)
+        startPlay(podcasts, didSelectIndex)
         playlistTableViewController.playerIsShow()
     }
 }
@@ -200,6 +215,7 @@ extension TabBarViewController: SettingsTableViewControllerDelegate {
 
 //MARK: - LikedMomentsViewControllerDelegate
 extension TabBarViewController: LikedMomentsViewControllerDelegate {
+    
     func likedMomentViewController(_ likedMomentViewController: LikedMomentsViewController, didSelectMomentAt index: Int, likedMoments: [LikedMoment]) {
         playerVC.view.isHidden = false
         playerVC.playMomentWith(atIndex: index, from: likedMoments)
@@ -208,6 +224,7 @@ extension TabBarViewController: LikedMomentsViewControllerDelegate {
 
 //MARK: - URLSessionDownloadDelegate
 extension TabBarViewController: URLSessionDownloadDelegate {
+    
     func urlSession(_ session                  : URLSession,
                     downloadTask               : URLSessionDownloadTask,
                     didWriteData bytesWritten  : Int64,
@@ -229,36 +246,38 @@ extension TabBarViewController: URLSessionDownloadDelegate {
     
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         let fileManager = FileManager.default
-        guard
-            let sourceURL = downloadTask.originalRequest?.url,
-            let documentsPath = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first
-        else { return }
         
-        let localPath = documentsPath.appendingPathComponent(sourceURL.lastPathComponent)
-        
-        try? fileManager.removeItem(at: localPath)
+        guard let url = downloadTask.originalRequest?.url else { return }
+        let localPath = url.localPath
         
         do {
             try fileManager.copyItem(at: location, to: localPath)
         } catch let error {
             print("Could not copy file to disk: \(error.localizedDescription)")
         }
-        guard let podcastDownload = self.downloadService.activeDownloads[sourceURL] else { return }
+        
+        do {
+            try fileManager.removeItem(at: location)
+        } catch let error {
+            print("Could not remove item at disk: \(error.localizedDescription)")
+        }
+        
+        guard let podcastDownload = self.downloadService.activeDownloads[url] else { return }
         let podcast = podcastDownload.podcast
         let indexPath = podcastDownload.indexPath
-        let viewContext = DataStoreManager.shared.viewContext
-        downloadService.activeDownloads[sourceURL] = nil
         
         DispatchQueue.main.async {
-            podcast.isDownLoad = true
-            viewContext.mySave()
+            FavoriteDocument.shared.downloadPodcast(podcast: podcast)
+            self.downloadService.endDownload(url: url)
             self.searchVC.reloadRows(indexPath: indexPath)
+            self.playListVc.reloadData()
         }
     }
 }
 
 //MARK: - URLSessionDelegate
 extension TabBarViewController: URLSessionDelegate {
+    
     func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {
         DispatchQueue.main.async {
             if let appDelegate = UIApplication.shared.delegate as? AppDelegate,
@@ -267,5 +286,14 @@ extension TabBarViewController: URLSessionDelegate {
                 completionHandler()
             }
         }
+    }
+}
+
+extension TabBarViewController: FirebaseDatabaseDelegate {
+    
+    func firebaseDatabaseDidGetData(_ firebaseDatabase: FirebaseDatabase) {
+        playListVc.reloadData()
+        searchVC.reloadData()
+        likedMomentVc.reloadData()
     }
 }

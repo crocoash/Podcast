@@ -55,8 +55,8 @@ class RegistrationViewController: UIViewController {
     private let alert = Alert()
     
     //MARK: - Settings
-    lazy private var email: String = userViewModel.userDocument.user.userName ?? "crocoash@gmail.com"
-    private var password: String = "123456"
+    lazy private var email: String = userViewModel.userDocument.user.userName ?? ""
+    private var password: String = ""
     
     private let colorFails = #colorLiteral(red: 0.5807225108, green: 0.066734083, blue: 0, alpha: 1)
     private let colorOk = #colorLiteral(red: 0.6000000238, green: 0.6000000238, blue: 0.6000000238, alpha: 1)
@@ -182,18 +182,18 @@ extension RegistrationViewController {
             //signInWithEmail
             if firstSegmentedControl {
                 authManger.signInWithEmail(email: email, password: password) { [weak self] (result, err) in
-                    self?.signIn(err: err, result: result)
+                    self?.signInOrUp(err: err, result: result)
                 }
             //signUpWithEmail
             } else  {
                 authManger.signUpWithEmail(email: email, password: password) { [weak self] (result, err) in
-                    self?.signIn(err: err, result: result)
+                    self?.signInOrUp(err: err, result: result)
                 }
             }
         }
     }
     
-    private func signIn(err: String, result: Bool) {
+    private func signInOrUp(err: String, result: Bool) {
         activityIndicator.stopAnimating()
 
         let timeInterval: TimeInterval = 2

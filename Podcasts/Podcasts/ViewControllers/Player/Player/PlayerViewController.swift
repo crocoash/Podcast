@@ -122,7 +122,7 @@ extension PlayerViewController {
         if observe == nil { addTimeObserve() }
         
         let requestWorkItem = DispatchWorkItem {
-            let item = AVPlayerItem(url: podcast.isDownLoad ? url.locaPath : url)
+            let item = AVPlayerItem(url: podcast.isDownLoad ? url.localPath : url)
             self.player.replaceCurrentItem(with: item)
             self.player.play()
             if !self.likedMoments.isEmpty {
@@ -234,7 +234,7 @@ extension PlayerViewController: BigPlayerViewControllerDelegate {
         let likedMoment = LikedMoment(context: context)
         likedMoment.podcast = podcast
         likedMoment.moment = moment
-        context.mySave()
+        DataStoreManager.shared.mySave()
     }
     
     func bigPlayerViewController(_ bigPlayerViewController: BigPlayerViewController, didChangeCurrentTime value: Double) {
