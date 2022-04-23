@@ -21,13 +21,14 @@ class RegistrationViewController: UIViewController {
     @IBOutlet private weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet private weak var backGroundView: UIView!
     
-    lazy private var tabBarVC: TabBarViewController = {
-        let vc = TabBarViewController.initVC
-        vc.modalPresentationStyle = .custom
-        vc.setUserViewModel(userViewModel)
-        vc.transitioningDelegate = self
-        return vc
-    }()
+    
+    private(set) var tabBarVC: TabBarViewController!
+    private(set) var userViewModel: UserViewModel!
+    
+    func configure(tabBarVC: TabBarViewController, userViewModel: UserViewModel) {
+        self.tabBarVC = tabBarVC
+        self.userViewModel = userViewModel
+    }
     
     // MARK: - View Methods
     override func viewDidLoad() {
@@ -36,22 +37,11 @@ class RegistrationViewController: UIViewController {
         configureView()
     }
     
-    private var userViewModel = UserViewModel()
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        if userViewModel.userDocument.user.isAuthorization {
-            UIView.animate(withDuration: 10, delay: 5) {
-                self.present(self.tabBarVC, animated: true)
-            }
-        }
-    }
-    
     //MARK: - Varibels
     private var firstSegmentedControl: Bool {
         segmentedControl.selectedSegmentIndex == 0
     }
     private let authManger = AuthService()
-
     private let alert = Alert()
     
     //MARK: - Settings

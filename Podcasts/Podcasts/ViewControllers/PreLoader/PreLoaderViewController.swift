@@ -13,10 +13,19 @@ class PreLoaderViewController: UIViewController {
     @IBOutlet private weak var horizontalCenterConstraint: NSLayoutConstraint!
     
     private var heightConstraint: NSLayoutConstraint?
+    private var userViewModel = UserViewModel()
     
-    lazy var topAnchorConst = view.frame.height / 2 - logoImageView.frame.height / 2
+    private lazy var topAnchorConst = view.frame.height / 2 - logoImageView.frame.height / 2
     
+    private lazy var tabBarVC: TabBarViewController = {
+        let vc = TabBarViewController.initVC
+        vc.modalPresentationStyle = .custom
+        vc.setUserViewModel(userViewModel)
+        vc.transitioningDelegate = self
+        return vc
+    }()
     
+    //MARK: - ViewMethods
     override func viewDidLoad() {
         super.viewDidLoad()
         horizontalCenterConstraint.isActive = false
@@ -28,13 +37,19 @@ class PreLoaderViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        heightConstraint?.constant = 120
-  
-        UIView.animate(withDuration: 0.5, animations: { self.view.layoutIfNeeded() }) { _ in
-            let vc = RegistrationViewController.initVC
-            vc.modalPresentationStyle = .custom
-            vc.transitioningDelegate = self
-            self.present(vc, animated: false)
+        if userViewModel.userDocument.user.isAuthorization {
+            UIView.animate(withDuration: 2, delay: 10) {
+                self.present(self.tabBarVC, animated: true)
+            }
+        } else {
+            heightConstraint?.constant = 120
+            UIView.animate(withDuration: 0.5, animations: { self.view.layoutIfNeeded() }) { _ in
+                let vc = RegistrationViewController.initVC
+                vc.configure(tabBarVC: self.tabBarVC, userViewModel: self.userViewModel)
+                vc.modalPresentationStyle = .custom
+                vc.transitioningDelegate = self
+                self.present(vc, animated: false)
+            }
         }
     }
 }
