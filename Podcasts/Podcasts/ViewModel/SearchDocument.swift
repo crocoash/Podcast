@@ -10,8 +10,10 @@ import CoreData
 
 class SearchPodcastDocument {
     
-    private let viewContext = DataStoreManager.shared.viewContext
+    static var shared = SearchPodcastDocument()
+    private init(){}
     
+    private let viewContext = DataStoreManager.shared.viewContext
     var podcasts: [Podcast] { searchResController.fetchedObjects ?? [] }
     
     lazy private(set) var searchResController: NSFetchedResultsController<Podcast> = {

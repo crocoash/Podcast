@@ -31,3 +31,12 @@ extension Optional where Wrapped == String  {
         return url
     }
 }
+
+extension Optional where Wrapped == String {
+    var localPath: URL? {
+        return self.url?.localPath
+    }
+}
+
+
+

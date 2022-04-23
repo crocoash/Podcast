@@ -9,6 +9,10 @@ import Foundation
 import CoreData
 
 class FavoriteDocument {
+    
+    static var shared = FavoriteDocument()
+    private init(){}
+    
     private let viewContext = DataStoreManager.shared.viewContext
     private var favorite: [Podcast] { favoritePodcastFetchResultController.fetchedObjects ?? [] }
     
@@ -38,7 +42,6 @@ class FavoriteDocument {
 
 extension FavoriteDocument {
     
-    
     //MARK: - Favorite
     
     var favoritePodcasts: [Podcast] { favoritePodcastFetchResultController.fetchedObjects ?? [] }
@@ -60,18 +63,20 @@ extension FavoriteDocument {
         viewContext.mySave()
     }
     
-    func removeFromFavorites(podcast: Podcast) {
-        podcast.isFavorite = false
-        viewContext.mySave()
+    func changeAllFavoritePodcast(podcasts: [Podcast]) {
+        guard favoritePodcasts != podcasts else { return }
+        removeAll()
         
-        guard let stringUrl = podcast.previewUrl,
-              let url = URL(string: stringUrl) else { return }
-        
-        do {
-            try FileManager.default.removeItem(at: url.locaPath)
-        } catch (let err) {
-            print("FAILED DELETEING VIDEO DATA \(err.localizedDescription)")
+        podcasts.forEach {
+            if let url = $0.previewUrl.url {
+                
+            }
         }
+    }
+    
+    func addOrRemoveToFavorite(podcast: Podcast) {
+        podcast.isFavorite = !podcast.isFavorite
+        viewContext.mySave()
     }
     
     //MARK: - Common

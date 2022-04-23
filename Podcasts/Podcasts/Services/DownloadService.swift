@@ -10,20 +10,34 @@ import Foundation
 class DownloadService {
     var downloadsSession: URLSession!
     
-    var activeDownloads: [URL: PodcastDownload] = [:]
+    private(set) var activeDownloads: [URL: PodcastDownload] = [:]
     
     func startDownload(_ podcast: Podcast, indexPath: IndexPath) {
-        
         guard let url = podcast.previewUrl.url else { return }
         
         if activeDownloads[url] == nil {
             let podcastDownload = PodcastDownload(podcast: podcast,indexPath: indexPath, task: downloadsSession.downloadTask(with: url))
             podcastDownload.task?.resume()
             activeDownloads[url] = podcastDownload
-        } else {
-            activeDownloads[url]?.task?.cancel()
-            activeDownloads[url] = nil
         }
+    }
+    
+    func cancelDownload(podcast: Podcast) {
+        guard let url = podcast.previewUrl.url else { return }
+        activeDownloads[url]?.task?.cancel()
+        activeDownloads[url] = nil
+        
+        do {
+            try FileManager.default.removeItem(at: url.localPath)
+        } catch (let err) {
+            //TODO:
+            fatalError(err.localizedDescription)
+//            print("FAILED DELETEING VIDEO DATA \(err.localizedDescription)")
+        }
+    }
+    
+    func endDownload(url: URL) {
+        activeDownloads[url] = nil
     }
 }
 

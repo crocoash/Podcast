@@ -9,8 +9,9 @@ import Foundation
 
 extension URL {
     
-    var locaPath: URL {
+    var localPath: URL {
         let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         return documentsPath.appendingPathComponent(self.lastPathComponent)
     }
 }
+
