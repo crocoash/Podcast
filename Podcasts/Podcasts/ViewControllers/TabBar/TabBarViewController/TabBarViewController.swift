@@ -1,6 +1,7 @@
 
 
 import UIKit
+import CoreData
 
 class TabBarViewController: UITabBarController {
     
@@ -29,6 +30,7 @@ class TabBarViewController: UITabBarController {
     
     private var playerVC = PlayerViewController()
     private var userViewModel: UserViewModel!
+    private let firestorageDatabase = FirestorageDatabase()
     
     private lazy var playListVc = createTabBar(PlaylistTableViewController.self , title: "Playlist", imageName: "folder.fill") {
         $0.delegate = self
@@ -36,7 +38,7 @@ class TabBarViewController: UITabBarController {
     private lazy var searchVC = createTabBar(SearchViewController.self, title: "Search", imageName: "magnifyingglass") {
         $0.delegate = self
     }
-    private lazy var likedMoments = createTabBar(LikedMomentsViewController.self , title: "Liked", imageName: "heart.fill") {
+    private lazy var likedMomentVc = createTabBar(LikedMomentsViewController.self , title: "Liked", imageName: "heart.fill") {
         $0.delegate = self
     }
     private lazy var settingsVC = createTabBar(SettingsTableViewController.self, title: "Settings", imageName: "gear") { [weak self] vc in
@@ -57,7 +59,8 @@ class TabBarViewController: UITabBarController {
         addPlayer()
         configureImageDarkMode()
         downloadService.downloadsSession = downloadsSession
-        
+        FirebaseDatabase.shared.observe()
+        FirebaseDatabase.shared.delegate = self
     }
 }
 
@@ -65,7 +68,7 @@ class TabBarViewController: UITabBarController {
 extension TabBarViewController {
     
     private func configureTabBar() {
-        viewControllers = [playListVc, searchVC, likedMoments, settingsVC]
+        viewControllers = [playListVc, searchVC, likedMomentVc, settingsVC]
     }
     
     private func createTabBar<T: UIViewController>(_ type: T.Type, title: String, imageName: String, completion: ((T) -> Void)? = nil) -> T {
@@ -112,6 +115,7 @@ extension TabBarViewController {
         let title = (podcast.trackName ?? "podcast") + (podcast.isFavorite ? "is removed from playlist" : "is added to playlist")
         MyToast.create(title: title,.bottom,timeToAppear: 0.2,timerToRemove: 2,for: view)
         FavoriteDocument.shared.addOrRemoveToFavorite(podcast: podcast)
+        FirebaseDatabase.shared.save()
         feedbackGenerator()
     }
     
@@ -132,6 +136,14 @@ extension TabBarViewController {
 
 // MARK: - SearchViewControllerDelegate
 extension TabBarViewController: SearchViewControllerDelegate {
+    func searchViewControllerDidSelectFavoriteStar(_ searchViewController: SearchViewController, podcast: Podcast) {
+        addOrRemoveFromFavorite(podcast: podcast)
+    }
+    
+    func searchViewControllerDidRefreshTableView(_ searchViewController: SearchViewController, completion: @escaping () -> Void) {
+        ///
+    }
+    
     
     func searchViewControllerDidSelectDownLoadImage(_ searchViewController: SearchViewController, podcast: Podcast, indexPath: IndexPath) {
         downloadOrRemovePodcast(podcast, indexPath)
@@ -141,14 +153,17 @@ extension TabBarViewController: SearchViewControllerDelegate {
         startPlay(podcasts, didSelectIndex)
         searchViewController.playerIsShow()
     }
-  
-    func podcastCellDidSelectStar(podcast: Podcast) {
-        addOrRemoveFromFavorite(podcast: podcast)
-    }
 }
 
 // MARK: - PlaylistTableViewControllerDelegate
 extension TabBarViewController: PlaylistViewControllerDelegate {
+    
+    func playlistTableViewControllerDidRefreshTableView(_ playlistTableViewController: PlaylistTableViewController, completion: @escaping () -> Void) {
+        DataStoreManager.shared.removeAll(fetchRequest: Podcast.fetchRequest())
+        FirebaseDatabase.shared.getPodcast { _ in
+            completion()
+        }
+    }
     
     func playlistTableViewControllerDidSelectStar(_ playlistTableViewController: PlaylistTableViewController, podcast: Podcast) {
         addOrRemoveFromFavorite(podcast: podcast)
@@ -255,7 +270,7 @@ extension TabBarViewController: URLSessionDownloadDelegate {
             FavoriteDocument.shared.downloadPodcast(podcast: podcast)
             self.downloadService.endDownload(url: url)
             self.searchVC.reloadRows(indexPath: indexPath)
-            self.playListVc.reloadRows(indexPath: indexPath)
+            self.playListVc.reloadData()
         }
     }
 }
@@ -271,5 +286,14 @@ extension TabBarViewController: URLSessionDelegate {
                 completionHandler()
             }
         }
+    }
+}
+
+extension TabBarViewController: FirebaseDatabaseDelegate {
+    
+    func firebaseDatabaseDidGetData(_ firebaseDatabase: FirebaseDatabase) {
+        playListVc.reloadData()
+        searchVC.reloadData()
+        likedMomentVc.reloadData()
     }
 }

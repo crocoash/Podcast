@@ -36,6 +36,8 @@ class LikedMomentsManager {
         
         return fetchResultController
     }()
+    
+   
 }
 
 extension LikedMomentsManager {
@@ -45,7 +47,7 @@ extension LikedMomentsManager {
     func deleteMoment(at indexPath: IndexPath) {
         let moment = likedMomentFetchResultController.object(at: indexPath)
         viewContext.delete(moment)
-        viewContext.mySave()
+        DataStoreManager.shared.mySave()
     }
     
     func getLikeMoment(at indexPath: IndexPath) -> LikedMoment {

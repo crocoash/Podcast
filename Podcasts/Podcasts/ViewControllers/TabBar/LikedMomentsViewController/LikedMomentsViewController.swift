@@ -28,20 +28,26 @@ class LikedMomentsViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         likedMomentsTableView.reloadData()
-        configureUI()
+        reloadData()
+    }
+    
+    func reloadData() {
+        likedMomentsTableView?.reloadData()
+        showEmptyImage()
     }
 }
 
 extension LikedMomentsViewController {
     
-    private func configureUI() {
+    private func showEmptyImage() {
         let likeMomentsIsEmpty = LikedMomentsManager.shared.likeMoments.isEmpty
-        emptyDataImage.isHidden = !likeMomentsIsEmpty
-        likedMomentsTableView.isHidden = likeMomentsIsEmpty
+        emptyDataImage?.isHidden = !likeMomentsIsEmpty
+        likedMomentsTableView?.isHidden = likeMomentsIsEmpty
     }
 }
 
 extension LikedMomentsViewController: UITableViewDelegate {
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         delegate?.likedMomentViewController(self, didSelectMomentAt: indexPath.row, likedMoments: LikedMomentsManager.shared.likeMoments)
     }
@@ -57,7 +63,7 @@ extension LikedMomentsViewController: UITableViewDelegate {
             LikedMomentsManager.shared.deleteMoment(at: indexPath)
             likedMomentsTableView.deleteRows(at: [indexPath], with: .fade)
             likedMomentsTableView.endUpdates()
-            configureUI()
+            reloadData()
         }
     }
 }

@@ -9,9 +9,11 @@ import UIKit
 import CoreData
 
 protocol PlaylistViewControllerDelegate : AnyObject {
+    
     func playlistTableViewController(_ playlistTableViewController: PlaylistTableViewController, podcasts: [Podcast], didSelectIndex: Int)
     func playlistTableViewControllerDidSelectDownLoadImage(_ playlistTableViewController: PlaylistTableViewController, podcast: Podcast)
     func playlistTableViewControllerDidSelectStar(_ playlistTableViewController: PlaylistTableViewController, podcast: Podcast)
+    func playlistTableViewControllerDidRefreshTableView(_ playlistTableViewController: PlaylistTableViewController, completion: @escaping () -> Void)
 }
 
 class PlaylistTableViewController: UIViewController {
@@ -38,26 +40,27 @@ class PlaylistTableViewController: UIViewController {
         podcastCell.updateDisplay(progress: progress, totalSize: totalSize)
     }
     
-    func reloadRows(indexPath: IndexPath) {
+    func reloadData() {
         showEmptyImage()
+        playListTableView.reloadData()
     }
 
     // MARK: - View Methods
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         showEmptyImage()
-        FirebaseManager().saveFavoritePodcasts(userId: "111", podcasts: FavoriteDocument.shared.favoritePodcasts)
+        playListTableView.reloadData()
     }
         
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
-        
     }
     
     //MARK: - Actions
     @IBAction func removeAllAction(_ sender: UIButton) {
         FavoriteDocument.shared.removaAllFavorites()
+        FirebaseDatabase.shared.save()
         showEmptyImage()
     }
     
@@ -77,9 +80,11 @@ class PlaylistTableViewController: UIViewController {
     }
     
     @objc func refreshTableView() {
-        FirebaseManager().getFavoritePodcasts(userId: "111") { [weak self] _ in
+        delegate?.playlistTableViewControllerDidRefreshTableView(self) { [weak self] in
             self?.refreshControll.endRefreshing()
             self?.refreshControll.isHidden = true
+            self?.showEmptyImage()
+            self?.playListTableView.reloadData()
         }
     }
 }
@@ -106,7 +111,6 @@ extension PlaylistTableViewController {
         playListTableView.isHidden = favoritePodcastsIsEmpty
         emptyTableImageView.isHidden = !favoritePodcastsIsEmpty
         removeAllButton.isEnabled = !favoritePodcastsIsEmpty
-        playListTableView.reloadData()
     }
 }
 
@@ -142,12 +146,11 @@ extension PlaylistTableViewController: UITableViewDataSource {
 extension PlaylistTableViewController : DetailViewControllerDelegate {
     func detailViewController(_ detailViewController: DetailViewController, addToFavoriteButtonDidTouchFor selectedPodcast: Podcast) {
         selectedPodcast.isFavorite = true
-        DataStoreManager.shared.viewContext.mySave()
+        DataStoreManager.shared.mySave()
     }
     
     func detailViewController(_ detailViewController: DetailViewController, removeFromFavoriteButtonDidTouchFor selectedPodcast: Podcast) {
         FavoriteDocument.shared.addOrRemoveToFavorite(podcast: selectedPodcast)
-        showEmptyImage()
     }
     
     func detailViewController(_ detailViewController: DetailViewController, playButtonDidTouchFor didSelectIndex: Int) {
@@ -187,10 +190,12 @@ extension PlaylistTableViewController: PodcastCellDelegate {
     func podcastCellDidSelectStar(_ podcastCell: PodcastCell, podcast: Podcast) {
         delegate?.playlistTableViewControllerDidSelectStar(self, podcast: podcast)
         showEmptyImage()
+        playListTableView.reloadData()
     }
     
     func podcastCellDidSelectDownLoadImage(_ podcastCell: PodcastCell, podcast: Podcast) {
         delegate?.playlistTableViewControllerDidSelectDownLoadImage(self, podcast: podcast)
         showEmptyImage()
+        playListTableView.reloadData()
     }
 }

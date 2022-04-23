@@ -234,7 +234,7 @@ extension PlayerViewController: BigPlayerViewControllerDelegate {
         let likedMoment = LikedMoment(context: context)
         likedMoment.podcast = podcast
         likedMoment.moment = moment
-        context.mySave()
+        DataStoreManager.shared.mySave()
     }
     
     func bigPlayerViewController(_ bigPlayerViewController: BigPlayerViewController, didChangeCurrentTime value: Double) {

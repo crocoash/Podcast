@@ -60,43 +60,26 @@ extension FavoriteDocument {
         favoritePodcastFetchResultController.fetchedObjects?.forEach {
             viewContext.delete($0)
         }
-        viewContext.mySave()
-    }
-    
-    func changeAllFavoritePodcast(podcasts: [Podcast]) {
-        guard favoritePodcasts != podcasts else { return }
-        removeAll()
-        
-        podcasts.forEach {
-            if let url = $0.previewUrl.url {
-                
-            }
-        }
+        DataStoreManager.shared.mySave()
     }
     
     func addOrRemoveToFavorite(podcast: Podcast) {
         podcast.isFavorite = !podcast.isFavorite
-        viewContext.mySave()
+        DataStoreManager.shared.mySave()
     }
     
     //MARK: - Common
-    func removeAll() {
-        DataStoreManager.shared.removeAll(fetchRequest: Podcast.fetchRequest())
-    }
     
     func downloadPodcast(podcast: Podcast) {
         if let podcast = viewContext.object(with: podcast.objectID) as? Podcast {
             podcast.isDownLoad = true
-            viewContext.mySave()
+            DataStoreManager.shared.mySave()
         }
     }
-   
+    
     func isDownload(podcast: Podcast) -> Bool {
-        guard let favoritePodcasts = favoritePodcastFetchResultController.fetchedObjects else { return false }
-        if let podcast = favoritePodcasts.firstPodcast(matching: podcast.id) {
-            return podcast.isDownLoad
-        }
-        return false
+        guard let url = podcast.previewUrl.localPath else { return false }
+        return FileManager.default.fileExists(atPath: url.path)
     }
    
     func podcastIsFavorite(podcast: Podcast) -> Bool {

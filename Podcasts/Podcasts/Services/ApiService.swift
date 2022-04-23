@@ -41,7 +41,8 @@ class ApiService {
             var result: Result<T>
             defer {
                 DispatchQueue.main.async {
-                    viewContext.mySave()
+                    DataStoreManager.shared.mySave()
+                    FirebaseDatabase.shared.save()
                     completion(result)
                 }
             }

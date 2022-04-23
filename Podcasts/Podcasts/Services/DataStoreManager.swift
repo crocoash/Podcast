@@ -7,7 +7,6 @@
 
 import CoreData
 
-// MARK: - Core Data stack
 class DataStoreManager {
     
     private init() {}
@@ -39,7 +38,19 @@ extension DataStoreManager {
             data.forEach {
                 viewContext.delete($0)
             }
-            viewContext.mySave()
+            mySave()
+        }
+    }
+    
+    func mySave() {
+        if viewContext.hasChanges {
+            do {
+                try viewContext.save()
+//                delegate?.dataStoreManagerContextDidSave(self, viewContext: viewContext)
+            } catch {
+                let nserror = error as NSError
+                fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+            }
         }
     }
 }

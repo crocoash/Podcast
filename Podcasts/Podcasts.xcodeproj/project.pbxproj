@@ -75,9 +75,10 @@
 		3A1FB25C280C85A700C3091C /* FavoriteDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A1FB25A280C85A600C3091C /* FavoriteDocument.swift */; };
 		3A4A3757280164DC000C80E4 /* PodcastData+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4A3755280164DC000C80E4 /* PodcastData+CoreDataClass.swift */; };
 		3A4A3758280164DC000C80E4 /* PodcastData+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4A3756280164DC000C80E4 /* PodcastData+CoreDataProperties.swift */; };
+		3AA59DC528142C0D00FF2D19 /* FirebaseDataBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA59DC428142C0D00FF2D19 /* FirebaseDataBase.swift */; };
 		3AB5ECEA2803650300EB445A /* String+FormaterDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AB5ECE92803650300EB445A /* String+FormaterDate.swift */; };
 		3ABCCC3427FD71CC00862AF2 /* AuthorData+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ABCCC3327FD71CC00862AF2 /* AuthorData+CoreDataClass.swift */; };
-		3AC4B2A628132337001BA710 /* FirebaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AC4B2A528132337001BA710 /* FirebaseManager.swift */; };
+		3AC4B2A628132337001BA710 /* FirestorageDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AC4B2A528132337001BA710 /* FirestorageDatabase.swift */; };
 		3FBCF1C2272847F100B70522 /* PodcastCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FBCF1C0272847F100B70522 /* PodcastCell.swift */; };
 		3FBCF1C3272847F100B70522 /* PodcastCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3FBCF1C1272847F100B70522 /* PodcastCell.xib */; };
 		3FBCF1C72728482A00B70522 /* PodcastByAuthorCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FBCF1C52728482A00B70522 /* PodcastByAuthorCell.swift */; };
@@ -156,9 +157,10 @@
 		3A1FB25A280C85A600C3091C /* FavoriteDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteDocument.swift; sourceTree = "<group>"; };
 		3A4A3755280164DC000C80E4 /* PodcastData+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PodcastData+CoreDataClass.swift"; sourceTree = "<group>"; };
 		3A4A3756280164DC000C80E4 /* PodcastData+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PodcastData+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		3AA59DC428142C0D00FF2D19 /* FirebaseDataBase.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = FirebaseDataBase.swift; sourceTree = "<group>"; };
 		3AB5ECE92803650300EB445A /* String+FormaterDate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+FormaterDate.swift"; sourceTree = "<group>"; };
 		3ABCCC3327FD71CC00862AF2 /* AuthorData+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AuthorData+CoreDataClass.swift"; sourceTree = "<group>"; };
-		3AC4B2A528132337001BA710 /* FirebaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseManager.swift; sourceTree = "<group>"; };
+		3AC4B2A528132337001BA710 /* FirestorageDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirestorageDatabase.swift; sourceTree = "<group>"; };
 		3FBCF1C0272847F100B70522 /* PodcastCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastCell.swift; sourceTree = "<group>"; };
 		3FBCF1C1272847F100B70522 /* PodcastCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PodcastCell.xib; sourceTree = "<group>"; };
 		3FBCF1C52728482A00B70522 /* PodcastByAuthorCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastByAuthorCell.swift; sourceTree = "<group>"; };
@@ -182,9 +184,8 @@
 		047B47A8273B1F27008E844F /* LikedMomentsViewController */ = {
 			isa = PBXGroup;
 			children = (
-				047B47AE273B1FF6008E844F /* LikedMomentsManager.swift */,
-				18FFCA4F27D54A450078CB3F /* LikedMomentsViewController.storyboard */,
 				047B47AD273B1FF6008E844F /* LikedMomentsViewController.swift */,
+				18FFCA4F27D54A450078CB3F /* LikedMomentsViewController.storyboard */,
 			);
 			path = LikedMomentsViewController;
 			sourceTree = "<group>";
@@ -398,6 +399,7 @@
 				3A1FB255280C7CA300C3091C /* SearchDocument.swift */,
 				3A1FB259280C85A600C3091C /* SearchAuthorsDocument.swift */,
 				3A1FB25A280C85A600C3091C /* FavoriteDocument.swift */,
+				047B47AE273B1FF6008E844F /* LikedMomentsManager.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -464,7 +466,8 @@
 			children = (
 				184CE18827270C8D0088044C /* ApiService.swift */,
 				181F5BC327E6718A00AC27EB /* DataStoreManager.swift */,
-				3AC4B2A528132337001BA710 /* FirebaseManager.swift */,
+				3AC4B2A528132337001BA710 /* FirestorageDatabase.swift */,
+				3AA59DC428142C0D00FF2D19 /* FirebaseDataBase.swift */,
 				1831DED02730560D00EC09E2 /* DownloadService.swift */,
 				1828F9BA2738798F00761CD5 /* DataProvider.swift */,
 				1855934627380C270012BA91 /* AuthService.swift */,
@@ -685,6 +688,7 @@
 				18D13DDC273C407A00495C97 /* UserDocument.swift in Sources */,
 				18D0EAA227F0FF8900941A0D /* Author+CoreDataClass.swift in Sources */,
 				3A4A3758280164DC000C80E4 /* PodcastData+CoreDataProperties.swift in Sources */,
+				3AA59DC528142C0D00FF2D19 /* FirebaseDataBase.swift in Sources */,
 				049D480327286D5900B6DA3C /* DetailViewController.swift in Sources */,
 				18FFCA5527D556920078CB3F /* PreLoaderViewController.swift in Sources */,
 				3FBCF1C72728482A00B70522 /* PodcastByAuthorCell.swift in Sources */,
@@ -728,7 +732,7 @@
 				3A1FB252280A067B00C3091C /* LikedMoment+CoreDataProperties.swift in Sources */,
 				181F5BE227E72E3800AC27EB /* extensionCoreData.swift in Sources */,
 				18A500612727FA3800CD3F0C /* RegistrationViewController.swift in Sources */,
-				3AC4B2A628132337001BA710 /* FirebaseManager.swift in Sources */,
+				3AC4B2A628132337001BA710 /* FirestorageDatabase.swift in Sources */,
 				1831DEDB2731944600EC09E2 /* DismissTransition.swift in Sources */,
 				189C1FAA272D336500A8480E /* UITableView + register.swift in Sources */,
 				1831DED12730560D00EC09E2 /* DownloadService.swift in Sources */,

@@ -10,9 +10,7 @@ import UIKit
 protocol SettingsTableViewControllerDelegate: AnyObject {
     
     func settingsTableViewControllerDidAppear(_ settingsTableViewController: SettingsTableViewController)
-    
     func settingsTableViewControllerDidDisappear(_ settingsTableViewController: SettingsTableViewController)
-    
     func settingsTableViewControllerDarkModeDidSelect(_ settingsTableViewController: SettingsTableViewController)
 }
 
@@ -20,6 +18,7 @@ class SettingsTableViewController: UITableViewController {
     
     private var userViewModel: UserViewModel!
     private var user: User { userViewModel.userDocument.user }
+    private let fireStoreDataBase = FirestorageDatabase()
     
     weak var delegate: SettingsTableViewControllerDelegate?
     
@@ -34,9 +33,14 @@ class SettingsTableViewController: UITableViewController {
     @IBOutlet private weak var userNameLabel: UILabel!
     @IBOutlet private weak var locationLabel: UILabel!
     @IBOutlet private weak var darkModeSwitch: UISwitch!
-    
+    @IBOutlet private weak var avatarImageView: UIImageView!
     @IBOutlet private weak var authorizationSwitch: UISwitch!
     
+    
+    //TODO: 
+    private let pickerController = UIImagePickerController()
+    
+    //MARK: - View Methods
     override func loadView() {
         super.loadView()
         ApiService.getData(for: URLS.api.rawValue) { [weak self] (result: IpModel?) in
@@ -60,6 +64,7 @@ class SettingsTableViewController: UITableViewController {
         delegate?.settingsTableViewControllerDidDisappear(self)
     }
     
+    //MARK: - Actions
     @IBAction func darkModeValueChanged(_ sender: UISwitch) {
         delegate?.settingsTableViewControllerDarkModeDidSelect(self)
         darkModeStyle(value: !isDarkTheme)
@@ -80,6 +85,7 @@ extension SettingsTableViewController {
         userNameLabel.text = user.userName
         authorizationSwitch.isOn = user.isAuthorization
         darkModeSwitch.isOn = isDarkTheme
+//        fireStoreDataBase.getFavoritePodcasts(userId: <#T##String#>, completion: <#T##([Podcast]) -> Void#>)
     }
     
     func switchDarkMode() {
