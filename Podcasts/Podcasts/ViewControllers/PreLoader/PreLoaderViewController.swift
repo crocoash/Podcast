@@ -37,7 +37,7 @@ class PreLoaderViewController: UIViewController {
         super.viewDidAppear(animated)
         
         if userViewModel.userDocument.user.isAuthorization {
-            UIView.animate(withDuration: 2, delay: 10) {
+            Timer.scheduledTimer(withTimeInterval: 1, repeats: false) { _ in
                 self.present(self.tabBarVC, animated: true)
             }
         } else {
