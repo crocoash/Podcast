@@ -29,7 +29,6 @@ class PreLoaderViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         horizontalCenterConstraint.isActive = false
-        
         heightConstraint = logoImageView.topAnchor.constraint(equalTo: view.topAnchor, constant: topAnchorConst)
         heightConstraint?.isActive = true
     }
