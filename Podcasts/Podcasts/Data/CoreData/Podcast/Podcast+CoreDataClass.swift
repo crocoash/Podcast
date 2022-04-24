@@ -11,7 +11,7 @@ import CoreData
 
 @objc(Podcast)
 public class Podcast: NSManagedObject, Codable {
-
+    
     private enum CodingKeys: String, CodingKey {
         case previewUrl
         case episodeFileExtension
@@ -39,23 +39,22 @@ public class Podcast: NSManagedObject, Codable {
         case episodeGuid
         case kind
         case wrapperType
-        case isDownLoad
         case progress
         case isFavorite
         case isSearched
     }
-
+    
     required convenience public init(from decoder: Decoder) throws {
-
+        
         guard let context = decoder.userInfo[.context] as? NSManagedObjectContext else {
             fatalError("mistake")
         }
-
+        
         let entity = NSEntityDescription.entity(forEntityName: Podcast.description(), in: context)!
         self.init(entity: entity, insertInto: context)
-
+        
         let container = try decoder.container(keyedBy: CodingKeys.self)
-
+        
         previewUrl =            try container.decodeIfPresent(String.self, forKey: .previewUrl)
         episodeFileExtension =  try container.decodeIfPresent(String.self, forKey: .episodeFileExtension)
         artworkUrl160 =         try container.decodeIfPresent(String.self, forKey: .artworkUrl160)
@@ -82,7 +81,6 @@ public class Podcast: NSManagedObject, Codable {
         episodeGuid =           try container.decodeIfPresent(String.self, forKey: .episodeGuid)
         kind =                  try container.decodeIfPresent(String.self, forKey: .kind)
         wrapperType =           try container.decodeIfPresent(String.self, forKey: .wrapperType)
-        isDownLoad =            try container.decodeIfPresent(Bool  .self, forKey: .isDownLoad) ?? false
         isFavorite =            try container.decodeIfPresent(Bool  .self, forKey: .isFavorite) ?? false
         isSearched =            try container.decodeIfPresent(Bool  .self, forKey: .isSearched) ?? true
     }
@@ -115,9 +113,8 @@ public class Podcast: NSManagedObject, Codable {
         try container.encode(episodeGuid, forKey: .episodeGuid)
         try container.encode(kind, forKey: .kind)
         try container.encode(wrapperType, forKey: .wrapperType)
-        try container.encode(isDownLoad, forKey: .isDownLoad)
         try container.encode(isFavorite, forKey: .isFavorite)
         try container.encode(isSearched, forKey: .isSearched)
-}
+    }
     
 }

@@ -11,7 +11,6 @@ protocol SettingsTableViewControllerDelegate: AnyObject {
     
     func settingsTableViewControllerDidAppear(_ settingsTableViewController: SettingsTableViewController)
     func settingsTableViewControllerDidDisappear(_ settingsTableViewController: SettingsTableViewController)
-    func settingsTableViewControllerDarkModeDidSelect(_ settingsTableViewController: SettingsTableViewController)
 }
 
 class SettingsTableViewController: UITableViewController {
@@ -24,10 +23,6 @@ class SettingsTableViewController: UITableViewController {
     
     func setUser(_ userViewModel: UserViewModel) {
         self.userViewModel = userViewModel
-    }
-    
-    private var isDarkTheme: Bool {
-        self.traitCollection.userInterfaceStyle == .dark
     }
     
     @IBOutlet private weak var userNameLabel: UILabel!
@@ -66,8 +61,7 @@ class SettingsTableViewController: UITableViewController {
     
     //MARK: - Actions
     @IBAction func darkModeValueChanged(_ sender: UISwitch) {
-        delegate?.settingsTableViewControllerDarkModeDidSelect(self)
-        darkModeStyle(value: !isDarkTheme)
+        darkModeStyle(value: sender.isOn)
     }
     
     @IBAction func avtorizationChangeValue(_ sender: UISwitch) {
@@ -75,7 +69,7 @@ class SettingsTableViewController: UITableViewController {
     }
     
     @IBAction func exit(_ sender: UITapGestureRecognizer) {
-        dismiss(animated: isDarkTheme)
+        dismiss(animated: true)
     }
 }
 
@@ -84,16 +78,13 @@ extension SettingsTableViewController {
     private func setUpUI() {
         userNameLabel.text = user.userName
         authorizationSwitch.isOn = user.isAuthorization
-        darkModeSwitch.isOn = isDarkTheme
-//        fireStoreDataBase.getFavoritePodcasts(userId: <#T##String#>, completion: <#T##([Podcast]) -> Void#>)
-    }
-    
-    func switchDarkMode() {
-        darkModeSwitch.isOn.toggle()
-        darkModeStyle(value: isDarkTheme)
+        darkModeSwitch.isOn = userViewModel.userDocument.user.userInterfaceStyleIsDark
     }
     
     func darkModeStyle(value: Bool) {
-        view.backgroundColor = value ? .black : .white
+        if let window = UIApplication.shared.windows.first {
+            window.overrideUserInterfaceStyle = value ? .dark : .light
+            userViewModel.changeUserInterfaceStyle(value: value)
+        }
     }
 }

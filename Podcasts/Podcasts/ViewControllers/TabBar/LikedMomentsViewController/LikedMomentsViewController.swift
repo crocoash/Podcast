@@ -6,33 +6,38 @@
 //
 
 import UIKit
+import CoreData
 
 protocol LikedMomentsViewControllerDelegate: AnyObject {
+    
     func likedMomentViewController(_ likedMomentViewController: LikedMomentsViewController, didSelectMomentAt index: Int, likedMoments: [LikedMoment])
 }
 
 class LikedMomentsViewController: UIViewController {
 
     @IBOutlet private weak var emptyDataImage: UIImageView!
-    @IBOutlet private weak var likedMomentsTableView: UITableView!
+    @IBOutlet private weak var tableView: UITableView!
     
     private var cellHeight: CGFloat = 75
     weak var delegate: LikedMomentsViewControllerDelegate?
     
+    //MARK: - View Methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        likedMomentsTableView.register(PodcastCell.self)
-        likedMomentsTableView.rowHeight = cellHeight
+        tableView.register(PodcastCell.self)
+        tableView.rowHeight = cellHeight
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        likedMomentsTableView.reloadData()
+        tableView.reloadData()
+        LikedMomentsManager.shared.likedMomentFetchResultController.delegate = self
         reloadData()
     }
     
+    //MARK: - Public Method
     func reloadData() {
-        likedMomentsTableView?.reloadData()
+        tableView?.reloadData()
         showEmptyImage()
     }
 }
@@ -42,32 +47,28 @@ extension LikedMomentsViewController {
     private func showEmptyImage() {
         let likeMomentsIsEmpty = LikedMomentsManager.shared.likeMoments.isEmpty
         emptyDataImage?.isHidden = !likeMomentsIsEmpty
-        likedMomentsTableView?.isHidden = likeMomentsIsEmpty
+        tableView?.isHidden = likeMomentsIsEmpty
     }
 }
 
+// MARK: - UITableViewDelegate
 extension LikedMomentsViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         delegate?.likedMomentViewController(self, didSelectMomentAt: indexPath.row, likedMoments: LikedMomentsManager.shared.likeMoments)
     }
     
-    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
-        return .delete
-    }
-    
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             //TODO: - beginUpdates()
-            likedMomentsTableView.beginUpdates()
             LikedMomentsManager.shared.deleteMoment(at: indexPath)
-            likedMomentsTableView.deleteRows(at: [indexPath], with: .fade)
-            likedMomentsTableView.endUpdates()
+//            tableView.deleteRows(at: [indexPath], with: .fade)
             reloadData()
         }
     }
 }
 
+// MARK: - UITableViewDataSource
 extension LikedMomentsViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -76,9 +77,23 @@ extension LikedMomentsViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let likedMoment = LikedMomentsManager.shared.getLikeMoment(at: indexPath)
-        let cell = likedMomentsTableView.getCell(cell: PodcastCell.self, indexPath: indexPath)
+        let cell = tableView.getCell(cell: PodcastCell.self, indexPath: indexPath)
         
         cell.configureCell(with: likedMoment.podcast)
         return cell
+    }
+}
+
+//MARK: - NSFetchedResultsControllerDelegate
+extension LikedMomentsViewController: NSFetchedResultsControllerDelegate {
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+       // TODO: -
+        guard let indexPath = indexPath else { return }
+
+        switch type {
+        case .delete:
+            tableView.deleteRows(at: [indexPath], with: .fade)
+        default: break
+        }
     }
 }

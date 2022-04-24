@@ -30,4 +30,8 @@ class UserViewModel {
     func changeAuthorization(value: Bool) {
         userDocument.changeAuthorization(value: value)
     }
+    
+    func changeUserInterfaceStyle(value: Bool) {
+        userDocument.changeUserInterfaceStyle(value: value)
+    }
 }

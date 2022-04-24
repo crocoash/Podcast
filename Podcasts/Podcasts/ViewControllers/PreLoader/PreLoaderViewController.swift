@@ -31,13 +31,17 @@ class PreLoaderViewController: UIViewController {
         horizontalCenterConstraint.isActive = false
         heightConstraint = logoImageView.topAnchor.constraint(equalTo: view.topAnchor, constant: topAnchorConst)
         heightConstraint?.isActive = true
+        
+        if let window = UIApplication.shared.windows.first {
+            window.overrideUserInterfaceStyle = userViewModel.userDocument.user.userInterfaceStyleIsDark ? .dark : .light
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
         if userViewModel.userDocument.user.isAuthorization {
-            Timer.scheduledTimer(withTimeInterval: 1, repeats: false) { _ in
+            Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { _ in
                 self.present(self.tabBarVC, animated: true)
             }
         } else {

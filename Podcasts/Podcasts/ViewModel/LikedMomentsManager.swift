@@ -16,10 +16,10 @@ class LikedMomentsManager {
     
     private var viewContext = DataStoreManager.shared.viewContext
     
-    private lazy var likedMomentFetchResultController: NSFetchedResultsController<LikedMoment> = {
+    private(set) lazy var likedMomentFetchResultController: NSFetchedResultsController<LikedMoment> = {
         let fetchRequest: NSFetchRequest<LikedMoment> = LikedMoment.fetchRequest()
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(LikedMoment.moment), ascending: true)]
-        
+        fetchRequest.returnsObjectsAsFaults = false
         let fetchResultController = NSFetchedResultsController(
             fetchRequest: fetchRequest,
             managedObjectContext: viewContext,
@@ -41,7 +41,7 @@ class LikedMomentsManager {
 }
 
 extension LikedMomentsManager {
-    var likeMoments: [LikedMoment] { LikedMomentsManager.shared.likedMomentFetchResultController.fetchedObjects ?? [] }
+    var likeMoments: [LikedMoment] { likedMomentFetchResultController.fetchedObjects ?? [] }
     var countOfLikeMoments: Int { likeMoments.count }
     
     func deleteMoment(at indexPath: IndexPath) {

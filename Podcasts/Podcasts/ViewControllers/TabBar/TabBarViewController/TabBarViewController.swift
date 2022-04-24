@@ -114,13 +114,16 @@ extension TabBarViewController {
     private func addOrRemoveFromFavorite(podcast: Podcast) {
         let title = (podcast.trackName ?? "podcast") + (podcast.isFavorite ? "is removed from playlist" : "is added to playlist")
         MyToast.create(title: title,.bottom,timeToAppear: 0.2,timerToRemove: 2,for: view)
+        
         FavoriteDocument.shared.addOrRemoveToFavorite(podcast: podcast)
+        if FavoriteDocument.shared.isDownload(podcast: podcast) { downloadService.cancelDownload(podcast: podcast)}
+        
         FirebaseDatabase.shared.save()
         feedbackGenerator()
     }
     
     private func downloadOrRemovePodcast(_ podcast: Podcast, _ indexPath: IndexPath) {
-        if podcast.isDownLoad {
+        if FavoriteDocument.shared.isDownload(podcast: podcast) {
             downloadService.cancelDownload(podcast: podcast)
         } else {
             downloadService.startDownload(podcast, indexPath: indexPath)
@@ -136,6 +139,7 @@ extension TabBarViewController {
 
 // MARK: - SearchViewControllerDelegate
 extension TabBarViewController: SearchViewControllerDelegate {
+    
     func searchViewControllerDidSelectFavoriteStar(_ searchViewController: SearchViewController, podcast: Podcast) {
         addOrRemoveFromFavorite(podcast: podcast)
     }
@@ -183,25 +187,6 @@ extension TabBarViewController: PlaylistViewControllerDelegate {
 // MARK: - SettingsTableViewControllerDelegate
 extension TabBarViewController: SettingsTableViewControllerDelegate {
     
-    func settingsTableViewControllerDarkModeDidSelect(_ settingsTableViewController: SettingsTableViewController) {
-        
-        self.trailConstraint?.isActive.toggle()
-        self.leadConstraint?.isActive.toggle()
-         
-        UIView.animate(withDuration: 2, delay: 0, options: [.curveEaseOut], animations: {
-            self.view.layoutIfNeeded()
-        }) { _ in
-            
-            settingsTableViewController.switchDarkMode()
-            
-            UIView.animate(withDuration: 0.5) {
-                self.trailConstraint?.isActive.toggle()
-                self.leadConstraint?.isActive.toggle()
-                self.view.layoutIfNeeded()
-            }
-        }
-    }
-    
     func settingsTableViewControllerDidAppear(_ settingsTableViewController: SettingsTableViewController) {
         self.playerVC.view.isHidden = true
     }
@@ -236,11 +221,11 @@ extension TabBarViewController: URLSessionDownloadDelegate {
         
         let progress = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite)
         let totalSize = ByteCountFormatter.string(fromByteCount: totalBytesExpectedToWrite, countStyle: .file)
-        let podcast = podcastDownload.podcast
+        let id = podcastDownload.id
         
         DispatchQueue.main.async {
-            self.searchVC.updateDisplay(progress: progress, totalSize: totalSize, podcast: podcast)
-            self.playListVc.updateDisplay(progress: progress, totalSize: totalSize, podcast: podcast)
+            self.searchVC.updateDisplay(progress: progress, totalSize: totalSize, id: id)
+            self.playListVc.updateDisplay(progress: progress, totalSize: totalSize, id: id)
         }
     }
     
@@ -262,14 +247,9 @@ extension TabBarViewController: URLSessionDownloadDelegate {
             print("Could not remove item at disk: \(error.localizedDescription)")
         }
         
-        guard let podcastDownload = self.downloadService.activeDownloads[url] else { return }
-        let podcast = podcastDownload.podcast
-        let indexPath = podcastDownload.indexPath
-        
         DispatchQueue.main.async {
-            FavoriteDocument.shared.downloadPodcast(podcast: podcast)
             self.downloadService.endDownload(url: url)
-            self.searchVC.reloadRows(indexPath: indexPath)
+            self.searchVC.reloadData()
             self.playListVc.reloadData()
         }
     }
@@ -289,6 +269,7 @@ extension TabBarViewController: URLSessionDelegate {
     }
 }
 
+//MARK: - FirebaseDatabaseDelegate
 extension TabBarViewController: FirebaseDatabaseDelegate {
     
     func firebaseDatabaseDidGetData(_ firebaseDatabase: FirebaseDatabase) {

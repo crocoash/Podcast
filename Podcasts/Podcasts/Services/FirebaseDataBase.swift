@@ -54,6 +54,8 @@ class FirebaseDatabase {
       guard let value = snapShot.value,
             let self = self else { return }
       DataStoreManager.shared.removeAll(fetchRequest: Podcast.fetchRequest())
+      
+      
       if let data = try? JSONSerialization.data(withJSONObject: value, options: .fragmentsAllowed) {
         do {
           _ = try JSONDecoder(context: self.viewContext).decode([Podcast].self, from: data)

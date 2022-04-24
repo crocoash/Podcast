@@ -25,7 +25,7 @@
                             </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="Z4P-ia-hHc"/>
-                        <color key="backgroundColor" systemColor="quaternarySystemFillColor"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="Z4P-ia-hHc" firstAttribute="trailing" secondItem="xR4-f7-j5p" secondAttribute="trailing" constant="36" id="CTa-zj-Jta"/>
                             <constraint firstItem="xR4-f7-j5p" firstAttribute="centerY" secondItem="Z4P-ia-hHc" secondAttribute="centerY" id="NLM-VF-MlM"/>
@@ -45,8 +45,8 @@
     </scenes>
     <resources>
         <image name="images" width="184" height="68.5"/>
-        <systemColor name="quaternarySystemFillColor">
-            <color red="0.45490196078431372" green="0.45490196078431372" blue="0.50196078431372548" alpha="0.080000000000000002" colorSpace="custom" customColorSpace="sRGB"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
     </resources>
 </document>

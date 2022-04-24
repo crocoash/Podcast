@@ -34,7 +34,6 @@
         <attribute name="feedUrl" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="NO"/>
         <attribute name="index" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="NO"/>
-        <attribute name="isDownLoad" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="isFavorite" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="isSearched" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="kind" optional="YES" attributeType="String"/>
@@ -54,8 +53,8 @@
     <elements>
         <element name="Author" positionX="230.0902099609375" positionY="154.2001037597656" width="128" height="89"/>
         <element name="AuthorData" positionX="88.09765625" positionY="6.51171875" width="128" height="59"/>
-        <element name="Podcast" positionX="-253.359375" positionY="231.23046875" width="128" height="494"/>
-        <element name="PodcastData" positionX="-45" positionY="171" width="128" height="59"/>
         <element name="LikedMoment" positionX="-45" positionY="171" width="128" height="59"/>
+        <element name="Podcast" positionX="-253.359375" positionY="231.23046875" width="128" height="479"/>
+        <element name="PodcastData" positionX="-45" positionY="171" width="128" height="59"/>
     </elements>
 </model>
