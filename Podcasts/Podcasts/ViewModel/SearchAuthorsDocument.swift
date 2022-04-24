@@ -20,6 +20,8 @@ class SearchAuthorsDocument {
         let fetchRequest: NSFetchRequest<Author> = Author.fetchRequest()
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(Author.artistID), ascending: true)]
         
+        fetchRequest.returnsObjectsAsFaults = false
+        
         let fetchResultController = NSFetchedResultsController(
             fetchRequest: fetchRequest,
             managedObjectContext: viewContext,

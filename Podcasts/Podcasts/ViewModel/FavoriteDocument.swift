@@ -20,7 +20,7 @@ class FavoriteDocument {
         let fetchRequest: NSFetchRequest<Podcast> = Podcast.fetchRequest()
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(Podcast.trackName), ascending: true)]
         fetchRequest.predicate = NSPredicate(format: "isFavorite = true")
-        
+        fetchRequest.returnsObjectsAsFaults = false
         let fetchResultController = NSFetchedResultsController(
             fetchRequest: fetchRequest,
             managedObjectContext: viewContext,
@@ -46,6 +46,8 @@ extension FavoriteDocument {
     
     var favoritePodcasts: [Podcast] { favoritePodcastFetchResultController.fetchedObjects ?? [] }
     
+    var countOffavoritePodcasts: Int { favoritePodcasts.count }
+    
     var favoritePodcastIsEmpty: Bool { favoritePodcasts.isEmpty }
     
     func getfavoritePodcast(for indexPath: IndexPath) -> Podcast {
@@ -70,18 +72,11 @@ extension FavoriteDocument {
     
     //MARK: - Common
     
-    func downloadPodcast(podcast: Podcast) {
-        if let podcast = viewContext.object(with: podcast.objectID) as? Podcast {
-            podcast.isDownLoad = true
-            DataStoreManager.shared.mySave()
-        }
-    }
-    
     func isDownload(podcast: Podcast) -> Bool {
         guard let url = podcast.previewUrl.localPath else { return false }
         return FileManager.default.fileExists(atPath: url.path)
     }
-   
+    
     func podcastIsFavorite(podcast: Podcast) -> Bool {
         if let podcasts = favoritePodcastFetchResultController.fetchedObjects {
             return podcasts.contains { $0.id == podcast.id }

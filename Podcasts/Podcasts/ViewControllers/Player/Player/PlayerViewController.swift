@@ -122,7 +122,7 @@ extension PlayerViewController {
         if observe == nil { addTimeObserve() }
         
         let requestWorkItem = DispatchWorkItem {
-            let item = AVPlayerItem(url: podcast.isDownLoad ? url.localPath : url)
+            let item = AVPlayerItem(url: FavoriteDocument.shared.isDownload(podcast: podcast) ? url.localPath : url)
             self.player.replaceCurrentItem(with: item)
             self.player.play()
             if !self.likedMoments.isEmpty {

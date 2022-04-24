@@ -28,4 +28,8 @@ struct UserDocument: Codable {
     mutating func changeAuthorization(value: Bool) {
         user.isAuthorization = value
     }
+    
+    mutating func changeUserInterfaceStyle(value: Bool) {
+        user.userInterfaceStyleIsDark = value
+    }
 }
