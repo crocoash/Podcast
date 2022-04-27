@@ -18,7 +18,3 @@ extension JSONDecoder {
         self.userInfo[.context] = context
     }
 }
-
-protocol SearchProtocol {
-    static func cancellSearch()
-}

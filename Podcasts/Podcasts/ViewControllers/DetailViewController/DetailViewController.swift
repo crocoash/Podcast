@@ -100,6 +100,6 @@ extension DetailViewController {
         removeFromPlaylistBookmark.addMyGestureRecognizer(self, type: .tap(), selector: #selector(removeBookmarkOnTouchUpInside))
         addToPlaylistBookmark.addMyGestureRecognizer(self, type: .tap(), selector: #selector(addBookmarkOnTouchUpInside))
         playImageView.addMyGestureRecognizer(self, type: .tap(), selector: #selector(playButtonOnTouchUpInside))
-        addMyGestureRecognizer(self, type: .screenEdgePanGestureRecognizer(directions: [.left]), selector: #selector(backAction))
+        addMyGestureRecognizer(self, type: .screenEdgePanGestureRecognizer(directions: [.left]), #selector(backAction))
     }
 }

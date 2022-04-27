@@ -2,7 +2,7 @@
 //  Podcast+CoreDataProperties.swift
 //  Podcasts
 //
-//  Created by Anton on 24.04.2022.
+//  Created by Anton on 25.04.2022.
 //
 //
 
@@ -46,6 +46,8 @@ extension Podcast {
     @NSManaged public var trackTimeMillis: NSNumber?
     @NSManaged public var trackViewUrl: String?
     @NSManaged public var wrapperType: String?
+    @NSManaged public var isLikedMoment: Bool
+
 }
 
 extension Podcast : Identifiable {

@@ -10,10 +10,10 @@ import CoreData
 import SwiftUI
 
 protocol SearchViewControllerDelegate: AnyObject {
-    func searchViewController(_ searchViewController: SearchViewController,_ podcasts: [Podcast], didSelectIndex: Int)
+    func searchViewController                      (_ searchViewController: SearchViewController,_ podcasts: [Podcast], didSelectIndex: Int)
     func searchViewControllerDidSelectDownLoadImage(_ searchViewController: SearchViewController, podcast: Podcast, indexPath: IndexPath)
-    func searchViewControllerDidSelectFavoriteStar(_ searchViewController: SearchViewController, podcast: Podcast)
-    func searchViewControllerDidRefreshTableView(_ searchViewController: SearchViewController, completion: @escaping () -> Void)
+    func searchViewControllerDidSelectFavoriteStar (_ searchViewController: SearchViewController, podcast: Podcast)
+    func searchViewControllerDidRefreshTableView   (_ searchViewController: SearchViewController, completion: @escaping () -> Void)
 }
 
 class SearchViewController : UIViewController {
@@ -28,19 +28,18 @@ class SearchViewController : UIViewController {
     private let refreshControll = UIRefreshControl()
 
     private let activityIndicator = UIActivityIndicatorView()
-    private var alert = Alert()
+    private var alert             = Alert()
+    private var podcasts          = Array<Podcast>()
+    
     weak var delegate: SearchViewControllerDelegate?
     
     //MARK: - Methods
     func playerIsShow() { playerOffSetConstraint.constant = 300  }
     
     func updateDisplay(progress: Float, totalSize: String, id: NSNumber) {
-        guard
-            let podcast = SearchPodcastDocument.shared.podcasts.firstPodcast(matching: id),
-            let indexPath = SearchPodcastDocument.shared.searchResController.indexPath(forObject: podcast)
-        else { return }
+        guard let index = podcasts.firstIndex(matching: id) else { return }
         
-        if let podcastCell = self.tableView?.cellForRow(at: indexPath) as? PodcastCell {
+        if let podcastCell = self.tableView?.cellForRow(at: IndexPath(row: index, section: 0)) as? PodcastCell {
             podcastCell.updateDisplay(progress: progress, totalSize: totalSize)
         }
     }
@@ -55,8 +54,8 @@ class SearchViewController : UIViewController {
     // MARK: - View Methods
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        tableView.reloadData()
-        if SearchPodcastDocument.shared.podcastsIsEmpty { searchBar.becomeFirstResponder() }
+        showEmptyImage()
+        if podcasts.isEmpty { searchBar.becomeFirstResponder() }
     }
     
     override func viewDidLoad() {
@@ -103,7 +102,7 @@ class SearchViewController : UIViewController {
         guard let view = sender.view as? UITableViewCell,
               let indexPath = tableView.indexPath(for: view) else { return }
         
-        let podcast = SearchPodcastDocument.shared.getPodcast(at: indexPath)
+        let podcast = podcasts[indexPath.row]
         let detailViewController = DetailViewController.initVC
         
         detailViewController.delegate = self
@@ -134,7 +133,6 @@ extension SearchViewController {
         configureSegmentalControl()
         configureAlert()
         configureActivityIndicator()
-        SearchPodcastDocument.shared.searchResController.delegate = self
         SearchAuthorsDocument.shared.searchResController.delegate = self
     }
     
@@ -179,7 +177,7 @@ extension SearchViewController {
     }
     
     private func showEmptyImage() {
-        let podcastsIsEmpty = SearchPodcastDocument.shared.podcastsIsEmpty
+        let podcastsIsEmpty = podcasts.isEmpty
         let authorsIsEmpty = SearchAuthorsDocument.shared.authorsIsEmpty
         
         if (searchSegmentalControl?.selectedSegmentIndex == 0 && podcastsIsEmpty) ||
@@ -201,18 +199,19 @@ extension SearchViewController {
         feedbackGenerator.impactOccurred()
     }
     
-    private func upDateInformation(podcast: Podcast) {
+    private func updateInformation(podcast: Podcast) {
         podcast.isFavorite = FavoriteDocument.shared.podcastIsFavorite(podcast: podcast)
-            DataStoreManager.shared.viewContext.mySave()
-        }
+    }
 }
 
 //MARK: - Private methods
 extension SearchViewController {
-    private func processResults<T>(data: [T]?) {
+    
+    private func processResults<T>(result: [T]?, completion: ([T]) -> Void) {
         activityIndicator.stopAnimating()
         
-        if let data = data, !data.isEmpty {
+        if let result = result, !result.isEmpty {
+            completion(result)
         } else {
             self.alert.create(title: "Ooops nothing search", withTimeIntervalToDismiss: 2)
         }
@@ -225,15 +224,18 @@ extension SearchViewController {
         
         if searchSegmentalControl.selectedSegmentIndex == 0 {
             ApiService.getData(for: UrlRequest1.getStringUrl(.podcast(request))) { [weak self] (info: PodcastData?) in
-                guard let self = self else { return }
-                let results = info?.results.compactMap { $0 as? Podcast }
-                self.processResults(data: results)
+                guard let self = self,
+                      let podcasts = info?.results.allObjects as? [Podcast] else { return }
+                
+                self.processResults(result: podcasts) {
+                    self.podcasts = $0
+                }
             }
         } else {
             ApiService.getData(for: UrlRequest1.getStringUrl(.authors(request))) { [weak self] (info: AuthorData?) in
-                guard let self = self else { return }
-                let results = info?.results.compactMap { $0 as? Author }
-                self.processResults(data: results)
+                guard let self = self,
+                      let authors = info?.results.allObjects as? [Author] else { return }
+                self.processResults(result: authors) { _ in }
             }
         }
     }
@@ -244,7 +246,7 @@ extension SearchViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if isPodcast {
-            return SearchPodcastDocument.shared.numberOfRowsInSection(section: section)
+            return podcasts.count
         } else {
             return SearchAuthorsDocument.shared.numberOfRowsInSection(section: section)
         }
@@ -255,11 +257,11 @@ extension SearchViewController: UITableViewDataSource {
     }
     
     private func configurePodcastCell(_ indexPath: IndexPath,for tableView: UITableView) -> UITableViewCell {
-        let podcast = SearchPodcastDocument.shared.getPodcast(at: indexPath)
+        let podcast = podcasts[indexPath.row]
         let cell = tableView.getCell(cell: PodcastCell.self, indexPath: indexPath)
         
-        upDateInformation(podcast: podcast)
         DownloadService().resumeDownload(podcast)
+        updateInformation(podcast: podcast)
         cell.delegate = self
         cell.configureCell(with: podcast)
         cell.addMyGestureRecognizer(self, type: .tap(), selector: #selector(handlerTapPodcastCell))
@@ -304,8 +306,7 @@ extension SearchViewController: UISearchBarDelegate {
     }
     
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
-        //TODO: проверить 
-        addMyGestureRecognizer(view, type: .tap(), selector: #selector(UIView.endEditing(_:)))
+        addMyGestureRecognizer(view, type: .tap(), #selector(UIView.endEditing(_:)))
     }
 }
 
@@ -339,7 +340,7 @@ extension SearchViewController: UIViewControllerTransitioningDelegate {
 extension SearchViewController: DetailViewControllerDelegate {
     
     func detailViewController(_ detailViewController: DetailViewController, playButtonDidTouchFor podcastIndex: Int) {
-        delegate?.searchViewController(self, SearchPodcastDocument.shared.podcasts, didSelectIndex: podcastIndex)
+        delegate?.searchViewController(self, podcasts, didSelectIndex: podcastIndex)
     }
     
     func detailViewController(_ detailViewController: DetailViewController, addToFavoriteButtonDidTouchFor selectedPodcast: Podcast) {

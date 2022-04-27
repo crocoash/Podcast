@@ -41,7 +41,7 @@ class ApiService {
             var result: Result<T>
             defer {
                 DispatchQueue.main.async {
-                    DataStoreManager.shared.mySave()
+                    viewContext.mySave()
                     FirebaseDatabase.shared.save()
                     completion(result)
                 }
@@ -52,8 +52,8 @@ class ApiService {
             }
             do {
                 let decoder = JSONDecoder(context: viewContext)
-                let data = try decoder.decode(T.self, from: data)
-                result = .success(result: data)
+                let value = try decoder.decode(T.self, from: data)
+                result = .success(result: value)
                 
             } catch let error {
                 result = .failure(error: error)

@@ -46,7 +46,7 @@ extension AuthorData: SearchProtocol {
                 authoreData.results.forEach { authors in
                     viewContext.delete(authors as! NSManagedObject)
                 }
-                DataStoreManager.shared.mySave()
+                DataStoreManager.shared.viewContext.mySave()
             }
         }
         

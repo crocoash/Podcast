@@ -11,7 +11,7 @@ import CoreData
 class FavoriteDocument {
     
     static var shared = FavoriteDocument()
-    private init(){}
+    private init() {}
     
     private let viewContext = DataStoreManager.shared.viewContext
     private var favorite: [Podcast] { favoritePodcastFetchResultController.fetchedObjects ?? [] }
@@ -20,7 +20,6 @@ class FavoriteDocument {
         let fetchRequest: NSFetchRequest<Podcast> = Podcast.fetchRequest()
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(Podcast.trackName), ascending: true)]
         fetchRequest.predicate = NSPredicate(format: "isFavorite = true")
-        fetchRequest.returnsObjectsAsFaults = false
         let fetchResultController = NSFetchedResultsController(
             fetchRequest: fetchRequest,
             managedObjectContext: viewContext,
@@ -60,14 +59,21 @@ extension FavoriteDocument {
     
     func removaAllFavorites() {
         favoritePodcastFetchResultController.fetchedObjects?.forEach {
-            viewContext.delete($0)
+            addOrRemoveToFavorite(podcast: $0)
         }
-        DataStoreManager.shared.mySave()
+        DataStoreManager.shared.viewContext.mySave()
     }
     
     func addOrRemoveToFavorite(podcast: Podcast) {
-        podcast.isFavorite = !podcast.isFavorite
-        DataStoreManager.shared.mySave()
+        if !podcast.isFavorite {
+            let newPodcast = Podcast(podcast: podcast)
+            newPodcast.isFavorite = true
+        } else {
+            if let podcast = FavoriteDocument.shared.favoritePodcastFetchResultController.fetchedObjects?.firstPodcast(matching: podcast.id) {
+                viewContext.delete(podcast)
+            }
+        }
+        viewContext.mySave()
     }
     
     //MARK: - Common

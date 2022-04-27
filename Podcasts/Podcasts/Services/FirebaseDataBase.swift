@@ -41,10 +41,17 @@ class FirebaseDatabase {
             let self = self else { return }
       
       if let data = try? JSONSerialization.data(withJSONObject: value, options: .fragmentsAllowed) {
-        if let podcasts = try? JSONDecoder(context: self.viewContext).decode([Podcast].self, from: data) {
-          DataStoreManager.shared.mySave()
+        do {
+          let podcasts = try JSONDecoder(context: self.viewContext).decode([Podcast].self, from: data)
+          podcasts.forEach { podcast in
+            _ = Podcast(podcast: podcast)
+          }
           completion(podcasts)
+          self.viewContext.mySave()
+        } catch let error {
+          print(error)
         }
+        
       }
     }
   }
@@ -53,20 +60,29 @@ class FirebaseDatabase {
     favoritePodcasts.observe(.value) { [weak self] snapShot in
       guard let value = snapShot.value,
             let self = self else { return }
-      DataStoreManager.shared.removeAll(fetchRequest: Podcast.fetchRequest())
       
+      DataStoreManager.shared.removeAll(fetchRequest: Podcast.fetchRequest())
       
       if let data = try? JSONSerialization.data(withJSONObject: value, options: .fragmentsAllowed) {
         do {
-          _ = try JSONDecoder(context: self.viewContext).decode([Podcast].self, from: data)
-          DataStoreManager.shared.mySave()
-          self.delegate?.firebaseDatabaseDidGetData(self)
+          let podcasts = try JSONDecoder(context: self.viewContext).decode([Podcast].self, from: data)
+          podcasts.forEach { podcast in
+            _ = Podcast(podcast: podcast)
+          }
+          self.viewContext.mySave()
         } catch let error {
           print(error)
         }
+        
       }
+      
+      self.delegate?.firebaseDatabaseDidGetData(self)
     }
   }
 }
+
+
+
+
 
 

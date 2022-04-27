@@ -33,7 +33,7 @@ class FirestorageDatabase {
             
             if let podcasts = try? decoder.decode([Podcast].self, from: data) {
                 DispatchQueue.main.async {
-                    DataStoreManager.shared.mySave()
+                    DataStoreManager.shared.viewContext.mySave()
                     completion(podcasts)
                 }
             }
