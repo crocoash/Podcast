@@ -61,6 +61,7 @@ class TabBarViewController: UITabBarController {
         downloadService.downloadsSession = downloadsSession
         FirebaseDatabase.shared.observe()
         FirebaseDatabase.shared.delegate = self
+        //        FirebaseDatabase.shared.observeLikedMoment()
     }
 }
 
@@ -237,13 +238,13 @@ extension TabBarViewController: URLSessionDownloadDelegate {
         
         do {
             try fileManager.copyItem(at: location, to: localPath)
-        } catch let error {
+        } catch {
             print("Could not copy file to disk: \(error.localizedDescription)")
         }
         
         do {
             try fileManager.removeItem(at: location)
-        } catch let error {
+        } catch {
             print("Could not remove item at disk: \(error.localizedDescription)")
         }
         
@@ -271,10 +272,13 @@ extension TabBarViewController: URLSessionDelegate {
 
 //MARK: - FirebaseDatabaseDelegate
 extension TabBarViewController: FirebaseDatabaseDelegate {
-    
+
     func firebaseDatabaseDidGetData(_ firebaseDatabase: FirebaseDatabase) {
         playListVc.reloadData()
         searchVC.reloadData()
+    }
+
+    func firebaseDatabaseDidGetData1(_ firebaseDatabase: FirebaseDatabase) {
         likedMomentVc.reloadData()
     }
 }

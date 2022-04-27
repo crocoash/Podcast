@@ -148,12 +148,11 @@ extension PlaylistTableViewController: UITableViewDataSource {
 // MARK: - DetailViewControllerDelegate
 extension PlaylistTableViewController : DetailViewControllerDelegate {
     func detailViewController(_ detailViewController: DetailViewController, addToFavoriteButtonDidTouchFor selectedPodcast: Podcast) {
-        selectedPodcast.isFavorite = true
-        DataStoreManager.shared.mySave()
+        delegate?.playlistTableViewControllerDidSelectStar(self, podcast: selectedPodcast)
     }
     
     func detailViewController(_ detailViewController: DetailViewController, removeFromFavoriteButtonDidTouchFor selectedPodcast: Podcast) {
-        FavoriteDocument.shared.addOrRemoveToFavorite(podcast: selectedPodcast)
+        delegate?.playlistTableViewControllerDidSelectStar(self, podcast: selectedPodcast)
     }
     
     func detailViewController(_ detailViewController: DetailViewController, playButtonDidTouchFor didSelectIndex: Int) {

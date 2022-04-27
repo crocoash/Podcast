@@ -76,6 +76,7 @@ class SettingsTableViewController: UITableViewController {
 extension SettingsTableViewController {
     
     private func setUpUI() {
+        //TODO: -
         userNameLabel.text = user.userName
         authorizationSwitch.isOn = user.isAuthorization
         darkModeSwitch.isOn = userViewModel.userDocument.user.userInterfaceStyleIsDark

@@ -24,12 +24,12 @@ public class PodcastData: NSManagedObject, Decodable {
         
         let entity = NSEntityDescription.entity(forEntityName: "PodcastData", in: context)!
         
-        self.init(entity: entity, insertInto: context)
+        self.init(entity: entity, insertInto: nil)
 
         let values = try decoder.container(keyedBy: CodingKeys.self)
         
-        resultCount = try values.decode(Int32.self, forKey: .resultCount)
-        results = try values.decode(Set<Podcast>.self, forKey: .results) as NSSet
+        resultCount = try values.decode(Int32.self,        forKey: .resultCount)
+        results =     try values.decode(Set<Podcast>.self, forKey: .results) as NSSet
     }
 }
 
@@ -50,7 +50,6 @@ extension PodcastData: SearchProtocol {
                         }
                     }
                 }
-                DataStoreManager.shared.mySave()
             }
         }
         
@@ -62,7 +61,7 @@ extension PodcastData: SearchProtocol {
                     $0.isSearched = false
                 }
             }
-            DataStoreManager.shared.mySave()
+            viewContext.mySave()
         }
         
         DataStoreManager.shared.removeAll(fetchRequest: PodcastData.fetchRequest())

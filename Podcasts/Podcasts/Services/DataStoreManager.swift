@@ -9,17 +9,10 @@ import CoreData
 
 class DataStoreManager {
     
+    static var shared: DataStoreManager = DataStoreManager()
     private init() {}
     
-    static var dataStoreManager: DataStoreManager!
-    static var shared: DataStoreManager {
-        if dataStoreManager == nil {
-            dataStoreManager = DataStoreManager()
-        }
-        return dataStoreManager
-    }
-
-    var persistentContainer: NSPersistentContainer = {
+    private(set) var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "CoreData")
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
             if let error = error as NSError? {
@@ -29,10 +22,11 @@ class DataStoreManager {
         return container
     }()
 
-    lazy var viewContext: NSManagedObjectContext = persistentContainer.viewContext
+    lazy private(set) var viewContext: NSManagedObjectContext = persistentContainer.viewContext
 }
 
 extension DataStoreManager {
+    
     func removeAll<T: NSManagedObject>(fetchRequest: NSFetchRequest<T>) {
         if let data = try? viewContext.fetch(fetchRequest), !data.isEmpty {
             data.forEach {
@@ -60,9 +54,9 @@ extension NSManagedObjectContext {
         if self.hasChanges {
             do {
                 try self.save()
+                print("print sucsesfull save ViewContext")
             } catch {
-                let nserror = error as NSError
-                fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+                print("print error saveContext \(error)")
             }
         }
     }

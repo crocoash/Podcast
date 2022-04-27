@@ -142,8 +142,8 @@ extension RegistrationViewController {
     }
     
     private func configureGestures() {
-        addMyGestureRecognizer(self, type: .swipe(), selector: #selector(swipeDirection))
-        addMyGestureRecognizer(view, type: .tap(), selector:  #selector(view.endEditing(_:)))
+        addMyGestureRecognizer(self, type: .swipe(), #selector(swipeDirection))
+        addMyGestureRecognizer(view, type: .tap(), #selector(view.endEditing(_:)))
         privacyPolicyLabel.addMyGestureRecognizer(self, type: .tap(), selector: #selector(showPrivacyInfo))
         forgotPasswordLabel.addMyGestureRecognizer(self, type: .tap(), selector: #selector(forgotPasswordTap))
     }

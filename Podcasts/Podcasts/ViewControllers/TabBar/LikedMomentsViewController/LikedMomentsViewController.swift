@@ -31,7 +31,7 @@ class LikedMomentsViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         tableView.reloadData()
-        LikedMomentsManager.shared.likedMomentFetchResultController.delegate = self
+        LikedMomentsManager.shared.likedMomentFRC.delegate = self
         reloadData()
     }
     
@@ -45,7 +45,7 @@ class LikedMomentsViewController: UIViewController {
 extension LikedMomentsViewController {
     
     private func showEmptyImage() {
-        let likeMomentsIsEmpty = LikedMomentsManager.shared.likeMoments.isEmpty
+        let likeMomentsIsEmpty = LikedMomentsManager.shared.podcast.isEmpty
         emptyDataImage?.isHidden = !likeMomentsIsEmpty
         tableView?.isHidden = likeMomentsIsEmpty
     }
@@ -55,14 +55,12 @@ extension LikedMomentsViewController {
 extension LikedMomentsViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        delegate?.likedMomentViewController(self, didSelectMomentAt: indexPath.row, likedMoments: LikedMomentsManager.shared.likeMoments)
+//        delegate?.likedMomentViewController(self, didSelectMomentAt: indexPath.row, likedMoments: LikedMomentsManager.shared.podcast)
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            //TODO: - beginUpdates()
             LikedMomentsManager.shared.deleteMoment(at: indexPath)
-//            tableView.deleteRows(at: [indexPath], with: .fade)
             reloadData()
         }
     }
@@ -86,6 +84,7 @@ extension LikedMomentsViewController: UITableViewDataSource {
 
 //MARK: - NSFetchedResultsControllerDelegate
 extension LikedMomentsViewController: NSFetchedResultsControllerDelegate {
+    
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
        // TODO: -
         guard let indexPath = indexPath else { return }

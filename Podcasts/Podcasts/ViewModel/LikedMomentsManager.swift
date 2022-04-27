@@ -16,7 +16,7 @@ class LikedMomentsManager {
     
     private var viewContext = DataStoreManager.shared.viewContext
     
-    private(set) lazy var likedMomentFetchResultController: NSFetchedResultsController<LikedMoment> = {
+    private(set) lazy var likedMomentFRC: NSFetchedResultsController<LikedMoment> = {
         let fetchRequest: NSFetchRequest<LikedMoment> = LikedMoment.fetchRequest()
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(LikedMoment.moment), ascending: true)]
         fetchRequest.returnsObjectsAsFaults = false
@@ -26,31 +26,29 @@ class LikedMomentsManager {
             sectionNameKeyPath: nil,
             cacheName: nil
         )
-        
+       
         do {
             try fetchResultController.performFetch()
         } catch {
             let nserror = error as NSError
             fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
         }
-        
         return fetchResultController
     }()
-    
-   
 }
 
 extension LikedMomentsManager {
-    var likeMoments: [LikedMoment] { likedMomentFetchResultController.fetchedObjects ?? [] }
-    var countOfLikeMoments: Int { likeMoments.count }
+    var podcast: [LikedMoment] { likedMomentFRC.fetchedObjects ?? [] }
+    var countOfLikeMoments: Int { podcast.count }
     
     func deleteMoment(at indexPath: IndexPath) {
-        let moment = likedMomentFetchResultController.object(at: indexPath)
+        let moment = likedMomentFRC.object(at: indexPath)
         viewContext.delete(moment)
-        DataStoreManager.shared.mySave()
+        
+        viewContext.mySave()
     }
     
     func getLikeMoment(at indexPath: IndexPath) -> LikedMoment {
-        return likedMomentFetchResultController.object(at: indexPath)
+        return likedMomentFRC.object(at: indexPath)
     }
 }

@@ -25,7 +25,7 @@ extension Collection where Element: UIView {
 }
 
 extension UIViewController {
-    func addMyGestureRecognizer(_ target: Any?, type gesture: TypeOfGestureRecognizer, selector: Selector) {
+    func addMyGestureRecognizer(_ target: Any?, type gesture: TypeOfGestureRecognizer, _ selector: Selector) {
         view.addMyGestureRecognizer(target, type: gesture, selector: selector)
     }
 }

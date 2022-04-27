@@ -208,8 +208,8 @@ extension PlayerViewController {
     }
     
     private func configureGesture() {
-        view.addMyGestureRecognizer(self, type: .swipe(directions: [.up]), selector: #selector(respondToSwipe))
-        view.addMyGestureRecognizer(self, type: .tap(), selector: #selector(respondToSwipe))
+        addMyGestureRecognizer(self, type: .swipe(directions: [.up]), #selector(respondToSwipe))
+        addMyGestureRecognizer(self, type: .tap(), #selector(respondToSwipe))
     }
     
     private func nextPodcast() {
@@ -226,15 +226,13 @@ extension PlayerViewController: BigPlayerViewControllerDelegate {
     
     func bigPlayerViewController(_ bigPlayerViewController: BigPlayerViewController, didLikeThis moment: Double) {
         guard let podcast = currentPodcast else { return }
-        //TODO: - Check
-//        let context = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
-//        DataStoreManager.shared.viewContext.parent = context
         
         let context = DataStoreManager.shared.viewContext
         let likedMoment = LikedMoment(context: context)
-        likedMoment.podcast = podcast
         likedMoment.moment = moment
-        DataStoreManager.shared.mySave()
+        likedMoment.podcast = podcast
+        DataStoreManager.shared.viewContext.mySave()
+//        FirebaseDatabase.shared.saveLikedMoment()
     }
     
     func bigPlayerViewController(_ bigPlayerViewController: BigPlayerViewController, didChangeCurrentTime value: Double) {
