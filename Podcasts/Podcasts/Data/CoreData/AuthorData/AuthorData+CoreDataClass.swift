@@ -36,7 +36,6 @@ public class AuthorData: NSManagedObject, Decodable {
 //MARK: - static methods
 extension AuthorData: SearchProtocol {
     
-    
     static func cancellSearch() {
         
         let viewContext = DataStoreManager.shared.viewContext
@@ -49,7 +48,6 @@ extension AuthorData: SearchProtocol {
                 DataStoreManager.shared.viewContext.mySave()
             }
         }
-        
         DataStoreManager.shared.removeAll(fetchRequest: AuthorData.fetchRequest())
     }
 }

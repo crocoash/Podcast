@@ -170,7 +170,7 @@ extension SearchViewController {
     
     private func cancelSearchAction() {
         AuthorData.cancellSearch()
-        PodcastData.cancellSearch()
+        podcasts.removeAll()
         FirebaseDatabase.shared.save()
         tableView.reloadData()
         showEmptyImage()
@@ -207,11 +207,11 @@ extension SearchViewController {
 //MARK: - Private methods
 extension SearchViewController {
     
-    private func processResults<T>(result: [T]?, completion: ([T]) -> Void) {
+    private func processResults<T>(result: [T]?, completion: (([T]) -> Void)? = nil) {
         activityIndicator.stopAnimating()
         
         if let result = result, !result.isEmpty {
-            completion(result)
+            completion?(result)
         } else {
             self.alert.create(title: "Ooops nothing search", withTimeIntervalToDismiss: 2)
         }
@@ -235,7 +235,7 @@ extension SearchViewController {
             ApiService.getData(for: UrlRequest1.getStringUrl(.authors(request))) { [weak self] (info: AuthorData?) in
                 guard let self = self,
                       let authors = info?.results.allObjects as? [Author] else { return }
-                self.processResults(result: authors) { _ in }
+                self.processResults(result: authors)
             }
         }
     }

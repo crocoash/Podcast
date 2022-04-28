@@ -14,54 +14,24 @@ class FirestorageDatabase {
     let storage = Storage.storage()
     let userID = Auth.auth().currentUser!.uid
     lazy var storageRef = storage.reference()
-    lazy var imagesRef = storageRef.child("FavoritsPodcast").child(userID)
-    lazy var favPodcast = storageRef.child("FavoritsPodcast").child(userID)
-    
-    func saveFavoritePodcasts(podcasts: [Podcast]) {
-        if let data = try? JSONEncoder().encode(podcasts) {
-            favPodcast.putData(data, metadata: nil)
-        }
-    }
-    
-    func getFavoritePodcasts(userId: String, completion: @escaping ([Podcast]) -> Void) {
-        imagesRef.getData(maxSize: Int64.max) { data, erorr in
-            guard erorr == nil,
-                  let data = data else { return }
-            
-            let viewContext = DataStoreManager.shared.viewContext
-            let decoder = JSONDecoder(context: viewContext)
-            
-            if let podcasts = try? decoder.decode([Podcast].self, from: data) {
-                DispatchQueue.main.async {
-                    DataStoreManager.shared.viewContext.mySave()
-                    completion(podcasts)
-                }
-            }
-        }
-    }
-    
-    func createObserve() {
+    lazy var logoImage = storageRef.child("LogoImage").child(userID)
+   
+    func getLogo(comletion: @escaping (UIImage) -> Void) {
+        let imageView = UIImage(systemName: "photo")!
         
-    }
-
-    ///-------------------------------------------------------------------------------------
-    func getLogo(for userId: String, completion: @escaping (UIImage) -> Void) {
-        let storage = storageRef.child("LogoImage").child(userId)
-        if let imageView = UIImage(named: "photo.on.rectangle") {
-            storage.getData(maxSize: 1024*1024) { data, erorr in
-                guard erorr == nil,
-                      let data = data else { completion(imageView); return }
-                
-                if let logo = UIImage(data: data) {
-                    completion(logo)
-                }
+        logoImage.getData(maxSize: Int64.max) { data, erorr in
+            guard erorr == nil,
+                  let data = data else { comletion(imageView); return }
+            
+            if let logo = UIImage(data: data) {
+                comletion(logo)
             }
         }
     }
     
-    func saveLogo(for userId: String, logo: UIImage) {
-        let storage = storageRef.child("LogoImage").child(userId)
-        guard let imageData = logo.pngData() else { return }
-        storage.putData(imageData, metadata: nil)
+    func saveLogo(logo: UIImage) {
+        guard let imageData = logo.jpegData(compressionQuality: 0.01) else { return }
+        logoImage.putData(imageData, metadata: nil)
     }
 }
+//24,888,467 bytes

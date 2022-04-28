@@ -48,14 +48,26 @@
                     <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" animating="YES" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="niz-vo-xOt">
                         <rect key="frame" x="296" y="36" width="20" height="20"/>
                     </activityIndicatorView>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hSk-zv-tfs" userLabel="TapGesture">
+                        <rect key="frame" x="292" y="1" width="28" height="28"/>
+                        <state key="normal" title="Button"/>
+                        <buttonConfiguration key="configuration" style="plain" title=""/>
+                        <connections>
+                            <action selector="handlerTapFavoriteStar:" destination="Tla-WZ-SO6" eventType="touchUpInside" id="PlO-yM-snl"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <color key="backgroundColor" systemColor="tertiarySystemBackgroundColor"/>
                 <constraints>
                     <constraint firstItem="niz-vo-xOt" firstAttribute="centerY" secondItem="wRd-Ac-IFA" secondAttribute="centerY" id="1XZ-sc-YFX"/>
                     <constraint firstItem="Rlk-QC-Yls" firstAttribute="leading" secondItem="jFc-Bc-tCa" secondAttribute="trailing" constant="15" id="2do-zT-nOj"/>
                     <constraint firstAttribute="bottom" secondItem="ZDP-F7-7bG" secondAttribute="bottom" id="2g4-gc-waa"/>
+                    <constraint firstItem="hSk-zv-tfs" firstAttribute="centerY" secondItem="cSq-aK-NQM" secondAttribute="centerY" constant="-1" id="6Ca-fj-VEx"/>
                     <constraint firstItem="cSq-aK-NQM" firstAttribute="width" secondItem="Y6n-gv-nHf" secondAttribute="width" multiplier="0.078125" constant="-9" id="6Ys-fF-KQu"/>
+                    <constraint firstItem="hSk-zv-tfs" firstAttribute="height" secondItem="cSq-aK-NQM" secondAttribute="height" multiplier="2" id="9Mn-ar-d2w"/>
+                    <constraint firstItem="hSk-zv-tfs" firstAttribute="width" secondItem="cSq-aK-NQM" secondAttribute="width" multiplier="1.75" id="FqA-gN-TPK"/>
                     <constraint firstItem="wRd-Ac-IFA" firstAttribute="height" secondItem="cSq-aK-NQM" secondAttribute="height" multiplier="1.10714" id="HBA-Pi-h5c"/>
+                    <constraint firstItem="hSk-zv-tfs" firstAttribute="centerX" secondItem="cSq-aK-NQM" secondAttribute="centerX" id="Ip8-0p-0WD"/>
                     <constraint firstItem="ZDP-F7-7bG" firstAttribute="top" secondItem="Y6n-gv-nHf" secondAttribute="top" id="TxO-14-AX2"/>
                     <constraint firstItem="wRd-Ac-IFA" firstAttribute="width" secondItem="cSq-aK-NQM" secondAttribute="width" multiplier="0.90625" id="Vuw-2O-GMj"/>
                     <constraint firstItem="niz-vo-xOt" firstAttribute="centerX" secondItem="wRd-Ac-IFA" secondAttribute="centerX" id="YqR-HM-PEp"/>
