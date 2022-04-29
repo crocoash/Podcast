@@ -17,7 +17,6 @@ struct UserDocument: Codable {
     init? (json: Data?) {
         guard let json = json,
               let userDocument = try? JSONDecoder().decode(UserDocument.self, from: json) else { return nil }
-        
         self = userDocument
     }
     
