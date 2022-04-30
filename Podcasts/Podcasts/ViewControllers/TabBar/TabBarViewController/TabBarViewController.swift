@@ -65,7 +65,7 @@ class TabBarViewController: UITabBarController {
     }
 }
 
-//MARK: - Private methods
+//MARK: -Private methods
 extension TabBarViewController {
     
     private func configureTabBar() {
@@ -138,7 +138,7 @@ extension TabBarViewController {
     }
 }
 
-// MARK: - SearchViewControllerDelegate
+// MARK: ------------- SearchViewControllerDelegate
 extension TabBarViewController: SearchViewControllerDelegate {
     
     func searchViewControllerDidSelectFavoriteStar(_ searchViewController: SearchViewController, podcast: Podcast) {
@@ -164,8 +164,7 @@ extension TabBarViewController: SearchViewControllerDelegate {
 extension TabBarViewController: PlaylistViewControllerDelegate {
     
     func playlistTableViewControllerDidRefreshTableView(_ playlistTableViewController: PlaylistTableViewController, completion: @escaping () -> Void) {
-        DataStoreManager.shared.removeAll(fetchRequest: Podcast.fetchRequest())
-        FirebaseDatabase.shared.getPodcast { _ in
+        FirebaseDatabase.shared.getPodcast {
             completion()
         }
     }
@@ -278,6 +277,7 @@ extension TabBarViewController: FirebaseDatabaseDelegate {
     func firebaseDatabaseDidGetData(_ firebaseDatabase: FirebaseDatabase) {
         playListVc.reloadData()
         searchVC.reloadData()
+        feedbackGenerator()
     }
 
     func firebaseDatabaseDidGetData1(_ firebaseDatabase: FirebaseDatabase) {

@@ -34,7 +34,7 @@ class PodcastCell: UITableViewCell {
         progressLabel.isHidden = true
     }
     
-    @objc func handlerTapFavoriteStar(_ sender: UITapGestureRecognizer) {
+    @IBAction func handlerTapFavoriteStar(_ sender: UIButton) {
         delegate?.podcastCellDidSelectStar(self, podcast: podcast)
     }
     
@@ -66,7 +66,7 @@ extension PodcastCell {
 
         podcastName.text = podcast.trackName
         
-        DataProvider().downloadImage(string: podcast.artworkUrl160) { [weak self] image in
+        DataProvider().downloadImage(string: podcast.artworkUrl600) { [weak self] image in
             self?.podcastImage.image = image
         }
     }

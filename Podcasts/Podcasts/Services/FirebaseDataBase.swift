@@ -79,7 +79,7 @@ class FirebaseDatabase {
         } catch let error {
           print(error)
         }
-        
+        completion()
       }
     }
   }
@@ -118,8 +118,30 @@ class FirebaseDatabase {
           print(error)
         }
       }
-      
-      self.delegate?.firebaseDatabaseDidGetData(self)
     }
   }
 }
+
+extension FirebaseDatabase {
+  private func obtain<T: Codable>(type: T.Type, snapshot: DataSnapshot, completion: @escaping ([T]) -> Void) where T: NSManagedObject {
+    guard let value = snapshot.value else { return }
+    
+    DataStoreManager.shared.removeAll(fetchRequest: NSFetchRequest<T>(entityName: type.description()))
+    
+    if let data = try? JSONSerialization.data(withJSONObject: value, options: .fragmentsAllowed) {
+      do {
+        let result = try JSONDecoder(context: self.viewContext).decode([T].self, from: data)
+        completion(result)
+        self.viewContext.mySave()
+      } catch let error {
+        print(error)
+      }
+    }
+    self.delegate?.firebaseDatabaseDidGetData(self)
+  }
+}
+
+
+
+
+
