@@ -42,7 +42,7 @@ class ApiService {
             defer {
                 DispatchQueue.main.async {
                     viewContext.mySave()
-                    FirebaseDatabase.shared.save()
+                    FirebaseDatabase.shared.savePodcast()
                     completion(result)
                 }
             }

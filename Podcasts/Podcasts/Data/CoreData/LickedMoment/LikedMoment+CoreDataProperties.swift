@@ -2,7 +2,7 @@
 //  LikedMoment+CoreDataProperties.swift
 //  Podcasts
 //
-//  Created by Anton on 15.04.2022.
+//  Created by Anton on 30.04.2022.
 //
 //
 
@@ -17,8 +17,8 @@ extension LikedMoment {
     }
 
     @NSManaged public var moment: Double
+    @NSManaged public var podcastID: NSNumber?
     @NSManaged public var podcast: Podcast
-
 }
 
 extension LikedMoment : Identifiable {

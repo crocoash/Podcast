@@ -18,42 +18,26 @@ class PlayerViewController: UIViewController {
     
     @IBOutlet private weak var progressView: UIProgressView!
     
-    var player: AVPlayer = AVPlayer()
+    private(set) var player: AVPlayer = AVPlayer()
+    lazy var bigPlayerVC: BigPlayerViewController = configureBigPlayer()
     
-    lazy private var bigPlayerVC = createBigPlayer()
-    
-    private var likedMoments: [LikedMoment] = []
     private var podcasts: [Podcast] = []
+    private(set) var currentPodcast: (podcast:Podcast, index: Int)?
     
-    private var playStopImage: UIImage? { player.rate == 0 ? playImage : pauseImage }
-    private var isLastPodcast: Bool { index == (podcasts.count - 1) }
-    private var isFirstPodcast: Bool { index == 0 }
-    
+    private var playStopImage: UIImage { player.rate == 0 ? playImage : pauseImage }
     private var workItem: DispatchWorkItem?
-    
-    var currentPodcast: Podcast? { !podcasts.isEmpty ? podcasts[index] : nil }
-    
     private var observe: Any?
     
-    private var index: Int = 0 {
-        didSet {
-            activityIndicator.startAnimating()
-            upDateUI()
-            player.pause()
-            startPlay()
-        }
-    }
-    
     //MARK: - Settings
-    private var pauseImage = UIImage(systemName: "pause.fill")
-    private var playImage = UIImage(systemName: "play.fill")
+    private var pauseImage = UIImage(systemName: "pause.fill")!
+    private var playImage = UIImage(systemName: "play.fill")!
     
     // MARK: - View Methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        upDateUI()
         configureGesture()
         addObserverForEndTrack()
+        updateaAllPlayers(with: currentPodcast?.podcast)
     }
     
     deinit {
@@ -61,163 +45,169 @@ class PlayerViewController: UIViewController {
     }
     
     //MARK: - Methods
-    func play(podcasts: [Podcast], at index: Int) {
-        likedMoments = []
-        self.podcasts = podcasts
-        self.index = index
+    func setPlayer(player: AVPlayer) {
+        self.player = player
     }
     
-    func playMomentWith(atIndex: Int, from: [LikedMoment]) {
-        likedMoments = from
-        var podcastsArray: [Podcast] = []
-        from.forEach {
-            podcastsArray.append($0.podcast)
-        }
-        podcasts = podcastsArray
-        index = atIndex
+    func startPlay(at index: Int, at moment: Double? = nil, podcasts: [Podcast]) {
+        let podcast = podcasts[index]
+        self.podcasts = podcasts
+        self.currentPodcast = (podcast, index)
+        startPlay(podcast: podcast, at: moment)
     }
     
     // MARK: - Actions
-    @objc func endTrack() {
-        if !isLastPodcast { index += 1 }
+    @objc func playNextTrackOfTheEndObserver() {
+        playNextPodcast()
     }
     
-    @IBAction func playPauseTouchUpInside(_ sender: UIButton) {
-        playStopPlayer()
+    @IBAction func playOrPause() {
+        player.rate == 0 ? player.play() : player.pause()
+        updateaAllPlayers(with: currentPodcast?.podcast)
     }
     
     @objc func respondToSwipe(gesture: UIGestureRecognizer) {
-
-        guard let playStopImage = playStopImage,
-              let currentPodcast = currentPodcast
-        else { return }
-        
         present(bigPlayerVC, animated: true)
-
-        bigPlayerVC.setPlayStopButton(with: playStopImage)
-        bigPlayerVC.upDateUI(
-            with: currentPodcast,
-            isFirst: isFirstPodcast,
-            isLast: isLastPodcast
-        )
+        bigPlayerVC.isPresented = true
+        if let podcast = currentPodcast?.podcast {
+            bigPlayerVC.upDateUI(with: podcast, isFirst: isFirstPodcast, isLast: isLastPodcast, playStopButton: playStopImage)
+        }
     }
 }
 
 //MARK: - Private methods
 extension PlayerViewController {
     
-    private func playStopPlayer() {
-        player.rate == 0 ? player.play() : player.pause()
-        
-        guard let playStopImage = playStopImage else { return }
-        playPauseButton.setImage(playStopImage, for: .normal)
+    private func configureBigPlayer() -> BigPlayerViewController {
+        let bigPlayerVC = BigPlayerViewController.loadFromXib()
+        bigPlayerVC.delegate = self
+        bigPlayerVC.modalPresentationStyle = .fullScreen
+        return bigPlayerVC
     }
     
-    private func startPlay() {
-        guard let podcast = currentPodcast,
-              let string = podcast.episodeUrl,
-              let url = URL(string: string) else { return }
-        
+    private func configureGesture() {
+        addMyGestureRecognizer(self, type: .swipe(directions: [.up]), #selector(respondToSwipe))
+        addMyGestureRecognizer(self, type: .tap()                   , #selector(respondToSwipe))
+    }
+    
+    private func addObserverForEndTrack() {
+        NotificationCenter.default.addObserver(self, selector: #selector(playNextTrackOfTheEndObserver), name: .AVPlayerItemDidPlayToEndTime, object: nil)
+    }
+    
+    private var isLastPodcast: Bool {
+        return (currentPodcast?.index ?? (Int.max - 1)) + 1 == podcasts.count
+    }
+    
+    private var isFirstPodcast: Bool {
+        return currentPodcast?.index ?? 1 == 0
+    }
+    
+    private func startPlay(podcast: Podcast, at moment: Double? = nil) {
+        activityIndicator.startAnimating()
+        /// if it is not likedMoment set current podcast with Index for next or previus playing
+        if !podcasts.isEmpty, let index = podcasts.firstIndex(of: podcast) {
+            currentPodcast = (podcast, index)
+        }
+        player.pause()
+        updateaAllPlayers(with: podcast)
         workItem?.cancel()
-        if observe == nil { addTimeObserve() }
         
-        let requestWorkItem = DispatchWorkItem {
-            let item = AVPlayerItem(url: FavoriteDocument.shared.isDownload(podcast: podcast) ? url.localPath : url)
+        if observe == nil {
+            addTimeObserve()
+        }
+        
+        guard let episodeUrl = podcast.episodeUrl.url else { return }
+        let url = FavoriteDocument.shared.isDownload(podcast: podcast) ? episodeUrl.localPath : episodeUrl
+        
+        let requestWorkItem = DispatchWorkItem { [weak self] in
+            guard let self = self else { return }
+            
+            let item = AVPlayerItem(url: url)
             self.player.replaceCurrentItem(with: item)
             self.player.play()
-            if !self.likedMoments.isEmpty {
-                self.player.seek(to: CMTime(seconds: self.likedMoments[self.index].moment, preferredTimescale: 60))
-            }
+            
+            if let moment = moment { self.playerSeek(to: moment) }
             
             DispatchQueue.main.async {
                 if let sceneDelegate = UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate  {
                     sceneDelegate.videoViewController = self
                 }
+                self.updateaAllPlayers(with: podcast)
             }
         }
         
         workItem = requestWorkItem
         
         DispatchQueue.global().asyncAfter(deadline: .now(), execute: requestWorkItem)
+    }
+    
+    private func playerSeek(to seconds: Double) {
+        self.player.seek(to: CMTime(seconds: seconds, preferredTimescale: 60))
+    }
+    
+    private func playNextPodcast() {
+        guard !podcasts.isEmpty, let currentPodcast = currentPodcast, !isLastPodcast else { return }
         
-        self.playPauseButton.setImage(self.pauseImage, for: .normal)
+        let podcast = podcasts[currentPodcast.index + 1]
+        let index = currentPodcast.index + 1
+        self.currentPodcast = (podcast,index)
+        startPlay(podcast: podcast)
+    }
+    
+    private func playPreviewsPodcast() {
+        guard !podcasts.isEmpty, let currentPodcast = currentPodcast, !isFirstPodcast else { return }
+        
+        let podcast = podcasts[currentPodcast.index - 1]
+        let index = currentPodcast.index - 1
+        self.currentPodcast = (podcast,index)
+        startPlay(podcast: podcast)
     }
     
     private func addTimeObserve() {
-        observe = player.addPeriodicTimeObserver(
-            forInterval: CMTimeMakeWithSeconds(1/60, preferredTimescale: Int32(NSEC_PER_SEC)),
-            queue: .main
-        ) { [weak self] time in
-            
+        observe = player.addPeriodicTimeObserver( forInterval: CMTimeMakeWithSeconds(1/60, preferredTimescale: Int32(NSEC_PER_SEC)),
+                                                  queue: .main ) { [weak self] time in
             guard
                 let self = self,
                 let duration = self.player.currentItem?.duration,
                 let currentItem = self.player.currentItem
             else { return }
             
+            /// update small player
             self.progressView.progress = Float((CMTimeGetSeconds(time) / CMTimeGetSeconds(duration)))
             
             if !self.activityIndicator.isHidden { self.activityIndicator.stopAnimating() }
             let currentTime = Float(self.player.currentTime().seconds)
-            
             if self.bigPlayerVC.isPresented {
-                self.bigPlayerVC.upDateProgressSlider(currentTime: currentTime, currentItem: Float(currentItem.asset.duration.seconds))
+                self.bigPlayerVC.upDateProgressSlider(currentTime: currentTime, duration: Float(currentItem.asset.duration.seconds))
             }
         }
     }
     
-    private func createBigPlayer() -> BigPlayerViewController {
-        bigPlayerVC = BigPlayerViewController.loadFromXib()
-        bigPlayerVC.delegate = self
-        bigPlayerVC.modalPresentationStyle = .fullScreen
-        
-        return bigPlayerVC
+    ///_____________________________
+    private func updateaAllPlayers(with podcast: Podcast?) {
+        guard let podcast = podcast else { return }
+        updateSmallPlayer(with: podcast)
+        updateBigBlayer(with: podcast)
     }
     
-    private func upDateUI() {
-        guard let currentPodcast = self.currentPodcast else { return }
-        
-        DataProvider().downloadImage(string: currentPodcast.artworkUrl600) { [weak self] image in
-            self?.podcastImageView.image = image
+    private func updateBigBlayer(with podcast: Podcast) {
+        if bigPlayerVC.isPresented {
+            bigPlayerVC.upDateUI(with: podcast, isFirst: isFirstPodcast, isLast: isLastPodcast, playStopButton: playStopImage)
+            bigPlayerVC.updatePlayButton(playButtonImage: playStopImage)
         }
-        
-        playPauseButton.setImage(pauseImage, for: .normal)
-        podcastNameLabel.text = currentPodcast.trackName
-        
-        if !self.bigPlayerVC.isPresented { return }
-        
-        bigPlayerVC.upDateUI(
-            with: currentPodcast,
-            isFirst: isFirstPodcast,
-            isLast: isLastPodcast
-        )
     }
     
-    private func updateUI(with moment: LikedMoment) {
-        let podcast = moment.podcast
+    private func updateSmallPlayer(with podcast: Podcast) {
         DataProvider().downloadImage(string: podcast.artworkUrl600) { [weak self] image in
             self?.podcastImageView.image = image
         }
-        
-        playPauseButton.setImage(pauseImage, for: .normal)
+        playPauseButton.setImage(playStopImage, for: .normal)
         podcastNameLabel.text = podcast.trackName
     }
     
-    private func addObserverForEndTrack() {
-        NotificationCenter.default.addObserver(self, selector: #selector(endTrack), name: .AVPlayerItemDidPlayToEndTime, object: nil)
-    }
-    
-    private func configureGesture() {
-        addMyGestureRecognizer(self, type: .swipe(directions: [.up]), #selector(respondToSwipe))
-        addMyGestureRecognizer(self, type: .tap(), #selector(respondToSwipe))
-    }
-    
-    private func nextPodcast() {
-        index += 1
-    }
-    
-    private func previewsPodcast() {
-        index -= 1
+    private func removeTimeObserve() {
+        player.removeTimeObserver(observe!)
+        observe = nil
     }
 }
 
@@ -225,37 +215,34 @@ extension PlayerViewController {
 extension PlayerViewController: BigPlayerViewControllerDelegate {
     
     func bigPlayerViewController(_ bigPlayerViewController: BigPlayerViewController, didLikeThis moment: Double) {
-        guard let podcast = currentPodcast else { return }
-        
-        let context = DataStoreManager.shared.viewContext
-        let likedMoment = LikedMoment(context: context)
-        likedMoment.moment = moment
-        likedMoment.podcast = podcast
+        guard let podcast = currentPodcast?.podcast else { return }
+        _ = LikedMoment(podcast: podcast, moment: moment, id: podcast.id!)
         DataStoreManager.shared.viewContext.mySave()
-//        FirebaseDatabase.shared.saveLikedMoment()
+        FirebaseDatabase.shared.saveLikedMoment()
     }
     
     func bigPlayerViewController(_ bigPlayerViewController: BigPlayerViewController, didChangeCurrentTime value: Double) {
         player.seek(to: CMTime(seconds: value, preferredTimescale: 60))
     }
     
-    func bigPlayerViewControllerDidSelectStopButton(_ bigPlayerViewController: BigPlayerViewController) {
-        playStopPlayer()
-        
-        guard let playStopImage = playStopImage else { return }
-        bigPlayerViewController.setPlayStopButton(with: playStopImage)
+    func bigPlayerViewControllerDidSelectPlayStopButton(_ bigPlayerViewController: BigPlayerViewController) {
+        playOrPause()
     }
     
     func bigPlayerViewControllerDidSelectNextTrackButton(_ bigPlayerViewController: BigPlayerViewController) {
-        nextPodcast()
+        removeTimeObserve()
+        bigPlayerViewController.refreshInfo()
+        playNextPodcast()
     }
     
     func bigPlayerViewControllerDidSelectPreviewsTrackButton(_ bigPlayerViewController: BigPlayerViewController) {
-        previewsPodcast()
+        removeTimeObserve()
+        bigPlayerViewController.refreshInfo()
+        playPreviewsPodcast()
     }
     
     func bigPlayerViewController (_ bigPlayerViewController: BigPlayerViewController, didAddCurrentTimeBy value: Double) {
-        guard let currentItem = player.currentItem else { return }
-            self.player.seek(to: currentItem.currentTime() + CMTime(seconds: value, preferredTimescale: 60))
+        guard let currentTime = player.currentItem?.currentTime().seconds else { return }
+        playerSeek(to: currentTime + value)
     }
 }

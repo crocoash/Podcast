@@ -7,7 +7,7 @@ class TabBarViewController: UITabBarController {
     
     // MARK: - View
     private let downloadService = DownloadService()
-    private lazy var downloadsSession: URLSession = {
+    lazy private var downloadsSession: URLSession = {
         let configuration = URLSessionConfiguration.background(withIdentifier: "BackGroundSession")
         return URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
     }()
@@ -15,13 +15,13 @@ class TabBarViewController: UITabBarController {
     private var trailConstraint: NSLayoutConstraint?
     private var leadConstraint: NSLayoutConstraint?
     
-    private lazy var constraintsSmallPlayer: [NSLayoutConstraint] = [
+    lazy private var constraintsSmallPlayer: [NSLayoutConstraint] = [
         playerVC.view.heightAnchor.constraint(equalToConstant: 50),
         playerVC.view.widthAnchor.constraint(equalTo: view.widthAnchor),
         playerVC.view.bottomAnchor.constraint(equalTo: tabBar.topAnchor)
     ]
     
-    private lazy var imageView: UIImageView =  {
+    lazy private var imageView: UIImageView =  {
         $0.image = UIImage(named: "decree")
         $0.isHidden = true
         $0.translatesAutoresizingMaskIntoConstraints = false
@@ -32,16 +32,16 @@ class TabBarViewController: UITabBarController {
     private var userViewModel: UserViewModel!
     private let firestorageDatabase = FirestorageDatabase()
     
-    private lazy var playListVc = createTabBar(PlaylistTableViewController.self , title: "Playlist", imageName: "folder.fill") {
+    lazy private var playListVc = createTabBar(PlaylistTableViewController.self , title: "Playlist", imageName: "folder.fill") {
         $0.delegate = self
     }
-    private lazy var searchVC = createTabBar(SearchViewController.self, title: "Search", imageName: "magnifyingglass") {
+    lazy private var searchVC = createTabBar(SearchViewController.self, title: "Search", imageName: "magnifyingglass") {
         $0.delegate = self
     }
-    private lazy var likedMomentVc = createTabBar(LikedMomentsViewController.self , title: "Liked", imageName: "heart.fill") {
+    lazy private var likedMomentVc = createTabBar(LikedMomentsViewController.self , title: "Liked", imageName: "heart.fill") {
         $0.delegate = self
     }
-    private lazy var settingsVC = createTabBar(SettingsTableViewController.self, title: "Settings", imageName: "gear") { [weak self] vc in
+    lazy private var settingsVC = createTabBar(SettingsTableViewController.self, title: "Settings", imageName: "gear") { [weak self] vc in
         guard let self = self else { return }
         vc.setUser((self.userViewModel))
         vc.delegate = self
@@ -59,9 +59,9 @@ class TabBarViewController: UITabBarController {
         addPlayer()
         configureImageDarkMode()
         downloadService.downloadsSession = downloadsSession
-        FirebaseDatabase.shared.observe()
+        FirebaseDatabase.shared.observePodcast()
+        FirebaseDatabase.shared.observeLikedMoment()
         FirebaseDatabase.shared.delegate = self
-        //        FirebaseDatabase.shared.observeLikedMoment()
     }
 }
 
@@ -119,7 +119,7 @@ extension TabBarViewController {
         FavoriteDocument.shared.addOrRemoveToFavorite(podcast: podcast)
         if FavoriteDocument.shared.isDownload(podcast: podcast) { downloadService.cancelDownload(podcast: podcast)}
         
-        FirebaseDatabase.shared.save()
+        FirebaseDatabase.shared.savePodcast()
         feedbackGenerator()
     }
     
@@ -134,7 +134,7 @@ extension TabBarViewController {
     
     private func startPlay(_ podcasts: [Podcast], _ didSelectIndex: Int) {
         playerVC.view.isHidden = false
-        playerVC.play(podcasts: podcasts, at: didSelectIndex)
+        playerVC.startPlay(at: didSelectIndex, podcasts: podcasts)
     }
 }
 
@@ -204,7 +204,9 @@ extension TabBarViewController: LikedMomentsViewControllerDelegate {
     
     func likedMomentViewController(_ likedMomentViewController: LikedMomentsViewController, didSelectMomentAt index: Int, likedMoments: [LikedMoment]) {
         playerVC.view.isHidden = false
-        playerVC.playMomentWith(atIndex: index, from: likedMoments)
+        let moment = likedMoments[index].moment
+        let podcast = likedMoments[index].podcast
+        playerVC.startPlay(at: 0, at: moment, podcasts: [podcast])
     }
 }
 

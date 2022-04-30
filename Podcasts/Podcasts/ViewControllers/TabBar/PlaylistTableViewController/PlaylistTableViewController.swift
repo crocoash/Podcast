@@ -63,7 +63,7 @@ class PlaylistTableViewController: UIViewController {
     //MARK: - Actions
     @IBAction func removeAllAction(_ sender: UIButton) {
         FavoriteDocument.shared.removaAllFavorites()
-        FirebaseDatabase.shared.save()
+        FirebaseDatabase.shared.savePodcast()
         showEmptyImage()
     }
     
@@ -137,7 +137,7 @@ extension PlaylistTableViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let podcast = FavoriteDocument.shared.getfavoritePodcast(for: indexPath)
         let cell = tableView.getCell(cell: PodcastCell.self, indexPath: indexPath)
-        cell.addMyGestureRecognizer(self, type: .tap(), selector: #selector(tapCell))
+        cell.addMyGestureRecognizer(self, type: .tap(), #selector(tapCell))
         cell.configureCell(with: podcast)
         cell.delegate = self
         

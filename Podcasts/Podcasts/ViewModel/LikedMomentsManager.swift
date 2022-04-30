@@ -51,4 +51,9 @@ extension LikedMomentsManager {
     func getLikeMoment(at indexPath: IndexPath) -> LikedMoment {
         return likedMomentFRC.object(at: indexPath)
     }
+    
+    func getPodcast(for id: NSNumber) -> Podcast? {
+        let podcasts = try? DataStoreManager.shared.viewContext.fetch(Podcast.fetchRequest())
+        return podcasts?.firstPodcast(matching: id)
+    }
 }

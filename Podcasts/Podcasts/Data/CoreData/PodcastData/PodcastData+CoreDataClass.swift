@@ -32,38 +32,3 @@ public class PodcastData: NSManagedObject, Decodable {
         results =     try values.decode(Set<Podcast>.self, forKey: .results) as NSSet
     }
 }
-
-//MARK: - static methods
-extension PodcastData: SearchProtocol {
-
-    static let viewContext = DataStoreManager.shared.viewContext
-    
-    static func cancellSearch() {
-        if let podcastData = try? viewContext.fetch(PodcastData.fetchRequest()) {
-            podcastData.forEach { podcasts in
-                podcasts.results.forEach { podcast in
-                    if let podcast = podcast as? Podcast {
-                        if podcast.isFavorite {
-                            podcast.isSearched = false
-                        } else {
-                            viewContext.delete(podcast)
-                        }
-                    }
-                }
-            }
-        }
-        
-        if let podcasts = try? DataStoreManager.shared.viewContext.fetch(Podcast.fetchRequest()) {
-            podcasts.forEach {
-                if !$0.isFavorite {
-                    viewContext.delete($0)
-                } else {
-                    $0.isSearched = false
-                }
-            }
-            viewContext.mySave()
-        }
-        
-        DataStoreManager.shared.removeAll(fetchRequest: PodcastData.fetchRequest())
-    }
-}

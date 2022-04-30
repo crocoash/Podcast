@@ -144,12 +144,12 @@ extension SearchViewController {
     }
     
     private func configureGesture() {
-        view.addMyGestureRecognizer(self, type: .swipe(directions: [.left,.right]), selector: #selector(handlerSwipe))
+        view.addMyGestureRecognizer(self, type: .swipe(directions: [.left,.right]), #selector(handlerSwipe))
         refreshControll.addTarget(self, action: #selector(refresh), for: .valueChanged)
     }
     
     private func configureCancelLabel() {
-        cancelLabel.addMyGestureRecognizer(self, type: .tap(), selector: #selector(cancelSearch))
+        cancelLabel.addMyGestureRecognizer(self, type: .tap(), #selector(cancelSearch))
     }
     
     private func configureSegmentalControl() {
@@ -170,8 +170,7 @@ extension SearchViewController {
     
     private func cancelSearchAction() {
         AuthorData.cancellSearch()
-        PodcastData.cancellSearch()
-        FirebaseDatabase.shared.save()
+        FirebaseDatabase.shared.savePodcast()
         tableView.reloadData()
         showEmptyImage()
     }
@@ -264,7 +263,7 @@ extension SearchViewController: UITableViewDataSource {
         updateInformation(podcast: podcast)
         cell.delegate = self
         cell.configureCell(with: podcast)
-        cell.addMyGestureRecognizer(self, type: .tap(), selector: #selector(handlerTapPodcastCell))
+        cell.addMyGestureRecognizer(self, type: .tap(), #selector(handlerTapPodcastCell))
         
         return cell
     }
@@ -273,7 +272,7 @@ extension SearchViewController: UITableViewDataSource {
         let author = SearchAuthorsDocument.shared.getAuthor(at: indexPath)
         let cell = tableView.getCell(cell: PodcastByAuthorCell.self, indexPath: indexPath)
         cell.configureCell(with: author, indexPath)
-        cell.addMyGestureRecognizer(self, type: .tap(), selector: #selector(handlerTapAuthorCell))
+        cell.addMyGestureRecognizer(self, type: .tap(), #selector(handlerTapAuthorCell))
         
         return cell
     }

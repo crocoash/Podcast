@@ -40,7 +40,6 @@ extension DataStoreManager {
         if viewContext.hasChanges {
             do {
                 try viewContext.save()
-//                delegate?.dataStoreManagerContextDidSave(self, viewContext: viewContext)
             } catch {
                 let nserror = error as NSError
                 fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
@@ -54,9 +53,8 @@ extension NSManagedObjectContext {
         if self.hasChanges {
             do {
                 try self.save()
-                print("print sucsesfull save ViewContext")
             } catch {
-                print("print error saveContext \(error)")
+                fatalError("Unresolved error \(error)")
             }
         }
     }

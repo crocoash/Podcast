@@ -26,8 +26,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     func sceneWillEnterForeground(_ scene: UIScene) {
         if let videoViewController = videoViewController, let avPlayerSavedReference = avPlayerSavedReference {
-            videoViewController.player = avPlayerSavedReference
-            self.avPlayerSavedReference = nil
+            videoViewController.setPlayer(player: avPlayerSavedReference)
+            self.avPlayerSavedReference = nil 
         }
     }
 }

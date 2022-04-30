@@ -15,9 +15,9 @@ class PreLoaderViewController: UIViewController {
     private var heightConstraint: NSLayoutConstraint?
     private var userViewModel = UserViewModel()
     
-    private lazy var topAnchorConst = view.frame.height / 2 - logoImageView.frame.height / 2
+    lazy private var topAnchorConst = view.frame.height / 2 - logoImageView.frame.height / 2
     
-    private lazy var tabBarVC: TabBarViewController = {
+    lazy private var tabBarVC: TabBarViewController = {
         let vc = TabBarViewController.initVC
         vc.modalPresentationStyle = .custom
         vc.setUserViewModel(userViewModel)

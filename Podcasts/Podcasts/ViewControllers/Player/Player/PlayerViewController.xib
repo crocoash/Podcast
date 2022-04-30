@@ -31,7 +31,7 @@
                     </constraints>
                     <state key="normal" image="pause.fill" catalog="system"/>
                     <connections>
-                        <action selector="playPauseTouchUpInside:" destination="-1" eventType="touchUpInside" id="Pr9-2n-hfw"/>
+                        <action selector="playOrPause" destination="-1" eventType="touchUpInside" id="NR2-Nw-1IG"/>
                     </connections>
                 </button>
                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" adjustsImageSizeForAccessibilityContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3vw-cZ-C9n">

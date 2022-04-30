@@ -47,11 +47,10 @@ public class Podcast: NSManagedObject, Codable {
   
   required convenience public init(from decoder: Decoder) throws {
     
-    guard let context = decoder.userInfo[.context] as? NSManagedObjectContext else {
-      fatalError("mistake")
-    }
+    guard let context = decoder.userInfo[.context] as? NSManagedObjectContext,
+          let entity = NSEntityDescription.entity(forEntityName: Podcast.description(), in: context)
+    else { fatalError("mistake") }
     
-    let entity = NSEntityDescription.entity(forEntityName: Podcast.description(), in: context)!
     self.init(entity: entity, insertInto: nil)
 
     let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -88,73 +87,74 @@ public class Podcast: NSManagedObject, Codable {
   }
 
   convenience init(podcast: Podcast) {
-    self.init(
-      entity: NSEntityDescription.entity(forEntityName: Podcast.description(),
-                                         in: DataStoreManager.shared.viewContext)!,
-      insertInto: DataStoreManager.shared.viewContext
-    )
-    self.previewUrl = podcast.previewUrl
-    self.episodeFileExtension = podcast.episodeFileExtension
-    self.artworkUrl160 = podcast.artworkUrl160
-    self.episodeContentType = podcast.episodeContentType
-    self.artworkUrl600 = podcast.artworkUrl600
-    self.artworkUrl60 = podcast.artworkUrl60
-    self.artistViewUrl = podcast.artistViewUrl
-    self.contentAdvisoryRating = podcast.contentAdvisoryRating
-    self.trackViewUrl = podcast.trackViewUrl
-    self.trackTimeMillis = podcast.trackTimeMillis
-    self.collectionViewUrl = podcast.collectionViewUrl
-    self.episodeUrl = podcast.episodeUrl
-    self.collectionId = podcast.collectionId
-    self.collectionName = podcast.collectionName
-    self.id = podcast.id
-    self.trackName = podcast.trackName
-    self.releaseDate = podcast.releaseDate
-    self.shortDescriptionMy = podcast.shortDescriptionMy
-    self.feedUrl = podcast.feedUrl
-    self.artistIds = podcast.artistIds
-    self.closedCaptioning = podcast.closedCaptioning
-    self.country = podcast.country
-    self.descriptionMy = podcast.descriptionMy
-    self.episodeGuid = podcast.episodeGuid
-    self.kind = podcast.kind
-    self.wrapperType = podcast.wrapperType
-    self.isFavorite = podcast.isFavorite
-    self.isSearched = podcast.isSearched
-    self.isLikedMoment = podcast.isLikedMoment
+    let viewContext = DataStoreManager.shared.viewContext
+    guard let entity = NSEntityDescription.entity(forEntityName: "Podcast", in: viewContext) else { fatalError() }
+    
+    self.init(entity: entity, insertInto: viewContext)
+    
+    self.previewUrl =             podcast.previewUrl
+    self.episodeFileExtension =   podcast.episodeFileExtension
+    self.artworkUrl160 =          podcast.artworkUrl160
+    self.episodeContentType =     podcast.episodeContentType
+    self.artworkUrl600 =          podcast.artworkUrl600
+    self.artworkUrl60 =           podcast.artworkUrl60
+    self.artistViewUrl =          podcast.artistViewUrl
+    self.contentAdvisoryRating =  podcast.contentAdvisoryRating
+    self.trackViewUrl =           podcast.trackViewUrl
+    self.trackTimeMillis =        podcast.trackTimeMillis
+    self.collectionViewUrl =      podcast.collectionViewUrl
+    self.episodeUrl =             podcast.episodeUrl
+    self.collectionId =           podcast.collectionId
+    self.collectionName =         podcast.collectionName
+    self.id =                     podcast.id
+    self.trackName =              podcast.trackName
+    self.releaseDate =            podcast.releaseDate
+    self.shortDescriptionMy =     podcast.shortDescriptionMy
+    self.feedUrl =                podcast.feedUrl
+    self.artistIds =              podcast.artistIds
+    self.closedCaptioning =       podcast.closedCaptioning
+    self.country =                podcast.country
+    self.descriptionMy =          podcast.descriptionMy
+    self.episodeGuid =            podcast.episodeGuid
+    self.kind =                   podcast.kind
+    self.wrapperType =            podcast.wrapperType
+    self.isFavorite =             podcast.isFavorite
+    self.isSearched =             podcast.isSearched
+    self.isLikedMoment =          podcast.isLikedMoment
   }
   
   public func encode(to encoder: Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
-    try container.encode(previewUrl, forKey: .previewUrl)
-    try container.encode(episodeFileExtension, forKey: .episodeFileExtension)
-    try container.encode(artworkUrl160, forKey: .artworkUrl160)
-    try container.encode(episodeContentType, forKey: .episodeContentType)
-    try container.encode(artworkUrl600, forKey: .artworkUrl600)
-    try container.encode(artworkUrl60, forKey: .artworkUrl60)
-    try container.encode(artistViewUrl, forKey: .artistViewUrl)
-    try container.encode(contentAdvisoryRating, forKey: .contentAdvisoryRating)
-    try container.encode(trackViewUrl, forKey: .trackViewUrl)
+    
+    try container.encode(previewUrl,                forKey: .previewUrl)
+    try container.encode(episodeFileExtension,      forKey: .episodeFileExtension)
+    try container.encode(artworkUrl160,             forKey: .artworkUrl160)
+    try container.encode(episodeContentType,        forKey: .episodeContentType)
+    try container.encode(artworkUrl600,             forKey: .artworkUrl600)
+    try container.encode(artworkUrl60,              forKey: .artworkUrl60)
+    try container.encode(artistViewUrl,             forKey: .artistViewUrl)
+    try container.encode(contentAdvisoryRating,     forKey: .contentAdvisoryRating)
+    try container.encode(trackViewUrl,              forKey: .trackViewUrl)
     try container.encode(trackTimeMillis?.intValue, forKey: .trackTimeMillis)
-    try container.encode(collectionViewUrl, forKey: .collectionViewUrl)
-    try container.encode(episodeUrl, forKey: .episodeUrl)
-    try container.encode(collectionId?.intValue, forKey: .collectionId)
-    try container.encode(collectionName, forKey: .collectionName)
-    try container.encode(id?.intValue, forKey: .id)
-    try container.encode(trackName, forKey: .trackName)
-    try container.encode(releaseDate, forKey: .releaseDate)
-    try container.encode(shortDescriptionMy, forKey: .shortDescriptionMy)
-    try container.encode(feedUrl, forKey: .feedUrl)
-    try container.encode(artistIds, forKey: .artistIds)
-    try container.encode(closedCaptioning, forKey: .closedCaptioning)
-    try container.encode(country, forKey: .country)
-    try container.encode(descriptionMy, forKey: .descriptionMy)
-    try container.encode(episodeGuid, forKey: .episodeGuid)
-    try container.encode(kind, forKey: .kind)
-    try container.encode(wrapperType, forKey: .wrapperType)
-    try container.encode(isFavorite, forKey: .isFavorite)
-    try container.encode(isSearched, forKey: .isSearched)
-    try container.encode(isLikedMoment, forKey: .isLikedMoment)
+    try container.encode(collectionViewUrl,         forKey: .collectionViewUrl)
+    try container.encode(episodeUrl,                forKey: .episodeUrl)
+    try container.encode(collectionId?.intValue,    forKey: .collectionId)
+    try container.encode(collectionName,            forKey: .collectionName)
+    try container.encode(id?.intValue,              forKey: .id)
+    try container.encode(trackName,                 forKey: .trackName)
+    try container.encode(releaseDate,               forKey: .releaseDate)
+    try container.encode(shortDescriptionMy,        forKey: .shortDescriptionMy)
+    try container.encode(feedUrl,                   forKey: .feedUrl)
+    try container.encode(artistIds,                 forKey: .artistIds)
+    try container.encode(closedCaptioning,          forKey: .closedCaptioning)
+    try container.encode(country,                   forKey: .country)
+    try container.encode(descriptionMy,             forKey: .descriptionMy)
+    try container.encode(episodeGuid,               forKey: .episodeGuid)
+    try container.encode(kind,                      forKey: .kind)
+    try container.encode(wrapperType,               forKey: .wrapperType)
+    try container.encode(isFavorite,                forKey: .isFavorite)
+    try container.encode(isSearched,                forKey: .isSearched)
+    try container.encode(isLikedMoment,             forKey: .isLikedMoment)
   }
 }
 

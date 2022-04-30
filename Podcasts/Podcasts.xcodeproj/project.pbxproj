@@ -75,6 +75,7 @@
 		3A1FB25C280C85A700C3091C /* FavoriteDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A1FB25A280C85A600C3091C /* FavoriteDocument.swift */; };
 		3A4A3757280164DC000C80E4 /* PodcastData+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4A3755280164DC000C80E4 /* PodcastData+CoreDataClass.swift */; };
 		3A4A3758280164DC000C80E4 /* PodcastData+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4A3756280164DC000C80E4 /* PodcastData+CoreDataProperties.swift */; };
+		3A632653281DAF6A005FFB08 /* Float + formatedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A632652281DAF6A005FFB08 /* Float + formatedString.swift */; };
 		3AA59DC528142C0D00FF2D19 /* FirebaseDataBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA59DC428142C0D00FF2D19 /* FirebaseDataBase.swift */; };
 		3AAB1B7B2816A516007C6B0E /* SearchProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AAB1B7A2816A516007C6B0E /* SearchProtocol.swift */; };
 		3AB5ECEA2803650300EB445A /* String+FormaterDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AB5ECE92803650300EB445A /* String+FormaterDate.swift */; };
@@ -91,7 +92,7 @@
 		00F531523154C13479CB9139 /* Pods-Podcasts.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Podcasts.release.xcconfig"; path = "Target Support Files/Pods-Podcasts/Pods-Podcasts.release.xcconfig"; sourceTree = "<group>"; };
 		04425A88273012DA00E897FA /* BigPlayerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BigPlayerViewController.swift; sourceTree = "<group>"; };
 		04425A89273012DA00E897FA /* BigPlayerViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = BigPlayerViewController.xib; sourceTree = "<group>"; };
-		045628242732EA370044878C /* String + conform.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String + conform.swift"; sourceTree = "<group>"; };
+		045628242732EA370044878C /* String + conform.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = "String + conform.swift"; sourceTree = "<group>"; };
 		0457FB1A272F1ECA00D57280 /* PlayerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerViewController.swift; sourceTree = "<group>"; };
 		0457FB1B272F1ECB00D57280 /* PlayerViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PlayerViewController.xib; sourceTree = "<group>"; };
 		047B47AD273B1FF6008E844F /* LikedMomentsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LikedMomentsViewController.swift; sourceTree = "<group>"; };
@@ -158,6 +159,7 @@
 		3A1FB25A280C85A600C3091C /* FavoriteDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteDocument.swift; sourceTree = "<group>"; };
 		3A4A3755280164DC000C80E4 /* PodcastData+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PodcastData+CoreDataClass.swift"; sourceTree = "<group>"; };
 		3A4A3756280164DC000C80E4 /* PodcastData+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PodcastData+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		3A632652281DAF6A005FFB08 /* Float + formatedString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Float + formatedString.swift"; sourceTree = "<group>"; };
 		3AA59DC428142C0D00FF2D19 /* FirebaseDataBase.swift */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = FirebaseDataBase.swift; sourceTree = "<group>"; };
 		3AAB1B7A2816A516007C6B0E /* SearchProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchProtocol.swift; sourceTree = "<group>"; };
 		3AB5ECE92803650300EB445A /* String+FormaterDate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+FormaterDate.swift"; sourceTree = "<group>"; };
@@ -219,7 +221,6 @@
 				184CE19027271D9D0088044C /* Resourses */,
 				184CE19127271DAE0088044C /* Helpers */,
 				18D13DDA273C400C00495C97 /* Services */,
-				189C1FAB272D337100A8480E /* Extensions */,
 				184CE18E27271D7B0088044C /* Data */,
 				189C1FB0272D84B100A8480E /* ViewModel */,
 				049D480427286D6300B6DA3C /* ViewControllers */,
@@ -315,6 +316,7 @@
 		184CE19127271DAE0088044C /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				189C1FAB272D337100A8480E /* Extensions */,
 				1847811D272C8B450036B89E /* Gestures */,
 				18478122272C8B450036B89E /* Alert */,
 				187B2B3C2732C0BD00C3EFFF /* CustomPresent */,
@@ -386,13 +388,15 @@
 				189C1FBB272EE6F100A8480E /* UIView + loadFromNib.swift */,
 				189C1FA9272D336500A8480E /* UITableView + register.swift */,
 				189C1FB1272D876B00A8480E /* Collection.swift */,
+				3A632652281DAF6A005FFB08 /* Float + formatedString.swift */,
 				1888C2AE2739A8CF00395B5B /* URL + localPath.swift */,
 				045628242732EA370044878C /* String + conform.swift */,
 				3AB5ECE92803650300EB445A /* String+FormaterDate.swift */,
 				18FFCA5927D602EF0078CB3F /* UIStoryboard.swift */,
 				181F5BE127E72E3700AC27EB /* extensionCoreData.swift */,
 			);
-			path = Extensions;
+			name = Extensions;
+			path = ../Extensions;
 			sourceTree = "<group>";
 		};
 		189C1FB0272D84B100A8480E /* ViewModel */ = {
@@ -693,6 +697,7 @@
 				3A4A3758280164DC000C80E4 /* PodcastData+CoreDataProperties.swift in Sources */,
 				3AA59DC528142C0D00FF2D19 /* FirebaseDataBase.swift in Sources */,
 				049D480327286D5900B6DA3C /* DetailViewController.swift in Sources */,
+				3A632653281DAF6A005FFB08 /* Float + formatedString.swift in Sources */,
 				18FFCA5527D556920078CB3F /* PreLoaderViewController.swift in Sources */,
 				3FBCF1C72728482A00B70522 /* PodcastByAuthorCell.swift in Sources */,
 				3A1FB256280C7CA300C3091C /* SearchPodcastDocument.swift in Sources */,

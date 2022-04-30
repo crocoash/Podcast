@@ -8,7 +8,7 @@
 import UIKit
 
 extension UIView {
-    func addMyGestureRecognizer(_ target: Any?,type gesture: TypeOfGestureRecognizer, selector: Selector) {
+    func addMyGestureRecognizer(_ target: Any?,type gesture: TypeOfGestureRecognizer,_ selector: Selector) {
         self.isUserInteractionEnabled = true
         // get array of GestureRecognizer then add him to the View
         gesture.createGestures(for: target, selector: selector).forEach { addGestureRecognizer($0) }
@@ -19,14 +19,14 @@ extension Collection where Element: UIView {
     func myAddGestureRecogniser(_ target: Any,type gesture: TypeOfGestureRecognizer, selector: Selector)  {
         forEach {
             $0.isUserInteractionEnabled = true
-            $0.addMyGestureRecognizer(target, type: gesture, selector: selector)
+            $0.addMyGestureRecognizer(target, type: gesture, selector)
         }
     }
 }
 
 extension UIViewController {
     func addMyGestureRecognizer(_ target: Any?, type gesture: TypeOfGestureRecognizer, _ selector: Selector) {
-        view.addMyGestureRecognizer(target, type: gesture, selector: selector)
+        view.addMyGestureRecognizer(target, type: gesture, selector)
     }
 }
 
