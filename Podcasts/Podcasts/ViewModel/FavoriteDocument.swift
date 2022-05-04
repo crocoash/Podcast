@@ -14,12 +14,11 @@ class FavoriteDocument {
     private init() {}
     
     private let viewContext = DataStoreManager.shared.viewContext
-    private var favorite: [Podcast] { favoritePodcastFetchResultController.fetchedObjects ?? [] }
+    private var favoritePodcasts: [FavoritePodcast] { favoritePodcastFetchResultController.fetchedObjects ?? [] }
     
-    lazy var favoritePodcastFetchResultController: NSFetchedResultsController<Podcast> = {
-        let fetchRequest: NSFetchRequest<Podcast> = Podcast.fetchRequest()
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(Podcast.trackName), ascending: true)]
-        fetchRequest.predicate = NSPredicate(format: "isFavorite = true")
+    private(set) lazy var favoritePodcastFetchResultController: NSFetchedResultsController<FavoritePodcast> = {
+        let fetchRequest: NSFetchRequest<FavoritePodcast> = FavoritePodcast.fetchRequest()
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(FavoritePodcast.idd), ascending: true)]
         let fetchResultController = NSFetchedResultsController(
             fetchRequest: fetchRequest,
             managedObjectContext: viewContext,
@@ -43,50 +42,54 @@ extension FavoriteDocument {
     
     //MARK: - Favorite
     
-    var favoritePodcasts: [Podcast] { favoritePodcastFetchResultController.fetchedObjects ?? [] }
+    var podcasts: [Podcast] { favoritePodcastFetchResultController.fetchedObjects?.compactMap { $0.podcast } ?? [] }
     
     var countOffavoritePodcasts: Int { favoritePodcasts.count }
-    
     var favoritePodcastIsEmpty: Bool { favoritePodcasts.isEmpty }
     
-    func getfavoritePodcast(for indexPath: IndexPath) -> Podcast {
-        return favoritePodcastFetchResultController.object(at: indexPath)
+    func getPodcast(for indexPath: IndexPath) -> Podcast {
+        return favoritePodcastFetchResultController.object(at: indexPath).podcast
     }
     
     func getIndexPath(for podcast: Podcast) -> IndexPath? {
-        return favoritePodcastFetchResultController.indexPath(forObject: podcast)
+        guard let favoritePodcast = favoritePodcasts.filter({ $0.podcast.id == podcast.id }).first else { return nil }
+        return favoritePodcastFetchResultController.indexPath(forObject: favoritePodcast)
     }
     
     func removaAllFavorites() {
-        favoritePodcastFetchResultController.fetchedObjects?.forEach {
-            addOrRemoveToFavorite(podcast: $0)
+        favoritePodcasts.forEach {
+            viewContext.delete($0)
         }
         DataStoreManager.shared.viewContext.mySave()
     }
     
     func addOrRemoveToFavorite(podcast: Podcast) {
-        if !podcast.isFavorite {
-            let newPodcast = Podcast(podcast: podcast)
-            newPodcast.isFavorite = true
+        if let favoritePodcast = getFavoritePodcast(podcast) {
+            viewContext.delete(favoritePodcast)
         } else {
-            if let podcast = FavoriteDocument.shared.favoritePodcastFetchResultController.fetchedObjects?.firstPodcast(matching: podcast.id) {
-                viewContext.delete(podcast)
-            }
+            _ = FavoritePodcast(podcast: podcast)
         }
         viewContext.mySave()
+        FirebaseDatabase.shared.savePodcast()
     }
     
     //MARK: - Common
-    
     func isDownload(podcast: Podcast) -> Bool {
         guard let url = podcast.previewUrl.localPath else { return false }
         return FileManager.default.fileExists(atPath: url.path)
     }
     
-    func podcastIsFavorite(podcast: Podcast) -> Bool {
-        if let podcasts = favoritePodcastFetchResultController.fetchedObjects {
-            return podcasts.contains { $0.id == podcast.id }
-        }
-        return false
+    func isFavorite(_ podcast: Podcast) -> Bool {
+        return favoritePodcasts.filter ({ $0.podcast.id == podcast.id }).first != nil
+    }
+    
+    func getFavoritePodcast(_ podcast: Podcast) -> FavoritePodcast? {
+        return favoritePodcasts.filter ({ $0.podcast.id == podcast.id }).first
     }
 }
+
+
+
+
+
+

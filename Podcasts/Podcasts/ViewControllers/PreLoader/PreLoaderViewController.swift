@@ -48,7 +48,7 @@ class PreLoaderViewController: UIViewController {
             heightConstraint?.constant = 120
             UIView.animate(withDuration: 0.5, animations: { self.view.layoutIfNeeded() }) { _ in
                 let vc = RegistrationViewController.initVC
-                vc.configure(tabBarVC: self.tabBarVC, userViewModel: self.userViewModel)
+                vc.configure(userViewModel: self.userViewModel)
                 vc.modalPresentationStyle = .custom
                 vc.transitioningDelegate = self
                 self.present(vc, animated: false)

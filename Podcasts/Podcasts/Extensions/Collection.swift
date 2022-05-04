@@ -21,7 +21,7 @@ extension Collection where Element: Identifiable {
         return self.contains { $0.id == id}
     }
     
-    func firstPodcast(matching id: Element.ID?) -> Element? {
+    func first(matching id: Element.ID?) -> Element? {
         return self.filter { $0.id == id }.first
     }
 }

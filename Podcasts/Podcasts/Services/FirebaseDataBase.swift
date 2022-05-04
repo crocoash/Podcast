@@ -25,56 +25,68 @@ class FirebaseDatabase {
   private var viewContext: NSManagedObjectContext { DataStoreManager.shared.viewContext }
   
   private var ref = Database.database(url: "https://podcast-app-8fcd2-default-rtdb.europe-west1.firebasedatabase.app").reference()
-  
-  lazy private var favoritePodcastsPath = ref.child(userID).child("FavoritePodcasts")
-  lazy private var likedPodcastsPath = ref.child(userID).child("LikedPodcasts")
+  lazy private var userStorage = ref.child(userID)
+  lazy private var favoritePodcastsPath = userStorage.child("FavoritePodcasts")
+  lazy private var likedPodcastsPath = userStorage.child("LikedPodcasts")
   
   func savePodcast() {
-    guard let podcasts = try? self.viewContext.fetch(Podcast.fetchRequest()) else { return }
-    if let podcastData = try? JSONEncoder().encode(podcasts) {
-      if let serialization = try? JSONSerialization.jsonObject(with: podcastData, options: .allowFragments) as? [Dictionary<String, Any>] {
-        favoritePodcastsPath.setValue(serialization)
-      }
+    save(type: FavoritePodcast.self) {
+      favoritePodcastsPath.setValue($0)
     }
   }
   
-  func observePodcast() {
-    favoritePodcastsPath.observe(.value) { [weak self] snapShot in
-      guard let value = snapShot.value,
-            let self = self else { return }
+  func saveLikedMoment() {
+    save(type: LikedMoment.self) {
+      likedPodcastsPath.setValue($0)
+    }
+  }
+  
+  func observe() {
+    userStorage.observe(.value) { [weak self] snapShot in
+
+      let favoriteSnapShot = snapShot.childSnapshot(forPath: "FavoritePodcasts")
+      let likedSnapShot = snapShot.childSnapshot(forPath: "LikedPodcasts")
       
-      DataStoreManager.shared.removeAll(fetchRequest: Podcast.fetchRequest())
-      
-      if let data = try? JSONSerialization.data(withJSONObject: value, options: .fragmentsAllowed) {
-        do {
-          let podcasts = try JSONDecoder(context: self.viewContext).decode([Podcast].self, from: data)
-          podcasts.forEach { podcast in
-            _ = Podcast(podcast: podcast)
+//      DataStoreManager.shared.persistentContainer.performBackgroundTask { context in
+
+        guard let self = self else { return }
+
+        self.obtain(type: FavoritePodcast.self, snapshot: favoriteSnapShot) {
+          $0.forEach {
+            let podcast = Podcast.getOrCreatePodcast(podcast: $0.podcast)
+            _ = FavoritePodcast(podcast: podcast)
+            self.viewContext.mySave()
           }
-          self.viewContext.mySave()
-        } catch let error {
-          print(error)
         }
-        
-      }
-      
-      self.delegate?.firebaseDatabaseDidGetData(self)
+
+        self.obtain(type: LikedMoment.self, snapshot: likedSnapShot) {
+          $0.forEach {
+            let podcast = Podcast.getOrCreatePodcast(podcast: $0.podcast)
+            _ = LikedMoment(podcast: podcast, moment: $0.moment)
+            self.viewContext.mySave()
+          }
+        }
+//        DispatchQueue.main.async {
+          self.delegate?.firebaseDatabaseDidGetData(self)
+//        }
+//      }
     }
   }
+    
   
-  func getPodcast(completion: @escaping ([Podcast]) -> Void) {
+  func getPodcast(completion: @escaping () -> Void) {
     favoritePodcastsPath.getData { [weak self] error, snapShot in
       guard error == nil,
             let value = snapShot.value,
             let self = self else { return }
-      
+
       if let data = try? JSONSerialization.data(withJSONObject: value, options: .fragmentsAllowed) {
         do {
           let podcasts = try JSONDecoder(context: self.viewContext).decode([Podcast].self, from: data)
           podcasts.forEach { podcast in
             _ = Podcast(podcast: podcast)
           }
-          completion(podcasts)
+          completion()
           self.viewContext.mySave()
         } catch let error {
           print(error)
@@ -83,61 +95,34 @@ class FirebaseDatabase {
       }
     }
   }
-  
-  /// ------
-  func saveLikedMoment() {
-    guard let podcasts = try? viewContext.fetch(LikedMoment.fetchRequest()) else { return }
-    if let podcastData = try? JSONEncoder().encode(podcasts) {
-      if let serialization = try? JSONSerialization.jsonObject(with: podcastData, options: .allowFragments) as? [Dictionary<String, Any>] {
-        likedPodcastsPath.setValue(serialization)
-      }
-    }
-  }
-  
-  func observeLikedMoment() {
-    likedPodcastsPath.observe(.value) { [weak self] snapShot in
-      guard let value = snapShot.value,
-            let self = self else { return }
-      
-      DataStoreManager.shared.removeAll(fetchRequest: LikedMoment.fetchRequest())
-      
-      if let data = try? JSONSerialization.data(withJSONObject: value, options: .fragmentsAllowed) {
-        do {
-          let likeMoments = try JSONDecoder(context: self.viewContext).decode([LikedMoment].self, from: data)
-          
-          likeMoments.forEach { likeMoment in
-            if let podcast = try? self.viewContext.fetch(Podcast.fetchRequest()).firstPodcast(matching: likeMoment.podcastID) {
-              let newLikedMoment = LikedMoment(context: self.viewContext)
-              newLikedMoment.podcast = podcast
-              newLikedMoment.moment = likeMoment.moment
-              newLikedMoment.podcastID = likeMoment.podcastID
-            }
-          }
-          self.viewContext.mySave()
-        } catch let error {
-          print(error)
-        }
-      }
-    }
-  }
 }
 
 extension FirebaseDatabase {
+  
+  private func save<T: Codable>(type: T.Type, completion: (Any) -> Void) where T: NSManagedObject {
+    guard let value = try? viewContext.fetch(NSFetchRequest<T>(entityName: String(describing: T.self))) else { return }
+    if let podcastData = try? JSONEncoder().encode(value) {
+      if let serialization = try? JSONSerialization.jsonObject(with: podcastData, options: .allowFragments) as? [Dictionary<String, Any>] {
+        completion(serialization)
+      }
+    }
+  }
+  
   private func obtain<T: Codable>(type: T.Type, snapshot: DataSnapshot, completion: @escaping ([T]) -> Void) where T: NSManagedObject {
     guard let value = snapshot.value else { return }
     
-    DataStoreManager.shared.removeAll(fetchRequest: NSFetchRequest<T>(entityName: type.description()))
+    DispatchQueue.main.async {
+      DataStoreManager.shared.removeAll(fetchRequest: NSFetchRequest<T>(entityName: String(describing: T.self)))
+    }
     
     if let data = try? JSONSerialization.data(withJSONObject: value, options: .fragmentsAllowed) {
       do {
         let result = try JSONDecoder(context: self.viewContext).decode([T].self, from: data)
         completion(result)
-        self.viewContext.mySave()
-      } catch let error {
+      } catch {
         print(error)
       }
     }
-    self.delegate?.firebaseDatabaseDidGetData(self)
   }
 }
 

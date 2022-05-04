@@ -21,12 +21,17 @@ class RegistrationViewController: UIViewController {
     @IBOutlet private weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet private weak var backGroundView: UIView!
     
-    
-    private(set) var tabBarVC: TabBarViewController!
     private(set) var userViewModel: UserViewModel!
     
-    func configure(tabBarVC: TabBarViewController, userViewModel: UserViewModel) {
-        self.tabBarVC = tabBarVC
+    lazy private var tabBarVC: TabBarViewController = {
+        let vc = TabBarViewController.initVC
+        vc.modalPresentationStyle = .custom
+        vc.setUserViewModel(userViewModel)
+        vc.transitioningDelegate = self
+        return vc
+    }()
+    
+    func configure(userViewModel: UserViewModel) {
         self.userViewModel = userViewModel
     }
     
@@ -142,10 +147,10 @@ extension RegistrationViewController {
     }
     
     private func configureGestures() {
-        addMyGestureRecognizer(self, type: .swipe(), #selector(swipeDirection))
-        addMyGestureRecognizer(view, type: .tap(), #selector(view.endEditing(_:)))
-        privacyPolicyLabel.addMyGestureRecognizer(self, type: .tap(), #selector(showPrivacyInfo))
-        forgotPasswordLabel.addMyGestureRecognizer(self, type: .tap(), #selector(forgotPasswordTap))
+                           addMyGestureRecognizer(self,  type: .swipe(), #selector(swipeDirection))
+                           addMyGestureRecognizer(view,  type: .tap(),   #selector(view.endEditing(_:)))
+        privacyPolicyLabel.addMyGestureRecognizer(self,  type: .tap(),   #selector(showPrivacyInfo))
+        forgotPasswordLabel.addMyGestureRecognizer(self, type: .tap(),   #selector(forgotPasswordTap))
     }
     
     private func nSAttributedString(message: String, color: UIColor) -> NSAttributedString {

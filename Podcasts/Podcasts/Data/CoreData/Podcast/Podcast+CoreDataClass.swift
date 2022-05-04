@@ -40,9 +40,6 @@ public class Podcast: NSManagedObject, Codable {
     case kind
     case wrapperType
     case progress
-    case isFavorite
-    case isSearched
-    case isLikedMoment
   }
   
   required convenience public init(from decoder: Decoder) throws {
@@ -81,13 +78,11 @@ public class Podcast: NSManagedObject, Codable {
     episodeGuid =           try container.decodeIfPresent(String.self, forKey: .episodeGuid)
     kind =                  try container.decodeIfPresent(String.self, forKey: .kind)
     wrapperType =           try container.decodeIfPresent(String.self, forKey: .wrapperType)
-    isFavorite =            try container.decodeIfPresent(Bool  .self, forKey: .isFavorite) ?? false
-    isSearched =            try container.decodeIfPresent(Bool  .self, forKey: .isSearched) ?? true
-    isLikedMoment =         try container.decodeIfPresent(Bool  .self, forKey: .isLikedMoment) ?? false
   }
 
   convenience init(podcast: Podcast) {
     let viewContext = DataStoreManager.shared.viewContext
+
     guard let entity = NSEntityDescription.entity(forEntityName: "Podcast", in: viewContext) else { fatalError() }
     
     self.init(entity: entity, insertInto: viewContext)
@@ -118,9 +113,6 @@ public class Podcast: NSManagedObject, Codable {
     self.episodeGuid =            podcast.episodeGuid
     self.kind =                   podcast.kind
     self.wrapperType =            podcast.wrapperType
-    self.isFavorite =             podcast.isFavorite
-    self.isSearched =             podcast.isSearched
-    self.isLikedMoment =          podcast.isLikedMoment
   }
   
   public func encode(to encoder: Encoder) throws {
@@ -152,10 +144,21 @@ public class Podcast: NSManagedObject, Codable {
     try container.encode(episodeGuid,               forKey: .episodeGuid)
     try container.encode(kind,                      forKey: .kind)
     try container.encode(wrapperType,               forKey: .wrapperType)
-    try container.encode(isFavorite,                forKey: .isFavorite)
-    try container.encode(isSearched,                forKey: .isSearched)
-    try container.encode(isLikedMoment,             forKey: .isLikedMoment)
   }
 }
 
-
+extension Podcast {
+  
+  static private var viewContext = DataStoreManager.shared.viewContext 
+  
+  static func getOrCreatePodcast(podcast: Podcast) -> Podcast {
+    if let podcasts = try? viewContext.fetch(Podcast.fetchRequest()) {
+      if let findsavePodcast = podcasts.first(matching: podcast.id) {
+        return findsavePodcast
+      }
+    }
+    let newPodcast = Podcast(podcast: podcast)
+    viewContext.mySave()
+    return newPodcast
+  }
+}

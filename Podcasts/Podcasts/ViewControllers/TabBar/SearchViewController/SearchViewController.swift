@@ -197,10 +197,6 @@ extension SearchViewController {
         feedbackGenerator.prepare()
         feedbackGenerator.impactOccurred()
     }
-    
-    private func updateInformation(podcast: Podcast) {
-        podcast.isFavorite = FavoriteDocument.shared.podcastIsFavorite(podcast: podcast)
-    }
 }
 
 //MARK: - Private methods
@@ -260,7 +256,6 @@ extension SearchViewController: UITableViewDataSource {
         let cell = tableView.getCell(cell: PodcastCell.self, indexPath: indexPath)
         
         DownloadService().resumeDownload(podcast)
-        updateInformation(podcast: podcast)
         cell.delegate = self
         cell.configureCell(with: podcast)
         cell.addMyGestureRecognizer(self, type: .tap(), #selector(handlerTapPodcastCell))

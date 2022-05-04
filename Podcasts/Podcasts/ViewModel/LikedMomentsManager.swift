@@ -44,7 +44,6 @@ extension LikedMomentsManager {
     func deleteMoment(at indexPath: IndexPath) {
         let moment = likedMomentFRC.object(at: indexPath)
         viewContext.delete(moment)
-        
         viewContext.mySave()
     }
     
@@ -54,6 +53,12 @@ extension LikedMomentsManager {
     
     func getPodcast(for id: NSNumber) -> Podcast? {
         let podcasts = try? DataStoreManager.shared.viewContext.fetch(Podcast.fetchRequest())
-        return podcasts?.firstPodcast(matching: id)
+        return podcasts?.first(matching: id)
+    }
+    
+    func addLikeMoment(podcast: Podcast, moment: Double) {
+        _ = LikedMoment(podcast: podcast, moment: moment)
+        viewContext.mySave()
+        FirebaseDatabase.shared.saveLikedMoment()
     }
 }

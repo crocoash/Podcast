@@ -34,4 +34,3 @@ class FirestorageDatabase {
         logoImage.putData(imageData, metadata: nil)
     }
 }
-//24,888,467 bytes

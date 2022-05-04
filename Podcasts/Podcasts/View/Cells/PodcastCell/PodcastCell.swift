@@ -56,7 +56,7 @@ extension PodcastCell {
         downLoadImageView    .addMyGestureRecognizer(self, type: .tap(), #selector(handlerTapDownloadImage))
                 
         /// information from favorite tab
-        let isFavorite = podcast.isFavorite
+        let isFavorite: Bool = FavoriteDocument.shared.isFavorite(podcast)
         isDownLoad =  FavoriteDocument.shared.isDownload(podcast: podcast)
         
         downLoadImageView.isHidden = !isFavorite

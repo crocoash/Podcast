@@ -32,19 +32,8 @@ extension DataStoreManager {
             data.forEach {
                 viewContext.delete($0)
             }
-            mySave()
         }
-    }
-    
-    func mySave() {
-        if viewContext.hasChanges {
-            do {
-                try viewContext.save()
-            } catch {
-                let nserror = error as NSError
-                fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
-            }
-        }
+        viewContext.mySave()
     }
 }
 
@@ -54,7 +43,7 @@ extension NSManagedObjectContext {
             do {
                 try self.save()
             } catch {
-                fatalError("Unresolved error \(error)")
+                fatalError(error.localizedDescription)
             }
         }
     }

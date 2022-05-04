@@ -59,8 +59,7 @@ class TabBarViewController: UITabBarController {
         addPlayer()
         configureImageDarkMode()
         downloadService.downloadsSession = downloadsSession
-        FirebaseDatabase.shared.observePodcast()
-        FirebaseDatabase.shared.observeLikedMoment()
+        FirebaseDatabase.shared.observe()
         FirebaseDatabase.shared.delegate = self
     }
 }
@@ -113,13 +112,12 @@ extension TabBarViewController {
     }
     
     private func addOrRemoveFromFavorite(podcast: Podcast) {
-        let title = (podcast.trackName ?? "podcast") + (podcast.isFavorite ? "is removed from playlist" : "is added to playlist")
+        let isFavorite = FavoriteDocument.shared.isFavorite(podcast)
+        let title = (podcast.trackName ?? "podcast") + (isFavorite ? "is removed from playlist" : "is added to playlist")
         MyToast.create(title: title,.bottom,timeToAppear: 0.2,timerToRemove: 2,for: view)
         
         FavoriteDocument.shared.addOrRemoveToFavorite(podcast: podcast)
         if FavoriteDocument.shared.isDownload(podcast: podcast) { downloadService.cancelDownload(podcast: podcast)}
-        
-        FirebaseDatabase.shared.savePodcast()
         feedbackGenerator()
     }
     
@@ -277,10 +275,7 @@ extension TabBarViewController: FirebaseDatabaseDelegate {
     func firebaseDatabaseDidGetData(_ firebaseDatabase: FirebaseDatabase) {
         playListVc.reloadData()
         searchVC.reloadData()
-        feedbackGenerator()
-    }
-
-    func firebaseDatabaseDidGetData1(_ firebaseDatabase: FirebaseDatabase) {
         likedMomentVc.reloadData()
+        feedbackGenerator()
     }
 }

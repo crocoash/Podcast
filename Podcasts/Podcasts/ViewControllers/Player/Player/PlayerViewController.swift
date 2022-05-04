@@ -216,9 +216,7 @@ extension PlayerViewController: BigPlayerViewControllerDelegate {
     
     func bigPlayerViewController(_ bigPlayerViewController: BigPlayerViewController, didLikeThis moment: Double) {
         guard let podcast = currentPodcast?.podcast else { return }
-        _ = LikedMoment(podcast: podcast, moment: moment, id: podcast.id!)
-        DataStoreManager.shared.viewContext.mySave()
-        FirebaseDatabase.shared.saveLikedMoment()
+        LikedMomentsManager.shared.addLikeMoment(podcast: podcast, moment: moment)
     }
     
     func bigPlayerViewController(_ bigPlayerViewController: BigPlayerViewController, didChangeCurrentTime value: Double) {

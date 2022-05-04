@@ -35,8 +35,6 @@ extension Podcast {
     @NSManaged public var feedUrl: String?
     @NSManaged public var id: NSNumber?
     @NSManaged public var index: NSNumber?
-    @NSManaged public var isFavorite: Bool
-    @NSManaged public var isSearched: Bool
     @NSManaged public var kind: String?
     @NSManaged public var previewUrl: String?
     @NSManaged public var progress: Float
@@ -46,7 +44,6 @@ extension Podcast {
     @NSManaged public var trackTimeMillis: NSNumber?
     @NSManaged public var trackViewUrl: String?
     @NSManaged public var wrapperType: String?
-    @NSManaged public var isLikedMoment: Bool
 
 }
 

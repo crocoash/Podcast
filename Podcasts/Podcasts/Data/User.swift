@@ -9,6 +9,6 @@ import Foundation
 
 struct User: Codable {
     var userName: String?
-    var isAuthorization: Bool = true
+    var isAuthorization: Bool = false
     var userInterfaceStyleIsDark = true
 }

@@ -41,12 +41,7 @@ class ApiService {
             var result: Result<T>
             defer {
                 DispatchQueue.main.async {
-                    viewContext.mySave()
                     completion(result)
-                    if T.self is SearchProtocol.Type {
-                        FirebaseDatabase.shared.save()
-                        DataStoreManager.shared.mySave()
-                    }
                 }
             }
             guard let data = data, response != nil, error == nil else {

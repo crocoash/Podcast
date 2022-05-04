@@ -34,12 +34,13 @@ class PlaylistTableViewController: UIViewController {
     }
     
     func updateDisplay(progress: Float, totalSize: String, id: NSNumber) {
-        guard
-            let podcast = FavoriteDocument.shared.favoritePodcasts.firstPodcast(matching: id),
-            let indexPath = FavoriteDocument.shared.getIndexPath(for: podcast)
+        let favoritePodcast = FavoriteDocument.shared.favoritePodcastFetchResultController.fetchedObjects
+        
+        guard let podcast = favoritePodcast?.filter({ $0.podcast.id == id }).first?.podcast,
+              let indexPath = FavoriteDocument.shared.getIndexPath(for: podcast),
+              let podcastCell = self.tableView?.cellForRow(at: indexPath) as? PodcastCell
         else { return }
         
-        guard let podcastCell = self.tableView?.cellForRow(at: indexPath) as? PodcastCell else { return }
         podcastCell.updateDisplay(progress: progress, totalSize: totalSize)
     }
     
@@ -71,7 +72,7 @@ class PlaylistTableViewController: UIViewController {
         guard let view = sender.view as? UITableViewCell,
               let indexPath = tableView.indexPath(for: view) else { return }
         
-        let podcast = FavoriteDocument.shared.getfavoritePodcast(for: indexPath)
+        let podcast = FavoriteDocument.shared.getPodcast(for: indexPath)
        
         let vc = DetailViewController.initVC
         vc.delegate = self
@@ -122,7 +123,7 @@ extension PlaylistTableViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            let podcast = FavoriteDocument.shared.getfavoritePodcast(for: indexPath)
+            let podcast = FavoriteDocument.shared.getPodcast(for: indexPath)
             delegate?.playlistTableViewControllerDidSelectStar(self, podcast: podcast)
 //            tableView.deleteRows(at: [indexPath], with: .fade)
             showEmptyImage()
@@ -135,7 +136,7 @@ extension PlaylistTableViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let podcast = FavoriteDocument.shared.getfavoritePodcast(for: indexPath)
+        let podcast = FavoriteDocument.shared.getPodcast(for: indexPath)
         let cell = tableView.getCell(cell: PodcastCell.self, indexPath: indexPath)
         cell.addMyGestureRecognizer(self, type: .tap(), #selector(tapCell))
         cell.configureCell(with: podcast)
@@ -156,7 +157,7 @@ extension PlaylistTableViewController : DetailViewControllerDelegate {
     }
     
     func detailViewController(_ detailViewController: DetailViewController, playButtonDidTouchFor didSelectIndex: Int) {
-        delegate?.playlistTableViewController(self,podcasts: FavoriteDocument.shared.favoritePodcasts, didSelectIndex: didSelectIndex)
+        delegate?.playlistTableViewController(self, podcasts: FavoriteDocument.shared.podcasts, didSelectIndex: didSelectIndex)
     }
 }
 
