@@ -32,7 +32,7 @@ class TabBarViewController: UITabBarController {
     private var userViewModel: UserViewModel!
     private let firestorageDatabase = FirestorageDatabase()
     
-    lazy private var playListVc = createTabBar(PlaylistTableViewController.self , title: "Playlist", imageName: "folder.fill") {
+    lazy private var playListVC = createTabBar(PlaylistTableViewController.self , title: "Playlist", imageName: "folder.fill") {
         $0.delegate = self
     }
     lazy private var searchVC = createTabBar(SearchViewController.self, title: "Search", imageName: "magnifyingglass") {
@@ -68,7 +68,7 @@ class TabBarViewController: UITabBarController {
 extension TabBarViewController {
     
     private func configureTabBar() {
-        viewControllers = [playListVc, searchVC, likedMomentVc, settingsVC]
+        viewControllers = [playListVC, searchVC, likedMomentVc, settingsVC]
     }
     
     private func createTabBar<T: UIViewController>(_ type: T.Type, title: String, imageName: String, completion: ((T) -> Void)? = nil) -> T {
@@ -124,6 +124,7 @@ extension TabBarViewController {
     private func downloadOrRemovePodcast(_ podcast: Podcast, _ indexPath: IndexPath) {
         if FavoriteDocument.shared.isDownload(podcast: podcast) {
             downloadService.cancelDownload(podcast: podcast)
+            reloadAllVC()
         } else {
             downloadService.startDownload(podcast, indexPath: indexPath)
         }
@@ -133,6 +134,11 @@ extension TabBarViewController {
     private func startPlay(_ podcasts: [Podcast], _ didSelectIndex: Int) {
         playerVC.view.isHidden = false
         playerVC.startPlay(at: didSelectIndex, podcasts: podcasts)
+    }
+    
+    private func reloadAllVC() {
+        self.searchVC.reloadData()
+        self.playListVC.reloadData()
     }
 }
 
@@ -225,9 +231,11 @@ extension TabBarViewController: URLSessionDownloadDelegate {
         
         DispatchQueue.main.async {
             self.searchVC.updateDisplay(progress: progress, totalSize: totalSize, id: id)
-            self.playListVc.updateDisplay(progress: progress, totalSize: totalSize, id: id)
+            self.playListVC.updateDisplay(progress: progress, totalSize: totalSize, id: id)
         }
     }
+    
+    
     
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         let fileManager = FileManager.default
@@ -249,8 +257,7 @@ extension TabBarViewController: URLSessionDownloadDelegate {
         
         DispatchQueue.main.async {
             self.downloadService.endDownload(url: url)
-            self.searchVC.reloadData()
-            self.playListVc.reloadData()
+            self.reloadAllVC()
         }
     }
 }
@@ -273,7 +280,7 @@ extension TabBarViewController: URLSessionDelegate {
 extension TabBarViewController: FirebaseDatabaseDelegate {
 
     func firebaseDatabaseDidGetData(_ firebaseDatabase: FirebaseDatabase) {
-        playListVc.reloadData()
+        playListVC.reloadData()
         searchVC.reloadData()
         likedMomentVc.reloadData()
         feedbackGenerator()

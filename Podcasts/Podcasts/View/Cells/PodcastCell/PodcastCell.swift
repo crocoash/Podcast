@@ -73,9 +73,8 @@ extension PodcastCell {
     
     func updateDisplay(progress: Float, totalSize : String) {
         
-        activityIndicator.isHidden = true
-        downLoadImageView.isHidden = false
-        
+        if !activityIndicator.isHidden { activityIndicator.isHidden = true }
+        if downLoadImageView.isHidden { downLoadImageView.isHidden = false }
         if downloadProgressView.isHidden { downloadProgressView.isHidden = false }
         if progressLabel.isHidden { progressLabel.isHidden = false }
         

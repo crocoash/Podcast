@@ -46,33 +46,27 @@ class FirebaseDatabase {
 
       let favoriteSnapShot = snapShot.childSnapshot(forPath: "FavoritePodcasts")
       let likedSnapShot = snapShot.childSnapshot(forPath: "LikedPodcasts")
+
+      guard let self = self else { return }
+
+      self.obtain(type: FavoritePodcast.self, snapshot: favoriteSnapShot) {
+        $0.forEach {
+          let podcast = Podcast.getOrCreatePodcast(podcast: $0.podcast)
+          _ = FavoritePodcast(podcast: podcast)
+          self.viewContext.mySave()
+        }
+      }
       
-//      DataStoreManager.shared.persistentContainer.performBackgroundTask { context in
-
-        guard let self = self else { return }
-
-        self.obtain(type: FavoritePodcast.self, snapshot: favoriteSnapShot) {
-          $0.forEach {
-            let podcast = Podcast.getOrCreatePodcast(podcast: $0.podcast)
-            _ = FavoritePodcast(podcast: podcast)
-            self.viewContext.mySave()
-          }
+      self.obtain(type: LikedMoment.self, snapshot: likedSnapShot) {
+        $0.forEach {
+          let podcast = Podcast.getOrCreatePodcast(podcast: $0.podcast)
+          _ = LikedMoment(podcast: podcast, moment: $0.moment)
+          self.viewContext.mySave()
         }
-
-        self.obtain(type: LikedMoment.self, snapshot: likedSnapShot) {
-          $0.forEach {
-            let podcast = Podcast.getOrCreatePodcast(podcast: $0.podcast)
-            _ = LikedMoment(podcast: podcast, moment: $0.moment)
-            self.viewContext.mySave()
-          }
-        }
-//        DispatchQueue.main.async {
-          self.delegate?.firebaseDatabaseDidGetData(self)
-//        }
-//      }
+      }
+      self.delegate?.firebaseDatabaseDidGetData(self)
     }
   }
-    
   
   func getPodcast(completion: @escaping () -> Void) {
     favoritePodcastsPath.getData { [weak self] error, snapShot in
@@ -88,7 +82,7 @@ class FirebaseDatabase {
           }
           completion()
           self.viewContext.mySave()
-        } catch let error {
+        } catch {
           print(error)
         }
         completion()
@@ -111,9 +105,7 @@ extension FirebaseDatabase {
   private func obtain<T: Codable>(type: T.Type, snapshot: DataSnapshot, completion: @escaping ([T]) -> Void) where T: NSManagedObject {
     guard let value = snapshot.value else { return }
     
-    DispatchQueue.main.async {
-      DataStoreManager.shared.removeAll(fetchRequest: NSFetchRequest<T>(entityName: String(describing: T.self)))
-    }
+    DataStoreManager.shared.removeAll(fetchRequest: NSFetchRequest<T>(entityName: String(describing: T.self)))
     
     if let data = try? JSONSerialization.data(withJSONObject: value, options: .fragmentsAllowed) {
       do {

@@ -49,6 +49,11 @@ class SearchViewController : UIViewController {
         showEmptyImage()
     }
     
+    func reloadData(indexPath: [IndexPath]) {
+        tableView?.reloadRows(at: indexPath, with: .none)
+        showEmptyImage()
+    }
+    
     private var isPodcast: Bool { searchSegmentalControl.selectedSegmentIndex == 0 }
     
     // MARK: - View Methods
@@ -285,7 +290,6 @@ extension SearchViewController: PodcastCellDelegate {
     func podcastCellDidSelectDownLoadImage(_ podcastCell: PodcastCell, podcast: Podcast) {
         guard let indexPath = tableView.indexPath(for: podcastCell) else { return }
         delegate?.searchViewControllerDidSelectDownLoadImage(self, podcast: podcast, indexPath: indexPath)
-        tableView.reloadRows(at: [indexPath], with: .none)
     }
 }
 

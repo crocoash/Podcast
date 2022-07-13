@@ -188,7 +188,5 @@ extension PlaylistTableViewController: PodcastCellDelegate {
     
     func podcastCellDidSelectDownLoadImage(_ podcastCell: PodcastCell, podcast: Podcast) {
         delegate?.playlistTableViewControllerDidSelectDownLoadImage(self, podcast: podcast)
-        showEmptyImage()
-        tableView.reloadData()
     }
 }
