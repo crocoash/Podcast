@@ -13,9 +13,9 @@ import CoreData
 extension LikedMoment {
 
     @nonobjc public class func fetchRequest() -> NSFetchRequest<LikedMoment> {
-        return NSFetchRequest<LikedMoment>(entityName: "LikedMoment")
+        return NSFetchRequest<LikedMoment>(entityName: Self.entityName)
     }
-
+    
     @NSManaged public var moment: Double
     @NSManaged public var podcast: Podcast
 

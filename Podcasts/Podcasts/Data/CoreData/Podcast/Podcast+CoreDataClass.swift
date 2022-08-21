@@ -149,8 +149,6 @@ public class Podcast: NSManagedObject, Codable {
 
 extension Podcast {
   
-  static private var viewContext = DataStoreManager.shared.viewContext 
-  
   static func getOrCreatePodcast(podcast: Podcast) -> Podcast {
     if let podcasts = try? viewContext.fetch(Podcast.fetchRequest()) {
       if let findsavePodcast = podcasts.first(matching: podcast.id) {

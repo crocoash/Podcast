@@ -18,12 +18,7 @@ public class FavoritePodcast: NSManagedObject, Codable {
     }
     
     required convenience public init(from decoder: Decoder) throws {
-        
-        guard let context = decoder.userInfo[.context] as? NSManagedObjectContext,
-              let entity = NSEntityDescription.entity(forEntityName: String(describing: Self.self), in: context)
-        else { fatalError("mistake") }
-        
-        self.init(entity: entity, insertInto: nil)
+        self.init(entity: Self.entity(), insertInto: nil)
         let values = try decoder.container(keyedBy: CodingKeys.self)
         podcast = try values.decode(Podcast.self, forKey: .podcast)
         idd = try values.decode(String.self, forKey: .idd)
@@ -40,8 +35,7 @@ public class FavoritePodcast: NSManagedObject, Codable {
         let viewContext = DataStoreManager.shared.viewContext
         let newPodcast = Podcast.getOrCreatePodcast(podcast: podcast)
 
-        guard let entity = NSEntityDescription.entity(forEntityName: "FavoritePodcast", in: viewContext) else { fatalError() }
-        self.init(entity: entity, insertInto: viewContext)
+        self.init(entity: Self.entity(), insertInto: viewContext)
         
         self.podcast = newPodcast
         self.idd = "=="

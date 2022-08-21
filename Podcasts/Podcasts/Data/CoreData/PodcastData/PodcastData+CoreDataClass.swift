@@ -17,14 +17,7 @@ public class PodcastData: NSManagedObject, Decodable {
     }
     
     required convenience public init(from decoder: Decoder) throws {
-        
-        guard let context = decoder.userInfo[.context] as? NSManagedObjectContext else {
-            fatalError("mistake")
-        }
-        
-        let entity = NSEntityDescription.entity(forEntityName: "PodcastData", in: context)!
-        
-        self.init(entity: entity, insertInto: nil)
+        self.init(entity: Self.entity(), insertInto: nil)
 
         let values = try decoder.container(keyedBy: CodingKeys.self)
         

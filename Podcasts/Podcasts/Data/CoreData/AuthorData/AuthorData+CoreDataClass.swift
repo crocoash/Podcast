@@ -17,14 +17,8 @@ public class AuthorData: NSManagedObject, Decodable {
     }
     
     required convenience public init(from decoder: Decoder) throws {
-        
-        guard let context = decoder.userInfo[.context] as? NSManagedObjectContext else {
-            fatalError("mistake")
-        }
-        
-        let entity = NSEntityDescription.entity(forEntityName: "AuthorData", in: context)!
-        
-        self.init(entity: entity, insertInto: context)
+        guard let context = decoder.userInfo[.context] as? NSManagedObjectContext else { fatalError("mistake")  }
+        self.init(entity: Self.entity(), insertInto: context)
 
         let values = try decoder.container(keyedBy: CodingKeys.self)
         
@@ -38,16 +32,15 @@ extension AuthorData: SearchProtocol {
     
     static func cancellSearch() {
         
-        let viewContext = DataStoreManager.shared.viewContext
-        
-        if let authoreDatas = try? viewContext.fetch(AuthorData.fetchRequest()) {
+        if let authoreDatas = try? Self.viewContext.fetch(AuthorData.fetchRequest()) {
             authoreDatas.forEach { authoreData in
                 authoreData.results.forEach { authors in
                     viewContext.delete(authors as! NSManagedObject)
                 }
-                DataStoreManager.shared.viewContext.mySave()
+                Self.saveContext()
             }
         }
-        DataStoreManager.shared.removeAll(fetchRequest: AuthorData.fetchRequest())
+        Self.removeAll()
     }
 }
+

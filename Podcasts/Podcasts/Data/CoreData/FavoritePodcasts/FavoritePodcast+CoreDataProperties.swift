@@ -13,7 +13,7 @@ import CoreData
 extension FavoritePodcast {
 
     @nonobjc public class func fetchRequest() -> NSFetchRequest<FavoritePodcast> {
-        return NSFetchRequest<FavoritePodcast>(entityName: "FavoritePodcast")
+        return NSFetchRequest<FavoritePodcast>(entityName: Self.entityName)
     }
 
     @NSManaged public var idd: String

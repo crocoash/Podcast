@@ -24,27 +24,3 @@ class DataStoreManager {
 
     lazy private(set) var viewContext: NSManagedObjectContext = persistentContainer.viewContext
 }
-
-extension DataStoreManager {
-    
-    func removeAll<T: NSManagedObject>(fetchRequest: NSFetchRequest<T>) {
-        if let data = try? viewContext.fetch(fetchRequest), !data.isEmpty {
-            data.forEach {
-                viewContext.delete($0)
-            }
-        }
-        viewContext.mySave()
-    }
-}
-
-extension NSManagedObjectContext {
-    func mySave() {
-        if self.hasChanges {
-            do {
-                try self.save()
-            } catch {
-                fatalError(error.localizedDescription)
-            }
-        }
-    }
-}

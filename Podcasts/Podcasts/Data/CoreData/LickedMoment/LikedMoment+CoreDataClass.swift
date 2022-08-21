@@ -38,10 +38,9 @@ public class LikedMoment: NSManagedObject, Codable {
     }
     
     convenience init(podcast: Podcast, moment: Double) {
-        let viewContext = DataStoreManager.shared.viewContext
         let newPodcast = Podcast.getOrCreatePodcast(podcast: podcast)
-        guard let entity = NSEntityDescription.entity(forEntityName: "LikedMoment", in: viewContext) else { fatalError() }
-        self.init(entity: entity, insertInto: viewContext)
+     
+        self.init(entity: Self.entity(), insertInto: Self.viewContext)
                 
         self.moment = moment
         self.podcast = newPodcast

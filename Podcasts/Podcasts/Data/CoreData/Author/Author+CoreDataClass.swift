@@ -19,11 +19,8 @@ public class Author: NSManagedObject, Decodable {
     }
     
     required convenience public init(from decoder: Decoder) throws {
-        
         guard let context = decoder.userInfo[.context] as? NSManagedObjectContext else { fatalError("mistake") }
-        
-        let entity = NSEntityDescription.entity(forEntityName: "Author", in: context)!
-        self.init(entity: entity, insertInto: context)
+        self.init(entity: Self.entity(), insertInto: context)
         
         let values = try decoder.container(keyedBy: CodingKeys.self)
         
@@ -38,10 +35,5 @@ public class Author: NSManagedObject, Decodable {
 extension Author {
     
     static var searchAuthors: [Author] { (try? DataStoreManager.shared.viewContext.fetch(Author.fetchRequest())) ?? [] }
-
-    
-    static func removeAll() {
-        DataStoreManager.shared.removeAll(fetchRequest: Author.fetchRequest())
-    }
     
 }

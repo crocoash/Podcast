@@ -94,7 +94,7 @@ class FirebaseDatabase {
 extension FirebaseDatabase {
   
   private func save<T: Codable>(type: T.Type, completion: (Any) -> Void) where T: NSManagedObject {
-    guard let value = try? viewContext.fetch(NSFetchRequest<T>(entityName: String(describing: T.self))) else { return }
+    guard let value = try? viewContext.fetch(NSFetchRequest<T>(entityName: T.entityName)) else { return }
     if let podcastData = try? JSONEncoder().encode(value) {
       if let serialization = try? JSONSerialization.jsonObject(with: podcastData, options: .allowFragments) as? [Dictionary<String, Any>] {
         completion(serialization)
@@ -104,9 +104,7 @@ extension FirebaseDatabase {
   
   private func obtain<T: Codable>(type: T.Type, snapshot: DataSnapshot, completion: @escaping ([T]) -> Void) where T: NSManagedObject {
     guard let value = snapshot.value else { return }
-    
-    DataStoreManager.shared.removeAll(fetchRequest: NSFetchRequest<T>(entityName: String(describing: T.self)))
-    
+    T.removeAll()
     if let data = try? JSONSerialization.data(withJSONObject: value, options: .fragmentsAllowed) {
       do {
         let result = try JSONDecoder(context: self.viewContext).decode([T].self, from: data)
