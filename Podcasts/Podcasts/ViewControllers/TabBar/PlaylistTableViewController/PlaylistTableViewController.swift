@@ -19,22 +19,23 @@ protocol PlaylistViewControllerDelegate : AnyObject {
 class PlaylistTableViewController: UIViewController {
     
     @IBOutlet private weak var tableView: UITableView!
-    @IBOutlet private weak var playerConstraint: NSLayoutConstraint!
+ 
     @IBOutlet private weak var emptyTableImageView: UIImageView!
     @IBOutlet private weak var removeAllButton: UIBarButtonItem!
     @IBOutlet private weak var tableViewBottomConstraint: NSLayoutConstraint!
     
     weak var delegate: PlaylistViewControllerDelegate?
-    
+    private var tableViewBottomConstraintConstant: CGFloat = 0
     private let refreshControll = UIRefreshControl()
     
     //MARK: - Methods
     func playerIsShow() {
-        tableViewBottomConstraint.constant = -50
+        tableViewBottomConstraintConstant = 50
+        tableViewBottomConstraint?.constant = tableViewBottomConstraintConstant
     }
     
     func updateDisplay(progress: Float, totalSize: String, id: NSNumber) {
-        let favoritePodcast = FavoriteDocument.shared.favoritePodcastFetchResultController.fetchedObjects
+        let favoritePodcast = FavoriteDocument.shared.favoritePodcastFRC.fetchedObjects
         
         guard let podcast = favoritePodcast?.filter({ $0.podcast.id == id }).first?.podcast,
               let indexPath = FavoriteDocument.shared.getIndexPath(for: podcast),
@@ -59,6 +60,7 @@ class PlaylistTableViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
+        tableViewBottomConstraint.constant = tableViewBottomConstraintConstant
     }
     
     //MARK: - Actions
@@ -97,7 +99,7 @@ class PlaylistTableViewController: UIViewController {
 extension PlaylistTableViewController {
     
     private func configureUI() {
-        FavoriteDocument.shared.favoritePodcastFetchResultController.delegate = self
+        FavoriteDocument.shared.favoritePodcastFRC.delegate = self
         navigationItem.title = "PlayList"
         configureTableView()
     }

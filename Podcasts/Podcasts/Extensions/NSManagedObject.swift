@@ -25,14 +25,15 @@ extension NSManagedObject {
         Self.saveContext()
     }
     
-    static func fetchObjectsOf<T: NSManagedObject>(_ type: T) -> [T]?  {
-        let fetchRequest = NSFetchRequest<T>(entityName: T.entityName)
-//        var array = [T]()
-//        do {
-//           array = try viewContext.fetch(fetchRequest)
-//        } catch {
-//            print(error)
-//        }
-        return try? viewContext.fetch(fetchRequest)
+    static func fetchObjectsOf<T>(_ type: T.Type) -> [T] where T: NSManagedObject {
+      let fetchRequest = NSFetchRequest<T>(entityName: T.entityName)
+      var objects: [T] = []
+      do {
+          objects = try viewContext.fetch(fetchRequest)
+      } catch {
+        print(error.localizedDescription)
       }
+      
+      return objects
+    }
 }

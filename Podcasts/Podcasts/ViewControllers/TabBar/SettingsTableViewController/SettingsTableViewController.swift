@@ -31,8 +31,6 @@ class SettingsTableViewController: UITableViewController {
     @IBOutlet private weak var authorizationSwitch: UISwitch!
     @IBOutlet private weak var wifiSegmentedControl: UISegmentedControl!
     
-    
-    
     private var pickerController: UIImagePickerController = {
         $0.allowsEditing = true
         $0.mediaTypes = ["public.image", "public.movie"]

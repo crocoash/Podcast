@@ -31,13 +31,27 @@ public class FavoritePodcast: NSManagedObject, Codable {
         try container.encode(idd,forKey: .idd)
     }
     
-    convenience init(podcast: Podcast) {
-        let viewContext = DataStoreManager.shared.viewContext
+    convenience init(podcast: Podcast, date: String) {
         let newPodcast = Podcast.getOrCreatePodcast(podcast: podcast)
 
-        self.init(entity: Self.entity(), insertInto: viewContext)
+        self.init(entity: Self.entity(), insertInto: Self.viewContext)
         
         self.podcast = newPodcast
-        self.idd = "=="
+        self.idd = date
+    }
+}
+
+extension FavoritePodcast {
+    
+    static func getOrCreateFavoritePodcast(_ favoritePodcast: FavoritePodcast) -> FavoritePodcast {
+        if let favoritePodcasts = try? viewContext.fetch(FavoritePodcast.fetchRequest()) {
+            for favoritePodcast in favoritePodcasts {
+                if favoritePodcast.podcast.id == favoritePodcast.podcast.id {
+                    return favoritePodcast
+                }
+            }
+        }
+        let podcast = Podcast.getOrCreatePodcast(podcast: favoritePodcast.podcast)
+        return FavoritePodcast(podcast: podcast, date: favoritePodcast.idd)
     }
 }

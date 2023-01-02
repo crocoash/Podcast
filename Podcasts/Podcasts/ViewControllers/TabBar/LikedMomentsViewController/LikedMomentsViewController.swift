@@ -17,8 +17,10 @@ class LikedMomentsViewController: UIViewController {
 
     @IBOutlet private weak var emptyDataImage: UIImageView!
     @IBOutlet private weak var tableView: UITableView!
-    
+    @IBOutlet private weak var tableViewBottomConstraint: NSLayoutConstraint!
+   
     private var cellHeight: CGFloat = 75
+    private var tableViewBottomConstraintConstant: CGFloat = 0
     weak var delegate: LikedMomentsViewControllerDelegate?
     
     //MARK: - View Methods
@@ -26,6 +28,7 @@ class LikedMomentsViewController: UIViewController {
         super.viewDidLoad()
         tableView.register(PodcastCell.self)
         tableView.rowHeight = cellHeight
+        tableViewBottomConstraint.constant = tableViewBottomConstraintConstant
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -39,6 +42,11 @@ class LikedMomentsViewController: UIViewController {
     func reloadData() {
         tableView?.reloadData()
         showEmptyImage()
+    }
+    
+    func playerIsShow() {
+        tableViewBottomConstraintConstant = 50
+        tableViewBottomConstraint?.constant = tableViewBottomConstraintConstant
     }
 }
 

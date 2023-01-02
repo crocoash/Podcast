@@ -29,6 +29,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         initialConfigurations()
         FirebaseApp.configure()
+        application.beginReceivingRemoteControlEvents()
+        becomeFirstResponder()
         return true
     }
     

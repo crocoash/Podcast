@@ -13,10 +13,7 @@ class SearchAuthorsDocument {
     static var shared = SearchAuthorsDocument()
     private init(){}
     
-    private let viewContext = DataStoreManager.shared.viewContext
-    private var authors: [Author] { Author.searchAuthors }
-    
-    lazy private(set) var searchResController: NSFetchedResultsController<Author> = {
+    lazy private(set) var searchFRC: NSFetchedResultsController<Author> = {
         let fetchRequest: NSFetchRequest<Author> = Author.fetchRequest()
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(Author.artistID), ascending: true)]
         
@@ -24,7 +21,7 @@ class SearchAuthorsDocument {
         
         let fetchResultController = NSFetchedResultsController(
             fetchRequest: fetchRequest,
-            managedObjectContext: viewContext,
+            managedObjectContext: Author.viewContext,
             sectionNameKeyPath: nil,
             cacheName: nil
         )
@@ -35,17 +32,19 @@ class SearchAuthorsDocument {
 
 extension SearchAuthorsDocument {
     
+    private var authors: [Author] { Author.searchAuthors }
+    
     var authorsIsEmpty: Bool { authors.isEmpty }
     
     func getAuthor(at indexPath: IndexPath) -> Author {
-        return searchResController.object(at: indexPath)
+        return searchFRC.object(at: indexPath)
     }
     
     func indexPath(for object: Author) -> IndexPath? {
-        return searchResController.indexPath(forObject: object)
+        return searchFRC.indexPath(forObject: object)
     }
     
     func numberOfRowsInSection(section: Int) -> Int {
-        return searchResController.sections?[section].numberOfObjects ?? 0
+        return searchFRC.sections?[section].numberOfObjects ?? 0
     }
 }

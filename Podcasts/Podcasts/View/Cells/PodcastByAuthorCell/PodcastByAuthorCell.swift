@@ -15,8 +15,7 @@ class PodcastByAuthorCell: UITableViewCell {
 
 extension PodcastByAuthorCell {
     
-    func configureCell(with author: Author,_ indexPath: IndexPath) {
-        
+    func configureCell(with author: Author) {
         label.text = author.artistName ?? "no name"
     }
 }

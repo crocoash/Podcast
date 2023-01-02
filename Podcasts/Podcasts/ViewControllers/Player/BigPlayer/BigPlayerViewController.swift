@@ -38,24 +38,21 @@ class BigPlayerViewController: UIViewController {
     private var podcast: Podcast?
     private var playButtonImage: UIImage!
     
-    var isPresented: Bool = false
+    private(set) var isPresented: Bool = false
     private let defaultTime = "0:00"
     
     private var isLast: Bool!
     private var isFirst: Bool!
     
+    //MARK: - ViewM ethods
     override func viewDidLoad() {
         super.viewDidLoad()
         addSwipeGesture()
     }
     
     //MARK: - Public Methods
-    func setPlatStopButton(playButtonImage: UIImage) {
-        self.playButtonImage = playButtonImage
-    }
-    
-    func updatePlayButton(playButtonImage: UIImage) {
-        self.playStopButton.setImage(playButtonImage, for: .normal)
+    func isPresented(_ bool: Bool) {
+        self.isPresented = bool
     }
     
     func upDateProgressSlider(currentTime: Float, duration: Float) {
@@ -73,6 +70,7 @@ class BigPlayerViewController: UIViewController {
         self.isFirst = isFirst
         self.updatePlayButton(playButtonImage: playStopButton)
         self.progressSlider.value = 0
+        self.podcast = podcast
         self.configureUI(with: podcast)
     }
     
@@ -112,7 +110,7 @@ class BigPlayerViewController: UIViewController {
     }
     
     @IBAction func likedButton(_ sender: UIButton) {
-        delegate?.bigPlayerViewController(self, didLikeThis: Double(progressSlider.value))
+         delegate?.bigPlayerViewController(self, didLikeThis: Double(progressSlider.value))
     }
     
     @IBAction func dissmisButtonTouchUpInside(_ sender: UIButton) {
@@ -141,5 +139,9 @@ extension BigPlayerViewController {
     private func dismissBigPlayer() {
         isPresented = false
         dismiss(animated: true)
+    }
+    
+    private func updatePlayButton(playButtonImage: UIImage) {
+        self.playStopButton.setImage(playButtonImage, for: .normal)
     }
 }

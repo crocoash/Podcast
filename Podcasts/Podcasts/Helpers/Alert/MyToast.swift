@@ -14,7 +14,7 @@ extension UIView {
         removeWithTimeInterval: TimeInterval = 3,
         _ location: LocationOfPost
     ) {
-        MyToast.create(title: title, location, timeToAppear: animateWithDuration, timerToRemove: removeWithTimeInterval, for: self)
+        MyToast.create(title: title, location, animateWithDuration: animateWithDuration, timerToRemove: removeWithTimeInterval, for: self)
     }
 }
 
@@ -27,7 +27,7 @@ class MyToast: UITextView {
     private var backgroundColorOfLayer: CGColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
     
     //MARK: - Inits
-     init(title: String, location: LocationOfPost,for bounds: CGRect) {
+     private init(title: String, location: LocationOfPost,for bounds: CGRect) {
         super.init(frame: location.createCGRect(for: bounds), textContainer: nil)
         text = title
         textAlignment = .center
@@ -45,7 +45,7 @@ class MyToast: UITextView {
     //create MyToast Method
     static func create (title: String,
                         _ location: LocationOfPost,
-                        timeToAppear: TimeInterval = 0.3,
+                                                animateWithDuration: TimeInterval = 0.3,
                         timerToRemove: TimeInterval = 3,
                         for myView: UIView? = nil)
     {
@@ -55,18 +55,16 @@ class MyToast: UITextView {
         if let myView = myView {
             view = myView
         } else {
-            guard
-                let myView = UIApplication.shared.windows.first?.rootViewController?.view
-            else { return }
+            guard let myView = UIApplication.shared.windows.first?.rootViewController?.view else { return }
             view = myView
         }
         let toast = MyToast(title: title, location: location, for: view.bounds)
         
-        UIView.animate(withDuration: timeToAppear) {
+        UIView.animate(withDuration: animateWithDuration) {
             view.addSubview(toast)
         }
         
-        Timer.scheduledTimer(withTimeInterval: timerToRemove, repeats: false) {_ in
+        Timer.scheduledTimer(withTimeInterval: timerToRemove, repeats: false) { _ in
             toast.removeFromSuperview()
         }
     }
@@ -77,13 +75,15 @@ enum LocationOfPost: CGFloat {
     case top = 30
     case center = 2
     case bottom = 150
+    case bottomWithPlayer = 200
     
     func createCGRect(for bounds: CGRect) -> CGRect {
         var y: CGFloat = 0
         switch self {
-        case .top: y = self.rawValue
-        case .center: y = bounds.height / self.rawValue
-        case .bottom: y = bounds.height - self.rawValue
+        case .top:              y = self.rawValue
+        case .center:           y = bounds.height / self.rawValue
+        case .bottom:           y = bounds.height - self.rawValue
+        case .bottomWithPlayer: y = bounds.height - self.rawValue
         }
         return CGRect(x: 50, y: y, width: bounds.size.width - 100, height: 50)
     }

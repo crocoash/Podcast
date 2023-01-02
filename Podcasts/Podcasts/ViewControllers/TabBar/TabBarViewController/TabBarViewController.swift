@@ -47,6 +47,8 @@ class TabBarViewController: UITabBarController {
         vc.delegate = self
     }
     
+    private var playerISShow = false
+    
     //MARK: - METHODS
     func setUserViewModel(_ userViewModel: UserViewModel) {
         self.userViewModel = userViewModel
@@ -114,10 +116,10 @@ extension TabBarViewController {
     private func addOrRemoveFromFavorite(podcast: Podcast) {
         let isFavorite = FavoriteDocument.shared.isFavorite(podcast)
         let title = (podcast.trackName ?? "podcast") + (isFavorite ? "is removed from playlist" : "is added to playlist")
-        MyToast.create(title: title,.bottom,timeToAppear: 0.2,timerToRemove: 2,for: view)
-        
+        MyToast.create(title: title, (playerISShow ? .bottomWithPlayer : .bottom), animateWithDuration: 0.2,timerToRemove: 2,for: view)
+
         FavoriteDocument.shared.addOrRemoveToFavorite(podcast: podcast)
-        if FavoriteDocument.shared.isDownload(podcast: podcast) { downloadService.cancelDownload(podcast: podcast)}
+        if FavoriteDocument.shared.isDownload(podcast: podcast) { downloadService.cancelDownload(podcast: podcast) }
         feedbackGenerator()
     }
     
@@ -133,12 +135,19 @@ extension TabBarViewController {
     
     private func startPlay(_ podcasts: [Podcast], _ didSelectIndex: Int) {
         playerVC.view.isHidden = false
-        playerVC.startPlay(at: didSelectIndex, podcasts: podcasts)
+        playerVC.playLikedPlaylist(at: didSelectIndex, likedPlaylist: podcasts)
     }
     
     private func reloadAllVC() {
         self.searchVC.reloadData()
         self.playListVC.reloadData()
+    }
+    
+    private func playerIsShow() {
+        playerISShow = true
+        playListVC.playerIsShow()
+        searchVC.playerIsShow()
+        likedMomentVc.playerIsShow()
     }
 }
 
@@ -150,7 +159,7 @@ extension TabBarViewController: SearchViewControllerDelegate {
     }
     
     func searchViewControllerDidRefreshTableView(_ searchViewController: SearchViewController, completion: @escaping () -> Void) {
-        ///
+        
     }
     
     
@@ -160,7 +169,7 @@ extension TabBarViewController: SearchViewControllerDelegate {
     
     func searchViewController(_ searchViewController: SearchViewController, _ podcasts: [Podcast], didSelectIndex: Int) {
         startPlay(podcasts, didSelectIndex)
-        searchViewController.playerIsShow()
+        playerIsShow()
     }
 }
 
@@ -168,7 +177,9 @@ extension TabBarViewController: SearchViewControllerDelegate {
 extension TabBarViewController: PlaylistViewControllerDelegate {
     
     func playlistTableViewControllerDidRefreshTableView(_ playlistTableViewController: PlaylistTableViewController, completion: @escaping () -> Void) {
-        FirebaseDatabase.shared.getPodcast {
+        FirebaseDatabase.shared.getFavoritePodcast { [weak self] in
+            guard let self = self else { return }
+            MyToast.create(title: "favorite podcast was updating", (self.playerISShow ? .bottomWithPlayer : .bottom), animateWithDuration: 0.2,timerToRemove: 2,for: playlistTableViewController.view)
             completion()
         }
     }
@@ -184,7 +195,7 @@ extension TabBarViewController: PlaylistViewControllerDelegate {
     
     func playlistTableViewController(_ playlistTableViewController: PlaylistTableViewController, podcasts: [Podcast], didSelectIndex: Int) {
         startPlay(podcasts, didSelectIndex)
-        playlistTableViewController.playerIsShow()
+        playerIsShow()
     }
 }
 
@@ -209,7 +220,8 @@ extension TabBarViewController: LikedMomentsViewControllerDelegate {
         playerVC.view.isHidden = false
         let moment = likedMoments[index].moment
         let podcast = likedMoments[index].podcast
-        playerVC.startPlay(at: 0, at: moment, podcasts: [podcast])
+        playerVC.playLikedPlaylist(at: 0, at: moment, likedPlaylist: [podcast])
+        playerIsShow()
     }
 }
 

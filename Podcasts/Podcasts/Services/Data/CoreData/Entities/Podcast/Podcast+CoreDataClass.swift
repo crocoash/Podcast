@@ -44,11 +44,7 @@ public class Podcast: NSManagedObject, Codable {
   
   required convenience public init(from decoder: Decoder) throws {
     
-    guard let context = decoder.userInfo[.context] as? NSManagedObjectContext,
-          let entity = NSEntityDescription.entity(forEntityName: Podcast.description(), in: context)
-    else { fatalError("mistake") }
-    
-    self.init(entity: entity, insertInto: nil)
+    self.init(entity: Self.entity(), insertInto: nil)
 
     let container = try decoder.container(keyedBy: CodingKeys.self)
     
@@ -113,6 +109,8 @@ public class Podcast: NSManagedObject, Codable {
     self.episodeGuid =            podcast.episodeGuid
     self.kind =                   podcast.kind
     self.wrapperType =            podcast.wrapperType
+    
+    DataStoreManager.shared.viewContext.mySave()
   }
   
   public func encode(to encoder: Encoder) throws {
@@ -155,8 +153,6 @@ extension Podcast {
         return findsavePodcast
       }
     }
-    let newPodcast = Podcast(podcast: podcast)
-    viewContext.mySave()
-    return newPodcast
+    return Podcast(podcast: podcast)
   }
 }

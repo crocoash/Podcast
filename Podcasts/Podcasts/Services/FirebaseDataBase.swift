@@ -32,6 +32,8 @@ class FirebaseDatabase {
   func savePodcast() {
     save(type: FavoritePodcast.self) {
       favoritePodcastsPath.setValue($0)
+//      favoritePodcastsPath.child("0").setNilValueForKey("idd")
+//      favoritePodcastsPath.
     }
   }
   
@@ -51,8 +53,7 @@ class FirebaseDatabase {
 
       self.obtain(type: FavoritePodcast.self, snapshot: favoriteSnapShot) {
         $0.forEach {
-          let podcast = Podcast.getOrCreatePodcast(podcast: $0.podcast)
-          _ = FavoritePodcast(podcast: podcast)
+          _ = FavoritePodcast.getOrCreateFavoritePodcast($0)
           self.viewContext.mySave()
         }
       }
@@ -68,19 +69,19 @@ class FirebaseDatabase {
     }
   }
   
-  func getPodcast(completion: @escaping () -> Void) {
+  func getFavoritePodcast(completion: @escaping () -> Void) {
     favoritePodcastsPath.getData { [weak self] error, snapShot in
+      let favoriteSnapShot = snapShot.childSnapshot(forPath: "FavoritePodcasts")
       guard error == nil,
-            let value = snapShot.value,
+            let value = favoriteSnapShot.value,
             let self = self else { return }
 
       if let data = try? JSONSerialization.data(withJSONObject: value, options: .fragmentsAllowed) {
         do {
-          let podcasts = try JSONDecoder(context: self.viewContext).decode([Podcast].self, from: data)
-          podcasts.forEach { podcast in
-            _ = Podcast(podcast: podcast)
+          let podcasts = try JSONDecoder(context: self.viewContext).decode([FavoritePodcast].self, from: data)
+          podcasts.forEach {
+            _ = FavoritePodcast.getOrCreateFavoritePodcast($0)
           }
-          completion()
           self.viewContext.mySave()
         } catch {
           print(error)
@@ -93,7 +94,7 @@ class FirebaseDatabase {
 
 extension FirebaseDatabase {
   
-  private func save<T: Codable>(type: T.Type, completion: (Any) -> Void) where T: NSManagedObject {
+  private func save<T: Codable & NSManagedObject>(type: T.Type, completion: (Any) -> Void) {
     guard let value = try? viewContext.fetch(NSFetchRequest<T>(entityName: T.entityName)) else { return }
     if let podcastData = try? JSONEncoder().encode(value) {
       if let serialization = try? JSONSerialization.jsonObject(with: podcastData, options: .allowFragments) as? [Dictionary<String, Any>] {
@@ -102,7 +103,7 @@ extension FirebaseDatabase {
     }
   }
   
-  private func obtain<T: Codable>(type: T.Type, snapshot: DataSnapshot, completion: @escaping ([T]) -> Void) where T: NSManagedObject {
+  private func obtain<T: Codable & NSManagedObject>(type: T.Type, snapshot: DataSnapshot, completion: @escaping ([T]) -> Void) {
     guard let value = snapshot.value else { return }
     T.removeAll()
     if let data = try? JSONSerialization.data(withJSONObject: value, options: .fragmentsAllowed) {

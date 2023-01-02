@@ -23,4 +23,16 @@ class DataStoreManager {
     }()
 
     lazy private(set) var viewContext: NSManagedObjectContext = persistentContainer.viewContext
+    
+    func fetchObjectsOf<T>(_ type: T.Type) -> [T] where T: NSManagedObject {
+      let fetchRequest = NSFetchRequest<T>(entityName: T.entityName)
+      var objects: [T] = []
+      do {
+        objects = try viewContext.fetch(fetchRequest)
+      } catch {
+        print(error.localizedDescription)
+      }
+      
+      return objects
+    }
 }

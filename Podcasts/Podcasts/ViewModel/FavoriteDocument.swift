@@ -14,9 +14,9 @@ class FavoriteDocument {
     private init() {}
     
     private let viewContext = DataStoreManager.shared.viewContext
-    private var favoritePodcasts: [FavoritePodcast] { favoritePodcastFetchResultController.fetchedObjects ?? [] }
+    private var favoritePodcasts: [FavoritePodcast] { favoritePodcastFRC.fetchedObjects ?? [] }
     
-    private(set) lazy var favoritePodcastFetchResultController: NSFetchedResultsController<FavoritePodcast> = {
+    private(set) lazy var favoritePodcastFRC: NSFetchedResultsController<FavoritePodcast> = {
         let fetchRequest: NSFetchRequest<FavoritePodcast> = FavoritePodcast.fetchRequest()
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(FavoritePodcast.idd), ascending: true)]
         let fetchResultController = NSFetchedResultsController(
@@ -42,18 +42,18 @@ extension FavoriteDocument {
     
     //MARK: - Favorite
     
-    var podcasts: [Podcast] { favoritePodcastFetchResultController.fetchedObjects?.compactMap { $0.podcast } ?? [] }
+    var podcasts: [Podcast] { favoritePodcastFRC.fetchedObjects?.compactMap { $0.podcast } ?? [] }
     
     var countOffavoritePodcasts: Int { favoritePodcasts.count }
     var favoritePodcastIsEmpty: Bool { favoritePodcasts.isEmpty }
     
     func getPodcast(for indexPath: IndexPath) -> Podcast {
-        return favoritePodcastFetchResultController.object(at: indexPath).podcast
+        return favoritePodcastFRC.object(at: indexPath).podcast
     }
     
     func getIndexPath(for podcast: Podcast) -> IndexPath? {
         guard let favoritePodcast = favoritePodcasts.filter({ $0.podcast.id == podcast.id }).first else { return nil }
-        return favoritePodcastFetchResultController.indexPath(forObject: favoritePodcast)
+        return favoritePodcastFRC.indexPath(forObject: favoritePodcast)
     }
     
     func removaAllFavorites() {
@@ -67,7 +67,7 @@ extension FavoriteDocument {
         if let favoritePodcast = getFavoritePodcast(podcast) {
             viewContext.delete(favoritePodcast)
         } else {
-            _ = FavoritePodcast(podcast: podcast)
+            _ = FavoritePodcast(podcast: podcast, date: String(describing: Date()) )
         }
         viewContext.mySave()
         FirebaseDatabase.shared.savePodcast()
