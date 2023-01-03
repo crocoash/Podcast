@@ -17,8 +17,10 @@ class LikedMomentsViewController: UIViewController {
 
     @IBOutlet private weak var emptyDataImage: UIImageView!
     @IBOutlet private weak var tableView: UITableView!
-    
+    @IBOutlet private weak var tableViewBottomConstraint: NSLayoutConstraint!
+   
     private var cellHeight: CGFloat = 75
+    private var tableViewBottomConstraintConstant: CGFloat = 0
     weak var delegate: LikedMomentsViewControllerDelegate?
     
     //MARK: - View Methods
@@ -26,6 +28,7 @@ class LikedMomentsViewController: UIViewController {
         super.viewDidLoad()
         tableView.register(PodcastCell.self)
         tableView.rowHeight = cellHeight
+        tableViewBottomConstraint.constant = tableViewBottomConstraintConstant
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -39,6 +42,11 @@ class LikedMomentsViewController: UIViewController {
     func reloadData() {
         tableView?.reloadData()
         showEmptyImage()
+    }
+    
+    func playerIsShow() {
+        tableViewBottomConstraintConstant = 50
+        tableViewBottomConstraint?.constant = tableViewBottomConstraintConstant
     }
 }
 
@@ -55,12 +63,13 @@ extension LikedMomentsViewController {
 extension LikedMomentsViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//        delegate?.likedMomentViewController(self, didSelectMomentAt: indexPath.row, likedMoments: LikedMomentsManager.shared.podcast)
+        delegate?.likedMomentViewController(self, didSelectMomentAt: indexPath.row, likedMoments: LikedMomentsManager.shared.podcast)
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             LikedMomentsManager.shared.deleteMoment(at: indexPath)
+            FirebaseDatabase.shared.saveLikedMoment()
             reloadData()
         }
     }
@@ -76,7 +85,6 @@ extension LikedMomentsViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let likedMoment = LikedMomentsManager.shared.getLikeMoment(at: indexPath)
         let cell = tableView.getCell(cell: PodcastCell.self, indexPath: indexPath)
-        
         cell.configureCell(with: likedMoment.podcast)
         return cell
     }
@@ -86,9 +94,7 @@ extension LikedMomentsViewController: UITableViewDataSource {
 extension LikedMomentsViewController: NSFetchedResultsControllerDelegate {
     
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-       // TODO: -
         guard let indexPath = indexPath else { return }
-
         switch type {
         case .delete:
             tableView.deleteRows(at: [indexPath], with: .fade)

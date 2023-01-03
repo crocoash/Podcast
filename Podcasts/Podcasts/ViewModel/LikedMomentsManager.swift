@@ -31,7 +31,7 @@ class LikedMomentsManager {
             try fetchResultController.performFetch()
         } catch {
             let nserror = error as NSError
-            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+            fatalError("Unresolved error \(error), \(nserror.userInfo)")
         }
         return fetchResultController
     }()
@@ -44,11 +44,21 @@ extension LikedMomentsManager {
     func deleteMoment(at indexPath: IndexPath) {
         let moment = likedMomentFRC.object(at: indexPath)
         viewContext.delete(moment)
-        
         viewContext.mySave()
     }
     
     func getLikeMoment(at indexPath: IndexPath) -> LikedMoment {
         return likedMomentFRC.object(at: indexPath)
+    }
+    
+    func getPodcast(for id: NSNumber) -> Podcast? {
+        let podcasts = try? DataStoreManager.shared.viewContext.fetch(Podcast.fetchRequest())
+        return podcasts?.first(matching: id)
+    }
+    
+    func addLikeMoment(podcast: Podcast, moment: Double) {
+        _ = LikedMoment(podcast: podcast, moment: moment)
+        viewContext.mySave()
+        FirebaseDatabase.shared.saveLikedMoment()
     }
 }

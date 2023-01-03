@@ -27,8 +27,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         } catch {
             print("Setting category to AVAudioSessionCategoryPlayback failed.")
         }
-        
+        initialConfigurations()
         FirebaseApp.configure()
+        application.beginReceivingRemoteControlEvents()
+        becomeFirstResponder()
         return true
     }
     
@@ -40,5 +42,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
         return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
+    }
+}
+
+extension AppDelegate {
+    private func setupFirstMobileAllowWiFi() {
+      if !UserDefaults.Local.wifiPermission && !UserDefaults.Local.cellularPermission && !UserDefaults.Local.askEverytime && !UserDefaults.Local.alwaysAllow {
+        MobileNetwork.configureNetworkPermission(network: .alwaysAsk)
+      }
+    }
+    
+    private func initialConfigurations() {
+        setupFirstMobileAllowWiFi()
     }
 }

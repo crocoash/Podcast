@@ -74,7 +74,7 @@ extension DetailViewController {
             self?.episodeImage.image = image
         }
         
-        if podcast.isFavorite {
+        if FavoriteDocument.shared.isFavorite(podcast) {
             addToPlaylistBookmark.isHidden = true
             addToPlaylistBookmark.isUserInteractionEnabled = false
             removeFromPlaylistBookmark.isHidden = false
@@ -96,10 +96,10 @@ extension DetailViewController {
     }
     
     private func configureGestures() {
-        backImageView.addMyGestureRecognizer(self, type: .tap(), selector: #selector(backAction))
-        removeFromPlaylistBookmark.addMyGestureRecognizer(self, type: .tap(), selector: #selector(removeBookmarkOnTouchUpInside))
-        addToPlaylistBookmark.addMyGestureRecognizer(self, type: .tap(), selector: #selector(addBookmarkOnTouchUpInside))
-        playImageView.addMyGestureRecognizer(self, type: .tap(), selector: #selector(playButtonOnTouchUpInside))
+        backImageView.addMyGestureRecognizer(self, type: .tap(), #selector(backAction))
+        removeFromPlaylistBookmark.addMyGestureRecognizer(self, type: .tap(), #selector(removeBookmarkOnTouchUpInside))
+        addToPlaylistBookmark.addMyGestureRecognizer(self, type: .tap(), #selector(addBookmarkOnTouchUpInside))
+        playImageView.addMyGestureRecognizer(self, type: .tap(), #selector(playButtonOnTouchUpInside))
         addMyGestureRecognizer(self, type: .screenEdgePanGestureRecognizer(directions: [.left]), #selector(backAction))
     }
 }

@@ -13,7 +13,7 @@ import CoreData
 extension PodcastData {
 
     @nonobjc public class func fetchRequest() -> NSFetchRequest<PodcastData> {
-        return NSFetchRequest<PodcastData>(entityName: "PodcastData")
+        return NSFetchRequest<PodcastData>(entityName: Self.entityName)
     }
 
     @NSManaged public var resultCount: Int32

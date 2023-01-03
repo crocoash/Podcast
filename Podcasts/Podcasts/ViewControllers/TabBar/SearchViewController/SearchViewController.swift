@@ -22,19 +22,26 @@ class SearchViewController : UIViewController {
     @IBOutlet private weak var tableView: UITableView!
     @IBOutlet private weak var cancelLabel: UILabel!
     @IBOutlet private weak var searchSegmentalControl: UISegmentedControl!
-    @IBOutlet private weak var playerOffSetConstraint: NSLayoutConstraint!
+    
+    @IBOutlet weak var tableViewBottomConstraint: NSLayoutConstraint!
+    
     @IBOutlet private weak var emptyTableImageView: UIImageView!
     
+    private var tableViewBottomConstraintContstnt: CGFloat = 0
     private let refreshControll = UIRefreshControl()
 
     private let activityIndicator = UIActivityIndicatorView()
     private var alert             = Alert()
     private var podcasts          = Array<Podcast>()
+    private var authors          = Array<Author>()
     
     weak var delegate: SearchViewControllerDelegate?
     
     //MARK: - Methods
-    func playerIsShow() { playerOffSetConstraint.constant = 300  }
+    func playerIsShow() {
+        tableViewBottomConstraintContstnt = 50
+        tableViewBottomConstraint?.constant = tableViewBottomConstraintContstnt
+    }
     
     func updateDisplay(progress: Float, totalSize: String, id: NSNumber) {
         guard let index = podcasts.firstIndex(matching: id) else { return }
@@ -46,6 +53,11 @@ class SearchViewController : UIViewController {
     
     func reloadData() {
         tableView?.reloadData()
+        showEmptyImage()
+    }
+    
+    func reloadData(indexPath: [IndexPath]) {
+        tableView?.reloadRows(at: indexPath, with: .none)
         showEmptyImage()
     }
     
@@ -63,8 +75,10 @@ class SearchViewController : UIViewController {
         configureUI()
         configureGesture()
         showEmptyImage()
+        tableViewBottomConstraint.constant = tableViewBottomConstraintContstnt
     }
     
+
     override func motionBegan(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
         cancelSearchAction()
         feedbackGenerator()
@@ -76,16 +90,12 @@ class SearchViewController : UIViewController {
     }
     
     @objc func refresh() {
-//        delegate?.searchViewControllerDidRefreshTableView(self) { [weak self] in
-//            self?.podcastTableView.reloadData()
-//            self?.refreshControll.endRefreshing()
-//        }
         refreshControll.endRefreshing()
-        tableView.reloadData()
+        getData()
     }
     
     @objc func changeTypeOfSearch(sender: UISegmentedControl) {
-        getData(with: searchBar.text)
+        getData()
     }
     
     @objc func handlerTapAuthorCell(sender: UITapGestureRecognizer) {
@@ -94,7 +104,7 @@ class SearchViewController : UIViewController {
               let request = SearchAuthorsDocument.shared.getAuthor(at: indexPath).artistName else { return }
         
         searchSegmentalControl.selectedSegmentIndex = 0
-        getData(with: request)
+        getData()
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
@@ -120,7 +130,7 @@ class SearchViewController : UIViewController {
         case .right: searchSegmentalControl.selectedSegmentIndex -= 1
         default: break
         }
-        getData(with: searchBar.text)
+        getData()
     }
 }
 
@@ -133,23 +143,25 @@ extension SearchViewController {
         configureSegmentalControl()
         configureAlert()
         configureActivityIndicator()
-        SearchAuthorsDocument.shared.searchResController.delegate = self
+        SearchAuthorsDocument.shared.searchFRC.delegate = self
     }
     
     private func configureTableView() {
         tableView.register(PodcastCell.self)
         tableView.register(PodcastByAuthorCell.self)
         tableView.rowHeight = 100
+        refreshControll.tintColor = .yellow
         tableView.refreshControl = refreshControll
+        
     }
     
     private func configureGesture() {
-        view.addMyGestureRecognizer(self, type: .swipe(directions: [.left,.right]), selector: #selector(handlerSwipe))
+        view.addMyGestureRecognizer(self, type: .swipe(directions: [.left,.right]), #selector(handlerSwipe))
         refreshControll.addTarget(self, action: #selector(refresh), for: .valueChanged)
     }
     
     private func configureCancelLabel() {
-        cancelLabel.addMyGestureRecognizer(self, type: .tap(), selector: #selector(cancelSearch))
+        cancelLabel.addMyGestureRecognizer(self, type: .tap(), #selector(cancelSearch))
     }
     
     private func configureSegmentalControl() {
@@ -169,22 +181,23 @@ extension SearchViewController {
     }
     
     private func cancelSearchAction() {
-        AuthorData.cancellSearch()
+        searchBar.text?.removeAll()
         podcasts.removeAll()
-        FirebaseDatabase.shared.save()
         tableView.reloadData()
         showEmptyImage()
     }
     
     private func showEmptyImage() {
         let podcastsIsEmpty = podcasts.isEmpty
-        let authorsIsEmpty = SearchAuthorsDocument.shared.authorsIsEmpty
+        let authorsIsEmpty = authors.isEmpty
         
         if (searchSegmentalControl?.selectedSegmentIndex == 0 && podcastsIsEmpty) ||
             (searchSegmentalControl?.selectedSegmentIndex == 1 && authorsIsEmpty) {
             tableView.isHidden = true
             emptyTableImageView.isHidden = false
+            tableView.reloadData()
         }
+        
         if (searchSegmentalControl?.selectedSegmentIndex == 0 && !podcastsIsEmpty ||
             (searchSegmentalControl?.selectedSegmentIndex == 1 && !authorsIsEmpty)) {
             tableView.isHidden = false
@@ -197,10 +210,6 @@ extension SearchViewController {
         let feedbackGenerator = UIImpactFeedbackGenerator()
         feedbackGenerator.prepare()
         feedbackGenerator.impactOccurred()
-    }
-    
-    private func updateInformation(podcast: Podcast) {
-        podcast.isFavorite = FavoriteDocument.shared.podcastIsFavorite(podcast: podcast)
     }
 }
 
@@ -218,8 +227,9 @@ extension SearchViewController {
         self.showEmptyImage()
     }
     
-    private func getData(with request: String?) {
-        guard let request = request?.conform, !request.isEmpty else { showEmptyImage(); return }
+    private func getData() {
+        tableView.setContentOffset(.zero, animated: true)
+        guard let request = searchBar.text?.conform, !request.isEmpty else { showEmptyImage(); return }
         activityIndicator.startAnimating()
         
         if searchSegmentalControl.selectedSegmentIndex == 0 {
@@ -235,25 +245,11 @@ extension SearchViewController {
             ApiService.getData(for: UrlRequest1.getStringUrl(.authors(request))) { [weak self] (info: AuthorData?) in
                 guard let self = self,
                       let authors = info?.results.allObjects as? [Author] else { return }
-                self.processResults(result: authors)
+                self.processResults(result: authors) {
+                    self.authors = $0
+                }
             }
         }
-    }
-}
-
-// MARK: - TableView Data Source
-extension SearchViewController: UITableViewDataSource {
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if isPodcast {
-            return podcasts.count
-        } else {
-            return SearchAuthorsDocument.shared.numberOfRowsInSection(section: section)
-        }
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        return isPodcast ? configurePodcastCell(indexPath, for: tableView) : configureAuthorCell(indexPath, for: tableView)
     }
     
     private func configurePodcastCell(_ indexPath: IndexPath,for tableView: UITableView) -> UITableViewCell {
@@ -261,22 +257,34 @@ extension SearchViewController: UITableViewDataSource {
         let cell = tableView.getCell(cell: PodcastCell.self, indexPath: indexPath)
         
         DownloadService().resumeDownload(podcast)
-        updateInformation(podcast: podcast)
         cell.delegate = self
         cell.configureCell(with: podcast)
-        cell.addMyGestureRecognizer(self, type: .tap(), selector: #selector(handlerTapPodcastCell))
+        cell.addMyGestureRecognizer(self, type: .tap(), #selector(handlerTapPodcastCell))
         
         return cell
     }
     
     private func configureAuthorCell(_ indexPath: IndexPath,for tableView: UITableView) -> UITableViewCell {
-        let author = SearchAuthorsDocument.shared.getAuthor(at: indexPath)
+        let author = authors[indexPath.row]
         let cell = tableView.getCell(cell: PodcastByAuthorCell.self, indexPath: indexPath)
-        cell.configureCell(with: author, indexPath)
-        cell.addMyGestureRecognizer(self, type: .tap(), selector: #selector(handlerTapAuthorCell))
-        
+        cell.configureCell(with: author)
+        cell.addMyGestureRecognizer(self, type: .tap(), #selector(handlerTapAuthorCell))
+       
         return cell
     }
+}
+
+// MARK: - TableView Data Source
+extension SearchViewController: UITableViewDataSource {
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return isPodcast ? podcasts.count : authors.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        return isPodcast ? configurePodcastCell(indexPath, for: tableView) : configureAuthorCell(indexPath, for: tableView)
+    }
+
 }
 
 // MARK: - PodcastCellDelegate
@@ -291,7 +299,6 @@ extension SearchViewController: PodcastCellDelegate {
     func podcastCellDidSelectDownLoadImage(_ podcastCell: PodcastCell, podcast: Podcast) {
         guard let indexPath = tableView.indexPath(for: podcastCell) else { return }
         delegate?.searchViewControllerDidSelectDownLoadImage(self, podcast: podcast, indexPath: indexPath)
-        tableView.reloadRows(at: [indexPath], with: .none)
     }
 }
 
@@ -301,12 +308,16 @@ extension SearchViewController: UISearchBarDelegate {
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         guard let text = searchBar.text, !text.isEmpty else { return }
-        getData(with: searchBar.text)
+        getData()
         view.endEditing(true)
     }
     
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
         addMyGestureRecognizer(view, type: .tap(), #selector(UIView.endEditing(_:)))
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        getData()
     }
 }
 

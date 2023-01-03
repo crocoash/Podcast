@@ -33,20 +33,11 @@ class ApiService {
         
         let viewContext = DataStoreManager.shared.viewContext
         
-        if let type = T.self as? SearchProtocol.Type {
-            type.cancellSearch()
-        }
-        
         URLSession.shared.dataTask(with: url) { data, response, error in
             var result: Result<T>
             defer {
                 DispatchQueue.main.async {
-                    viewContext.mySave()
                     completion(result)
-                    if T.self is SearchProtocol.Type {
-                        FirebaseDatabase.shared.save()
-                        DataStoreManager.shared.mySave()
-                    }
                 }
             }
             guard let data = data, response != nil, error == nil else {

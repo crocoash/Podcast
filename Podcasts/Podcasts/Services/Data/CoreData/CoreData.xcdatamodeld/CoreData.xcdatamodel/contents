@@ -10,6 +10,10 @@
         <attribute name="resultCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="results" toMany="YES" deletionRule="Nullify" destinationEntity="Author"/>
     </entity>
+    <entity name="FavoritePodcast" representedClassName=".FavoritePodcast" syncable="YES">
+        <attribute name="idd" attributeType="String"/>
+        <relationship name="podcast" maxCount="1" deletionRule="Nullify" destinationEntity="Podcast"/>
+    </entity>
     <entity name="LikedMoment" representedClassName=".LikedMoment" syncable="YES">
         <attribute name="moment" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <relationship name="podcast" maxCount="1" deletionRule="Nullify" destinationEntity="Podcast"/>
@@ -34,9 +38,6 @@
         <attribute name="feedUrl" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="NO"/>
         <attribute name="index" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="NO"/>
-        <attribute name="isFavorite" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
-        <attribute name="isLikedMoment" attributeType="Boolean" usesScalarValueType="YES"/>
-        <attribute name="isSearched" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="kind" optional="YES" attributeType="String"/>
         <attribute name="previewUrl" optional="YES" attributeType="String"/>
         <attribute name="progress" optional="YES" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES"/>
@@ -54,8 +55,9 @@
     <elements>
         <element name="Author" positionX="259.2503662109375" positionY="169.5555725097656" width="128" height="89"/>
         <element name="AuthorData" positionX="322.57421875" positionY="-17.06640625" width="128" height="59"/>
-        <element name="LikedMoment" positionX="-104.5703125" positionY="732.328125" width="164.91015625" height="73"/>
-        <element name="Podcast" positionX="-350.546875" positionY="143.78515625" width="190.59375" height="508"/>
+        <element name="FavoritePodcast" positionX="-135" positionY="135" width="128" height="59"/>
+        <element name="LikedMoment" positionX="-104.5703125" positionY="732.328125" width="164.91015625" height="59"/>
+        <element name="Podcast" positionX="-350.546875" positionY="143.78515625" width="190.59375" height="449"/>
         <element name="PodcastData" positionX="-257.46484375" positionY="-38.6015625" width="212.1328125" height="73"/>
     </elements>
 </model>

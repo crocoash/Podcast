@@ -2,7 +2,7 @@
 //  LikedMoment+CoreDataProperties.swift
 //  Podcasts
 //
-//  Created by Anton on 15.04.2022.
+//  Created by Anton on 04.05.2022.
 //
 //
 
@@ -13,9 +13,9 @@ import CoreData
 extension LikedMoment {
 
     @nonobjc public class func fetchRequest() -> NSFetchRequest<LikedMoment> {
-        return NSFetchRequest<LikedMoment>(entityName: "LikedMoment")
+        return NSFetchRequest<LikedMoment>(entityName: Self.entityName)
     }
-
+    
     @NSManaged public var moment: Double
     @NSManaged public var podcast: Podcast
 

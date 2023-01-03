@@ -29,12 +29,12 @@ class SettingsTableViewController: UITableViewController {
     @IBOutlet private weak var darkModeSwitch: UISwitch!
     @IBOutlet private weak var avatarImageView: UIImageView!
     @IBOutlet private weak var authorizationSwitch: UISwitch!
-    
+    @IBOutlet private weak var wifiSegmentedControl: UISegmentedControl!
     
     private var pickerController: UIImagePickerController = {
         $0.allowsEditing = true
         $0.mediaTypes = ["public.image", "public.movie"]
-      
+        
         return $0
     }(UIImagePickerController())
     
@@ -54,7 +54,7 @@ class SettingsTableViewController: UITableViewController {
             self?.locationLabel.text = ipData.country + " " + ipData.city
         }
     }
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpUI()
@@ -90,8 +90,13 @@ class SettingsTableViewController: UITableViewController {
     @objc func openCamera() {
         present(cameraPickerController, animated: true)
     }
+    
+    @IBAction func handleSegmentControlValueChanged(_ sender: Any) {
+        
+    }
 }
 
+//MARK: - private Methods
 extension SettingsTableViewController {
     
     private func getAvatar() {
@@ -109,16 +114,40 @@ extension SettingsTableViewController {
         avatarImageView.layer.cornerRadius = avatarImageView.frame.height / 2.7
         pickerController.delegate = self
         pickerController.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .camera, target: self, action: #selector(openCamera))
+        wifiSegmentedControl.selectedSegmentIndex = selectedSegment
     }
     
-    func darkModeStyle(value: Bool) {
+    private func darkModeStyle(value: Bool) {
         if let window = UIApplication.shared.windows.first {
             window.overrideUserInterfaceStyle = value ? .dark : .light
             userViewModel.changeUserInterfaceStyle(value: value)
         }
     }
+    
+    private var selectedSegment: Int {
+        switch UserDefaults.Local.permissionNetworkName {
+        case "settings_mobile_network_wifi".localized:
+            return 0
+        case "settings_mobile_network_ask".localized:
+            return 1
+        case "settings_mobile_network_allow".localized:
+            return 2
+        default:
+            if MobileNetwork.checkNetworkStatus(network: .wiFi) {
+                return 0
+            } else if MobileNetwork.checkNetworkStatus(network: .alwaysAsk) {
+                return 1
+            } else if MobileNetwork.checkNetworkStatus(network: .alwaysAllow) {
+                return 2
+            } else {
+                MobileNetwork.configureNetworkPermission(network: .wiFi)
+                return 0
+            }
+        }
+    }
 }
 
+//MARK: - UIImagePickerControllerDelegate
 extension SettingsTableViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {

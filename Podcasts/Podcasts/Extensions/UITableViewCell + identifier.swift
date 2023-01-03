@@ -11,4 +11,5 @@ extension UITableViewCell {
     static var identifier: String {
         return "\(Self.self)"
     }
+
 }

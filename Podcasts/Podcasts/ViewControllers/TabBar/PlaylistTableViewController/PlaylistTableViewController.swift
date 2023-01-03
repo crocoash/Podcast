@@ -19,27 +19,29 @@ protocol PlaylistViewControllerDelegate : AnyObject {
 class PlaylistTableViewController: UIViewController {
     
     @IBOutlet private weak var tableView: UITableView!
-    @IBOutlet private weak var playerConstraint: NSLayoutConstraint!
+ 
     @IBOutlet private weak var emptyTableImageView: UIImageView!
     @IBOutlet private weak var removeAllButton: UIBarButtonItem!
     @IBOutlet private weak var tableViewBottomConstraint: NSLayoutConstraint!
     
     weak var delegate: PlaylistViewControllerDelegate?
-    
+    private var tableViewBottomConstraintConstant: CGFloat = 0
     private let refreshControll = UIRefreshControl()
     
     //MARK: - Methods
     func playerIsShow() {
-        tableViewBottomConstraint.constant = -50
+        tableViewBottomConstraintConstant = 50
+        tableViewBottomConstraint?.constant = tableViewBottomConstraintConstant
     }
     
     func updateDisplay(progress: Float, totalSize: String, id: NSNumber) {
-        guard
-            let podcast = FavoriteDocument.shared.favoritePodcasts.firstPodcast(matching: id),
-            let indexPath = FavoriteDocument.shared.getIndexPath(for: podcast)
+        let favoritePodcast = FavoriteDocument.shared.favoritePodcastFRC.fetchedObjects
+        
+        guard let podcast = favoritePodcast?.filter({ $0.podcast.id == id }).first?.podcast,
+              let indexPath = FavoriteDocument.shared.getIndexPath(for: podcast),
+              let podcastCell = self.tableView?.cellForRow(at: indexPath) as? PodcastCell
         else { return }
         
-        guard let podcastCell = self.tableView?.cellForRow(at: indexPath) as? PodcastCell else { return }
         podcastCell.updateDisplay(progress: progress, totalSize: totalSize)
     }
     
@@ -58,12 +60,13 @@ class PlaylistTableViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
+        tableViewBottomConstraint.constant = tableViewBottomConstraintConstant
     }
     
     //MARK: - Actions
     @IBAction func removeAllAction(_ sender: UIButton) {
         FavoriteDocument.shared.removaAllFavorites()
-        FirebaseDatabase.shared.save()
+        FirebaseDatabase.shared.savePodcast()
         showEmptyImage()
     }
     
@@ -71,7 +74,7 @@ class PlaylistTableViewController: UIViewController {
         guard let view = sender.view as? UITableViewCell,
               let indexPath = tableView.indexPath(for: view) else { return }
         
-        let podcast = FavoriteDocument.shared.getfavoritePodcast(for: indexPath)
+        let podcast = FavoriteDocument.shared.getPodcast(for: indexPath)
        
         let vc = DetailViewController.initVC
         vc.delegate = self
@@ -96,7 +99,7 @@ class PlaylistTableViewController: UIViewController {
 extension PlaylistTableViewController {
     
     private func configureUI() {
-        FavoriteDocument.shared.favoritePodcastFetchResultController.delegate = self
+        FavoriteDocument.shared.favoritePodcastFRC.delegate = self
         navigationItem.title = "PlayList"
         configureTableView()
     }
@@ -122,7 +125,7 @@ extension PlaylistTableViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            let podcast = FavoriteDocument.shared.getfavoritePodcast(for: indexPath)
+            let podcast = FavoriteDocument.shared.getPodcast(for: indexPath)
             delegate?.playlistTableViewControllerDidSelectStar(self, podcast: podcast)
 //            tableView.deleteRows(at: [indexPath], with: .fade)
             showEmptyImage()
@@ -135,9 +138,9 @@ extension PlaylistTableViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let podcast = FavoriteDocument.shared.getfavoritePodcast(for: indexPath)
+        let podcast = FavoriteDocument.shared.getPodcast(for: indexPath)
         let cell = tableView.getCell(cell: PodcastCell.self, indexPath: indexPath)
-        cell.addMyGestureRecognizer(self, type: .tap(), selector: #selector(tapCell))
+        cell.addMyGestureRecognizer(self, type: .tap(), #selector(tapCell))
         cell.configureCell(with: podcast)
         cell.delegate = self
         
@@ -156,7 +159,7 @@ extension PlaylistTableViewController : DetailViewControllerDelegate {
     }
     
     func detailViewController(_ detailViewController: DetailViewController, playButtonDidTouchFor didSelectIndex: Int) {
-        delegate?.playlistTableViewController(self,podcasts: FavoriteDocument.shared.favoritePodcasts, didSelectIndex: didSelectIndex)
+        delegate?.playlistTableViewController(self, podcasts: FavoriteDocument.shared.podcasts, didSelectIndex: didSelectIndex)
     }
 }
 
@@ -187,7 +190,5 @@ extension PlaylistTableViewController: PodcastCellDelegate {
     
     func podcastCellDidSelectDownLoadImage(_ podcastCell: PodcastCell, podcast: Podcast) {
         delegate?.playlistTableViewControllerDidSelectDownLoadImage(self, podcast: podcast)
-        showEmptyImage()
-        tableView.reloadData()
     }
 }

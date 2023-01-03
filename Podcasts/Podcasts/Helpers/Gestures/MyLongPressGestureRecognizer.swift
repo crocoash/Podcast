@@ -24,23 +24,23 @@ struct MyLongPressGestureRecognizer {
     
     //For UITableViewCell
     static func createSelector<Cell: UITableViewCell>(for longPressGR: UILongPressGestureRecognizer, completion: (Cell) -> ()) {
-        guard let cell = longPressGR.view as? Cell else { return }
-        if longPressGR.state == .began {
-            completion(cell)
-            feedbackGenerator(for: longPressGR)
-        }
+        guard let cell = longPressGR.view as? Cell,
+              longPressGR.state == .began else { return }
+        
+        completion(cell)
+        feedbackGenerator()
     }
     
     //For UICollectionViewCell
     static func createSelector<Cell: UICollectionViewCell>(for longPressGR: UILongPressGestureRecognizer, completion: (Cell) -> ())   {
-        guard let cell = longPressGR.view as? Cell else { return }
-        if longPressGR.state == .began {
-            completion(cell)
-            feedbackGenerator(for: longPressGR)
-        }
+        guard let cell = longPressGR.view as? Cell,
+              longPressGR.state == .began else { return }
+        
+        completion(cell)
+        feedbackGenerator()
     }
     
-    private static func feedbackGenerator(for longPressGR: UILongPressGestureRecognizer) {
+    private static func feedbackGenerator() {
         let feedbackGenerator = UIImpactFeedbackGenerator()
         feedbackGenerator.prepare()
         feedbackGenerator.impactOccurred()

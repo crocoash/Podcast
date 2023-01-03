@@ -157,6 +157,44 @@
                                         </tableViewCellContentView>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="M9t-6U-KAs">
+                                        <rect key="frame" x="0.0" y="512.5" width="414" height="43.5"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="M9t-6U-KAs" id="xyd-77-Tw3">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="NetWorking : " textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gGg-Z1-fhk">
+                                                    <rect key="frame" x="20" y="11.5" width="104" height="21"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" constant="104" id="HWS-r3-yxE"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="sOl-g9-eg2">
+                                                    <rect key="frame" x="132" y="6.5" width="267" height="32"/>
+                                                    <segments>
+                                                        <segment title="wiFi"/>
+                                                        <segment title="alwaysAsk"/>
+                                                        <segment title="alwaysAllow"/>
+                                                    </segments>
+                                                    <connections>
+                                                        <action selector="handleSegmentControlValueChanged:" destination="Q14-vm-flJ" eventType="valueChanged" id="DZN-Dv-OD3"/>
+                                                    </connections>
+                                                </segmentedControl>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="sOl-g9-eg2" firstAttribute="leading" secondItem="gGg-Z1-fhk" secondAttribute="trailing" constant="8" symbolic="YES" id="O2r-mW-9i2"/>
+                                                <constraint firstItem="gGg-Z1-fhk" firstAttribute="leading" secondItem="xyd-77-Tw3" secondAttribute="leading" constant="20" symbolic="YES" id="Q1f-5s-MNM"/>
+                                                <constraint firstItem="gGg-Z1-fhk" firstAttribute="centerY" secondItem="xyd-77-Tw3" secondAttribute="centerY" id="RCj-8n-S0I"/>
+                                                <constraint firstItem="sOl-g9-eg2" firstAttribute="centerY" secondItem="xyd-77-Tw3" secondAttribute="centerY" id="sI8-yO-0Ri"/>
+                                                <constraint firstAttribute="trailing" secondItem="sOl-g9-eg2" secondAttribute="trailing" constant="15" id="sVA-Lr-Hfd"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    </tableViewCell>
                                 </cells>
                             </tableViewSection>
                             <tableViewSection headerTitle="" id="OiF-lc-aTz">
@@ -165,7 +203,7 @@
                             <tableViewSection headerTitle="" id="moq-DE-azl">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="Rst-1S-ugr">
-                                        <rect key="frame" x="0.0" y="646.5" width="414" height="43.5"/>
+                                        <rect key="frame" x="0.0" y="690" width="414" height="43.5"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Rst-1S-ugr" id="ssV-89-TW3">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
@@ -209,6 +247,7 @@
                         <outlet property="darkModeSwitch" destination="Pw5-L1-mcI" id="INm-Hv-C9c"/>
                         <outlet property="locationLabel" destination="8Qq-QP-rQ9" id="Yx0-dj-VR4"/>
                         <outlet property="userNameLabel" destination="Ntm-Nx-hfX" id="Ifg-og-Jit"/>
+                        <outlet property="wifiSegmentedControl" destination="sOl-g9-eg2" id="eSh-He-MrB"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ciV-Ja-dCD" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
