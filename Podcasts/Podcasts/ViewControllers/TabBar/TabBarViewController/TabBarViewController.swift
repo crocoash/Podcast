@@ -46,9 +46,7 @@ class TabBarViewController: UITabBarController {
         vc.setUser((self.userViewModel))
         vc.delegate = self
     }
-    
-    private var playerISShow = false
-    
+        
     //MARK: - METHODS
     func setUserViewModel(_ userViewModel: UserViewModel) {
         self.userViewModel = userViewModel
@@ -61,12 +59,17 @@ class TabBarViewController: UITabBarController {
         addPlayer()
         configureImageDarkMode()
         downloadService.downloadsSession = downloadsSession
-        FirebaseDatabase.shared.observe()
-        FirebaseDatabase.shared.delegate = self
+        
+        let favDoc = FavoriteDocument.shared
+
+        FirebaseDatabase.shared.observe(add: LikedMoment.addFromFireBase, remove: LikedMoment.removeFromFireBase)
+        FirebaseDatabase.shared.observe(add: favDoc.addFromFireBase, remove: favDoc.removeFromFireBase)
+        FavoriteDocument.shared.updateFavoritePodcastFromFireBase(completion: nil)
+        LikedMoment.updateLikedMomentsFromFireBase {}
     }
 }
 
-//MARK: -Private methods
+//MARK: - Private methods
 extension TabBarViewController {
     
     private func configureTabBar() {
@@ -113,89 +116,64 @@ extension TabBarViewController {
         feedbackGenerator.impactOccurred()
     }
     
-    private func addOrRemoveFromFavorite(podcast: Podcast) {
-        let isFavorite = FavoriteDocument.shared.isFavorite(podcast)
-        let title = (podcast.trackName ?? "podcast") + (isFavorite ? "is removed from playlist" : "is added to playlist")
-        MyToast.create(title: title, (playerISShow ? .bottomWithPlayer : .bottom), animateWithDuration: 0.2,timerToRemove: 2,for: view)
-
+    private func addOrRemoveFavoritePodcast(podcast: Podcast) {
         FavoriteDocument.shared.addOrRemoveToFavorite(podcast: podcast)
-        if FavoriteDocument.shared.isDownload(podcast: podcast) { downloadService.cancelDownload(podcast: podcast) }
+        if FavoriteDocument.shared.isDownload(podcast) { downloadService.cancelDownload(podcast: podcast) }
         feedbackGenerator()
     }
     
-    private func downloadOrRemovePodcast(_ podcast: Podcast, _ indexPath: IndexPath) {
-        if FavoriteDocument.shared.isDownload(podcast: podcast) {
+    private func downloadOrRemovePodcast(_ podcast: Podcast) {
+        if FavoriteDocument.shared.isDownload(podcast) {
             downloadService.cancelDownload(podcast: podcast)
-            reloadAllVC()
         } else {
-            downloadService.startDownload(podcast, indexPath: indexPath)
+            downloadService.startDownload(podcast)
         }
         feedbackGenerator()
     }
     
-    private func startPlay(_ podcasts: [Podcast], _ didSelectIndex: Int) {
-        playerVC.view.isHidden = false
-        playerVC.playLikedPlaylist(at: didSelectIndex, likedPlaylist: podcasts)
+    private func startPlay(at index: Int, at moment: Double? = nil, playlist: [Podcast]) {
+        playerVC.startPlay(at: index, at: moment, playlist: playlist)
+        playerIsHidden(false)
     }
     
-    private func reloadAllVC() {
-        self.searchVC.reloadData()
-        self.playListVC.reloadData()
-    }
-    
-    private func playerIsShow() {
-        playerISShow = true
-        playListVC.playerIsShow()
-        searchVC.playerIsShow()
-        likedMomentVc.playerIsShow()
+    private func playerIsHidden(_ bool: Bool) {
+        playerVC.view.isHidden = bool
+        playListVC.playerIsHidden(bool)
+        searchVC.playerIsHidden(bool)
+        likedMomentVc.playerIsHidden(bool)
     }
 }
 
-// MARK: ------------- SearchViewControllerDelegate
+// MARK: - SearchViewControllerDelegate
 extension TabBarViewController: SearchViewControllerDelegate {
     
     func searchViewControllerDidSelectFavoriteStar(_ searchViewController: SearchViewController, podcast: Podcast) {
-        addOrRemoveFromFavorite(podcast: podcast)
+        addOrRemoveFavoritePodcast(podcast: podcast)
     }
     
-    func searchViewControllerDidRefreshTableView(_ searchViewController: SearchViewController, completion: @escaping () -> Void) {
-        
-    }
-    
-    
-    func searchViewControllerDidSelectDownLoadImage(_ searchViewController: SearchViewController, podcast: Podcast, indexPath: IndexPath) {
-        downloadOrRemovePodcast(podcast, indexPath)
+    func searchViewControllerDidSelectDownLoadImage(_ searchViewController: SearchViewController, podcast: Podcast) {
+        downloadOrRemovePodcast(podcast)
     }
     
     func searchViewController(_ searchViewController: SearchViewController, _ podcasts: [Podcast], didSelectIndex: Int) {
-        startPlay(podcasts, didSelectIndex)
-        playerIsShow()
+        startPlay(at: didSelectIndex, playlist: podcasts)
     }
 }
 
 // MARK: - PlaylistTableViewControllerDelegate
 extension TabBarViewController: PlaylistViewControllerDelegate {
     
-    func playlistTableViewControllerDidRefreshTableView(_ playlistTableViewController: PlaylistTableViewController, completion: @escaping () -> Void) {
-        FirebaseDatabase.shared.getFavoritePodcast { [weak self] in
-            guard let self = self else { return }
-            MyToast.create(title: "favorite podcast was updating", (self.playerISShow ? .bottomWithPlayer : .bottom), animateWithDuration: 0.2,timerToRemove: 2,for: playlistTableViewController.view)
-            completion()
-        }
-    }
-    
-    func playlistTableViewControllerDidSelectStar(_ playlistTableViewController: PlaylistTableViewController, podcast: Podcast) {
-        addOrRemoveFromFavorite(podcast: podcast)
+    func playlistTableViewControllerDidSelectStar(_ playlistTableViewController: PlaylistTableViewController, favoritePodcast: FavoritePodcast) {
+        let podcast = favoritePodcast.podcast
+        addOrRemoveFavoritePodcast(podcast: podcast)
     }
     
     func playlistTableViewControllerDidSelectDownLoadImage(_ playlistTableViewController: PlaylistTableViewController, podcast: Podcast) {
-        guard let indexPath = FavoriteDocument.shared.getIndexPath(for: podcast) else { return }
-        downloadOrRemovePodcast(podcast, indexPath)
+        downloadOrRemovePodcast(podcast)
     }
     
     func playlistTableViewController(_ playlistTableViewController: PlaylistTableViewController, podcasts: [Podcast], didSelectIndex: Int) {
-        startPlay(podcasts, didSelectIndex)
-        playerIsShow()
+        startPlay(at: didSelectIndex, playlist: podcasts)
     }
 }
 
@@ -217,11 +195,9 @@ extension TabBarViewController: SettingsTableViewControllerDelegate {
 extension TabBarViewController: LikedMomentsViewControllerDelegate {
     
     func likedMomentViewController(_ likedMomentViewController: LikedMomentsViewController, didSelectMomentAt index: Int, likedMoments: [LikedMoment]) {
-        playerVC.view.isHidden = false
         let moment = likedMoments[index].moment
         let podcast = likedMoments[index].podcast
-        playerVC.playLikedPlaylist(at: 0, at: moment, likedPlaylist: [podcast])
-        playerIsShow()
+        startPlay(at: .zero, at: moment, playlist: [podcast])
     }
 }
 
@@ -267,9 +243,15 @@ extension TabBarViewController: URLSessionDownloadDelegate {
             print("Could not remove item at disk: \(error.localizedDescription)")
         }
         
+        let podcastID = downloadService.activeDownloads[url]?.id
+     
         DispatchQueue.main.async {
             self.downloadService.endDownload(url: url)
-            self.reloadAllVC()
+            
+            if let id = podcastID, let indexPath = FavoriteDocument.shared.getIndexPath(id: id) {
+                self.playListVC.reloadData(indexPath: [indexPath])
+                self.searchVC.reloadData(indexPath: [indexPath])
+            }
         }
     }
 }
@@ -285,16 +267,5 @@ extension TabBarViewController: URLSessionDelegate {
                 completionHandler()
             }
         }
-    }
-}
-
-//MARK: - FirebaseDatabaseDelegate
-extension TabBarViewController: FirebaseDatabaseDelegate {
-
-    func firebaseDatabaseDidGetData(_ firebaseDatabase: FirebaseDatabase) {
-        playListVC.reloadData()
-        searchVC.reloadData()
-        likedMomentVc.reloadData()
-        feedbackGenerator()
     }
 }

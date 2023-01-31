@@ -20,23 +20,19 @@ protocol BigPlayerViewControllerDelegate: AnyObject {
 class BigPlayerViewController: UIViewController {
     
     @IBOutlet private weak var podcastImageView:      UIImageView!
-    
     @IBOutlet private weak var podcastNameLabel:      UILabel!
     @IBOutlet private weak var currentTimeLabel:      UILabel!
     @IBOutlet private weak var durationTrackLabel:    UILabel!
-    
-    @IBOutlet weak var progressSlider:                UISlider!
-    
+    @IBOutlet private weak var progressSlider:        UISlider!
     @IBOutlet private weak var previousPodcastButton: UIButton!
     @IBOutlet private weak var nextPodcastButton:     UIButton!
-    @IBOutlet private weak var playStopButton:        UIButton!
-    
+    @IBOutlet private weak var playPauseButton:        UIButton!
+    @IBOutlet private weak var likedButton:           UIButton!
     @IBOutlet private weak var activityIndicator:     UIActivityIndicatorView!
     
     weak var delegate: BigPlayerViewControllerDelegate?
     
     private var podcast: Podcast?
-    private var playButtonImage: UIImage!
     
     private(set) var isPresented: Bool = false
     private let defaultTime = "0:00"
@@ -55,29 +51,39 @@ class BigPlayerViewController: UIViewController {
         self.isPresented = bool
     }
     
+    func updatePlayStopButton(with playStopImage: UIImage) {
+        playPauseButton.setImage(playStopImage, for: .normal)
+    }
+    
     func upDateProgressSlider(currentTime: Float, duration: Float) {
-        self.progressSlider.value = currentTime
-        self.progressSlider.maximumValue = duration
-        self.currentTimeLabel.text = currentTime.formattedString
-        self.durationTrackLabel.text = duration.formattedString
+        progressSlider.value = currentTime
+        progressSlider.maximumValue = duration
+        currentTimeLabel.text = currentTime.formattedString
+        durationTrackLabel.text = duration.formattedString
 
         if !activityIndicator.isHidden { activityIndicator.stopAnimating() }
+        if !likedButton.isEnabled { likedButton.isEnabled = true }
     }
     
     func upDateUI(with podcast: Podcast, isFirst: Bool, isLast: Bool, playStopButton: UIImage) {
         self.isPresented = true
-        self.isLast = isLast
-        self.isFirst = isFirst
-        self.updatePlayButton(playButtonImage: playStopButton)
-        self.progressSlider.value = 0
+        
+        if self.podcast != podcast {
+            self.isLast = isLast
+            self.isFirst = isFirst
+            self.progressSlider.value = 0
+            self.configureUI(with: podcast)
+        }
+        self.playPauseButton?.setImage(playStopButton, for: .normal)
         self.podcast = podcast
-        self.configureUI(with: podcast)
     }
     
     func refreshInfo() {
-        activityIndicator.startAnimating()
-        durationTrackLabel.text = defaultTime
-        currentTimeLabel.text = defaultTime
+        activityIndicator?.startAnimating()
+        likedButton?.isEnabled = false
+        podcastImageView?.image = nil
+        durationTrackLabel?.text = defaultTime
+        currentTimeLabel?.text = defaultTime
     }
     
     //MARK: - Actions
@@ -122,7 +128,7 @@ extension BigPlayerViewController {
     
     private func configureUI(with podcast: Podcast) {
         
-        DataProvider().downloadImage(string: podcast.artworkUrl160) { [weak self] image in
+        DataProvider.shared.downloadImage(string: podcast.artworkUrl160) { [weak self] image in
             self?.podcastImageView.image = image
         }
         
@@ -139,9 +145,5 @@ extension BigPlayerViewController {
     private func dismissBigPlayer() {
         isPresented = false
         dismiss(animated: true)
-    }
-    
-    private func updatePlayButton(playButtonImage: UIImage) {
-        self.playStopButton.setImage(playButtonImage, for: .normal)
     }
 }

@@ -18,7 +18,9 @@ extension FavoritePodcast {
 
     @NSManaged public var idd: String
     @NSManaged public var podcast: Podcast
-
+    
+    var key: String { podcast.id?.stringValue ?? "" }
+    var viewContext: NSManagedObjectContext { DataStoreManager.shared.viewContext }
 }
 
 extension FavoritePodcast : Identifiable {

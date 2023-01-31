@@ -8,9 +8,10 @@
 import Foundation
 import CoreData
 
-class SearchAuthorsDocument {
+
+class AuthorDocument {
     
-    static var shared = SearchAuthorsDocument()
+    static var shared = AuthorDocument()
     private init(){}
     
     lazy private(set) var searchFRC: NSFetchedResultsController<Author> = {
@@ -30,7 +31,7 @@ class SearchAuthorsDocument {
     }()
 }
 
-extension SearchAuthorsDocument {
+extension AuthorDocument {
     
     private var authors: [Author] { Author.searchAuthors }
     

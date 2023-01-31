@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
-    <device id="retina6_1" orientation="portrait" appearance="light"/>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <dependencies>
-        <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -14,8 +12,9 @@
                 <outlet property="activityIndicator" destination="JSQ-Ks-8p4" id="6CG-qY-uDF"/>
                 <outlet property="currentTimeLabel" destination="oqM-Hi-VRJ" id="22g-Mt-VQj"/>
                 <outlet property="durationTrackLabel" destination="YBf-Sa-DCQ" id="R1P-Cj-B1q"/>
+                <outlet property="likedButton" destination="s8Y-pZ-k98" id="AFU-gY-A1e"/>
                 <outlet property="nextPodcastButton" destination="l7l-J4-oxV" id="1oF-pf-Kd3"/>
-                <outlet property="playStopButton" destination="31N-RF-imm" id="Uef-rF-HxG"/>
+                <outlet property="playPauseButton" destination="31N-RF-imm" id="Uef-rF-HxG"/>
                 <outlet property="podcastImageView" destination="S9q-Kg-Gm0" id="NNi-hU-SuU"/>
                 <outlet property="podcastNameLabel" destination="4U4-Fn-z6L" id="OGF-ML-FQI"/>
                 <outlet property="previousPodcastButton" destination="Efo-Ay-eoH" id="ne5-8b-CUg"/>
@@ -29,7 +28,7 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="S9q-Kg-Gm0">
-                    <rect key="frame" x="20" y="64" width="374" height="249.5"/>
+                    <rect key="frame" x="20" y="20.000000000000014" width="374" height="249.33333333333337"/>
                     <color key="backgroundColor" red="0.69553225799999996" green="0.55586313639999996" blue="0.4945483806" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <constraints>
                         <constraint firstAttribute="width" secondItem="S9q-Kg-Gm0" secondAttribute="height" multiplier="3:2" id="7jq-qa-LeH"/>
@@ -41,7 +40,7 @@
                     </userDefinedRuntimeAttributes>
                 </imageView>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0:00" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oqM-Hi-VRJ">
-                    <rect key="frame" x="20" y="430" width="41.5" height="25"/>
+                    <rect key="frame" x="20.000000000000004" y="386" width="41.333333333333343" height="25"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="25" id="HKO-pg-nY0"/>
                     </constraints>
@@ -50,16 +49,16 @@
                     <nil key="highlightedColor"/>
                 </label>
                 <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="cXA-Ai-yFn">
-                    <rect key="frame" x="18" y="460" width="378" height="31"/>
+                    <rect key="frame" x="18" y="416" width="378" height="31"/>
                     <connections>
                         <action selector="progressSliderValueChanged:" destination="-1" eventType="valueChanged" id="fqQ-3b-e89"/>
                     </connections>
                 </slider>
                 <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="arR-z9-12W">
-                    <rect key="frame" x="20" y="515" width="374" height="40"/>
+                    <rect key="frame" x="20" y="471" width="374" height="40"/>
                     <subviews>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Efo-Ay-eoH">
-                            <rect key="frame" x="0.0" y="0.0" width="68.5" height="40"/>
+                            <rect key="frame" x="0.0" y="0.0" width="68.333333333333329" height="40"/>
                             <constraints>
                                 <constraint firstAttribute="width" priority="900" constant="40" id="VFq-oA-g9t"/>
                                 <constraint firstAttribute="height" constant="40" id="Z1I-BT-FGM"/>
@@ -71,7 +70,7 @@
                             </connections>
                         </button>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ETb-lJ-ika">
-                            <rect key="frame" x="76.5" y="0.0" width="68.5" height="40"/>
+                            <rect key="frame" x="76.333333333333343" y="0.0" width="68.333333333333343" height="40"/>
                             <constraints>
                                 <constraint firstAttribute="width" priority="900" constant="40" id="2y1-HH-Smc"/>
                                 <constraint firstAttribute="height" constant="40" id="y8w-bK-amM"/>
@@ -83,7 +82,7 @@
                             </connections>
                         </button>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="31N-RF-imm">
-                            <rect key="frame" x="153" y="0.0" width="68" height="40"/>
+                            <rect key="frame" x="152.66666666666666" y="0.0" width="68.666666666666657" height="40"/>
                             <constraints>
                                 <constraint firstAttribute="width" priority="900" constant="40" id="WiO-GD-xkW"/>
                                 <constraint firstAttribute="height" constant="40" id="f3l-zh-zTu"/>
@@ -94,7 +93,7 @@
                             </connections>
                         </button>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4xx-HQ-zWN">
-                            <rect key="frame" x="229" y="0.0" width="68.5" height="40"/>
+                            <rect key="frame" x="229.33333333333334" y="0.0" width="68.333333333333343" height="40"/>
                             <constraints>
                                 <constraint firstAttribute="width" priority="900" constant="40" id="2f1-oa-BHH"/>
                                 <constraint firstAttribute="height" constant="40" id="yWp-Mc-Kfo"/>
@@ -106,7 +105,7 @@
                             </connections>
                         </button>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="l7l-J4-oxV">
-                            <rect key="frame" x="305.5" y="0.0" width="68.5" height="40"/>
+                            <rect key="frame" x="305.66666666666669" y="0.0" width="68.333333333333314" height="40"/>
                             <constraints>
                                 <constraint firstAttribute="width" priority="900" constant="40" id="r8x-gJ-imj"/>
                                 <constraint firstAttribute="height" constant="40" id="v0R-KU-bWO"/>
@@ -120,7 +119,7 @@
                     </subviews>
                 </stackView>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Podcast Name" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="4" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="4U4-Fn-z6L">
-                    <rect key="frame" x="20" y="330" width="374" height="90"/>
+                    <rect key="frame" x="20" y="286" width="374" height="90"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="90" id="6aA-kE-WTJ"/>
                     </constraints>
@@ -129,10 +128,10 @@
                     <nil key="highlightedColor"/>
                 </label>
                 <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" animating="YES" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="JSQ-Ks-8p4">
-                    <rect key="frame" x="197" y="492" width="20" height="20"/>
+                    <rect key="frame" x="197" y="448" width="20" height="20"/>
                 </activityIndicatorView>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="00:00" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YBf-Sa-DCQ">
-                    <rect key="frame" x="340.5" y="430" width="53.5" height="25"/>
+                    <rect key="frame" x="340.66666666666669" y="386" width="53.333333333333314" height="25"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="25" id="4JG-Kq-65J"/>
                     </constraints>
@@ -140,15 +139,15 @@
                     <color key="textColor" systemColor="systemGray2Color"/>
                     <nil key="highlightedColor"/>
                 </label>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="s8Y-pZ-k98">
-                    <rect key="frame" x="182" y="560" width="50" height="50"/>
+                <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="s8Y-pZ-k98">
+                    <rect key="frame" x="182" y="516" width="50" height="49.666666666666629"/>
                     <state key="normal" image="like-1"/>
                     <connections>
                         <action selector="likedButton:" destination="-1" eventType="touchUpInside" id="x9y-uK-lFd"/>
                     </connections>
                 </button>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4wB-gs-qWY">
-                    <rect key="frame" x="344" y="64" width="50" height="50"/>
+                    <rect key="frame" x="344" y="20" width="50" height="50"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="50" id="1Mg-ff-l3G"/>
                         <constraint firstAttribute="height" constant="50" id="evg-bU-Fw6"/>
@@ -194,7 +193,7 @@
     <resources>
         <image name="chevron-down" width="512" height="512"/>
         <image name="like-1" width="640" height="640"/>
-        <image name="play.fill" catalog="system" width="116" height="128"/>
+        <image name="play.fill" catalog="system" width="117" height="128"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

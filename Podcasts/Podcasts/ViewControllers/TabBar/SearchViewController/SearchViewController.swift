@@ -11,9 +11,8 @@ import SwiftUI
 
 protocol SearchViewControllerDelegate: AnyObject {
     func searchViewController                      (_ searchViewController: SearchViewController,_ podcasts: [Podcast], didSelectIndex: Int)
-    func searchViewControllerDidSelectDownLoadImage(_ searchViewController: SearchViewController, podcast: Podcast, indexPath: IndexPath)
+    func searchViewControllerDidSelectDownLoadImage(_ searchViewController: SearchViewController, podcast: Podcast)
     func searchViewControllerDidSelectFavoriteStar (_ searchViewController: SearchViewController, podcast: Podcast)
-    func searchViewControllerDidRefreshTableView   (_ searchViewController: SearchViewController, completion: @escaping () -> Void)
 }
 
 class SearchViewController : UIViewController {
@@ -33,14 +32,22 @@ class SearchViewController : UIViewController {
     private let activityIndicator = UIActivityIndicatorView()
     private var alert             = Alert()
     private var podcasts          = Array<Podcast>()
-    private var authors          = Array<Author>()
+    private var authors           = Array<Author>()
     
     weak var delegate: SearchViewControllerDelegate?
     
     //MARK: - Methods
-    func playerIsShow() {
-        tableViewBottomConstraintContstnt = 50
-        tableViewBottomConstraint?.constant = tableViewBottomConstraintContstnt
+    
+    private var playerIsSHidden = true {
+        didSet {
+            tableViewBottomConstraintContstnt = playerIsSHidden ? 0 : 50
+            tableViewBottomConstraint?.constant = tableViewBottomConstraintContstnt
+        }
+    }
+    
+    //MARK: - Methods
+    func playerIsHidden(_ bool: Bool) {
+        playerIsSHidden = bool
     }
     
     func updateDisplay(progress: Float, totalSize: String, id: NSNumber) {
@@ -49,11 +56,6 @@ class SearchViewController : UIViewController {
         if let podcastCell = self.tableView?.cellForRow(at: IndexPath(row: index, section: 0)) as? PodcastCell {
             podcastCell.updateDisplay(progress: progress, totalSize: totalSize)
         }
-    }
-    
-    func reloadData() {
-        tableView?.reloadData()
-        showEmptyImage()
     }
     
     func reloadData(indexPath: [IndexPath]) {
@@ -90,8 +92,8 @@ class SearchViewController : UIViewController {
     }
     
     @objc func refresh() {
-        refreshControll.endRefreshing()
         getData()
+        refreshControll.endRefreshing()
     }
     
     @objc func changeTypeOfSearch(sender: UISegmentedControl) {
@@ -100,8 +102,7 @@ class SearchViewController : UIViewController {
     
     @objc func handlerTapAuthorCell(sender: UITapGestureRecognizer) {
         guard let view = sender.view as? UITableViewCell,
-              let indexPath = tableView.indexPath(for: view),
-              let request = SearchAuthorsDocument.shared.getAuthor(at: indexPath).artistName else { return }
+              let indexPath = tableView.indexPath(for: view) else { return }
         
         searchSegmentalControl.selectedSegmentIndex = 0
         getData()
@@ -143,7 +144,7 @@ extension SearchViewController {
         configureSegmentalControl()
         configureAlert()
         configureActivityIndicator()
-        SearchAuthorsDocument.shared.searchFRC.delegate = self
+        AuthorDocument.shared.searchFRC.delegate = self
     }
     
     private func configureTableView() {
@@ -183,7 +184,6 @@ extension SearchViewController {
     private func cancelSearchAction() {
         searchBar.text?.removeAll()
         podcasts.removeAll()
-        tableView.reloadData()
         showEmptyImage()
     }
     
@@ -195,14 +195,12 @@ extension SearchViewController {
             (searchSegmentalControl?.selectedSegmentIndex == 1 && authorsIsEmpty) {
             tableView.isHidden = true
             emptyTableImageView.isHidden = false
-            tableView.reloadData()
         }
         
         if (searchSegmentalControl?.selectedSegmentIndex == 0 && !podcastsIsEmpty ||
             (searchSegmentalControl?.selectedSegmentIndex == 1 && !authorsIsEmpty)) {
             tableView.isHidden = false
             emptyTableImageView.isHidden = true
-            tableView.reloadData()
         }
     }
     
@@ -217,38 +215,54 @@ extension SearchViewController {
 extension SearchViewController {
     
     private func processResults<T>(result: [T]?, completion: (([T]) -> Void)? = nil) {
-        activityIndicator.stopAnimating()
-        
         if let result = result, !result.isEmpty {
             completion?(result)
         } else {
             self.alert.create(title: "Ooops nothing search", withTimeIntervalToDismiss: 2)
         }
         self.showEmptyImage()
+        tableView.reloadData()
     }
     
     private func getData() {
         tableView.setContentOffset(.zero, animated: true)
         guard let request = searchBar.text?.conform, !request.isEmpty else { showEmptyImage(); return }
         activityIndicator.startAnimating()
-        
         if searchSegmentalControl.selectedSegmentIndex == 0 {
-            ApiService.getData(for: UrlRequest1.getStringUrl(.podcast(request))) { [weak self] (info: PodcastData?) in
-                guard let self = self,
-                      let podcasts = info?.results.allObjects as? [Podcast] else { return }
-                
-                self.processResults(result: podcasts) {
-                    self.podcasts = $0
-                }
-            }
+            getPodcasts(request: UrlRequest1.podcastEpisode(request).url)
         } else {
-            ApiService.getData(for: UrlRequest1.getStringUrl(.authors(request))) { [weak self] (info: AuthorData?) in
-                guard let self = self,
-                      let authors = info?.results.allObjects as? [Author] else { return }
-                self.processResults(result: authors) {
-                    self.authors = $0
+            getAuthors(request: UrlRequest1.authors(request).url)
+        }
+    }
+    
+    private func getPodcasts(request: String) {
+        ApiService.getData(for: request) { [weak self] (result: Result<PodcastData>) in
+            switch result {
+            case .success(result: let podcastData) :
+                guard let podcasts = podcastData.results.allObjects as? [Podcast] else { return }
+                
+                self?.processResults(result: podcasts) {
+                    self?.podcasts = $0
                 }
+            case .failure(error: let error) :
+                error.showAlert(vc: self)
             }
+            self?.activityIndicator.stopAnimating()
+        }
+    }
+    
+    private func getAuthors(request: String) {
+        ApiService.getData(for: request) { [weak self] (result: Result<AuthorData>) in
+            switch result {
+            case .success(result: let authorData) :
+                let authors = authorData.results.allObjects as? [Author]
+                self?.processResults(result: authors) {
+                    self?.authors = $0
+                }
+            case .failure(error: let error) :
+                error.showAlert(vc: self)
+            }
+            self?.activityIndicator.stopAnimating()
         }
     }
     
@@ -291,14 +305,17 @@ extension SearchViewController: UITableViewDataSource {
 extension SearchViewController: PodcastCellDelegate {
     
     func podcastCellDidSelectStar(_ podcastCell: PodcastCell, podcast: Podcast) {
+        searchBar.resignFirstResponder()
         guard let indexPath = tableView.indexPath(for: podcastCell) else { return }
         delegate?.searchViewControllerDidSelectFavoriteStar(self, podcast: podcast)
-        tableView.reloadRows(at: [indexPath], with: .none)
+        tableView.reloadRows(at: [indexPath], with: .automatic)
     }
     
     func podcastCellDidSelectDownLoadImage(_ podcastCell: PodcastCell, podcast: Podcast) {
+        searchBar.resignFirstResponder()
+        delegate?.searchViewControllerDidSelectDownLoadImage(self, podcast: podcast)
         guard let indexPath = tableView.indexPath(for: podcastCell) else { return }
-        delegate?.searchViewControllerDidSelectDownLoadImage(self, podcast: podcast, indexPath: indexPath)
+        tableView.reloadRows(at: [indexPath], with: .top)
     }
 }
 
@@ -356,12 +373,10 @@ extension SearchViewController: DetailViewControllerDelegate {
     
     func detailViewController(_ detailViewController: DetailViewController, addToFavoriteButtonDidTouchFor selectedPodcast: Podcast) {
         delegate?.searchViewControllerDidSelectFavoriteStar(self, podcast: selectedPodcast)
-//        podcastTableView.reloadRows(at: [indexPath], with: .none)
     }
     
     func detailViewController(_ detailViewController: DetailViewController, removeFromFavoriteButtonDidTouchFor selectedPodcast: Podcast) {
         delegate?.searchViewControllerDidSelectFavoriteStar(self, podcast: selectedPodcast)
-//        podcastTableView.reloadRows(at: [indexPath], with: .none)
     }
 }
 

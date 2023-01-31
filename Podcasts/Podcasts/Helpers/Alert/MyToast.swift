@@ -72,18 +72,18 @@ class MyToast: UITextView {
 
 
 enum LocationOfPost: CGFloat {
-    case top = 30
+    case top = 4
     case center = 2
-    case bottom = 150
-    case bottomWithPlayer = 200
+    case bottom = 180
+    case bottomWithPlayer = 220
     
     func createCGRect(for bounds: CGRect) -> CGRect {
         var y: CGFloat = 0
         switch self {
-        case .top:              y = self.rawValue
+        case .top:              y = self.rawValue + (UIApplication.shared.windows.first?.safeAreaInsets.top ?? 0)
         case .center:           y = bounds.height / self.rawValue
-        case .bottom:           y = bounds.height - self.rawValue
-        case .bottomWithPlayer: y = bounds.height - self.rawValue
+        case .bottom:           y = (UIApplication.shared.windows.first?.safeAreaInsets.bottom ?? 0) + bounds.height - self.rawValue
+        case .bottomWithPlayer: y = (UIApplication.shared.windows.first?.safeAreaInsets.bottom ?? 0) + bounds.height - self.rawValue
         }
         return CGRect(x: 50, y: y, width: bounds.size.width - 100, height: 50)
     }

@@ -42,6 +42,7 @@ class PreLoaderViewController: UIViewController {
         
         if userViewModel.userDocument.user.isAuthorization {
             Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { _ in
+                UIApplication.shared.windows.first?.rootViewController = self.tabBarVC
                 self.present(self.tabBarVC, animated: true)
             }
         } else {
@@ -51,9 +52,11 @@ class PreLoaderViewController: UIViewController {
                 vc.configure(userViewModel: self.userViewModel)
                 vc.modalPresentationStyle = .custom
                 vc.transitioningDelegate = self
+                UIApplication.shared.windows.first?.rootViewController = vc
                 self.present(vc, animated: false)
             }
         }
+        NetworkMonitior.shared.starMonitor()
     }
 }
 

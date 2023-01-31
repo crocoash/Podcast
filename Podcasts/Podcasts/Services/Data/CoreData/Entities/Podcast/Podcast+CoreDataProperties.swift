@@ -2,7 +2,7 @@
 //  Podcast+CoreDataProperties.swift
 //  Podcasts
 //
-//  Created by Anton on 25.04.2022.
+//  Created by Anton on 16.01.2023.
 //
 //
 
@@ -44,9 +44,35 @@ extension Podcast {
     @NSManaged public var trackTimeMillis: NSNumber?
     @NSManaged public var trackViewUrl: String?
     @NSManaged public var wrapperType: String?
+    @NSManaged public var favoritePodcast: FavoritePodcast?
+    @NSManaged public var likedMoment: LikedMoment?
 
 }
 
 extension Podcast : Identifiable {
 
+
+    static var podcasts: [Podcast] { viewContext.fetchObjects(self) }
+    
+    static func delete(_ podcast: Podcast) {
+        viewContext.delete(podcast)
+    }
+    
+    //MARK: - Common
+    static func isDownload(_ podcast: Podcast) -> Bool {
+        guard let url = podcast.previewUrl.localPath else { return false }
+        return FileManager.default.fileExists(atPath: url.path)
+    }
+    
+    static func getOrCreatePodcast(podcast: Podcast) -> Podcast {
+        if let findSavePodcast = podcasts.first(matching: podcast.id) {
+            return findSavePodcast
+        }
+        return Podcast(podcast: podcast)
+    }
+    
+    static func remove(_ podcast: Podcast) {
+        viewContext.myDelete(podcast)
+        viewContext.mySave()
+    }
 }

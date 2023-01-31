@@ -10,6 +10,8 @@ import CoreData
 class DataStoreManager {
     
     static var shared: DataStoreManager = DataStoreManager()
+    lazy var viewContext = persistentContainer.viewContext
+    
     private init() {}
     
     private(set) var persistentContainer: NSPersistentContainer = {
@@ -21,18 +23,4 @@ class DataStoreManager {
         })
         return container
     }()
-
-    lazy private(set) var viewContext: NSManagedObjectContext = persistentContainer.viewContext
-    
-    func fetchObjectsOf<T>(_ type: T.Type) -> [T] where T: NSManagedObject {
-      let fetchRequest = NSFetchRequest<T>(entityName: T.entityName)
-      var objects: [T] = []
-      do {
-        objects = try viewContext.fetch(fetchRequest)
-      } catch {
-        print(error.localizedDescription)
-      }
-      
-      return objects
-    }
 }

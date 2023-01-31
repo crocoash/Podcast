@@ -16,7 +16,7 @@ class UserViewModel {
     }
     
     init() {
-       userDocument =  UserDocument(json: UserDefaults.standard.data(forKey: String(describing: Self.self))) ?? UserDocument()
+       userDocument = UserDocument(json: UserDefaults.standard.data(forKey: String(describing: Self.self))) ?? UserDocument()
     }
     
     func changeUserName(newName: String) {

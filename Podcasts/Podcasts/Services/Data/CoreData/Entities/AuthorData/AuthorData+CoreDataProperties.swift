@@ -17,7 +17,6 @@ extension AuthorData {
 
     @NSManaged public var resultCount: Int32
     @NSManaged public var results: NSSet
-
 }
 
 // MARK: Generated accessors for results

@@ -70,7 +70,7 @@ extension DetailViewController {
     private func setupView(){
         removeFromPlaylistBookmark.isHidden = true
         removeFromPlaylistBookmark.isUserInteractionEnabled = false
-        DataProvider().downloadImage(string: podcast.artworkUrl600) { [weak self] image in
+        DataProvider.shared.downloadImage(string: podcast.artworkUrl600) { [weak self] image in
             self?.episodeImage.image = image
         }
         

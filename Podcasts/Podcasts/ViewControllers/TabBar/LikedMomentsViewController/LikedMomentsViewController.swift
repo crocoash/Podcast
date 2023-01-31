@@ -23,37 +23,38 @@ class LikedMomentsViewController: UIViewController {
     private var tableViewBottomConstraintConstant: CGFloat = 0
     weak var delegate: LikedMomentsViewControllerDelegate?
     
+    private var playerIsSHidden = true {
+        didSet {
+            tableViewBottomConstraintConstant = playerIsSHidden ? 0 : 50
+            tableViewBottomConstraint?.constant = tableViewBottomConstraintConstant
+        }
+    }
+    
     //MARK: - View Methods
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.register(PodcastCell.self)
         tableView.rowHeight = cellHeight
         tableViewBottomConstraint.constant = tableViewBottomConstraintConstant
+        LikedMoment.likedMomentFRC.delegate = self
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         tableView.reloadData()
-        LikedMomentsManager.shared.likedMomentFRC.delegate = self
-        reloadData()
-    }
-    
-    //MARK: - Public Method
-    func reloadData() {
-        tableView?.reloadData()
         showEmptyImage()
     }
     
-    func playerIsShow() {
-        tableViewBottomConstraintConstant = 50
-        tableViewBottomConstraint?.constant = tableViewBottomConstraintConstant
+    //MARK: - Methods
+    func playerIsHidden(_ bool: Bool) {
+        playerIsSHidden = bool
     }
 }
 
 extension LikedMomentsViewController {
     
     private func showEmptyImage() {
-        let likeMomentsIsEmpty = LikedMomentsManager.shared.podcast.isEmpty
+        let likeMomentsIsEmpty = LikedMoment.isEmpty
         emptyDataImage?.isHidden = !likeMomentsIsEmpty
         tableView?.isHidden = likeMomentsIsEmpty
     }
@@ -63,14 +64,13 @@ extension LikedMomentsViewController {
 extension LikedMomentsViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        delegate?.likedMomentViewController(self, didSelectMomentAt: indexPath.row, likedMoments: LikedMomentsManager.shared.podcast)
+        delegate?.likedMomentViewController(self, didSelectMomentAt: indexPath.row, likedMoments: LikedMoment.likedMoments)
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            LikedMomentsManager.shared.deleteMoment(at: indexPath)
-            FirebaseDatabase.shared.saveLikedMoment()
-            reloadData()
+            let moment = LikedMoment.getLikedMoment(at: indexPath)
+            LikedMoment.delete(moment)
         }
     }
 }
@@ -79,11 +79,11 @@ extension LikedMomentsViewController: UITableViewDelegate {
 extension LikedMomentsViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return LikedMomentsManager.shared.countOfLikeMoments
+        return LikedMoment.countOfLikedMoments
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let likedMoment = LikedMomentsManager.shared.getLikeMoment(at: indexPath)
+        let likedMoment = LikedMoment.getLikedMoment(at: indexPath)
         let cell = tableView.getCell(cell: PodcastCell.self, indexPath: indexPath)
         cell.configureCell(with: likedMoment.podcast)
         return cell
@@ -94,11 +94,41 @@ extension LikedMomentsViewController: UITableViewDataSource {
 extension LikedMomentsViewController: NSFetchedResultsControllerDelegate {
     
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        guard let indexPath = indexPath else { return }
+        
         switch type {
-        case .delete:
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        default: break
+        case .delete :
+            guard let indexPath = indexPath else { return }
+            tableView.deleteRows(at: [indexPath], with: .left)
+            let title = "podcast is removed from playlist"
+            MyToast.create(title: title, (playerIsSHidden ? .bottom : .bottomWithPlayer), for: view)
+            
+        case .insert :
+            if let newIndexPath = newIndexPath {
+                tableView.insertRows(at: [newIndexPath], with: .left)
+                let likedMoment = LikedMoment.likedMomentFRC.object(at: newIndexPath)
+                let name = likedMoment.podcast.trackName ?? ""
+                let title = "\(name) podcast is added to playlist"
+                MyToast.create(title: title, (playerIsSHidden ? .bottom : .bottomWithPlayer), for: view)
+            }
+            
+        case .move :
+            if let indexPath = indexPath {
+                tableView.deleteRows(at: [indexPath], with: .left)
+            }
+            if let newIndexPath = newIndexPath {
+                tableView.insertRows(at: [newIndexPath], with: .left)
+            }
+            
+        case .update :
+            if let indexPath = indexPath {
+                let podcast = LikedMoment.getLikedMoment(at: indexPath).podcast
+                if let cell = tableView.cellForRow(at: indexPath) as? PodcastCell {
+                    cell.configureCell(with: podcast)
+                }
+            }
+            
+        default : break
         }
+        showEmptyImage()
     }
 }

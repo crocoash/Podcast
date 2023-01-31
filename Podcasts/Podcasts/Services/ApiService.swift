@@ -9,48 +9,28 @@ import Foundation
 import UIKit
 import CoreData
 
-enum Result<T> {
-    case success(result: T)
-    case failure(error: Error)
-}
-
 class ApiService {
     
-    static func getData<T: Decodable>(for string: String, completion: @escaping (T?) -> Void) {
-        getData(for: string) { (result: Result<T>) in
-            switch result {
-            case .success(let result):
-                completion(result)
-            case .failure(let error):
-                print("print mistake \(String(describing: error))")
-                completion(nil)
-            }
-        }
-    }
-    
-    private static func getData<T: Decodable>(for request: String, completion: @escaping (Result<T>) -> Void) {
+    static func getData<T: Decodable>(for request: String, completion: @escaping (Result<T>) -> Void) {
+        
         guard let url = URL(string: request.encodeUrl) else { fatalError() }
         
         let viewContext = DataStoreManager.shared.viewContext
         
         URLSession.shared.dataTask(with: url) { data, response, error in
-            var result: Result<T>
-            defer {
-                DispatchQueue.main.async {
-                    completion(result)
-                }
-            }
+            
             guard let data = data, response != nil, error == nil else {
-                result = .failure(error: error!)
+                completion(.failure(error: .error(error?.localizedDescription ?? "No Data" )))
                 return
             }
+            
             do {
                 let decoder = JSONDecoder(context: viewContext)
                 let value = try decoder.decode(T.self, from: data)
-                result = .success(result: value)
+                completion(.success(result: value))
                 
             } catch let error {
-                result = .failure(error: error)
+                completion(.failure(error: .error(error.localizedDescription)))
             }
         }.resume()
     }

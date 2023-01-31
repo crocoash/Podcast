@@ -12,3 +12,4 @@ struct User: Codable {
     var isAuthorization = false
     var userInterfaceStyleIsDark = true
 }
+

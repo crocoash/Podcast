@@ -206,6 +206,7 @@ extension RegistrationViewController {
             }
         } else {
             userViewModel.changeUserName(newName: email)
+            UIApplication.shared.windows.first?.rootViewController = tabBarVC
             present(tabBarVC, animated: true)
         }
     }

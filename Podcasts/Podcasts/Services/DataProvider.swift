@@ -9,9 +9,14 @@ import UIKit
 
 class DataProvider {
     
+    static var shared = DataProvider()
+    private init() { }
+    
     var imageCache = NSCache<NSString, UIImage>()
     
+    
     func downloadImage(string: String?, completion: @escaping (UIImage?) -> Void) {
+        
         guard let string = string,
               let url = URL(string: string) else { return }
         

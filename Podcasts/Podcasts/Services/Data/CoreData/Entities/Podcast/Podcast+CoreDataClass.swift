@@ -45,7 +45,7 @@ public class Podcast: NSManagedObject, Codable {
   required convenience public init(from decoder: Decoder) throws {
     
     self.init(entity: Self.entity(), insertInto: nil)
-
+    
     let container = try decoder.container(keyedBy: CodingKeys.self)
     
     previewUrl =            try container.decodeIfPresent(String.self, forKey: .previewUrl)
@@ -67,7 +67,8 @@ public class Podcast: NSManagedObject, Codable {
     releaseDate =           try container.decodeIfPresent(String.self, forKey: .releaseDate)
     shortDescriptionMy =    try container.decodeIfPresent(String.self, forKey: .shortDescriptionMy)
     feedUrl =               try container.decodeIfPresent(String.self, forKey: .feedUrl)
-    artistIds =             try container.decodeIfPresent([Int] .self, forKey: .artistIds)
+    artistIds =             container.contains(.artistIds) ? try container.decode([Int].self, forKey: .artistIds) : []
+    //    artistIds =             try container.decodeIfPresent([Int].self, forKey: .artistIds)
     closedCaptioning =      try container.decodeIfPresent(String.self, forKey: .closedCaptioning)
     country =               try container.decodeIfPresent(String.self, forKey: .country)
     descriptionMy =         try container.decodeIfPresent(String.self, forKey: .descriptionMy)
@@ -75,13 +76,10 @@ public class Podcast: NSManagedObject, Codable {
     kind =                  try container.decodeIfPresent(String.self, forKey: .kind)
     wrapperType =           try container.decodeIfPresent(String.self, forKey: .wrapperType)
   }
-
+  
   convenience init(podcast: Podcast) {
-    let viewContext = DataStoreManager.shared.viewContext
-
-    guard let entity = NSEntityDescription.entity(forEntityName: "Podcast", in: viewContext) else { fatalError() }
     
-    self.init(entity: entity, insertInto: viewContext)
+    self.init(entity: Self.entity(), insertInto: Self.viewContext)
     
     self.previewUrl =             podcast.previewUrl
     self.episodeFileExtension =   podcast.episodeFileExtension
@@ -110,7 +108,7 @@ public class Podcast: NSManagedObject, Codable {
     self.kind =                   podcast.kind
     self.wrapperType =            podcast.wrapperType
     
-    DataStoreManager.shared.viewContext.mySave()
+    Self.viewContext.mySave()
   }
   
   public func encode(to encoder: Encoder) throws {
@@ -142,17 +140,5 @@ public class Podcast: NSManagedObject, Codable {
     try container.encode(episodeGuid,               forKey: .episodeGuid)
     try container.encode(kind,                      forKey: .kind)
     try container.encode(wrapperType,               forKey: .wrapperType)
-  }
-}
-
-extension Podcast {
-  
-  static func getOrCreatePodcast(podcast: Podcast) -> Podcast {
-    if let podcasts = try? viewContext.fetch(Podcast.fetchRequest()) {
-      if let findsavePodcast = podcasts.first(matching: podcast.id) {
-        return findsavePodcast
-      }
-    }
-    return Podcast(podcast: podcast)
   }
 }

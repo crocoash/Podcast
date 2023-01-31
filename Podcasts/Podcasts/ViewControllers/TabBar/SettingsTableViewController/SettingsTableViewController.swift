@@ -49,9 +49,15 @@ class SettingsTableViewController: UITableViewController {
     //MARK: - View Methods
     override func loadView() {
         super.loadView()
-        ApiService.getData(for: URLS.api.rawValue) { [weak self] (result: IpModel?) in
-            guard let ipData = result else { return }
-            self?.locationLabel.text = ipData.country + " " + ipData.city
+        ApiService.getData(for: URLS.api.rawValue) { [weak self] (result: Result<IpModel>) in
+            switch result {
+                
+            case .failure(error: let error):
+                error.showAlert(vc: self)
+                
+            case .success(result: let result) :
+                self?.locationLabel.text = result.country + " " + result.city
+            }
         }
     }
     
@@ -125,24 +131,15 @@ extension SettingsTableViewController {
     }
     
     private var selectedSegment: Int {
-        switch UserDefaults.Local.permissionNetworkName {
-        case "settings_mobile_network_wifi".localized:
+        if MobileNetwork.checkNetworkStatus(network: .wiFi) {
             return 0
-        case "settings_mobile_network_ask".localized:
+        } else if MobileNetwork.checkNetworkStatus(network: .alwaysAsk) {
             return 1
-        case "settings_mobile_network_allow".localized:
+        } else if MobileNetwork.checkNetworkStatus(network: .alwaysAllow) {
             return 2
-        default:
-            if MobileNetwork.checkNetworkStatus(network: .wiFi) {
-                return 0
-            } else if MobileNetwork.checkNetworkStatus(network: .alwaysAsk) {
-                return 1
-            } else if MobileNetwork.checkNetworkStatus(network: .alwaysAllow) {
-                return 2
-            } else {
-                MobileNetwork.configureNetworkPermission(network: .wiFi)
-                return 0
-            }
+        } else {
+            MobileNetwork.configureNetworkPermission(network: .wiFi)
+            return 0
         }
     }
 }

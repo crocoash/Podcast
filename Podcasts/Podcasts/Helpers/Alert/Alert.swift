@@ -27,8 +27,9 @@ class Alert {
     func create(title: String, withTimeIntervalToDismiss timeInterval: TimeInterval) {
         create(title: title, actions: nil)
         
-        Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: false) { [weak self] _ in
-            self?.delegate?.alertEndShow(self!)
+        Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: false) { _ in
+            let vc = UIApplication.shared.windows.first?.rootViewController
+            vc?.dismiss(animated: true)
         }
     }
     
@@ -39,14 +40,19 @@ class Alert {
             alertController.addTextField { textfield in
                 configureTextField(textfield)
             }
+            
+            if let actions = actions {
+                if let textFields = alertController.textFields, !textFields.isEmpty, let text = textFields.first?.text {
+                    actions(text).forEach { alertController.addAction($0) }
+                }
+            }
+        } else {
+            if let actions = actions {
+                actions("").forEach { alertController.addAction($0) }
+            }
         }
-        
-        if let actions = actions {
-            guard let textFields = alertController.textFields, !textFields.isEmpty, let text = textFields.first?.text else { return }
-            actions(text).forEach { alertController.addAction($0) }
-        }
-        
-        delegate?.alertShouldShow(self, alertController: alertController)
-        
+                
+        let vc = UIApplication.shared.windows.first?.rootViewController
+        vc?.present(alertController, animated: true)
     }
 }

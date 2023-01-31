@@ -9,8 +9,8 @@ import CoreData
 
 extension NSManagedObject {
     
-    static var entityName: String { return String(describing: Self.self)  }
-    static var viewContext: NSManagedObjectContext { return DataStoreManager.shared.viewContext }
+    static var entityName: String { String(describing: Self.self)  }
+    static var viewContext: NSManagedObjectContext { DataStoreManager.shared.viewContext }
     
     static func saveContext() {
         viewContext.mySave()
@@ -25,15 +25,29 @@ extension NSManagedObject {
         Self.saveContext()
     }
     
-    static func fetchObjectsOf<T>(_ type: T.Type) -> [T] where T: NSManagedObject {
-      let fetchRequest = NSFetchRequest<T>(entityName: T.entityName)
-      var objects: [T] = []
-      do {
-          objects = try viewContext.fetch(fetchRequest)
-      } catch {
-        print(error.localizedDescription)
-      }
-      
-      return objects
-    }
+//    var fetchObjectsreturn: [Self] {
+//        let fetchRequest = NSFetchRequest<Self>(entityName: Self.entityName)
+//        var objects: [Self] = []
+//        do {
+//            objects = try Self.viewContext.fetch(fetchRequest)
+//        } catch {
+//            print(error.localizedDescription)
+//        }
+//
+//        return objects
+//    }
 }
+
+extension NSManagedObject {
+  var convert: [String: Any]? {
+    if let new = self as? Encodable {
+      if let data = try? JSONEncoder().encode(new) {
+        if let result = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any] {
+          return result
+        }
+      }
+    }
+    return nil
+  }
+}
+
