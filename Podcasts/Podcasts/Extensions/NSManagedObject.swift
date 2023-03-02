@@ -9,31 +9,50 @@ import CoreData
 
 extension NSManagedObject {
     
-    static var entityName: String { return String(describing: Self.self)  }
-    static var viewContext: NSManagedObjectContext { return DataStoreManager.shared.viewContext }
+    static var entityName: String { String(describing: Self.self)  }
+    static var viewContext: NSManagedObjectContext { DataStoreManager.shared.viewContext }
     
-    static func saveContext() {
-        viewContext.mySave()
+    func saveCoreData() {
+        Self.viewContext.mySave()
     }
     
-    static func removeAll() {
-        if let data = try? viewContext.fetch( NSFetchRequest<Self>(entityName: Self.entityName) ), !data.isEmpty {
-            data.forEach {
-                viewContext.delete($0)
-            }
+    func saveInit() {
+        saveCoreData()
+        if let self = self as? (any FirebaseProtocol) {
+            self.saveInFireBase()
         }
-        Self.saveContext()
     }
     
-    static func fetchObjectsOf<T>(_ type: T.Type) -> [T] where T: NSManagedObject {
-      let fetchRequest = NSFetchRequest<T>(entityName: T.entityName)
-      var objects: [T] = []
-      do {
-          objects = try viewContext.fetch(fetchRequest)
-      } catch {
-        print(error.localizedDescription)
-      }
-      
-      return objects
+    func myValidateDelete() {
+        Self.viewContext.myValidateDelete(self)
+    }
+    
+    func remove() {
+        if let self = self as? (any CoreDataProtocol), let self = self as? (any FirebaseProtocol)  {
+            let key = self.key
+            self.self.removeFromCoreData()
+            self.self.removeFromFireBase(key: key)
+        } else if let self = self as? (any CoreDataProtocol) {
+            self.removeFromCoreData()
+        } else {
+            
+        }
     }
 }
+
+extension NSManagedObject {
+  var convert: [String: Any]? {
+    if let self = self as? Encodable {
+      if let data = try? JSONEncoder().encode(self) {
+        if let result = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any] {
+          return result
+        }
+      }
+    }
+    return nil
+  }
+}
+
+
+
+

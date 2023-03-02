@@ -31,7 +31,9 @@ extension UserDefaults {
         
         static var askEverytime: Bool {
           get { return userDefaults.bool(forKey: Keys.askEverytime.rawValue) }
-          set { userDefaults.setValue(newValue, forKey: Keys.askEverytime.rawValue) }
+          set {
+              userDefaults.setValue(newValue, forKey: Keys.askEverytime.rawValue)
+          }
         }
         
         static var alwaysAllow: Bool {

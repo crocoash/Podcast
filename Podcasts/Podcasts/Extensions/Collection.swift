@@ -18,10 +18,14 @@ extension Collection where Element: Identifiable {
     }
     
     func firstIndex(matching id: Element.ID?) -> Bool {
-        return self.contains { $0.id == id}
+        return self.contains { $0.id == id }
     }
     
     func first(matching id: Element.ID?) -> Element? {
         return self.filter { $0.id == id }.first
+    }
+    
+    func first(matching element: Element) -> Element? {
+        return self.filter { $0.id == element.id }.first
     }
 }

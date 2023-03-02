@@ -28,7 +28,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             print("Setting category to AVAudioSessionCategoryPlayback failed.")
         }
         initialConfigurations()
-        FirebaseApp.configure()
         application.beginReceivingRemoteControlEvents()
         becomeFirstResponder()
         return true
@@ -54,5 +53,6 @@ extension AppDelegate {
     
     private func initialConfigurations() {
         setupFirstMobileAllowWiFi()
+        FirebaseApp.configure()
     }
 }

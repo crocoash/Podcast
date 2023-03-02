@@ -10,8 +10,11 @@ import Foundation
 extension URL {
     
     var localPath: URL {
-        let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        return documentsPath.appendingPathComponent(self.lastPathComponent)
+        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!.appendingPathComponent(self.lastPathComponent)
+    }
+    
+    var isDownLoad: Bool {
+        FileManager.default.fileExists(atPath: self.path)
     }
 }
 
