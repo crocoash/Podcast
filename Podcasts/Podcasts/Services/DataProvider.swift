@@ -42,3 +42,12 @@ class DataProvider {
         }
     }
 }
+
+//
+//extension String {
+//    var getImage: UIImage? {
+//        DataProvider.shared.downloadImage(string: self) {
+//            return $0
+//        }
+//    }
+//}

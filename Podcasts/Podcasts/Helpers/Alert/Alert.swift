@@ -16,24 +16,23 @@ class Alert {
     
     weak var delegate: AlertDelegate?
     
-    func create(title: String?, message: String?, actions: ((String) -> [UIAlertAction])? ) {
-        create(title: title, message: message, actions: actions, configureTextField: nil)
+    func create(for vc: UIViewController, title: String?, message: String?, actions: ((String) -> [UIAlertAction])? ) {
+        create(for: vc, title: title, message: message, actions: actions, configureTextField: nil)
     }
     
-    func create( title: String, actions: ((String) -> [UIAlertAction])? ) {
-        create(title: title, message: nil, actions: actions)
+    func create(for vc: UIViewController, title: String, actions: ((String) -> [UIAlertAction])? ) {
+        create(for: vc, title: title, message: nil, actions: actions)
     }
     
-    func create(title: String, withTimeIntervalToDismiss timeInterval: TimeInterval) {
-        create(title: title, actions: nil)
+    func create(vc: UIViewController, title: String, withTimeIntervalToDismiss timeInterval: TimeInterval) {
+        create(for: vc, title: title, actions: nil)
         
         Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: false) { _ in
-            let vc = UIApplication.shared.windows.first?.rootViewController
-            vc?.dismiss(animated: true)
+            vc.dismiss(animated: true)
         }
     }
     
-    func create(title: String?, message: String?, actions: ((String) -> ([UIAlertAction]))?, configureTextField: ((UITextField) -> Void)?) {
+    func create(for vc: UIViewController, title: String?, message: String?, actions: ((String) -> ([UIAlertAction]))?, configureTextField: ((UITextField) -> Void)?) {
         let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
         
         if let configureTextField = configureTextField {
@@ -52,7 +51,6 @@ class Alert {
             }
         }
                 
-        let vc = UIApplication.shared.windows.first?.rootViewController
-        vc?.present(alertController, animated: true)
+        vc.present(alertController, animated: true)
     }
 }

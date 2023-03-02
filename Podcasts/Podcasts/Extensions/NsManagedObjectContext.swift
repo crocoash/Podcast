@@ -13,7 +13,7 @@ extension NSManagedObjectContext {
             do {
                 try self.save()
             } catch {
-                print("print mySave\(error.localizedDescription)")
+                print("print mySave \(error)")
             }
         }
     }
@@ -30,7 +30,7 @@ extension NSManagedObjectContext {
         return objects
     }
     
-    func myDelete(_ object: NSManagedObject) {
+    func myValidateDelete(_ object: NSManagedObject) {
         do {
             try object.validateForDelete()
             self.delete(object)

@@ -47,17 +47,9 @@ class MyToast: UITextView {
                         _ location: LocationOfPost,
                                                 animateWithDuration: TimeInterval = 0.3,
                         timerToRemove: TimeInterval = 3,
-                        for myView: UIView? = nil)
+                        for view: UIView)
     {
-        
-        let view: UIView
-        
-        if let myView = myView {
-            view = myView
-        } else {
-            guard let myView = UIApplication.shared.windows.first?.rootViewController?.view else { return }
-            view = myView
-        }
+      
         let toast = MyToast(title: title, location: location, for: view.bounds)
         
         UIView.animate(withDuration: animateWithDuration) {

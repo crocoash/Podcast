@@ -19,18 +19,27 @@ class ApiService {
         
         URLSession.shared.dataTask(with: url) { data, response, error in
             
+            var result: Result<T>
+            
+            defer {
+                DispatchQueue.main.async {
+                    completion(result)
+                }
+            }
+            
             guard let data = data, response != nil, error == nil else {
-                completion(.failure(error: .error(error?.localizedDescription ?? "No Data" )))
+                result = .failure(error: .error(error?.localizedDescription ?? "No Data" ))
                 return
             }
             
             do {
                 let decoder = JSONDecoder(context: viewContext)
                 let value = try decoder.decode(T.self, from: data)
-                completion(.success(result: value))
+                result = .success(result: value)
                 
             } catch let error {
-                completion(.failure(error: .error(error.localizedDescription)))
+                print(error)
+                result = .failure(error: .error(error.localizedDescription.debugDescription))
             }
         }.resume()
     }

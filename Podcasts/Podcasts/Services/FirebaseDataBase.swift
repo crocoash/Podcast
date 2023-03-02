@@ -27,11 +27,11 @@ class FirebaseDatabase {
       userStorage.child(T.entityName).child(key).setValue(serialization)
    }
    
-   func remove<T: NSManagedObject>(object: T, key: String) {
+   func remove<T: NSManagedObject>(object: T.Type, key: String) {
       userStorage.child(T.entityName).child(key).removeValue()
    }
    
-   func update<T: Decodable & NSManagedObject>( completion: @escaping (Result<[T]>) -> Void) {
+   func update<T: Decodable & NSManagedObject>(completion: @escaping (Result<[T]>) -> Void) {
       userStorage.child(T.entityName).getData { [weak self] error, snapShot in
          
          guard error == nil, let value = snapShot.value, !(snapShot.value is NSNull), let self = self else {
@@ -55,25 +55,37 @@ class FirebaseDatabase {
       }
    }
    
-   func observe<T: NSManagedObject & Decodable>(add: @escaping (T) -> Void, remove: @escaping (T) -> Void) {
+   func observe<T: NSManagedObject & Decodable>(add: @escaping (Result<T>) -> Void, remove: @escaping (Result<T>) -> Void) {
       
       Database.database().isPersistenceEnabled = true
       
-      connectedRef.observe(.value) { [weak self] snapshot in
+      connectedRef.observe(.value) { [weak self] snapsdhot in
          
-         if snapshot.value as? Bool ?? false {
+         if snapsdhot.value as? Bool ?? false {
             
             guard let self = self else { return }
             
+            ///childAdded
             self.userStorage.child(T.entityName).observe(.childAdded) { [weak self] snapShot in
-               self?.obtain(snapshot: snapShot) { (object: T) in
-                  add(object)
+               self?.obtain(snapshot: snapShot) { (result: Result<T>) in
+                  switch result {
+                  case .success(result: let object):
+                     add(.success(result: object))
+                  case .failure(error: let error) :
+                     add(.failure(error: error))
+                  }
                }
             }
             
+            ///childRemoved
             self.userStorage.child(T.entityName).observe(.childRemoved) { [weak self] snapShot in
-               self?.obtain(snapshot: snapShot) { (object: T) in
-                  remove(object)
+               self?.obtain(snapshot: snapShot) { (result: Result<T>) in
+                  switch result {
+                  case .success(result: let object):
+                     remove(.success(result: object))
+                  case .failure(error: let error) :
+                     remove(.failure(error: error))
+                  }
                }
             }
          }
@@ -86,14 +98,14 @@ protocol FireBaseProtocol: Decodable { }
 // MARK: - Private Methods
 extension FirebaseDatabase {
    
-   private func obtain<T: Decodable>(snapshot: DataSnapshot, completion: @escaping (T) -> Void) {
+   private func obtain<T: Decodable>(snapshot: DataSnapshot, completion: @escaping (Result<T>) -> Void) {
       guard let value = snapshot.value else { return }
       if let data = try? JSONSerialization.data(withJSONObject: value, options: .fragmentsAllowed) {
          do {
             let result = try JSONDecoder(context: self.viewContext).decode(T.self, from: data)
-            completion(result)
-         } catch {
-            print("print \(error)")
+            completion(.success(result: result))
+         } catch let error {
+            completion(.failure(error: .error(error.localizedDescription)))
          }
       }
    }

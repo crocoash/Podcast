@@ -11,7 +11,7 @@ import AVKit
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
-    var videoViewController: PlayerViewController? = nil
+    var videoViewController: Player? = nil
     var avPlayerSavedReference: AVPlayer? = nil
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
@@ -20,13 +20,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     func sceneDidEnterBackground(_ scene: UIScene) {
       if let videoViewController = videoViewController {
-        avPlayerSavedReference = videoViewController.player
+        avPlayerSavedReference = videoViewController.playerAVP
       }
     }
     
     func sceneWillEnterForeground(_ scene: UIScene) {
         if let videoViewController = videoViewController, let avPlayerSavedReference = avPlayerSavedReference {
-            videoViewController.setPlayer(player: avPlayerSavedReference)
+//            videoViewController.setPlayer(player: avPlayerSavedReference)
             self.avPlayerSavedReference = nil 
         }
     }
