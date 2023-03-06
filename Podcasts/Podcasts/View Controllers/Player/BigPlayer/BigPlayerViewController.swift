@@ -53,6 +53,7 @@ class BigPlayerViewController: UIViewController {
     private var pauseImage = UIImage(systemName: "pause.fill")!
     private var playImage = UIImage(systemName: "play.fill")!
     private var bigPlayerPlayableProtocol: BigPlayerPlayableProtocol!
+    
     //MARK: View Methods
     override func viewDidLoad() {
         super.viewDidLoad()

@@ -8,6 +8,14 @@
 import UIKit
 
 extension UIViewController {
+    
+    static var identifier: String {
+        return "\(Self.self)"
+    }
+}
+
+extension UIView {
+    
     static var identifier: String {
         return "\(Self.self)"
     }

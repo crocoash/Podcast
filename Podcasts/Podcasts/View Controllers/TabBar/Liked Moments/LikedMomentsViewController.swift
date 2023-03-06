@@ -47,7 +47,7 @@ class LikedMomentsViewController: UIViewController {
     
     //MARK: - Methods
     func updateConstraintForTableView(playerIsPresent value: Bool) {
-        playerIsSHidden = value
+        playerIsSHidden = !value
     }
 }
 

@@ -47,7 +47,7 @@ class SearchViewController : UIViewController {
     
     //MARK: - Methods
     func updateConstraintForTableView(playerIsPresent value: Bool) {
-        playerIsSHidden = value
+        playerIsSHidden = !value
     }
     
     func updateDownloadInformation(progress: Float, totalSize: String, podcast: Podcast) {
