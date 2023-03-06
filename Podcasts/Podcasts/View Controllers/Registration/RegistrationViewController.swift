@@ -24,7 +24,7 @@ class RegistrationViewController: UIViewController {
     private(set) var userViewModel: UserViewModel!
     
     lazy private var tabBarVC: TabBarViewController = {
-        let vc = TabBarViewController.initVC
+        let vc = TabBarViewController.loadFromStoryboard
         vc.modalPresentationStyle = .custom
         vc.setUserViewModel(userViewModel)
         vc.transitioningDelegate = self

@@ -12,25 +12,20 @@ class TabBarViewController: UITabBarController {
     private var trailConstraint: NSLayoutConstraint?
     private var leadConstraint: NSLayoutConstraint?
     
-    lazy private var constraintsSmallPlayer: [NSLayoutConstraint] = [
-        smallPlayer.view.heightAnchor.constraint(equalToConstant: 50),
-        smallPlayer.view.widthAnchor.constraint(equalTo: view.widthAnchor),
-        smallPlayer.view.bottomAnchor.constraint(equalTo: tabBar.topAnchor)
-    ]
-    
     lazy private var player: Player = {
         $0.delegate = self
         return $0
     }(Player())
     
-    lazy private var imageView: UIImageView =  {
+    private var imageView: UIImageView =  {
         $0.image = UIImage(named: "decree")
         $0.isHidden = true
         $0.translatesAutoresizingMaskIntoConstraints = false
         return $0
     }(UIImageView())
     
-    private var smallPlayer = SmallPlayerViewController()
+    let smallPlayer = SmallPlayerViewController()
+    
     private var userViewModel: UserViewModel!
     private let firestorageDatabase = FirestorageDatabase()
     
@@ -55,8 +50,8 @@ class TabBarViewController: UITabBarController {
         $0.transitioningDelegate = self
         $0.modalPresentationStyle = .custom
         return $0
-    }(DetailViewController.initVC)
-
+    }(DetailViewController.loadFromStoryboard)
+    
     private var bigPlayerVc: BigPlayerViewController?
     
     //MARK: - METHODS
@@ -67,12 +62,147 @@ class TabBarViewController: UITabBarController {
     // MARK: - View Methods
     override func viewDidLoad() {
         super.viewDidLoad()
+        configureView()
+        fireBase()
+    }
+}
+
+//MARK: - Private methods
+extension TabBarViewController {
+    
+    private func feedbackGenerator() {
+        let feedbackGenerator = UIImpactFeedbackGenerator()
+        feedbackGenerator.prepare()
+        feedbackGenerator.impactOccurred()
+    }
+    
+    private func addOrRemoveFavoritePodcast(podcast: Podcast) {
+        podcast.addOrRemoveToFavorite()
+        if podcast.stateOfDownload == .isDownload { downloadService.cancelDownload(podcast) }
+        feedbackGenerator()
+    }
+    
+    private func downloadOrRemovePodcast(for vc: UIViewController, _ entity: DownloadServiceProtocol, completion: @escaping () -> Void) {
+        switch entity.stateOfDownload {
+            
+        case .notDownloaded:
+            downloadService.startDownload(vc: vc, entity)
+            
+        case .isDownloading:
+            self.downloadService.pauseDownload(entity)
+            Alert().create(for: vc, title: "Do you want cancel downloading ?") { [weak self] _ in
+                [UIAlertAction(title: "Yes", style: .default) { [weak self] _ in
+                    self?.downloadService.cancelDownload(entity)
+                    completion()
+                }, UIAlertAction(title: "Continue", style: .default) { [weak self] _ in
+                    self?.downloadService.continueDownload(entity)
+                    completion()
+                }]
+            }
+            
+        case .isDownload:
+            Alert().create(for: vc, title: "Do you want remove podcast from your device?") { [weak self] _ in
+                [UIAlertAction(title: "yes", style: .destructive) { [weak self] _ in
+                    self?.downloadService.cancelDownload(entity)
+                    completion()
+                }, UIAlertAction(title: "Cancel", style: .cancel) { _ in
+                    completion()
+                }
+                ]
+            }
+        }
+        
+        feedbackGenerator()
+    }
+    
+    private func startPlay(track: InputPlayerProtocol, at moment: Double? = nil, playlist: [InputPlayerProtocol]) {
+        player.startPlay(track: track, playList: playlist, at: moment)
+        playerIsPresent(true)
+    }
+    
+    private func playerIsPresent(_ value: Bool) {
+        smallPlayer.isHidden = !value
+        favoritePodcastVC.updateConstraintForTableView(playerIsPresent: value)
+        searchVC.updateConstraintForTableView(playerIsPresent: value)
+        likedMomentVc.updateConstraintForTableView(playerIsPresent: value)
+        detailViewController.updateConstraintForTableView(playerIsPresent: value)
+    }
+    
+    private func presentDetailViewController(podcast: Podcast, completion: (() -> Void)? = nil) {
+        if detailViewController.podcast == podcast {
+            self.present(self.detailViewController, animated: true, completion: completion)
+        } else {
+            guard let id = podcast.collectionId?.stringValue else { return }
+            ApiService.getData(for: DinamicLinkManager.podcastById(id).url) { [weak self] (result : Result<PodcastData>) in
+                guard let self = self else { return }
+                switch result {
+                case .failure(error: let error):
+                    error.showAlert(vc: self)
+                case .success(result: let podcastData) :
+                    let podcasts = podcastData.podcasts.filter { $0.wrapperType == "podcastEpisode"}
+                    self.detailViewController.setUp(podcast: podcast, playlist: podcasts)
+                    self.present(self.detailViewController,animated: true, completion: completion)
+                }
+            }
+        }
+    }
+    
+    private func presentBigPlayer() {
+        self.bigPlayerVc = configureBigPlayer()
+        guard let bigPlayerVc = bigPlayerVc else { return }
+        present(bigPlayerVc, animated: true)
+        self.bigPlayerVc?.setUpUI(with: player)
+    }
+    
+    //MARK: configureView
+    private func configureTabBar() {
+        viewControllers = [favoritePodcastVC, searchVC, likedMomentVc, settingsVC]
+    }
+    
+    private func createTabBar<T: UIViewController>(_ type: T.Type, title: String, imageName: String, completion: ((T) -> Void)? = nil) -> T {
+        
+        let vc = T.loadFromStoryboard
+        vc.tabBarItem.title = title
+        vc.tabBarItem.image = UIImage(systemName: imageName)
+        
+        completion?(vc)
+        return vc
+    }
+
+    private func configureSmallPlayer() {
+        view.addSubview(smallPlayer)
+        smallPlayer.delegate = self
+        smallPlayer.isHidden = true
+        smallPlayer.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        smallPlayer.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
+        smallPlayer.bottomAnchor.constraint(equalTo: tabBar.topAnchor).isActive = true
+    }
+    
+    private func configureImageDarkMode() {
+        view.addSubview(imageView)
+        imageView.heightAnchor.constraint(equalToConstant: 200).isActive = true
+        imageView.widthAnchor.constraint(equalToConstant: 200).isActive = true
+        trailConstraint = imageView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -54)
+        leadConstraint = imageView.trailingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0)
+        leadConstraint?.isActive = true
+        imageView.topAnchor.constraint(equalTo: view.topAnchor, constant: 200).isActive = true
+    }
+
+    private func configureView() {
         configureTabBar()
         configureSmallPlayer()
-        presentPlayer(for: self)
         configureImageDarkMode()
         downloadService.configureURLSession(delegate: self)
-        
+    }
+    
+    private func configureBigPlayer() -> BigPlayerViewController {
+        let bigPlayerVC = BigPlayerViewController.loadFromXib
+        bigPlayerVC.delegate = self
+        bigPlayerVC.modalPresentationStyle = .fullScreen
+        return bigPlayerVC
+    }
+    
+    private func fireBase() {
         ///FavoritePodcast
         FirebaseDatabase.shared.observe(
             add: { [weak self] (result: Result<FavoritePodcast>) in
@@ -127,144 +257,6 @@ class TabBarViewController: UITabBarController {
     }
 }
 
-//MARK: - Private methods
-extension TabBarViewController {
-    
-    private func configureTabBar() {
-        viewControllers = [favoritePodcastVC, searchVC, likedMomentVc, settingsVC]
-    }
-    
-    private func createTabBar<T: UIViewController>(_ type: T.Type, title: String, imageName: String, completion: ((T) -> Void)? = nil) -> T {
-        
-        let vc = T.initVC
-        vc.tabBarItem.title = title
-        vc.tabBarItem.image = UIImage(systemName: imageName)
-        
-        completion?(vc)
-        return vc
-    }
-    
-    private func configureSmallPlayer() {
-        //        smallPlayer.view.isHidden = true
-        smallPlayer.view.layer.borderColor = UIColor.gray.cgColor
-        smallPlayer.view.layer.borderWidth = 0.3
-        smallPlayer.view.layer.shadowRadius = 3
-        smallPlayer.view.layer.shadowColor = UIColor.black.cgColor
-        smallPlayer.view.layer.shadowOpacity = 1
-        smallPlayer.view.layer.shadowOffset = .zero
-        smallPlayer.delegate = self
-        player.smallPlayerDelegate = self
-        //        addChild(smallPlayer)
-        smallPlayer.view.translatesAutoresizingMaskIntoConstraints = false
-    }
-    
-    private func presentPlayer(for vc: UIViewController) {
-        vc.addChild(smallPlayer)
-        vc.view.addSubview(smallPlayer.view)
-        NSLayoutConstraint.activate(constraintsSmallPlayer)
-    }
-    
-    private func configureImageDarkMode() {
-        view.addSubview(imageView)
-        imageView.heightAnchor.constraint(equalToConstant: 200).isActive = true
-        imageView.widthAnchor.constraint(equalToConstant: 200).isActive = true
-        trailConstraint = imageView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -54)
-        leadConstraint = imageView.trailingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0)
-        leadConstraint?.isActive = true
-        imageView.topAnchor.constraint(equalTo: view.topAnchor, constant: 200).isActive = true
-    }
-    
-    private func feedbackGenerator() {
-        let feedbackGenerator = UIImpactFeedbackGenerator()
-        feedbackGenerator.prepare()
-        feedbackGenerator.impactOccurred()
-    }
-    
-    private func addOrRemoveFavoritePodcast(podcast: Podcast) {
-        podcast.addOrRemoveToFavorite()
-        if podcast.stateOfDownload == .isDownload { downloadService.cancelDownload(podcast) }
-        feedbackGenerator()
-    }
-    
-    private func downloadOrRemovePodcast(for vc: UIViewController, _ entity: DownloadServiceProtocol, completion: @escaping () -> Void) {
-        switch entity.stateOfDownload {
-            
-        case .notDownloaded:
-            downloadService.startDownload(vc: vc, entity)
-            
-        case .isDownloading:
-            self.downloadService.pauseDownload(entity)
-            Alert().create(for: vc, title: "Do you want cancel downloading ?") { [weak self] _ in
-                [UIAlertAction(title: "Yes", style: .default) { [weak self] _ in
-                    self?.downloadService.cancelDownload(entity)
-                    completion()
-                }, UIAlertAction(title: "Continue", style: .default) { [weak self] _ in
-                    self?.downloadService.continueDownload(entity)
-                    completion()
-                }]
-            }
-            
-        case .isDownload:
-            Alert().create(for: vc, title: "Do you want remove podcast from your device?") { [weak self] _ in
-                [UIAlertAction(title: "yes", style: .destructive) { [weak self] _ in
-                    self?.downloadService.cancelDownload(entity)
-                    completion()
-                }, UIAlertAction(title: "Cancel", style: .cancel) { _ in
-                    completion()
-                }
-                ]
-            }
-        }
-        
-        feedbackGenerator()
-    }
-    
-    private func startPlay(track: InputPlayerProtocol, at moment: Double? = nil, playlist: [InputPlayerProtocol]) {
-        player.startPlay(track: track, playList: playlist, at: moment)
-        playerIsHidden(false)
-    }
-    
-    private func playerIsHidden(_ value: Bool) {
-        smallPlayer.view.isHidden = value
-        favoritePodcastVC.updateConstraintForTableView(playerIsPresent: value)
-        searchVC.updateConstraintForTableView(playerIsPresent: value)
-        likedMomentVc.updateConstraintForTableView(playerIsPresent: value)
-    }
-    
-    private func presentDetailViewController(podcast: Podcast, completion: (() -> Void)? = nil) {
-        if detailViewController.podcast == podcast {
-            self.present(self.detailViewController, animated: true, completion: completion)
-        } else {
-            guard let id = podcast.collectionId?.stringValue else { return }
-            ApiService.getData(for: DinamicLinkManager.podcastById(id).url) { [weak self] (result : Result<PodcastData>) in
-                guard let self = self else { return }
-                switch result {
-                case .failure(error: let error):
-                    error.showAlert(vc: self)
-                case .success(result: let podcastData) :
-                    let podcasts = podcastData.podcasts.filter { $0.wrapperType == "podcastEpisode"}
-                    self.detailViewController.setUp(podcast: podcast, playlist: podcasts)
-                    self.present(self.detailViewController,animated: true, completion: completion)
-                }
-            }
-        }
-    }
-    
-    private func presentBigPlayer() {
-        self.bigPlayerVc = configureBigPlayer()
-        guard let bigPlayerVc = bigPlayerVc else { return }
-        present(bigPlayerVc, animated: true)
-        self.bigPlayerVc?.setUpUI(with: player)
-    }
-    
-    private func configureBigPlayer() -> BigPlayerViewController {
-        let bigPlayerVC = BigPlayerViewController.loadFromXib()
-        bigPlayerVC.delegate = self
-        bigPlayerVC.modalPresentationStyle = .fullScreen
-        return bigPlayerVC
-    }
-}
-
 // MARK: - PlaylistTableViewControllerDelegate
 extension TabBarViewController: FavoritePodcastViewControllerDelegate {
     
@@ -273,7 +265,7 @@ extension TabBarViewController: FavoritePodcastViewControllerDelegate {
     }
     
     func favoritePodcastTableViewControllerDidSelectDownLoadImage(_ favoritePodcastTableViewController: FavoritePodcastTableViewController, podcast: Podcast) {
-        //        downloadOrRemovePodcast(for: favoritePodcastTableViewController, podcast, completion: completion)
+//        downloadOrRemovePodcast(for: favoritePodcastTableViewController, podcast, completion: completion)
     }
     
     func favoritePodcastTableViewControllerDidSelectStar(_ favoritePodcastTableViewController: FavoritePodcastTableViewController, podcast: Podcast) {
@@ -287,6 +279,7 @@ extension TabBarViewController: FavoritePodcastViewControllerDelegate {
 
 // MARK: - SearchViewControllerDelegate
 extension TabBarViewController: SearchViewControllerDelegate {
+    
     func searchViewControllerDidSelectCell(_ searchViewController: SearchViewController, podcast: Podcast) {
         presentDetailViewController(podcast: podcast)
     }
@@ -308,13 +301,12 @@ extension TabBarViewController: SearchViewControllerDelegate {
 extension TabBarViewController: SettingsTableViewControllerDelegate {
     
     func settingsTableViewControllerDidAppear(_ settingsTableViewController: SettingsTableViewController) {
-//        presentPlayer(for: settingsTableViewController)
-        self.smallPlayer.view.isHidden = true
+        self.smallPlayer.isHidden = true
     }
     
     func settingsTableViewControllerDidDisappear(_ settingsTableViewController: SettingsTableViewController) {
         if self.player.currentTrack != nil {
-            self.smallPlayer.view.isHidden = false
+            self.smallPlayer.isHidden = false
         }
     }
 }
@@ -455,7 +447,16 @@ extension TabBarViewController: BigPlayerViewControllerDelegate {
 // MARK: - DetailViewControllerDelegate
 extension TabBarViewController : DetailViewControllerDelegate {
     
+    func detailViewControllerPlayStopButtonDidTouchInSmallPlayer(_ detailViewController: DetailViewController) {
+        player.playOrPause()
+    }
+    
+    func detailViewControllerDidSwipeOnPlayer(_ detailViewController: DetailViewController) {
+        presentBigPlayer()
+    }
+    
     func detailViewControllerPlayButtonDidTouchFor(_ detailViewController: DetailViewController, podcast: Podcast, at moment: Double?, playlist: [Podcast]) {
+        playerIsPresent(true)
         startPlay(track: podcast, at: moment, playlist: playlist)
     }
     
@@ -478,6 +479,7 @@ extension TabBarViewController : DetailViewControllerDelegate {
 
 //MARK: - UIViewControllerTransitioningDelegate
 extension TabBarViewController: UIViewControllerTransitioningDelegate {
+    
     func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         return PresentTransition()
     }

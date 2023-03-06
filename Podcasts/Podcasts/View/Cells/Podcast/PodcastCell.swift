@@ -29,17 +29,17 @@ class PodcastCell: UITableViewCell {
     @IBOutlet private weak var downLoadImageView:     UIImageView!
     @IBOutlet private weak var playStopButton:        UIImageView!
 
-    @IBOutlet private weak var podcastName:       UILabel!
-    @IBOutlet private weak var downloadProgressLabel:     UILabel!
-    @IBOutlet private weak var podcastDescription:UILabel!
-    @IBOutlet private weak var trackDuration:     UILabel!
-    @IBOutlet private weak var dateLabel:         UILabel!
+    @IBOutlet private weak var podcastName:           UILabel!
+    @IBOutlet private weak var downloadProgressLabel: UILabel!
+    @IBOutlet private(set) weak var podcastDescription:    UILabel!
+    @IBOutlet private weak var trackDuration:         UILabel!
+    @IBOutlet private weak var dateLabel:             UILabel!
     
     @IBOutlet private weak var downloadActivityIndicator: UIActivityIndicatorView!
     @IBOutlet private weak var playerActivityIndicator:   UIActivityIndicatorView!
     
     @IBOutlet private weak var listeningProgressView: UIProgressView!
-    @IBOutlet private weak var downloadProgressView: UIProgressView!
+    @IBOutlet private weak var downloadProgressView:  UIProgressView!
 
     private let pauseImage = UIImage(systemName: "pause.circle.fill")!
     private let playImage = UIImage(systemName: "play.circle.fill")!
@@ -203,9 +203,12 @@ extension PodcastCell {
     private func configure(with podcast: Podcast) {
         self.podcast = podcast
         configureGestures()
-        dateLabel.text = podcast.formattedDate(dateFormat: "d MMM YYY") 
+        dateLabel.text = podcast.formattedDate(dateFormat: "d MMM YYY")
         trackDuration.text = podcast.trackTimeMillis?.minute
         podcastDescription.text = podcast.descriptionMy
+//        if isSelected {
+            podcastDescription.numberOfLines = podcastDescription.maxNumberOfLines
+//        }
         podcastName.text = podcast.trackName
         setListeningProgressView(progress: podcast.progress)
         setFavoriteStarImage(podcast: podcast)

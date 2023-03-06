@@ -22,14 +22,14 @@ class PreLoaderViewController: UIViewController {
         $0.transitioningDelegate = self
         $0.setUserViewModel(userViewModel)
         return $0
-    }(TabBarViewController.initVC)
+    }(TabBarViewController.loadFromStoryboard)
     
     lazy private var registrationVC: RegistrationViewController =  {
         $0.configure(userViewModel: self.userViewModel)
         $0.modalPresentationStyle = .custom
         $0.transitioningDelegate = self
         return $0
-    }(RegistrationViewController.initVC)
+    }(RegistrationViewController.loadFromStoryboard)
     
     //MARK: - ViewMethods
     

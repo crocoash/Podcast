@@ -9,15 +9,11 @@ import UIKit
 
 extension UIView {
     
-    func loadFromNib() {
+    func loadFromXib() {
         let bundle = Bundle(for: Self.self)
-        let nib = UINib(nibName: "\(Self.self)", bundle: bundle)
+        let nib = UINib(nibName: Self.identifier, bundle: bundle)
         let view = nib.instantiate(withOwner: self, options: nil).first as! UIView
         view.frame = bounds
         addSubview(view)
-    }
-    
-    func loadFromNib<T: UIView>() -> T {
-        return Bundle.main.loadNibNamed(String(describing: T.self), owner: nil, options: nil)!.first as! T
     }
 }

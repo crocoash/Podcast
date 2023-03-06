@@ -55,7 +55,7 @@ class Player {
     private var observe: Any?
     
     weak var delegate: PlayerDelegate?
-    weak var smallPlayerDelegate: PlayerDelegate?
+//    weak var smallPlayerDelegate: PlayerDelegate?
     
     private(set) var isPlaying = false {
         didSet {

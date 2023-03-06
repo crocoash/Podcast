@@ -45,8 +45,8 @@ class FavoritePodcastTableViewController: UIViewController {
     }
     
     //MARK: Public Methods
-    func updateConstraintForTableView(playerIsPresent bool: Bool) {
-        playerIsSHidden = bool
+    func updateConstraintForTableView(playerIsPresent value: Bool) {
+        playerIsSHidden = !value
     }
     
     /// Download

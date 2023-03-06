@@ -6,9 +6,6 @@
 //
 
 import UIKit
-import AVFoundation
-import CoreData
-import MediaPlayer
 
 protocol SmallPlayerViewControllerDelegate: AnyObject {
     func smallPlayerViewControllerSwipeOrTouch(_ smallPlayerViewController: SmallPlayerViewController)
@@ -22,7 +19,8 @@ protocol SmallPlayerPlayableProtocol {
     var isPlaying: Bool { get }
 }
 
-class SmallPlayerViewController: UIViewController {
+@IBDesignable
+class SmallPlayerViewController: UIView {
     
     @IBOutlet private weak var playPauseButton: UIButton!
     @IBOutlet private weak var trackImageView: UIImageView!
@@ -30,7 +28,7 @@ class SmallPlayerViewController: UIViewController {
     @IBOutlet private weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet private weak var progressView: UIProgressView!
     
-    //MARK: - Settings
+    //MARK: Settings
     private var pauseImage = UIImage(systemName: "pause.fill")!
     private var playImage = UIImage(systemName: "play.fill")!
     weak var delegate: SmallPlayerViewControllerDelegate?
@@ -58,14 +56,22 @@ class SmallPlayerViewController: UIViewController {
         progressView.progress = Float(player.progress ?? 0)
     }
     
-    // MARK: - View Methods
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    // MARK: - Init
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        loadFromXib()
+        configureView()
+        configureGesture()
+    }
+    
+    required init?(coder: NSCoder) {
+      super.init(coder: coder)
+        loadFromXib()
+        configureView()
         configureGesture()
     }
     
     // MARK: - Actions
-    
     @IBAction func playOrPause() {
         delegate?.smallPlayerViewControllerDidTouchPlayStopButton(self)
     }
@@ -77,6 +83,16 @@ class SmallPlayerViewController: UIViewController {
 
 //MARK: - Private methods
 extension SmallPlayerViewController {
+
+    private func configureView() {
+        layer.borderColor = UIColor.gray.cgColor
+        layer.borderWidth = 0.3
+        layer.shadowRadius = 3
+        layer.shadowColor = UIColor.black.cgColor
+        layer.shadowOpacity = 1
+        layer.shadowOffset = .zero
+        translatesAutoresizingMaskIntoConstraints = false
+    }
     
     private func configureGesture() {
         addMyGestureRecognizer(self, type: .swipe(directions: [.up]), #selector(respondToSwipeOrTouch))

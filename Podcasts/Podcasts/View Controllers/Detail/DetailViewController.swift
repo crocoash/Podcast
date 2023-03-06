@@ -9,13 +9,15 @@ import UIKit
 
 protocol DetailViewControllerDelegate: AnyObject {
     func detailViewControllerPlayButtonDidTouchFor(_ detailViewController: DetailViewController, podcast: Podcast, at moment: Double?, playlist: [Podcast])
+    func detailViewControllerPlayStopButtonDidTouchInSmallPlayer(_ detailViewController: DetailViewController)
+    func detailViewControllerDidSwipeOnPlayer(_ detailViewController: DetailViewController)
     func detailViewControllerStopButtonDidTouchFor(_ detailViewController: DetailViewController, podcast: Podcast)
     func detailViewController(_ detailViewController: DetailViewController, addToFavoriteButtonDidTouchFor podcast: Podcast)
     func detailViewController(_ detailViewController: DetailViewController, removeFromFavoriteButtonDidTouchFor selectedPodcast: Podcast)
     func detailViewControllerDidSelectDownLoadImage(_ detailViewController: DetailViewController, podcast: Podcast, completion: @escaping () -> Void)
 }
 
-protocol DetailPlayableProtocol: PodcastCellPlayableProtocol {
+protocol DetailPlayableProtocol: PodcastCellPlayableProtocol, SmallPlayerPlayableProtocol {
     var id: NSNumber? { get }
     var isPlaying: Bool { get }
     var progress: Double? { get }
@@ -33,6 +35,8 @@ class DetailViewController: UIViewController {
     @IBOutlet private weak var dateLabel          : UILabel!
     @IBOutlet private weak var genresLabel        : UILabel!
     
+    @IBOutlet private(set) weak var smallPlayerView: SmallPlayerViewController!
+    
     @IBOutlet private weak var descriptionTextView: UITextView!
 
     @IBOutlet private weak var episodeImage              : UIImageView!
@@ -47,6 +51,7 @@ class DetailViewController: UIViewController {
 
     @IBOutlet private weak var heightTableViewConstraint: NSLayoutConstraint!
     
+    @IBOutlet weak var bottomPlayerConstraint: NSLayoutConstraint!
     //MARK: Variables
     private(set) var podcast : Podcast? {
         didSet {
@@ -69,18 +74,8 @@ class DetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureGestures()
-        episodeTableView.register(PodcastCell.self)
         setupView()
-//        let popUpButtonClosure = { (action: UIAction) in
-//            print("Pop-up action")
-//        }
-//
-//        if #available(iOS 14.0, *) {
-//
-//            let children = Genre.allObjectsFromCoreData.compactMap { createSortChildMenu(genre: $0)}
-//            self.sortButton.menu = UIMenu(children:  children.isEmpty ? [] : children)
-//            self.sortButton.showsMenuAsPrimaryAction = true
-//        }
+        smallPlayerView.delegate = self
     }
     
     //MARK: Public Methods
@@ -98,6 +93,31 @@ class DetailViewController: UIViewController {
         return UIAction(title: genre.name ?? "" , handler: popUpButtonClosure)
     }
     
+    func updateConstraintForTableView(playerIsPresent: Bool) {
+        smallPlayerView.isHidden = !playerIsPresent
+        bottomPlayerConstraint.constant = playerIsPresent ? 50 : 0
+    }
+    
+    func setupView() {
+        episodeImage.image = nil
+        DataProvider.shared.downloadImage(string: podcast?.image600) { [weak self] image in
+            self?.episodeImage.image = image
+        }
+        heightTableViewConstraint.constant =  1000 //CGFloat(playlist.count) * episodeTableView.rowHeight
+        updateBookMark()
+        episodeName.text = podcast?.trackName
+        artistName.text = podcast?.artistName
+        genresLabel.text = podcast?.genresString
+        descriptionTextView.text = playlist[0].descriptionMy
+        countryLabel.text = podcast?.country
+        advisoryRatingLabel.text = podcast?.contentAdvisoryRating
+        dateLabel.text = podcast?.releaseDateInformation?.formattedDate(dateFormat: "d MMM YYY")
+        
+///        DateFormatter().date(from: <#T##String#>)
+        durationLabel.text = podcast?.trackTimeMillis?.minute
+    }
+    
+    ///BigPlayer
     func setOffsetForBigPlayer(id: NSNumber?) {
         guard let cell = getCell(id: id) ,let indexPath = episodeTableView.indexPath(for: cell) else { return }
         let yPositionCell = episodeTableView.rectForRow(at: indexPath).origin.y
@@ -111,30 +131,35 @@ class DetailViewController: UIViewController {
     func playerEndPlay(player: DetailPlayableProtocol) {
         let id = player.id
         reloadCell(for: id)
+        
     }
     
     func playerIsGoingPlay(player: DetailPlayableProtocol) {
         let id = player.id
         let cell = getCell(id: id)
         cell?.playerIsGoingPlay(player: player)
+        smallPlayerView.playerIsGoingPlay(player: player)
     }
     
     func playerIsEndLoading(player: DetailPlayableProtocol) {
         let id = player.id
         let cell = getCell(id: id)
         cell?.playerIsEndLoading(player: player)
+        smallPlayerView.playerIsEndLoading(player: player)
     }
     
     func updateProgressView(player: DetailPlayableProtocol) {
         let id = player.id
         let cell = getCell(id: id)
         cell?.updateListeningProgressView(player: player)
+        smallPlayerView.updateProgressView(player: player)
     }
     
     func updatePlayStopButton(player: DetailPlayableProtocol) {
         let id = player.id
         let cell = getCell(id: id)
         cell?.updatePlayStopButton(player: player)
+        smallPlayerView.setPlayStopButton(player: player)
     }
     
     //MARK: Downloading
@@ -189,25 +214,6 @@ extension DetailViewController {
         return nil
     }
     
-    func setupView() {
-        episodeImage.image = nil
-        DataProvider.shared.downloadImage(string: podcast?.image600) { [weak self] image in
-            self?.episodeImage.image = image
-        }
-        heightTableViewConstraint.constant =  1000//CGFloat(playlist.count) * episodeTableView.rowHeight
-        updateBookMark()
-        episodeName.text = podcast?.trackName
-        artistName.text = podcast?.artistName
-        genresLabel.text = podcast?.genresString
-        descriptionTextView.text = playlist[0].descriptionMy
-        countryLabel.text = podcast?.country
-        advisoryRatingLabel.text = podcast?.contentAdvisoryRating
-        dateLabel.text = podcast?.releaseDateInformation?.formattedDate(dateFormat: "d MMM YYY")
-        
-///        DateFormatter().date(from: <#T##String#>)
-        durationLabel.text = podcast?.trackTimeMillis?.minute
-    }
-    
     private func configureGestures() {
         backImageView             .addMyGestureRecognizer(self, type: .tap(),                                               #selector(backAction))
         removeFromPlaylistBookmark.addMyGestureRecognizer(self, type: .tap(),                                               #selector(removeBookmarkOnTouchUpInside))
@@ -254,15 +260,10 @@ extension DetailViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if selectedCell.contains(where: { indexPath == $0 }) {
-            return 300
+            return UITableView.automaticDimension
         }
         return 100
     }
-    
-//    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
-//        print("print 4\(indexPath)")
-//        return 100
-//    }
 }
 
 //MARK: - PodcastCellDelegate
@@ -287,11 +288,15 @@ extension DetailViewController: PodcastCellDelegate {
         guard let podcast = getPodcast(podcastCell) else { return }
         
         delegate?.detailViewControllerDidSelectDownLoadImage(self, podcast: podcast) {
+            
             switch podcast.stateOfDownload {
+                
             case .isDownload:
                 podcastCell.endDownloading()
+                
             case .notDownloaded:
                 podcastCell.removePodcastFromDownloads()
+                
             case .isDownloading:
                 podcastCell.startDownloading()
             }
@@ -299,28 +304,16 @@ extension DetailViewController: PodcastCellDelegate {
     }
 }
 
-
-//extension String {
-//    var releaseDate: String {
-//        let index = "\(self[1] + self[0])"
-//        return Month[index].rawvalue
-//    }
-//
-//    enum Month: String, CaseIterable {
-//        case january
-//        case fabruary
-//        case march
-//        case april
-//        case may
-//        case june
-//        case july
-//        case augest
-//        case september
-//        case october
-//        case november
-//        case december
-//    }
-//}
+extension DetailViewController: SmallPlayerViewControllerDelegate {
+    
+    func smallPlayerViewControllerSwipeOrTouch(_ smallPlayerViewController: SmallPlayerViewController) {
+        delegate?.detailViewControllerDidSwipeOnPlayer(self)
+    }
+    
+    func smallPlayerViewControllerDidTouchPlayStopButton(_ smallPlayerViewController: SmallPlayerViewController) {
+        delegate?.detailViewControllerPlayStopButtonDidTouchInSmallPlayer(self)
+    }
+}
 
 extension NSNumber {
     var minute: String {
