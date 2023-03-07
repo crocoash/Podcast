@@ -50,8 +50,8 @@ class DetailViewController: UIViewController {
     @IBOutlet private weak var episodeTableView: UITableView!
 
     @IBOutlet private weak var heightTableViewConstraint: NSLayoutConstraint!
+    @IBOutlet private weak var bottomPlayerConstraint:    NSLayoutConstraint!
     
-    @IBOutlet weak var bottomPlayerConstraint: NSLayoutConstraint!
     //MARK: Variables
     private(set) var podcast : Podcast? {
         didSet {
@@ -61,10 +61,21 @@ class DetailViewController: UIViewController {
         }
     }
     
-    private var selectedCell: [IndexPath] = [] {
+    private let heightCell: CGFloat = 100
+    
+    private var selectedCell: [IndexPath: CGFloat] = [:] {
         didSet {
-            episodeTableView.reloadRows(at: selectedCell, with: .automatic)
+            let allIndexPath = Array(selectedCell.keys)
+            episodeTableView.reloadRows(at: allIndexPath, with: .automatic)
         }
+    }
+    
+    private func reloadTableView() {
+        let allHeight = Array(selectedCell.values)
+        let offSet = allHeight.reduce(into: CGFloat.zero) { $0 += $1 - 100 }
+        let heightOfTableView = CGFloat(playlist.count) * heightCell + offSet
+        heightTableViewConstraint.constant = heightOfTableView
+        episodeTableView.layoutIfNeeded()
     }
     
     private(set) var playlist: [Podcast] = []
@@ -103,7 +114,7 @@ class DetailViewController: UIViewController {
         DataProvider.shared.downloadImage(string: podcast?.image600) { [weak self] image in
             self?.episodeImage.image = image
         }
-        heightTableViewConstraint.constant =  1000 //CGFloat(playlist.count) * episodeTableView.rowHeight
+        heightTableViewConstraint.constant = CGFloat(playlist.count) * heightCell
         updateBookMark()
         episodeName.text = podcast?.trackName
         artistName.text = podcast?.artistName
@@ -246,20 +257,29 @@ extension DetailViewController: UITableViewDataSource {
         cell.configureCell(self, with: podcast)
         return cell
     }
+    
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        let offset = tableView.rectForRow(at: indexPath).height
+        if selectedCell[indexPath] != nil {
+            selectedCell[indexPath] = offset
+            reloadTableView()
+        }
+    }
 }
 
 extension DetailViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if selectedCell.contains(where: { indexPath == $0 }), let index = selectedCell.firstIndex(of: indexPath) {
-            selectedCell.remove(at: index)
+        if selectedCell[indexPath] == nil {
+            selectedCell[indexPath] = 0
         } else {
-            selectedCell.append(indexPath)
+            selectedCell[indexPath] = nil
+            reloadTableView()
         }
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if selectedCell.contains(where: { indexPath == $0 }) {
+        if selectedCell[indexPath] != nil {
             return UITableView.automaticDimension
         }
         return 100
