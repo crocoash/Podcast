@@ -39,7 +39,7 @@ public class LikedMoment: NSManagedObject, Codable {
     convenience init(podcast: Podcast, moment: Double) {
         self.init(entity: Self.entity(), insertInto: Self.viewContext)
         self.moment = moment
-        self.podcast = podcast.getFromCoreDataIfNoSavedNew()
+        self.podcast = podcast.getFromCoreDataIfNoSavedNew
         
         saveInit()
     }
@@ -68,59 +68,59 @@ extension LikedMoment {
     
     var key: String { "\(podcast.id ?? 0)" }
     
-    
     static func getLikedMoment(at indexPath: IndexPath) -> LikedMoment {
         return likedMomentFRC.object(at: indexPath)
     }
 }
 
 
-//MARK: - fffffffffff
+//MARK: - CoreDataProtocol
 extension LikedMoment: CoreDataProtocol {
+    
+    typealias T = LikedMoment
     
     static var allObjectsFromCoreData: [LikedMoment] {
         viewContext.fetchObjects(Self.self)
     }
-        
-    func getFromCoreDataIfNoSavedNew() -> LikedMoment {
-        return getFromCoreData() ?? LikedMoment(podcast: podcast, moment: moment)
+    
+    var getFromCoreData: LikedMoment? {
+        return Self.allObjectsFromCoreData.filter { $0.podcast.id == podcast.id && $0.moment == moment }.first
     }
     
+    var getFromCoreDataIfNoSavedNew: LikedMoment {
+        return getFromCoreData ?? LikedMoment(podcast: podcast, moment: moment)
+    }
+   
     func saveInCoredataIfNotSaved() {
-        if getFromCoreData() == nil {
+        if getFromCoreData == nil {
             let podcast = podcast
             let moment = moment
             _ = LikedMoment(podcast: podcast, moment: moment)
         }
     }
     
-    func getFromCoreData() -> LikedMoment? {
-        return Self.allObjectsFromCoreData.filter { $0.podcast.id == id && $0.moment == moment }.first
+    func removeFromCoreDataWithOwnEntityRule() {
+        if let likedMoment = getFromCoreData {
+            let podcast = likedMoment.podcast
+            likedMoment.removeFromViewContext()
+            podcast.remove()
+        }
     }
     
-    func removeFromCoreData() {
-        guard let likedMoment = getFromCoreData() else { return }
-        let podcast = likedMoment.podcast
-        remove()
-        saveCoreData()
-        podcast.remove()
-    }
-    
-    static func removeAllFromCoreData() {
+    static func removeAll() {
         allObjectsFromCoreData.forEach {
-            $0.removeFromCoreData()
+            $0.remove()
         }
     }
 }
 
-
+//MARK: - FirebaseProtocol
 extension LikedMoment: FirebaseProtocol {
     
-    func saveInFireBase() { FirebaseDatabase.shared.add(object: self, key: key)
+    func saveInFireBase() {
+        FirebaseDatabase.shared.add(object: self, key: key)
     }
-    
-    typealias T = LikedMoment
-    
+       
     func removeFromFireBase(key: String) {
         FirebaseDatabase.shared.remove(object: Self.self, key: key)
     }
@@ -130,16 +130,17 @@ extension LikedMoment: FirebaseProtocol {
             switch result {
             case .failure(let error) :
                 if error == .noData {
-                    removeAllFromCoreData()
+                    removeAll()
+                    return
                 }
             case .success(let moments) :
-                
+
                 allObjectsFromCoreData.forEach {
-                    if $0.getFromCoreData() != nil {
-                        $0.removeFromCoreData()
+                    if $0.getFromCoreData != nil {
+                        $0.remove()
                     }
                 }
-                
+
                 moments.forEach {
                     $0.saveInCoredataIfNotSaved()
                 }
@@ -148,6 +149,3 @@ extension LikedMoment: FirebaseProtocol {
         }
     }
 }
-
-
-

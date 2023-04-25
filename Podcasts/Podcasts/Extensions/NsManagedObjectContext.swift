@@ -8,35 +8,24 @@
 import CoreData
 
 extension NSManagedObjectContext {
+    
     func mySave() {
         if self.hasChanges {
             do {
                 try self.save()
             } catch {
-                print("print mySave \(error)")
+                print(error)
             }
         }
     }
     
     func fetchObjects<T: NSManagedObject>(_ type: T.Type) -> [T] {
         let fetchRequest = NSFetchRequest<T>(entityName: T.entityName)
-        var objects: [T] = []
         do {
-            objects = try self.fetch(fetchRequest)
+             return try self.fetch(fetchRequest)
         } catch {
             print(error.localizedDescription)
         }
-        
-        return objects
-    }
-    
-    func myValidateDelete(_ object: NSManagedObject) {
-        do {
-            try object.validateForDelete()
-            self.delete(object)
-        } catch let error {
-            print("print \(error)")
-            print("print can not delete \(object)")
-        }
+        return []
     }
 }

@@ -51,7 +51,7 @@ class FavoritePodcastTableViewController: UIViewController {
     
     /// Download
     func updateDownloadInformation(progress: Float, totalSize: String, podcast: Podcast) {
-        guard let favoritePodcast = podcast.getFavoritePodcast(),
+        guard let favoritePodcast = podcast.getFavoritePodcast,
               let indexPath = favoritePodcast.getIndexPath,
               let podcastCell = tableView?.cellForRow(at: indexPath) as? PodcastCell
         else { return }
@@ -70,7 +70,6 @@ class FavoritePodcastTableViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         showEmptyImage()
-//        tableView.reloadData()
     }
     
     override func viewDidLoad() {
@@ -86,7 +85,7 @@ class FavoritePodcastTableViewController: UIViewController {
     
     //MARK: Actions
     @IBAction func removeAllAction(_ sender: UIButton) {
-        FavoritePodcast.removeAllFromCoreData()
+        FavoritePodcast.removeAll()
     }
     
     func tapCell(at indexPath: IndexPath) {

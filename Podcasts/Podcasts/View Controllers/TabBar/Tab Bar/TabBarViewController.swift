@@ -129,6 +129,7 @@ extension TabBarViewController {
     }
     
     private func presentDetailViewController(podcast: Podcast, completion: (() -> Void)? = nil) {
+        guard presentedViewController as? DetailViewController == nil else { completion?(); return }
         if detailViewController.podcast == podcast {
             self.present(self.detailViewController, animated: true, completion: completion)
         } else {
@@ -141,16 +142,16 @@ extension TabBarViewController {
                 case .success(result: let podcastData) :
                     let podcasts = podcastData.podcasts.filter { $0.wrapperType == "podcastEpisode"}
                     self.detailViewController.setUp(podcast: podcast, playlist: podcasts)
-                    self.present(self.detailViewController,animated: true, completion: completion)
+                    self.present(self.detailViewController, animated: true, completion: completion)
                 }
             }
         }
     }
     
-    private func presentBigPlayer() {
+    private func presentBigPlayer(for vc: UIViewController) {
         self.bigPlayerVc = configureBigPlayer()
         guard let bigPlayerVc = bigPlayerVc else { return }
-        present(bigPlayerVc, animated: true)
+        vc.present(bigPlayerVc, animated: true)
         self.bigPlayerVc?.setUpUI(with: player)
     }
     
@@ -215,11 +216,19 @@ extension TabBarViewController {
             }, remove: { [weak self] (result: Result<FavoritePodcast>) in
                 switch result {
                 case .success(result: let favoritePodcast):
-                    favoritePodcast.removeFromCoreData()
+                    favoritePodcast.remove()
                 case .failure(error: let error):
                     error.showAlert(vc: self, tittle: "Can't remove FavoritePodcast")
                 }
             })
+        
+        FavoritePodcast.updateFromFireBase { [weak self] result in
+            switch result {
+            case .failure(error: let error) :
+                error.showAlert(vc: self)
+            default: break
+            }
+        }
         
         ///LikedMoment
         FirebaseDatabase.shared.observe(
@@ -233,20 +242,12 @@ extension TabBarViewController {
             }, remove: { [weak self] (result: Result<LikedMoment>) in
                 switch result {
                 case .success(result: let likedMoment):
-                    likedMoment.removeFromCoreData()
+                    likedMoment.remove()
                 case .failure(error: let error):
                     error.showAlert(vc: self, tittle: "Can't remove likedMoment")
                 }
             })
-        
-        FavoritePodcast.updateFromFireBase { [weak self] result in
-            switch result {
-            case .failure(error: let error) :
-                error.showAlert(vc: self)
-            default: break
-            }
-        }
-        
+
         LikedMoment.updateFromFireBase { [weak self] result in
             switch result {
             case .failure(error: let error) :
@@ -401,7 +402,7 @@ extension TabBarViewController: SmallPlayerViewControllerDelegate {
     }
     
     func smallPlayerViewControllerSwipeOrTouch(_ smallPlayerViewController: SmallPlayerViewController) {
-        presentBigPlayer()
+        presentBigPlayer(for: self)
     }
 }
 
@@ -412,7 +413,7 @@ extension TabBarViewController: BigPlayerViewControllerDelegate {
         guard let podcast = track as? Podcast else { return }
         bigPlayerViewController.dismiss(animated: true)
         presentDetailViewController(podcast: podcast) { [weak self] in
-            self?.detailViewController.setOffsetForBigPlayer(id: track?.id)
+            self?.detailViewController.scrollToCell(id: track?.id)
         }
     }
     
@@ -452,7 +453,7 @@ extension TabBarViewController : DetailViewControllerDelegate {
     }
     
     func detailViewControllerDidSwipeOnPlayer(_ detailViewController: DetailViewController) {
-        presentBigPlayer()
+        presentBigPlayer(for: detailViewController)
     }
     
     func detailViewControllerPlayButtonDidTouchFor(_ detailViewController: DetailViewController, podcast: Podcast, at moment: Double?, playlist: [Podcast]) {

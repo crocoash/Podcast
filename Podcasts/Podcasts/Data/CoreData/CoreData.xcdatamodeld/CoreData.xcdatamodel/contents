@@ -18,7 +18,7 @@
     <entity name="Genre" representedClassName="Genre" syncable="YES">
         <attribute name="id" optional="YES" attributeType="String"/>
         <attribute name="name" optional="YES" attributeType="String"/>
-        <relationship name="podcast" optional="YES" toMany="YES" deletionRule="Deny" destinationEntity="Podcast" inverseName="genres" inverseEntity="Podcast"/>
+        <relationship name="podcasts" optional="YES" toMany="YES" deletionRule="Deny" destinationEntity="Podcast" inverseName="genres" inverseEntity="Podcast"/>
     </entity>
     <entity name="LikedMoment" representedClassName=".LikedMoment" syncable="YES">
         <attribute name="moment" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
@@ -58,7 +58,7 @@
         <attribute name="trackViewUrl" optional="YES" attributeType="String"/>
         <attribute name="wrapperType" optional="YES" attributeType="String"/>
         <relationship name="favoritePodcast" optional="YES" maxCount="1" deletionRule="Deny" destinationEntity="FavoritePodcast" inverseName="podcast" inverseEntity="FavoritePodcast"/>
-        <relationship name="genres" optional="YES" toMany="YES" deletionRule="No Action" destinationEntity="Genre" inverseName="podcast" inverseEntity="Genre"/>
+        <relationship name="genres" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Genre" inverseName="podcasts" inverseEntity="Genre"/>
         <relationship name="likedMoment" optional="YES" toMany="YES" deletionRule="Deny" destinationEntity="LikedMoment" inverseName="podcast" inverseEntity="LikedMoment"/>
         <relationship name="listeningPodcast" optional="YES" maxCount="1" deletionRule="Deny" destinationEntity="ListeningPodcast" inverseName="podcast" inverseEntity="ListeningPodcast"/>
     </entity>

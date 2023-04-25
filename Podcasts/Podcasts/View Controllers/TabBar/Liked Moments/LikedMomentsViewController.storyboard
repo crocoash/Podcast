@@ -13,7 +13,7 @@
         <scene sceneID="wiw-iT-wZo">
             <objects>
                 <viewController storyboardIdentifier="LikedMomentsViewController" id="kUl-8K-gI8" customClass="LikedMomentsViewController" customModule="Podcasts" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="lqu-WF-Wpd" userLabel="EView">
+                    <view key="view" contentMode="scaleToFill" id="lqu-WF-Wpd">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
@@ -32,7 +32,13 @@
                             <navigationBar contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="S1B-6Q-U5h">
                                 <rect key="frame" x="0.0" y="48" width="414" height="44"/>
                                 <items>
-                                    <navigationItem title="Liked moment" id="Mga-Yg-hrc"/>
+                                    <navigationItem title="Liked moment" id="Mga-Yg-hrc">
+                                        <barButtonItem key="rightBarButtonItem" title="Remova all" id="ZeP-k6-tGE">
+                                            <connections>
+                                                <action selector="removeAll:" destination="kUl-8K-gI8" id="5N7-EK-85p"/>
+                                            </connections>
+                                        </barButtonItem>
+                                    </navigationItem>
                                 </items>
                             </navigationBar>
                         </subviews>

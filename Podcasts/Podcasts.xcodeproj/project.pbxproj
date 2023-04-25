@@ -89,6 +89,11 @@
 		3A6EC24329A7A01400383D12 /* CoreDataProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A6EC24229A7A01400383D12 /* CoreDataProtocol.swift */; };
 		3A6EC24C29B5361600383D12 /* UILabel + maxNumberOfLines.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A6EC24B29B5361500383D12 /* UILabel + maxNumberOfLines.swift */; };
 		3AA59DC528142C0D00FF2D19 /* FirebaseDataBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA59DC428142C0D00FF2D19 /* FirebaseDataBase.swift */; };
+		3AA82D1E29EAB5CC00557A94 /* NsNumber + minute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA82D1D29EAB5CC00557A94 /* NsNumber + minute.swift */; };
+		3AA82D2029EAB9E500557A94 /* Dictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA82D1F29EAB9E500557A94 /* Dictionary.swift */; };
+		3AA82D2229EABEFA00557A94 /* Int.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA82D2129EABEFA00557A94 /* Int.swift */; };
+		3AA82D2429EAC50C00557A94 /* HeaderForPodcastTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA82D2329EAC50C00557A94 /* HeaderForPodcastTableView.swift */; };
+		3AA82D2729EAC55100557A94 /* HeaderForPodcastTableView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3AA82D2629EAC55100557A94 /* HeaderForPodcastTableView.xib */; };
 		3AA99B582966E4A300721136 /* PodcastDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA99B572966E4A300721136 /* PodcastDocument.swift */; };
 		3AB5ECEA2803650300EB445A /* String+FormaterDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AB5ECE92803650300EB445A /* String+FormaterDate.swift */; };
 		3ABCCC3427FD71CC00862AF2 /* AuthorData+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ABCCC3327FD71CC00862AF2 /* AuthorData+CoreDataClass.swift */; };
@@ -186,6 +191,11 @@
 		3A6EC24229A7A01400383D12 /* CoreDataProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataProtocol.swift; sourceTree = "<group>"; };
 		3A6EC24B29B5361500383D12 /* UILabel + maxNumberOfLines.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UILabel + maxNumberOfLines.swift"; sourceTree = "<group>"; };
 		3AA59DC428142C0D00FF2D19 /* FirebaseDataBase.swift */ = {isa = PBXFileReference; indentWidth = 3; lastKnownFileType = sourcecode.swift; path = FirebaseDataBase.swift; sourceTree = "<group>"; tabWidth = 4; };
+		3AA82D1D29EAB5CC00557A94 /* NsNumber + minute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NsNumber + minute.swift"; sourceTree = "<group>"; };
+		3AA82D1F29EAB9E500557A94 /* Dictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dictionary.swift; sourceTree = "<group>"; };
+		3AA82D2129EABEFA00557A94 /* Int.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Int.swift; sourceTree = "<group>"; };
+		3AA82D2329EAC50C00557A94 /* HeaderForPodcastTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderForPodcastTableView.swift; sourceTree = "<group>"; };
+		3AA82D2629EAC55100557A94 /* HeaderForPodcastTableView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = HeaderForPodcastTableView.xib; sourceTree = "<group>"; };
 		3AA99B572966E4A300721136 /* PodcastDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastDocument.swift; sourceTree = "<group>"; };
 		3AB5ECE92803650300EB445A /* String+FormaterDate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+FormaterDate.swift"; sourceTree = "<group>"; };
 		3ABCCC3327FD71CC00862AF2 /* AuthorData+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AuthorData+CoreDataClass.swift"; sourceTree = "<group>"; };
@@ -322,6 +332,7 @@
 		184CE18F27271D8D0088044C /* View */ = {
 			isa = PBXGroup;
 			children = (
+				3AA82D2829EAC74B00557A94 /* Headers */,
 				3FBCF1BF272847E400B70522 /* Cells */,
 			);
 			path = View;
@@ -405,22 +416,25 @@
 		189C1FAB272D337100A8480E /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				189C1FAC272D496F00A8480E /* UIViewController + identifier.swift */,
-				18FFCA5927D602EF0078CB3F /* UIViewController + loadFromXib .swift */,
-				189C1FBB272EE6F100A8480E /* UIView + loadFromNib.swift */,
-				189C1FA9272D336500A8480E /* UITableView + register.swift */,
 				189C1FB1272D876B00A8480E /* Collection.swift */,
-				3A632652281DAF6A005FFB08 /* formated.swift */,
-				3A6EC24B29B5361500383D12 /* UILabel + maxNumberOfLines.swift */,
-				1888C2AE2739A8CF00395B5B /* URL + localPath.swift */,
-				045628242732EA370044878C /* String + conform.swift */,
-				3AB5ECE92803650300EB445A /* String+FormaterDate.swift */,
 				181F5BE127E72E3700AC27EB /* CoreData.swift */,
-				3A69EA0028B2557500241414 /* UserDefaults.swift */,
-				3A69EA0528B26E2800241414 /* String.swift */,
+				3AA82D1F29EAB9E500557A94 /* Dictionary.swift */,
+				3A632652281DAF6A005FFB08 /* formated.swift */,
+				3A41942929881A0300D59AA4 /* MyError.swift */,
 				3A69EA0728B2B09200241414 /* NSManagedObject.swift */,
 				3A69EA0928B2B9C600241414 /* NsManagedObjectContext.swift */,
-				3A41942929881A0300D59AA4 /* MyError.swift */,
+				3AA82D1D29EAB5CC00557A94 /* NsNumber + minute.swift */,
+				045628242732EA370044878C /* String + conform.swift */,
+				3AA82D2129EABEFA00557A94 /* Int.swift */,
+				3A69EA0528B26E2800241414 /* String.swift */,
+				3AB5ECE92803650300EB445A /* String+FormaterDate.swift */,
+				3A6EC24B29B5361500383D12 /* UILabel + maxNumberOfLines.swift */,
+				189C1FA9272D336500A8480E /* UITableView + register.swift */,
+				189C1FBB272EE6F100A8480E /* UIView + loadFromNib.swift */,
+				189C1FAC272D496F00A8480E /* UIViewController + identifier.swift */,
+				18FFCA5927D602EF0078CB3F /* UIViewController + loadFromXib .swift */,
+				1888C2AE2739A8CF00395B5B /* URL + localPath.swift */,
+				3A69EA0028B2557500241414 /* UserDefaults.swift */,
 			);
 			name = Extensions;
 			path = ../Extensions;
@@ -624,6 +638,15 @@
 			path = Entities;
 			sourceTree = "<group>";
 		};
+		3AA82D2829EAC74B00557A94 /* Headers */ = {
+			isa = PBXGroup;
+			children = (
+				3AA82D2329EAC50C00557A94 /* HeaderForPodcastTableView.swift */,
+				3AA82D2629EAC55100557A94 /* HeaderForPodcastTableView.xib */,
+			);
+			path = Headers;
+			sourceTree = "<group>";
+		};
 		3FBCF1BF272847E400B70522 /* Cells */ = {
 			isa = PBXGroup;
 			children = (
@@ -709,6 +732,7 @@
 				18FFCA5227D553B70078CB3F /* SettingsTableViewController.storyboard in Resources */,
 				0457FB1D272F1ECC00D57280 /* SmallPlayerViewController.xib in Resources */,
 				18FFCA4A27D548AE0078CB3F /* DetailViewController.storyboard in Resources */,
+				3AA82D2729EAC55100557A94 /* HeaderForPodcastTableView.xib in Resources */,
 				049D47E52726E05F00B6DA3C /* Assets.xcassets in Resources */,
 				18FFCA5827D556BB0078CB3F /* PreLoaderViewController.storyboard in Resources */,
 				18FFCA5027D54A450078CB3F /* LikedMomentsViewController.storyboard in Resources */,
@@ -790,6 +814,7 @@
 				3A04BB08299A1E9600338919 /* Genre+CoreDataClass.swift in Sources */,
 				1855934727380C270012BA91 /* AuthService.swift in Sources */,
 				187B2B3E2732C11000C3EFFF /* UserViewModel.swift in Sources */,
+				3AA82D2029EAB9E500557A94 /* Dictionary.swift in Sources */,
 				189C1FBC272EE6F100A8480E /* UIView + loadFromNib.swift in Sources */,
 				184CE18927270C8D0088044C /* ApiService.swift in Sources */,
 				1828F9BB2738798F00761CD5 /* DataProvider.swift in Sources */,
@@ -833,13 +858,16 @@
 				1831DEDB2731944600EC09E2 /* DismissTransition.swift in Sources */,
 				189C1FAA272D336500A8480E /* UITableView + register.swift in Sources */,
 				3A63266528211CD0005FFB08 /* FavoritePodcast+CoreDataClass.swift in Sources */,
+				3AA82D1E29EAB5CC00557A94 /* NsNumber + minute.swift in Sources */,
 				3A1928772970A5590087A2C9 /* NetworkMonitor.swift in Sources */,
 				1831DED12730560D00EC09E2 /* DownloadService.swift in Sources */,
 				189C1FB2272D876B00A8480E /* Collection.swift in Sources */,
 				3AC5839D299141B30042DDC5 /* Player.swift in Sources */,
 				049D47DE2726E05B00B6DA3C /* SceneDelegate.swift in Sources */,
+				3AA82D2429EAC50C00557A94 /* HeaderForPodcastTableView.swift in Sources */,
 				3ABCCC3427FD71CC00862AF2 /* AuthorData+CoreDataClass.swift in Sources */,
 				187B2B4227345F6200C3EFFF /* Constant.swift in Sources */,
+				3AA82D2229EABEFA00557A94 /* Int.swift in Sources */,
 				045628252732EA370044878C /* String + conform.swift in Sources */,
 				3A6104362997C8CD0096EDE2 /* ListeningPodcast+CoreDataClass.swift in Sources */,
 				18478129272C8B460036B89E /* MyActionSheet.swift in Sources */,
@@ -994,7 +1022,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = R6BUN55S84;
 				INFOPLIST_FILE = Podcasts/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1017,7 +1045,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = R6BUN55S84;
 				INFOPLIST_FILE = Podcasts/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

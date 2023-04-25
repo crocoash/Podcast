@@ -20,6 +20,7 @@ class LikedMomentsViewController: UIViewController {
     @IBOutlet private weak var tableViewBottomConstraint: NSLayoutConstraint!
    
     private var cellHeight: CGFloat = 75
+    
     private var tableViewBottomConstraintConstant: CGFloat = 0
     weak var delegate: LikedMomentsViewControllerDelegate?
     
@@ -45,7 +46,12 @@ class LikedMomentsViewController: UIViewController {
         showEmptyImage()
     }
     
-    //MARK: - Methods
+    //MARK: Actions
+    @IBAction func removeAll(_ sender: UIBarButtonItem) {
+        LikedMoment.removeAll()
+    }
+    
+    //MARK: Public Methods
     func updateConstraintForTableView(playerIsPresent value: Bool) {
         playerIsSHidden = !value
     }
