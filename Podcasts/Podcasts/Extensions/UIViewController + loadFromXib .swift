@@ -16,11 +16,4 @@ extension UIViewController {
     static var loadFromXib: Self {
         return Self(nibName: "\(Self.self)", bundle: nil)
     }
-    
-//    static var loadFromXib: Self {
-//        let bundle = Bundle(for: Self.self)
-//        let nib = UINib(nibName: Self.identifier, bundle: bundle)
-//        return nib.instantiate(withOwner: self, options: nil).first as! Self
-//       
-//    }
 }

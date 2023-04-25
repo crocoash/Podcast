@@ -40,7 +40,7 @@ public class FavoritePodcast: NSManagedObject, Codable {
         
         self.init(entity: Self.entity(), insertInto: Self.viewContext)
         
-        self.podcast = podcast.getFromCoreDataIfNoSavedNew()
+        self.podcast = podcast.getFromCoreDataIfNoSavedNew
         self.date = Date()
         
         saveInit()
@@ -55,30 +55,30 @@ extension FavoritePodcast: CoreDataProtocol {
     
     static var allObjectsFromCoreData: [FavoritePodcast] { fetchResultController.fetchedObjects ?? [] }
     
-    func getFromCoreDataIfNoSavedNew() -> FavoritePodcast {
-        return getFromCoreData() ?? FavoritePodcast(podcast: podcast)
-    }
     
-    func removeFromCoreData() {
-        guard let favoritePodcast = getFromCoreData() else { return }
+    func removeFromCoreDataWithOwnEntityRule() {
+        guard let favoritePodcast = getFromCoreData else { return }
         let podcast = favoritePodcast.podcast
-        Self.viewContext.delete(favoritePodcast)
-        saveCoreData()
+        favoritePodcast.removeFromViewContext()
         podcast.remove()
     }
+  
+    func saveInCoredataIfNotSaved() {
+        if getFromCoreData == nil {  _ = FavoritePodcast(podcast: podcast) }
+    }
     
-    func getFromCoreData() -> FavoritePodcast? {
+    static func removeAll() {
+        allObjectsFromCoreData.forEach {
+            $0.remove()
+        }
+    }
+    
+    var getFromCoreData: FavoritePodcast? {
         Self.allObjectsFromCoreData.filter { $0.podcast.id == podcast.id }.first
     }
     
-    func saveInCoredataIfNotSaved() {
-        if getFromCoreData() == nil {  _ = FavoritePodcast(podcast: podcast) }
-    }
-    
-    static func removeAllFromCoreData() {
-        allObjectsFromCoreData.forEach {
-            $0.removeFromCoreData()
-        }
+    var getFromCoreDataIfNoSavedNew: FavoritePodcast {
+        return getFromCoreData ?? FavoritePodcast(podcast: podcast)
     }
 }
 
@@ -145,7 +145,8 @@ extension FavoritePodcast: FirebaseProtocol {
             switch result {
             case .failure(let error) :
                 if error == .noData {
-                    Self.removeAllFromCoreData()
+                    Self.removeAll()
+                    return
                 }
             case .success(let podcastsFromFireBase) :
                 Self.updateFavoritePodcast(by: podcastsFromFireBase)
@@ -158,7 +159,7 @@ extension FavoritePodcast: FirebaseProtocol {
     static func updateFavoritePodcast(by podcastsFromFireBase: [FavoritePodcast]) {
         for favoritePodcast in Self.allObjectsFromCoreData {
             if !podcastsFromFireBase.contains(where: { $0.podcast.id == favoritePodcast.podcast.id }) {
-                favoritePodcast.removeFromCoreData()
+                favoritePodcast.remove()
             }
         }
         

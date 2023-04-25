@@ -31,7 +31,7 @@ class PodcastCell: UITableViewCell {
 
     @IBOutlet private weak var podcastName:           UILabel!
     @IBOutlet private weak var downloadProgressLabel: UILabel!
-    @IBOutlet private(set) weak var podcastDescription:    UILabel!
+    @IBOutlet private(set) weak var podcastDescription: UILabel!
     @IBOutlet private weak var trackDuration:         UILabel!
     @IBOutlet private weak var dateLabel:             UILabel!
     

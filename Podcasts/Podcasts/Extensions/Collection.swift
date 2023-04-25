@@ -29,3 +29,11 @@ extension Collection where Element: Identifiable {
         return self.filter { $0.id == element.id }.first
     }
 }
+
+extension Collection {
+    
+    var count: CGFloat {
+        
+        return CGFloat(self.count)
+    }
+}

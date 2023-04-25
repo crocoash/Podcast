@@ -10,15 +10,16 @@ import CoreData
 protocol CoreDataProtocol: NSManagedObject {
     
     associatedtype T: NSManagedObject, Identifiable
-    func remove()
+    
     static var allObjectsFromCoreData: [T] { get }
     
-    func removeFromCoreData()
+    func removeFromCoreDataWithOwnEntityRule()
     func saveInCoredataIfNotSaved()
-    func getFromCoreData() -> T?
-    func getFromCoreDataIfNoSavedNew() -> T
+    var getFromCoreData: T? { get }
+    var getFromCoreDataIfNoSavedNew: T { get }
     
-    static func removeAllFromCoreData()
+    func remove()
+    static func removeAll()
 }
 
 protocol NsManagedTableViewProtocol: CoreDataProtocol {

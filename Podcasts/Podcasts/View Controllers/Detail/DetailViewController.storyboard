@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21678"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="UIMenu" message="Requires Xcode 11 or later." minToolsVersion="11.0" requiredIntegratedClassName="UICommandDiff"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -191,9 +192,28 @@
                                                         <nil key="textColor"/>
                                                         <nil key="highlightedColor"/>
                                                     </label>
-                                                    <button opaque="NO" contentMode="scaleToFill" showsMenuAsPrimaryAction="YES" contentHorizontalAlignment="trailing" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" changesSelectionAsPrimaryAction="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fB5-9e-uBb">
+                                                    <button opaque="NO" contentMode="scaleToFill" showsMenuAsPrimaryAction="YES" contentHorizontalAlignment="right" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" changesSelectionAsPrimaryAction="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5Hk-fF-f3p">
                                                         <rect key="frame" x="58" y="0.0" width="230" height="30"/>
-                                                        <state key="normal" title="Sort"/>
+                                                        <menu key="menu" id="PyO-b6-YQ2">
+                                                            <children>
+                                                                <command title="by genres" menuElementState="on" id="pvc-pR-Tro">
+                                                                    <connections>
+                                                                        <action selector="refreshByGenre:" destination="sQZ-Of-rko" id="5Uy-4I-eTY"/>
+                                                                    </connections>
+                                                                </command>
+                                                                <command title="by newest" id="xmu-sr-1KB">
+                                                                    <connections>
+                                                                        <action selector="refreshByNewest:" destination="sQZ-Of-rko" id="IOh-Hy-4XW"/>
+                                                                    </connections>
+                                                                </command>
+                                                                <command title="by oldest" id="xjr-iA-Arz">
+                                                                    <connections>
+                                                                        <action selector="refreshByOldest:" destination="sQZ-Of-rko" id="biq-Jf-nk7"/>
+                                                                    </connections>
+                                                                </command>
+                                                            </children>
+                                                        </menu>
+                                                        <state key="normal" title="Button"/>
                                                     </button>
                                                 </subviews>
                                             </stackView>
@@ -206,7 +226,7 @@
                                                 <color key="textColor" systemColor="systemGray2Color"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
-                                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" scrollEnabled="NO" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="100" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="bAS-ET-t7V">
+                                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" scrollEnabled="NO" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="bAS-ET-t7V">
                                                 <rect key="frame" x="2" y="803.5" width="316" height="533.5"/>
                                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                                 <constraints>
@@ -320,7 +340,6 @@
                         <outlet property="removeFromPlaylistBookmark" destination="0rF-W7-03P" id="PgX-ss-8Ox"/>
                         <outlet property="scrollView" destination="wBV-HU-qSH" id="eR6-BK-d96"/>
                         <outlet property="smallPlayerView" destination="Vma-81-gU9" id="6mf-gz-09h"/>
-                        <outlet property="sortButton" destination="fB5-9e-uBb" id="3aN-gw-22l"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="OIq-KL-K6k" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

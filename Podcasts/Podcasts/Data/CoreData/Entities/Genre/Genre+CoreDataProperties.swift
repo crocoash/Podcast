@@ -18,7 +18,7 @@ extension Genre {
 
     @NSManaged public var id: String?
     @NSManaged public var name: String?
-    @NSManaged public var podcast: NSSet?
+    @NSManaged public var podcasts: NSSet?
 
 }
 

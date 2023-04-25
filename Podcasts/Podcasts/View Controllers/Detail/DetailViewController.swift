@@ -38,49 +38,67 @@ class DetailViewController: UIViewController {
     @IBOutlet private(set) weak var smallPlayerView: SmallPlayerViewController!
     
     @IBOutlet private weak var descriptionTextView: UITextView!
-
+    
     @IBOutlet private weak var episodeImage              : UIImageView!
     @IBOutlet private weak var backImageView             : UIImageView!
     @IBOutlet private weak var removeFromPlaylistBookmark: UIImageView!
     @IBOutlet private weak var addToPlaylistBookmark     : UIImageView!
     @IBOutlet private weak var playImageView             : UIImageView!
     
-    @IBOutlet private weak var sortButton: UIButton!
+    @IBOutlet weak var item1: UICommand!
+    
     
     @IBOutlet private weak var episodeTableView: UITableView!
-
     @IBOutlet private weak var heightTableViewConstraint: NSLayoutConstraint!
     @IBOutlet private weak var bottomPlayerConstraint:    NSLayoutConstraint!
     
     //MARK: Variables
     private(set) var podcast : Podcast? {
         didSet {
-            if oldValue != nil {
-                episodeTableView.reloadData(); setupView()
+            if let _ = oldValue {
+                episodeTableView.reloadData()
+                setupView()
             }
         }
     }
     
-    private let heightCell: CGFloat = 100
+    private let defaultRowHeight: CGFloat = 100
+    private var sumOfHeightsOfAllHeaders :CGFloat = 0
+    private let paddingBetweenSections: CGFloat = 20
     
-    private var selectedCell: [IndexPath: CGFloat] = [:] {
+    private var playlistByGenre = PlayListByGenre()
+    private var playlistByNewest = PlaylistByNewest()
+    private var playlistByOldest = PlayListByOldest()
+    private var currentPlaylist: [(key: String, podcasts: [Podcast])] {
+        switch typeOfSort {
+        case .byGenre:
+            return playlistByGenre
+        case .byNewest:
+            return playlistByNewest
+        case .byOldest:
+            return playlistByOldest
+        }
+    }
+                                   
+    private var headers = [UILabel]()
+    weak var delegate: DetailViewControllerDelegate?
+    
+    private var selectedCellAndHisHeight = [IndexPath : CGFloat]()
+        
+    private enum TypeSortOfTableView {
+        case byNewest
+        case byOldest
+        case byGenre
+    }
+    
+    private var typeOfSort: TypeSortOfTableView = .byGenre {
         didSet {
-            let allIndexPath = Array(selectedCell.keys)
-            episodeTableView.reloadRows(at: allIndexPath, with: .automatic)
+            configureHeadersForSectionsAndCalculateHeightsOfAllHeaders()
+            setHeightOfEpisodeTableView()
+            episodeTableView.reloadData()
         }
     }
     
-    private func reloadTableView() {
-        let allHeight = Array(selectedCell.values)
-        let offSet = allHeight.reduce(into: CGFloat.zero) { $0 += $1 - 100 }
-        let heightOfTableView = CGFloat(playlist.count) * heightCell + offSet
-        heightTableViewConstraint.constant = heightOfTableView
-        episodeTableView.layoutIfNeeded()
-    }
-    
-    private(set) var playlist: [Podcast] = []
-    weak var delegate: DetailViewControllerDelegate?
-
     //MARK: View Methods
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -91,17 +109,10 @@ class DetailViewController: UIViewController {
     
     //MARK: Public Methods
     func setUp(podcast: Podcast, playlist: [Podcast]) {
-        self.playlist = playlist.sorted { $0.releaseDateInformation! > $1.releaseDateInformation! }
+        playlistByGenre = playlist.sortPodcastsByGenre
+        playlistByNewest = playlist.sortPodcastsByNewest
+        playlistByOldest = playlist.sortPodcastsByOldest
         self.podcast = podcast
-    }
-    
-    //TODO: remove this
-    private func createSortChildMenu(genre: Genre) -> UIAction {
-        let popUpButtonClosure = { (action: UIAction) in
-            print("Pop-up action")
-        }
-          
-        return UIAction(title: genre.name ?? "" , handler: popUpButtonClosure)
     }
     
     func updateConstraintForTableView(playerIsPresent: Bool) {
@@ -114,22 +125,26 @@ class DetailViewController: UIViewController {
         DataProvider.shared.downloadImage(string: podcast?.image600) { [weak self] image in
             self?.episodeImage.image = image
         }
-        heightTableViewConstraint.constant = CGFloat(playlist.count) * heightCell
-        updateBookMark()
-        episodeName.text = podcast?.trackName
-        artistName.text = podcast?.artistName
-        genresLabel.text = podcast?.genresString
-        descriptionTextView.text = playlist[0].descriptionMy
-        countryLabel.text = podcast?.country
-        advisoryRatingLabel.text = podcast?.contentAdvisoryRating
-        dateLabel.text = podcast?.releaseDateInformation?.formattedDate(dateFormat: "d MMM YYY")
         
-///        DateFormatter().date(from: <#T##String#>)
-        durationLabel.text = podcast?.trackTimeMillis?.minute
+        configureHeadersForSectionsAndCalculateHeightsOfAllHeaders()
+        setHeightOfEpisodeTableView()
+    
+        if #available(iOS 15.0, *) {
+            episodeTableView.sectionHeaderTopPadding = paddingBetweenSections
+        }
+        
+        episodeName        .text = podcast?.trackName
+        artistName         .text = podcast?.artistName
+        genresLabel        .text = podcast?.genresString
+        descriptionTextView.text = currentPlaylist[0].podcasts.first?.descriptionMy
+        countryLabel       .text = podcast?.country
+        advisoryRatingLabel.text = podcast?.contentAdvisoryRating
+        dateLabel          .text = podcast?.releaseDateInformation?.formattedDate(dateFormat: "d MMM YYY")
+        durationLabel      .text = podcast?.trackTimeMillis?.minute
     }
     
     ///BigPlayer
-    func setOffsetForBigPlayer(id: NSNumber?) {
+    func scrollToCell(id: NSNumber?) {
         guard let cell = getCell(id: id) ,let indexPath = episodeTableView.indexPath(for: cell) else { return }
         let yPositionCell = episodeTableView.rectForRow(at: indexPath).origin.y
         let y = episodeTableView.frame.origin.y
@@ -142,7 +157,6 @@ class DetailViewController: UIViewController {
     func playerEndPlay(player: DetailPlayableProtocol) {
         let id = player.id
         reloadCell(for: id)
-        
     }
     
     func playerIsGoingPlay(player: DetailPlayableProtocol) {
@@ -175,41 +189,35 @@ class DetailViewController: UIViewController {
     
     //MARK: Downloading
     func updateDownloadInformation(progress: Float, totalSize: String, for podcast: Podcast) {
-        guard let index = playlist.firstIndex(matching: podcast),
-              let podcastCell = episodeTableView?.cellForRow(at: IndexPath(row: index, section: 0)) as? PodcastCell
+        guard let indexPath = currentPlaylist.getIndexPath(for: podcast).first,
+              let podcastCell = episodeTableView?.cellForRow(at: indexPath) as? PodcastCell
         else { return }
         
         podcastCell.updateDownloadInformation(progress: progress, totalSize: totalSize)
     }
     
     func endDownloading(podcast: Podcast) {
-        guard let index = playlist.firstIndex(matching: podcast) else { return }
-        if let cell = episodeTableView.cellForRow(at: IndexPath(row: index, section: 0)) as? PodcastCell {
+        guard let indexPath = currentPlaylist.getIndexPath(for: podcast).first else { return }
+        if let cell = episodeTableView.cellForRow(at: indexPath) as? PodcastCell {
             cell.endDownloading()
         }
     }
     
-    //TODO: Remove this
-    func reloadCell(for id: NSNumber?) {
-        guard let index = playlist.firstIndex(where: { $0.id == id }) else { return }
-        episodeTableView?.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
-    }
-    
-    //MARK: Actions
-    @objc private func addBookmarkOnTouchUpInside(_ sender: UIButton) {
-//        delegate?.detailViewController(self, addToFavoriteButtonDidTouchFor: podcast)
-//        updateBookMark()
-    }
-    
-    @objc private func removeBookmarkOnTouchUpInside(_ sender: UIButton) {
-//        let podcast = Podcast(podcast: podcast, viewContext: nil)
-//        delegate?.detailViewController(self, removeFromFavoriteButtonDidTouchFor: self.podcast)
-//        self.podcast = podcast
-//        updateBookMark()
-    }
-    
+    //MARK: - Actions
     @objc private func backAction(_ sender: Any) {
         dismiss(animated: true)
+    }
+    
+    @IBAction private func refreshByGenre(_ sender: UICommand) {
+        typeOfSort = .byGenre
+    }
+    
+    @IBAction private func refreshByNewest(_ sender: UICommand) {
+        typeOfSort = .byNewest
+    }
+    
+    @IBAction private func refreshByOldest(_ sender: UICommand) {
+        typeOfSort = .byOldest
     }
 }
 
@@ -217,72 +225,128 @@ class DetailViewController: UIViewController {
 extension DetailViewController {
     
     private func getCell(id: NSNumber?) -> PodcastCell? {
-        if let index = playlist.firstIndex(where: { $0.id == id }) {
-            if let cell = episodeTableView.cellForRow(at: IndexPath(row: index, section: 0)) as? PodcastCell {
-                return cell
-            }
+        guard let indexPath = currentPlaylist.getIndexPath(for: id).first else { return nil }
+        if let cell = episodeTableView.cellForRow(at: indexPath) as? PodcastCell {
+            return cell
         }
         return nil
     }
     
     private func configureGestures() {
-        backImageView             .addMyGestureRecognizer(self, type: .tap(),                                               #selector(backAction))
-        removeFromPlaylistBookmark.addMyGestureRecognizer(self, type: .tap(),                                               #selector(removeBookmarkOnTouchUpInside))
-        addToPlaylistBookmark     .addMyGestureRecognizer(self, type: .tap(),                                               #selector(addBookmarkOnTouchUpInside))
-                                   addMyGestureRecognizer(self, type: .screenEdgePanGestureRecognizer(directions: [.left]), #selector(backAction))
-    }
-    
-    private func updateBookMark() {
-//        guard let isFavorite = podcast?.isFavorite else { return }
-//        addToPlaylistBookmark.isHidden = isFavorite
-//        removeFromPlaylistBookmark.isHidden = !isFavorite
+        backImageView.addMyGestureRecognizer(self, type: .tap(),#selector(backAction))
+        addMyGestureRecognizer(self, type: .screenEdgePanGestureRecognizer(directions: [.left]), #selector(backAction))
     }
     
     private func getPodcast(_ cell: UITableViewCell) -> Podcast? {
-        guard let index = episodeTableView.indexPath(for: cell)?.row else { return nil }
-        return playlist[index]
+        guard let indexPath = episodeTableView.indexPath(for: cell) else { return nil }
+        return currentPlaylist[indexPath.section].podcasts[indexPath.row]
+    }
+    
+    private func reloadCellHeightIsChange(for indexPath: IndexPath) {
+        episodeTableView.reloadRows(at: [indexPath], with: .automatic)
+        reloadTableViewHeightConstraint()
+    }
+    
+    private func reloadTableViewHeightConstraint() {
+        let allHeight = selectedCellAndHisHeight.arrayOfValues
+        let offSet = allHeight.reduce(into: .zero) { $0 += $1 - defaultRowHeight }
+        let heightOfTableView = currentPlaylist.countOfValues.cgFloat * defaultRowHeight + offSet + sumOfHeightsOfAllHeaders
+        
+        heightTableViewConstraint.constant = heightOfTableView
+    }
+
+    private func reloadCell(for id: NSNumber?) {
+        let indexPath = currentPlaylist.getIndexPath(for: id)
+        episodeTableView?.reloadRows(at: indexPath, with: .none)
+    }
+    
+    private var getCountOfSections: Int {
+        return currentPlaylist.count
+    }
+    
+    private func getHeader(for section: Int) -> UILabel {
+       return headers[section]
+    }
+    
+    private func getCountOfRowsInSection(section: Int) -> Int {
+        return currentPlaylist[section].podcasts.count
+    }
+    
+    private func configureHeadersForSectionsAndCalculateHeightsOfAllHeaders () {
+        headers.removeAll()
+        sumOfHeightsOfAllHeaders = 0
+     
+        for item in currentPlaylist {
+            let label = UILabel(frame: CGRect(origin: .zero, size: CGSize(width: episodeTableView.frame.width, height: .zero)))
+            label.numberOfLines = 0
+            label.text = item.key
+            let heightOfHeader = label.font.lineHeight * label.maxNumberOfLines.cgFloat + paddingBetweenSections
+
+            label.frame.size = CGSize(width: label.frame.width, height: heightOfHeader)
+            sumOfHeightsOfAllHeaders += heightOfHeader
+            headers.append(label)
+        }
+    }
+    
+    private func setHeightOfEpisodeTableView() {
+        heightTableViewConstraint.constant = currentPlaylist.countOfValues.cgFloat * defaultRowHeight + sumOfHeightsOfAllHeaders + 20
+        episodeTableView.layoutIfNeeded()
     }
 }
 
 //MARK: - UITableViewDataSource
 extension DetailViewController: UITableViewDataSource {
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return playlist.count
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return getCountOfSections
     }
-   
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return getCountOfRowsInSection(section: section)
+    }
+
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        return getHeader(for: section)
+    }
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = episodeTableView.getCell(cell: PodcastCell.self, indexPath: indexPath)
-        let podcast = playlist[indexPath.row]
+        let podcast = currentPlaylist[indexPath.section].podcasts[indexPath.row]
         cell.configureCell(self, with: podcast)
         return cell
     }
-    
-    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        let offset = tableView.rectForRow(at: indexPath).height
-        if selectedCell[indexPath] != nil {
-            selectedCell[indexPath] = offset
-            reloadTableView()
-        }
-    }
+
 }
 
+//MARK: - UITableViewDelegate
 extension DetailViewController: UITableViewDelegate {
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if selectedCell[indexPath] == nil {
-            selectedCell[indexPath] = 0
-        } else {
-            selectedCell[indexPath] = nil
-            reloadTableView()
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if selectedCellAndHisHeight[indexPath] != nil {
+            if let cell = episodeTableView.cellForRow(at: indexPath) as? PodcastCell, cell.podcastDescription.maxNumberOfLines > 3 {
+                return UITableView.automaticDimension
+            }
         }
+        return defaultRowHeight
     }
     
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if selectedCell[indexPath] != nil {
-            return UITableView.automaticDimension
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        /// check if the cell all ready selected
+        if selectedCellAndHisHeight[indexPath] == nil {
+            selectedCellAndHisHeight[indexPath] = 0 // default value
+        } else {
+            selectedCellAndHisHeight[indexPath] = nil
         }
-        return 100
+        reloadCellHeightIsChange(for: indexPath)
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        /// write value for calculate height of tableview
+        let offset = tableView.rectForRow(at: indexPath).height
+        if selectedCellAndHisHeight[indexPath] != nil {
+            selectedCellAndHisHeight[indexPath] = offset
+            reloadTableViewHeightConstraint()
+        }
     }
 }
 
@@ -291,7 +355,7 @@ extension DetailViewController: PodcastCellDelegate {
     
     func podcastCellDidTouchPlayButton(_ podcastCell: PodcastCell) {
         guard let podcast = getPodcast(podcastCell) else { return }
-        delegate?.detailViewControllerPlayButtonDidTouchFor(self, podcast: podcast, at: Double(podcast.currentTime ?? 0), playlist: playlist)
+        delegate?.detailViewControllerPlayButtonDidTouchFor(self, podcast: podcast, at: Double(podcast.currentTime ?? 0), playlist: currentPlaylist.flatMap { $0.podcasts })
     }
     
     func podcastCellDidTouchStopButton(_ podcastCell: PodcastCell) {
@@ -324,6 +388,7 @@ extension DetailViewController: PodcastCellDelegate {
     }
 }
 
+//MARK: - SmallPlayerViewControllerDelegate
 extension DetailViewController: SmallPlayerViewControllerDelegate {
     
     func smallPlayerViewControllerSwipeOrTouch(_ smallPlayerViewController: SmallPlayerViewController) {
@@ -332,11 +397,5 @@ extension DetailViewController: SmallPlayerViewControllerDelegate {
     
     func smallPlayerViewControllerDidTouchPlayStopButton(_ smallPlayerViewController: SmallPlayerViewController) {
         delegate?.detailViewControllerPlayStopButtonDidTouchInSmallPlayer(self)
-    }
-}
-
-extension NSNumber {
-    var minute: String {
-        String((self.intValue / 1000) / 60) + " min"
     }
 }

@@ -52,12 +52,13 @@ public class ListeningPodcast: NSManagedObject, Codable {
         self.currentTime = 0
         self.duration = 0
         self.progress = 0
-        self.podcast = podcast.getFromCoreDataIfNoSavedNew()
+        self.podcast = podcast.getFromCoreDataIfNoSavedNew
         
         saveInit()
     }
 }
 
+//MARK: - CoreDataProtocol
 extension ListeningPodcast: CoreDataProtocol {
     
     typealias T = ListeningPodcast
@@ -66,36 +67,36 @@ extension ListeningPodcast: CoreDataProtocol {
         return Self.viewContext.fetchObjects(Self.self)
     }
     
-    func removeFromCoreData() {
-        if let listeningPodcast = getFromCoreData() {
+    func removeFromCoreDataWithOwnEntityRule() {
+        if let listeningPodcast = getFromCoreData {
             let podcast = listeningPodcast.podcast
-            Self.viewContext.delete(listeningPodcast)
-            saveCoreData()
-            podcast.removeFromCoreData()
+            listeningPodcast.removeFromViewContext()
+            podcast.remove()
         }
     }
     
     func saveInCoredataIfNotSaved() {
-        if getFromCoreData() == nil {
+        if getFromCoreData == nil {
             _ = ListeningPodcast(podcast: podcast)
         }
     }
     
-    func getFromCoreData() -> ListeningPodcast? {
+    var getFromCoreData: ListeningPodcast? {
         return Self.allObjectsFromCoreData.first(matching: self)
     }
     
-    func getFromCoreDataIfNoSavedNew() -> ListeningPodcast {
-        return  getFromCoreData() ?? ListeningPodcast(podcast: podcast)
+    var getFromCoreDataIfNoSavedNew: ListeningPodcast {
+        return getFromCoreData ?? ListeningPodcast(podcast: podcast)
     }
     
-    static func removeAllFromCoreData() {
+    static func removeAll() {
         Self.allObjectsFromCoreData.forEach {
-            $0.removeFromCoreData()
+            $0.remove()
         }
     }
 }
 
+//MARK: - FirebaseProtocol
 extension ListeningPodcast: FirebaseProtocol {
     
     var key: String { "\(podcast.id ?? 0)" }
@@ -113,7 +114,7 @@ extension ListeningPodcast: FirebaseProtocol {
             switch result {
             case .failure(let error) :
                 if error == .noData {
-                    removeAllFromCoreData()
+                    removeAll()
                 }
             case .success(let entities) :
                 update(by: entities)
@@ -126,7 +127,7 @@ extension ListeningPodcast: FirebaseProtocol {
     static func update(by entities: [ListeningPodcast]) {
         Self.allObjectsFromCoreData.forEach { entity in
             if !entities.contains(where: { $0.id == entity.id }) {
-                entity.removeFromCoreData()
+                entity.remove()
             }
         }
         
