@@ -226,17 +226,13 @@
                                                 <color key="textColor" systemColor="systemGray2Color"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
-                                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" scrollEnabled="NO" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="bAS-ET-t7V">
+                                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" scrollEnabled="NO" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="bAS-ET-t7V" customClass="EpisodeTableView" customModule="Podcasts" customModuleProvider="target">
                                                 <rect key="frame" x="2" y="803.5" width="316" height="533.5"/>
                                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="533.5" id="dFA-PX-nW1"/>
                                                 </constraints>
                                                 <sections/>
-                                                <connections>
-                                                    <outlet property="dataSource" destination="sQZ-Of-rko" id="MLA-5P-22C"/>
-                                                    <outlet property="delegate" destination="sQZ-Of-rko" id="a1H-ez-khO"/>
-                                                </connections>
                                             </tableView>
                                         </subviews>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -299,12 +295,15 @@
                                     <constraint firstAttribute="trailing" secondItem="vpM-jf-L40" secondAttribute="trailing" id="vRc-N5-3xQ"/>
                                 </constraints>
                             </scrollView>
-                            <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Vma-81-gU9" customClass="SmallPlayerViewController" customModule="Podcasts" customModuleProvider="target">
+                            <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Vma-81-gU9" customClass="SmallPlayerView" customModule="Podcasts" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="1912" width="320" height="50"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="O56-iV-tYo"/>
                                 </constraints>
+                                <connections>
+                                    <outlet property="delegate" destination="sQZ-Of-rko" id="faX-D3-OFP"/>
+                                </connections>
                             </view>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="clg-OB-ibQ"/>
@@ -333,7 +332,7 @@
                         <outlet property="durationLabel" destination="Jpg-sW-iVn" id="L68-NO-0lU"/>
                         <outlet property="episodeImage" destination="BRV-am-zIV" id="enr-7U-4TR"/>
                         <outlet property="episodeName" destination="8pd-2s-Xre" id="il5-ZQ-j8S"/>
-                        <outlet property="episodeTableView" destination="bAS-ET-t7V" id="xtn-xn-5nL"/>
+                        <outlet property="episodeTableView" destination="bAS-ET-t7V" id="L4x-NK-RT3"/>
                         <outlet property="genresLabel" destination="icP-tM-Gqp" id="YQ7-xa-PYS"/>
                         <outlet property="heightTableViewConstraint" destination="dFA-PX-nW1" id="23z-nD-eUY"/>
                         <outlet property="playImageView" destination="hMl-6K-ePn" id="IAm-S2-nb0"/>

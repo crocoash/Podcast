@@ -7,9 +7,9 @@
 
 import UIKit
 
-protocol SmallPlayerViewControllerDelegate: AnyObject {
-    func smallPlayerViewControllerSwipeOrTouch(_ smallPlayerViewController: SmallPlayerViewController)
-    func smallPlayerViewControllerDidTouchPlayStopButton(_ smallPlayerViewController: SmallPlayerViewController)
+@objc protocol SmallPlayerViewControllerDelegate: AnyObject {
+    func smallPlayerViewControllerSwipeOrTouch(_ smallPlayerView: SmallPlayerView)
+    func smallPlayerViewControllerDidTouchPlayStopButton(_ smallPlayerView: SmallPlayerView)
 }
 
 protocol SmallPlayerPlayableProtocol {
@@ -20,18 +20,19 @@ protocol SmallPlayerPlayableProtocol {
 }
 
 @IBDesignable
-class SmallPlayerViewController: UIView {
+class SmallPlayerView: UIView {
     
     @IBOutlet private weak var playPauseButton: UIButton!
     @IBOutlet private weak var trackImageView: UIImageView!
     @IBOutlet private weak var trackNameLabel: UILabel!
     @IBOutlet private weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet private weak var progressView: UIProgressView!
+    @IBOutlet weak var delegate: SmallPlayerViewControllerDelegate!
     
     //MARK: Settings
     private var pauseImage = UIImage(systemName: "pause.fill")!
     private var playImage = UIImage(systemName: "play.fill")!
-    weak var delegate: SmallPlayerViewControllerDelegate?
+   
     
     func playerIsGoingPlay(player: SmallPlayerPlayableProtocol) {
         if player.progress == 0 { progressView.progress = 1 }
@@ -47,20 +48,12 @@ class SmallPlayerViewController: UIView {
         activityIndicator.stopAnimating()
     }
     
-    func setPlayStopButton(player: SmallPlayerPlayableProtocol) {
-        let image = player.isPlaying ? pauseImage : playImage
-        playPauseButton.setImage(image, for: .normal)
-    }
-    
-    func updateProgressView(player: SmallPlayerPlayableProtocol) {
-        progressView.progress = Float(player.progress ?? 0)
-    }
-    
     // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: frame)
         loadFromXib()
         configureView()
+        addObserverPlayerEventNotification()
         configureGesture()
     }
     
@@ -68,7 +61,12 @@ class SmallPlayerViewController: UIView {
       super.init(coder: coder)
         loadFromXib()
         configureView()
+        addObserverPlayerEventNotification()
         configureGesture()
+    }
+    
+    deinit {
+        removeObserverEventNotification()
     }
     
     // MARK: - Actions
@@ -82,7 +80,7 @@ class SmallPlayerViewController: UIView {
 }
 
 //MARK: - Private methods
-extension SmallPlayerViewController {
+extension SmallPlayerView {
 
     private func configureView() {
         layer.borderColor = UIColor.gray.cgColor
@@ -97,5 +95,41 @@ extension SmallPlayerViewController {
     private func configureGesture() {
         addMyGestureRecognizer(self, type: .swipe(directions: [.up]), #selector(respondToSwipeOrTouch))
         addMyGestureRecognizer(self, type: .tap()                   , #selector(respondToSwipeOrTouch))
+    }
+}
+
+extension SmallPlayerView: PlayerEventNotification {
+
+    func addObserverPlayerEventNotification() {
+        Player.addObserverPlayerPlayerEventNotification(for: self)
+    }
+    
+    func removeObserverEventNotification() {
+        Player.removeObserverEventNotification(for: self)
+    }
+    
+    func playerDidEndPlay(notification: NSNotification) {
+        
+    }
+    
+    func playerStartLoading(notification: NSNotification) {
+        guard let player = notification.object as? SmallPlayerPlayableProtocol else { return }
+        playerIsGoingPlay(player: player)
+    }
+    
+    func playerDidEndLoading(notification: NSNotification) {
+        guard let player = notification.object as? SmallPlayerPlayableProtocol else { return }
+        playerIsEndLoading(player: player)
+    }
+    
+    func playerUpdatePlayingInformation(notification: NSNotification) {
+        guard let player = notification.object as? SmallPlayerPlayableProtocol else { return }
+        progressView.progress = Float(player.progress ?? 0)
+    }
+    
+    func playerStateDidChanged(notification: NSNotification) {
+        guard let player = notification.object as? SmallPlayerPlayableProtocol else { return }
+        let image = player.isPlaying ? pauseImage : playImage
+        playPauseButton.setImage(image, for: .normal)
     }
 }

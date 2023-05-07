@@ -8,14 +8,6 @@
 import Foundation
 import MediaPlayer
 
-protocol PlayerDelegate: AnyObject {
-    func playerEndPlay(player: OutputPlayerProtocol)
-    func playerStartLoading(player: OutputPlayerProtocol)
-    func playerDidEndLoading(player: OutputPlayerProtocol)
-    func playerUpdatePlayingInformation(player: OutputPlayerProtocol)
-    func playerStateDidChanged(player: OutputPlayerProtocol)
-}
-
 protocol InputPlayerProtocol {
     var url: URL?                      { get }
     var image600: String?              { get }
@@ -38,11 +30,50 @@ protocol InputPlayerProtocol {
     var duration: Double?              { get set }
 }
 
-protocol OutputPlayerProtocol: DetailPlayableProtocol, SmallPlayerPlayableProtocol, BigPlayerPlayableProtocol {
-    
+@objc protocol PlayerEventNotification {
+    func addObserverPlayerEventNotification()
+    func removeObserverEventNotification()
+    func playerDidEndPlay(notification: NSNotification)
+    func playerStartLoading(notification: NSNotification)
+    func playerDidEndLoading(notification: NSNotification)
+    func playerUpdatePlayingInformation(notification: NSNotification)
+    func playerStateDidChanged(notification: NSNotification)
 }
 
 class Player {
+    
+    private enum PlayerEvent: String {
+        case playerEndPlay
+        case playerStartLoading
+        case playerDidEndLoading
+        case playerUpdatePlayingInformation
+        case playerStateDidChanged
+        
+        var notificationName: NSNotification.Name {
+            return NSNotification.Name(rawValue: self.rawValue)
+        }
+    }
+    
+    static func addObserverPlayerPlayerEventNotification <T: PlayerEventNotification>(for object: T) {
+        let playerEndPlay = PlayerEvent.playerEndPlay.notificationName
+        NotificationCenter.default.addObserver(object, selector: #selector(object.playerDidEndPlay(notification: )), name: playerEndPlay, object: nil)
+        
+        let playerStartLoading = PlayerEvent.playerStartLoading.notificationName
+        NotificationCenter.default.addObserver(object, selector: #selector(object.playerStartLoading(notification: )), name: playerStartLoading, object: nil)
+        
+        let playerDidEndLoading = PlayerEvent.playerDidEndLoading.notificationName
+        NotificationCenter.default.addObserver(object, selector: #selector(object.playerDidEndLoading(notification: )), name: playerDidEndLoading, object: nil)
+        
+        let playerUpdatePlayingInformation = PlayerEvent.playerUpdatePlayingInformation.notificationName
+        NotificationCenter.default.addObserver(object, selector: #selector(object.playerUpdatePlayingInformation(notification: )), name: playerUpdatePlayingInformation, object: nil)
+        
+        let playerStateDidChanged = PlayerEvent.playerStateDidChanged.notificationName
+        NotificationCenter.default.addObserver(object, selector: #selector(object.playerStateDidChanged(notification: )), name: playerStateDidChanged, object: nil)
+    }
+    
+    static func removeObserverEventNotification<T: PlayerEventNotification>(for object: T) {
+        NotificationCenter.default.removeObserver(object)
+    }
     
     var playlist: [InputPlayerProtocol] = []
     var currentTrack: (track: InputPlayerProtocol, index: Int)?
@@ -54,17 +85,13 @@ class Player {
     
     private var observe: Any?
     
-    weak var delegate: PlayerDelegate?
-//    weak var smallPlayerDelegate: PlayerDelegate?
-    
     private(set) var isPlaying = false {
         didSet {
             if oldValue != isPlaying {
-                delegate?.playerStateDidChanged(player: self)
+                NotificationCenter.default.post(name: PlayerEvent.playerStateDidChanged.notificationName, object: self)
             }
         }
     }
-    
     
     var isLast: Bool { (currentTrack?.index ?? (Int.max - 1)) + 1 == playlist.count }
     var isFirst: Bool { currentTrack?.index ?? 1 == 0 }
@@ -73,9 +100,9 @@ class Player {
         didSet {
             if playerIsLoading != oldValue {
                 if playerIsLoading {
-                    delegate?.playerStartLoading(player: self)
+                    NotificationCenter.default.post(name: PlayerEvent.playerStartLoading.notificationName, object: self)
                 } else {
-                    delegate?.playerDidEndLoading(player: self)
+                    NotificationCenter.default.post(name: PlayerEvent.playerDidEndLoading.notificationName, object: self)
                 }
             }
         }
@@ -148,7 +175,7 @@ class Player {
 }
 
 // MARK: - Private Methods
-extension Player: OutputPlayerProtocol {
+extension Player {
     
     private func startPlay(track: InputPlayerProtocol, at moment: Double? = nil) {
         pause()
@@ -203,7 +230,7 @@ extension Player: OutputPlayerProtocol {
             self.currentTrack?.track.progress = progress
             self.currentTrack?.track.duration = duration
             
-            self.delegate?.playerUpdatePlayingInformation(player: self)
+            NotificationCenter.default.post(name: PlayerEvent.playerUpdatePlayingInformation.notificationName, object: self)
             
             /// ---------------
             self.mPNowPlayingInfoCenter?.nowPlayingInfo?[MPNowPlayingInfoPropertyPlaybackProgress] = currentTime
@@ -226,7 +253,7 @@ extension Player: OutputPlayerProtocol {
     
     private func changeTrack(with newTrack: InputPlayerProtocol) {
         if let track = currentTrack?.track, newTrack.id != track.id {
-            delegate?.playerEndPlay(player: self)
+            NotificationCenter.default.post(name: PlayerEvent.playerEndPlay.notificationName, object: self)
         }
     }
     
@@ -255,10 +282,12 @@ extension Player: OutputPlayerProtocol {
     }
 }
 
+//MARK: - OutputPlayerProtocol
+protocol OutputPlayerProtocol: DetailPlayableProtocol, SmallPlayerPlayableProtocol, BigPlayerPlayableProtocol {
+    
+}
 
-
-
-extension Player {
+extension Player: OutputPlayerProtocol {
     var id: NSNumber? { currentTrack?.track.id }
     var track: InputPlayerProtocol? { currentTrack?.track }
     var progress: Double? { currentTrack?.track.progress }

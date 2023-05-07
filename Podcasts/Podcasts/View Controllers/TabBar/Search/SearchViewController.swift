@@ -11,7 +11,7 @@ import SwiftUI
 
 protocol SearchViewControllerDelegate: AnyObject {
     func searchViewController                      (_ searchViewController: SearchViewController,_ playlist: [InputPlayerProtocol], track: InputPlayerProtocol)
-    func searchViewControllerDidSelectDownLoadImage(_ searchViewController: SearchViewController, podcast: Podcast, completion: @escaping () -> Void)
+    func searchViewControllerDidSelectDownLoadImage(_ searchViewController: SearchViewController, entity: DownloadServiceProtocol, completion: @escaping () -> Void)
     func searchViewControllerDidSelectFavoriteStar (_ searchViewController: SearchViewController, podcast: Podcast)
     func searchViewControllerDidSelectCell (_ searchViewController: SearchViewController, podcast: Podcast)
 }
@@ -45,7 +45,7 @@ class SearchViewController : UIViewController {
         }
     }
     
-    //MARK: - Methods
+    //MARK: - Public Methods
     func updateConstraintForTableView(playerIsPresent value: Bool) {
         playerIsSHidden = !value
     }
