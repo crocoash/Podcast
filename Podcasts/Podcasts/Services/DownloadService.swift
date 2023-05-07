@@ -37,21 +37,85 @@ class DownloadService {
         let configuration = URLSessionConfiguration.background(withIdentifier: "BackGroundSession")
         self.downloadsSession = URLSession(configuration: configuration, delegate: delegate, delegateQueue: nil)
     }
+
+    func conform(vc: UIViewController, entity: DownloadServiceProtocol, completion: @escaping () -> Void) {
+     
+        switch entity.stateOfDownload {
+            
+        case .notDownloaded:
+            startDownload(vc: vc, entity, completion: completion)
+            
+        case .isDownloading:
+            pauseDownload(entity)
+            Alert().create(for: vc, title: "Do you want cancel downloading ?") { [weak self] _ in
+                [UIAlertAction(title: "Yes", style: .default) { [weak self] _ in
+                    self?.cancelDownload(entity)
+                    completion()
+                }, UIAlertAction(title: "Continue", style: .default) { [weak self] _ in
+                    self?.continueDownload(entity)
+                    completion()
+                }]
+            }
+            
+        case .isDownload:
+            Alert().create(for: vc, title: "Do you want remove podcast from your device?") { [weak self] _ in
+                [UIAlertAction(title: "yes", style: .destructive) { [weak self] _ in
+                    self?.cancelDownload(entity)
+                    completion()
+                }, UIAlertAction(title: "Cancel", style: .cancel) { _ in
+                }
+                ]
+            }
+        }
+    }
     
-    func startDownload(vc: UIViewController,_ downloadServiceProtocol: DownloadServiceProtocol) {
+     func cancelDownload(_ downloadServiceProtocol: DownloadServiceProtocol) {
+        guard let url = downloadServiceProtocol.downloadUrl else { return }
+        activeDownloads[url]?.downloadDataTask.cancel()
+        activeDownloads[url] = nil
+        
+        do {
+            try FileManager.default.removeItem(at: url.localPath)
+        } catch {
+            print(error)
+        }
+    }
+    
+    func endDownload(_ downloadServiceProtocol: DownloadServiceProtocol) {
+        guard let url = downloadServiceProtocol.downloadUrl else { return }
+        activeDownloads[url] = nil
+    }
+    
+    func isDownLoad(_ downloadServiceProtocol: DownloadServiceProtocol) -> Bool {
+        guard let url = downloadServiceProtocol.downloadUrl?.localPath else { return false }
+        return FileManager.default.fileExists(atPath: url.path)
+    }
+    
+    func isDownloading(_ downloadServiceProtocol: DownloadServiceProtocol) -> Bool {
+        guard let url = downloadServiceProtocol.downloadUrl else { return false }
+        return activeDownloads[url] != nil
+    }
+}
+
+//MARK: - Private Methods
+extension DownloadService {
+    
+    private func startDownload(vc: UIViewController,_ downloadServiceProtocol: DownloadServiceProtocol, completion: @escaping () -> Void) {
         
         if !NetworkMonitor.shared.isConnection {
             Alert().create(for: vc, title: "No Internet") { _ in
-                [UIAlertAction(title: "Ok", style: .cancel)]
+                [UIAlertAction(title: "Ok", style: .cancel) { _ in
+                    completion()
+                }]
             }
             return
         } else if NetworkMonitor.shared.connectionType == .cellular {
-            Alert().create(for: vc, title: "Used Mobile intertnet for downLoad? ") { _ in
-                [ UIAlertAction(title: "Now", style: .cancel) { _ in
-                    vc.dismiss(animated: true)
+            Alert().create(for: vc, title: "Use Mobile intertnet for downLoad? ") { _ in
+                [ UIAlertAction(title: "No", style: .cancel) { _ in
+                    completion()
                     return
                 }, UIAlertAction(title: "Yes", style: .default) { _ in
-                    vc.dismiss(animated: true)
+                    completion()
                 }]
             }
         }
@@ -64,40 +128,13 @@ class DownloadService {
         }
     }
     
-    func cancelDownload(_ downloadServiceProtocol: DownloadServiceProtocol) {
-        guard let url = downloadServiceProtocol.downloadUrl else { return }
-        activeDownloads[url]?.downloadDataTask.cancel()
-        activeDownloads[url] = nil
-        
-        do {
-            try FileManager.default.removeItem(at: url.localPath)
-        } catch {
-            print(error)
-        }
-    }
-    
-    func continueDownload(_ downloadServiceProtocol: DownloadServiceProtocol) {
+    private func continueDownload(_ downloadServiceProtocol: DownloadServiceProtocol) {
         guard let url = downloadServiceProtocol.downloadUrl else { return }
         activeDownloads[url]?.downloadDataTask.resume()
     }
     
-    func pauseDownload(_ downloadServiceProtocol: DownloadServiceProtocol) {
+    private func pauseDownload(_ downloadServiceProtocol: DownloadServiceProtocol) {
         guard let url = downloadServiceProtocol.downloadUrl else { return }
         activeDownloads[url]?.downloadDataTask.suspend()
-    }
-    
-    func endDownload(_ downloadServiceProtocol: DownloadServiceProtocol) {
-        guard let url = downloadServiceProtocol.downloadUrl else { return }
-        activeDownloads[url] = nil
-    }
-    
-    func isDownloading(_ downloadServiceProtocol: DownloadServiceProtocol) -> Bool {
-        guard let url = downloadServiceProtocol.downloadUrl else { return false }
-        return activeDownloads[url] != nil
-    }
-    
-    func isDownLoad(_ downloadServiceProtocol: DownloadServiceProtocol) -> Bool {
-        guard let url = downloadServiceProtocol.downloadUrl?.localPath else { return false }
-        return FileManager.default.fileExists(atPath: url.path)
     }
 }

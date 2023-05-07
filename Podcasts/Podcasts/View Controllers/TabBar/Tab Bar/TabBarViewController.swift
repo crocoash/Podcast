@@ -7,13 +7,11 @@ class TabBarViewController: UITabBarController {
     
     private var downloadService = DownloadService.shared
     
-    // MARK: - View
-    
+    // MARK: - variables
     private var trailConstraint: NSLayoutConstraint?
     private var leadConstraint: NSLayoutConstraint?
     
     lazy private var player: Player = {
-        $0.delegate = self
         return $0
     }(Player())
     
@@ -24,7 +22,15 @@ class TabBarViewController: UITabBarController {
         return $0
     }(UIImageView())
     
-    let smallPlayer = SmallPlayerViewController()
+    lazy var smallPlayer: SmallPlayerView = {
+        view.addSubview($0)
+        $0.delegate = self
+        $0.isHidden = true
+        $0.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        $0.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
+        $0.bottomAnchor.constraint(equalTo: tabBar.topAnchor).isActive = true
+        return $0
+    }(SmallPlayerView())
     
     private var userViewModel: UserViewModel!
     private let firestorageDatabase = FirestorageDatabase()
@@ -52,9 +58,13 @@ class TabBarViewController: UITabBarController {
         return $0
     }(DetailViewController.loadFromStoryboard)
     
-    private var bigPlayerVc: BigPlayerViewController?
+    lazy private var bigPlayerVc: BigPlayerViewController = {
+        $0.delegate = self
+        $0.modalPresentationStyle = .fullScreen
+        return $0
+    }(BigPlayerViewController.loadFromXib)
     
-    //MARK: - METHODS
+    //MARK: - Public Method
     func setUserViewModel(_ userViewModel: UserViewModel) {
         self.userViewModel = userViewModel
     }
@@ -70,49 +80,14 @@ class TabBarViewController: UITabBarController {
 //MARK: - Private methods
 extension TabBarViewController {
     
-    private func feedbackGenerator() {
-        let feedbackGenerator = UIImpactFeedbackGenerator()
-        feedbackGenerator.prepare()
-        feedbackGenerator.impactOccurred()
-    }
-    
     private func addOrRemoveFavoritePodcast(podcast: Podcast) {
         podcast.addOrRemoveToFavorite()
         if podcast.stateOfDownload == .isDownload { downloadService.cancelDownload(podcast) }
         feedbackGenerator()
     }
     
-    private func downloadOrRemovePodcast(for vc: UIViewController, _ entity: DownloadServiceProtocol, completion: @escaping () -> Void) {
-        switch entity.stateOfDownload {
-            
-        case .notDownloaded:
-            downloadService.startDownload(vc: vc, entity)
-            
-        case .isDownloading:
-            self.downloadService.pauseDownload(entity)
-            Alert().create(for: vc, title: "Do you want cancel downloading ?") { [weak self] _ in
-                [UIAlertAction(title: "Yes", style: .default) { [weak self] _ in
-                    self?.downloadService.cancelDownload(entity)
-                    completion()
-                }, UIAlertAction(title: "Continue", style: .default) { [weak self] _ in
-                    self?.downloadService.continueDownload(entity)
-                    completion()
-                }]
-            }
-            
-        case .isDownload:
-            Alert().create(for: vc, title: "Do you want remove podcast from your device?") { [weak self] _ in
-                [UIAlertAction(title: "yes", style: .destructive) { [weak self] _ in
-                    self?.downloadService.cancelDownload(entity)
-                    completion()
-                }, UIAlertAction(title: "Cancel", style: .cancel) { _ in
-                    completion()
-                }
-                ]
-            }
-        }
-        
-        feedbackGenerator()
+    private func downloadOrRemovePodcast(for vc: UIViewController, entity: DownloadServiceProtocol ,completion: @escaping () -> Void) {
+        downloadService.conform(vc: vc, entity: entity, completion: completion)
     }
     
     private func startPlay(track: InputPlayerProtocol, at moment: Double? = nil, playlist: [InputPlayerProtocol]) {
@@ -129,7 +104,13 @@ extension TabBarViewController {
     }
     
     private func presentDetailViewController(podcast: Podcast, completion: (() -> Void)? = nil) {
-        guard presentedViewController as? DetailViewController == nil else { completion?(); return }
+        
+        /// don't present new detail vc if it already present ( big player vc )
+        guard presentedViewController as? DetailViewController == nil else {
+            completion?()
+            return
+        }
+        
         if detailViewController.podcast == podcast {
             self.present(self.detailViewController, animated: true, completion: completion)
         } else {
@@ -149,15 +130,13 @@ extension TabBarViewController {
     }
     
     private func presentBigPlayer(for vc: UIViewController) {
-        self.bigPlayerVc = configureBigPlayer()
-        guard let bigPlayerVc = bigPlayerVc else { return }
         vc.present(bigPlayerVc, animated: true)
-        self.bigPlayerVc?.setUpUI(with: player)
+        self.bigPlayerVc.setUpUI(with: player)
     }
     
     //MARK: configureView
     private func configureTabBar() {
-        viewControllers = [favoritePodcastVC, searchVC, likedMomentVc, settingsVC]
+        self.viewControllers = [favoritePodcastVC, searchVC, likedMomentVc, settingsVC]
     }
     
     private func createTabBar<T: UIViewController>(_ type: T.Type, title: String, imageName: String, completion: ((T) -> Void)? = nil) -> T {
@@ -168,15 +147,6 @@ extension TabBarViewController {
         
         completion?(vc)
         return vc
-    }
-
-    private func configureSmallPlayer() {
-        view.addSubview(smallPlayer)
-        smallPlayer.delegate = self
-        smallPlayer.isHidden = true
-        smallPlayer.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        smallPlayer.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
-        smallPlayer.bottomAnchor.constraint(equalTo: tabBar.topAnchor).isActive = true
     }
     
     private func configureImageDarkMode() {
@@ -191,16 +161,8 @@ extension TabBarViewController {
 
     private func configureView() {
         configureTabBar()
-        configureSmallPlayer()
         configureImageDarkMode()
         downloadService.configureURLSession(delegate: self)
-    }
-    
-    private func configureBigPlayer() -> BigPlayerViewController {
-        let bigPlayerVC = BigPlayerViewController.loadFromXib
-        bigPlayerVC.delegate = self
-        bigPlayerVC.modalPresentationStyle = .fullScreen
-        return bigPlayerVC
     }
     
     private func fireBase() {
@@ -256,6 +218,12 @@ extension TabBarViewController {
             }
         }
     }
+    
+    private func feedbackGenerator() {
+        let feedbackGenerator = UIImpactFeedbackGenerator()
+        feedbackGenerator.prepare()
+        feedbackGenerator.impactOccurred()
+    }
 }
 
 // MARK: - PlaylistTableViewControllerDelegate
@@ -289,8 +257,8 @@ extension TabBarViewController: SearchViewControllerDelegate {
         addOrRemoveFavoritePodcast(podcast: podcast)
     }
     
-    func searchViewControllerDidSelectDownLoadImage(_ searchViewController: SearchViewController, podcast: Podcast, completion: @escaping () -> Void) {
-        downloadOrRemovePodcast(for: searchViewController, podcast, completion: completion)
+    func searchViewControllerDidSelectDownLoadImage(_ searchViewController: SearchViewController, entity: DownloadServiceProtocol, completion: @escaping () -> Void) {
+        downloadOrRemovePodcast(for: self, entity: entity, completion: completion)
     }
     
     func searchViewController(_ searchViewController: SearchViewController, _ playlist: [InputPlayerProtocol], track: InputPlayerProtocol) {
@@ -397,11 +365,11 @@ extension TabBarViewController: URLSessionDelegate {
 //MARK: - SmallPlayerViewControllerDelegate
 extension TabBarViewController: SmallPlayerViewControllerDelegate {
     
-    func smallPlayerViewControllerDidTouchPlayStopButton(_ smallPlayerViewController: SmallPlayerViewController) {
+    func smallPlayerViewControllerDidTouchPlayStopButton(_ smallPlayerViewController: SmallPlayerView) {
         player.playOrPause()
     }
     
-    func smallPlayerViewControllerSwipeOrTouch(_ smallPlayerViewController: SmallPlayerViewController) {
+    func smallPlayerViewControllerSwipeOrTouch(_ smallPlayerViewController: SmallPlayerView) {
         presentBigPlayer(for: self)
     }
 }
@@ -473,8 +441,8 @@ extension TabBarViewController : DetailViewControllerDelegate {
         addOrRemoveFavoritePodcast(podcast: selectedPodcast)
     }
     
-    func detailViewControllerDidSelectDownLoadImage(_ detailViewController: DetailViewController, podcast: Podcast, completion: @escaping () -> Void) {
-        downloadOrRemovePodcast(for: detailViewController, podcast, completion: completion)
+    func detailViewControllerDidSelectDownLoadImage(_ detailViewController: DetailViewController, entity: DownloadServiceProtocol, completion: @escaping () -> Void) {
+        downloadOrRemovePodcast(for: detailViewController, entity: entity ,completion: completion)
     }
 }
 
@@ -487,38 +455,5 @@ extension TabBarViewController: UIViewControllerTransitioningDelegate {
     
     func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         return DismissTransition()
-    }
-}
-
-//MARK: - PlayerDelegate
-extension TabBarViewController: PlayerDelegate {
-    
-    func playerEndPlay(player: OutputPlayerProtocol) {
-        detailViewController.playerEndPlay(player: player)
-        bigPlayerVc?.playerEndPlay(player: player)
-    }
-    
-    func playerStartLoading(player: OutputPlayerProtocol) {
-        smallPlayer.playerIsGoingPlay(player: player)
-        bigPlayerVc?.playerIsGoingPlay(player: player)
-        detailViewController.playerIsGoingPlay(player: player)
-    }
-    
-    func playerDidEndLoading(player: OutputPlayerProtocol) {
-        smallPlayer.playerIsEndLoading(player: player)
-        bigPlayerVc?.playerIsEndLoading(player: player)
-        detailViewController.playerIsEndLoading(player: player)
-    }
-    
-    func playerUpdatePlayingInformation(player: OutputPlayerProtocol) {
-        smallPlayer.updateProgressView(player: player)
-        bigPlayerVc?.upDateProgressSlider(player: player)
-        detailViewController.updateProgressView(player: player)
-    }
-    
-    func playerStateDidChanged(player: OutputPlayerProtocol) {
-        smallPlayer.setPlayStopButton(player: player)
-        bigPlayerVc?.setPlayPauseButton(player: player)
-        detailViewController.updatePlayStopButton(player: player)
     }
 }

@@ -84,14 +84,11 @@ class PodcastCell: UITableViewCell {
     }
     
     @objc func handlerTapDownloadImage(_ sender: UITapGestureRecognizer) {
+        
         switch podcast.stateOfDownload {
-            
         case .notDownloaded:
             startDownloading()
-        case .isDownloading:
-            suspendDownloading()
-        case .isDownload:
-            removePodcastFromDownloads()
+        default: break
         }
         
         delegate?.podcastCellDidSelectDownLoadImage(self)
@@ -160,10 +157,7 @@ extension PodcastCell {
         downloadProgressLabel.isHidden = true
         downLoadImageView.image = UIImage(systemName: "icloud.and.arrow.down")
     }
-    
-    func suspendDownloading() {
-        
-    }
+
 }
 
 //MARK: - Private Methods
