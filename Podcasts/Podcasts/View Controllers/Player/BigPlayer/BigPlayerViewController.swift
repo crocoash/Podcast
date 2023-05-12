@@ -19,7 +19,7 @@ protocol BigPlayerViewControllerDelegate: AnyObject {
 }
 
 protocol BigPlayerPlayableProtocol {
-    var playerIsLoading: Bool { get }
+    var playerIsLoadingNewTrack: Bool { get }
     var isLast: Bool { get }
     var isFirst: Bool { get }
     var isPlaying: Bool { get }
@@ -65,13 +65,13 @@ class BigPlayerViewController: UIViewController {
         durationTrackLabel.text = player.duration?.formatted ?? defaultTime
         podcastNameLabel  .text = player.trackName
         
-        activityIndicator.isHidden = !player.playerIsLoading
+        activityIndicator.isHidden = !player.playerIsLoadingNewTrack
         
         DataProvider.shared.downloadImage(string: player.trackImage) { [weak self] image in
             self?.podcastImageView.image = image
         }
         
-        likedButton          .isEnabled = !player.playerIsLoading
+        likedButton          .isEnabled = !player.playerIsLoadingNewTrack
         previousPodcastButton.isEnabled = !player.isFirst
         nextPodcastButton    .isEnabled = !player.isLast
         

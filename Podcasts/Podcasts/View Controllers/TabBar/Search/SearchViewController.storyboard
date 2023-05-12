@@ -6,7 +6,6 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21678"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
-        <capability name="collection view cell content view" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -31,32 +30,19 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="GdD-5g-WGK">
-                                <rect key="frame" x="0.0" y="120" width="393" height="698"/>
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="GdD-5g-WGK" customClass="SearchCollectionView" customModule="Podcasts" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="151" width="393" height="667"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="l4K-2z-pD5">
+                                <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="0.0" minimumInteritemSpacing="0.0" id="l4K-2z-pD5">
                                     <size key="itemSize" width="128" height="128"/>
                                     <size key="headerReferenceSize" width="0.0" height="0.0"/>
                                     <size key="footerReferenceSize" width="0.0" height="0.0"/>
                                     <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                 </collectionViewFlowLayout>
-                                <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="qgm-cX-unf">
-                                        <rect key="frame" x="0.0" y="0.0" width="127.99999999999997" height="128"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="svK-W6-kx6">
-                                            <rect key="frame" x="0.0" y="0.0" width="127.99999999999997" height="128"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                        </collectionViewCellContentView>
-                                    </collectionViewCell>
-                                </cells>
-                                <connections>
-                                    <outlet property="dataSource" destination="dxT-ao-o0w" id="Jbs-g6-ZxM"/>
-                                    <outlet property="delegate" destination="dxT-ao-o0w" id="zwQ-Zw-wad"/>
-                                </connections>
+                                <cells/>
                             </collectionView>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" image="doc.text.magnifyingglass" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="f1A-p3-gZv">
-                                <rect key="frame" x="0.0" y="120.33333333333331" width="393" height="699"/>
+                                <rect key="frame" x="0.0" y="151.33333333333337" width="393" height="668"/>
                                 <color key="tintColor" systemColor="systemGray2Color"/>
                             </imageView>
                             <segmentedControl opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="252" verticalCompressionResistancePriority="752" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="Myz-Yx-tUL">
@@ -85,18 +71,17 @@
                             <constraint firstItem="Myz-Yx-tUL" firstAttribute="leading" secondItem="CkL-nP-p0R" secondAttribute="leading" id="btd-pu-LBb"/>
                             <constraint firstItem="CkL-nP-p0R" firstAttribute="top" secondItem="q4i-Pj-N2t" secondAttribute="top" id="hZR-Yk-Of6"/>
                             <constraint firstItem="f1A-p3-gZv" firstAttribute="trailing" secondItem="GdD-5g-WGK" secondAttribute="trailing" id="o4i-VY-E3K"/>
-                            <constraint firstItem="GdD-5g-WGK" firstAttribute="top" secondItem="Myz-Yx-tUL" secondAttribute="top" id="oQr-p0-HiX"/>
+                            <constraint firstItem="GdD-5g-WGK" firstAttribute="top" secondItem="Myz-Yx-tUL" secondAttribute="bottom" id="oQr-p0-HiX"/>
                             <constraint firstItem="TAB-13-DJU" firstAttribute="centerY" secondItem="CkL-nP-p0R" secondAttribute="centerY" id="qe3-MF-vV0"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="YfB-Bd-ZcC"/>
                     <connections>
                         <outlet property="cancelLabel" destination="TAB-13-DJU" id="Qam-EA-r9R"/>
-                        <outlet property="collectionViewFlowLayout" destination="l4K-2z-pD5" id="0te-oh-7xr"/>
-                        <outlet property="emptyTableImageView" destination="f1A-p3-gZv" id="dsS-8e-W9Y"/>
+                        <outlet property="emptyTableImageView" destination="f1A-p3-gZv" id="U9R-m0-teg"/>
                         <outlet property="searchBar" destination="CkL-nP-p0R" id="JWs-0P-azs"/>
+                        <outlet property="searchCollectionView" destination="GdD-5g-WGK" id="lRL-Y2-mds"/>
                         <outlet property="searchSegmentalControl" destination="Myz-Yx-tUL" id="qKh-Qm-wZn"/>
-                        <outlet property="tableView" destination="GdD-5g-WGK" id="x3E-2e-8BY"/>
                         <outlet property="tableViewBottomConstraint" destination="JLw-cU-vQW" id="9Ae-mX-Yge"/>
                     </connections>
                 </viewController>

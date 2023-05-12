@@ -11,9 +11,7 @@ class TabBarViewController: UITabBarController {
     private var trailConstraint: NSLayoutConstraint?
     private var leadConstraint: NSLayoutConstraint?
     
-    lazy private var player: Player = {
-        return $0
-    }(Player())
+    lazy private var player: Player = Player()
     
     private var imageView: UIImageView =  {
         $0.image = UIImage(named: "decree")
@@ -22,10 +20,20 @@ class TabBarViewController: UITabBarController {
         return $0
     }(UIImageView())
     
-    lazy var smallPlayer: SmallPlayerView = {
-        view.addSubview($0)
+    lazy private var activityIndicator: UIActivityIndicatorView = {
+        $0.hidesWhenStopped = true
+        $0.isHidden = true
+        $0.stopAnimating()
+        $0.style = .large
+        $0.color = .white
+        $0.center = view.center
+        return $0
+    }(UIActivityIndicatorView())
+    
+    lazy private var smallPlayer: SmallPlayerView = {
         $0.delegate = self
         $0.isHidden = true
+        view.addSubview($0)
         $0.heightAnchor.constraint(equalToConstant: 50).isActive = true
         $0.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
         $0.bottomAnchor.constraint(equalTo: tabBar.topAnchor).isActive = true
@@ -74,6 +82,7 @@ class TabBarViewController: UITabBarController {
         super.viewDidLoad()
         configureView()
         fireBase()
+        downloadService.configureURLSession(delegate: self)
     }
 }
 
@@ -104,19 +113,24 @@ extension TabBarViewController {
     }
     
     private func presentDetailViewController(podcast: Podcast, completion: (() -> Void)? = nil) {
+        activityIndicator.isHidden = false
+        activityIndicator.startAnimating()
         
         /// don't present new detail vc if it already present ( big player vc )
         guard presentedViewController as? DetailViewController == nil else {
             completion?()
+            activityIndicator.stopAnimating()
             return
         }
         
         if detailViewController.podcast == podcast {
             self.present(self.detailViewController, animated: true, completion: completion)
+            
         } else {
             guard let id = podcast.collectionId?.stringValue else { return }
-            ApiService.getData(for: DinamicLinkManager.podcastById(id).url) { [weak self] (result : Result<PodcastData>) in
+            ApiService.getData(for: DynamicLinkManager.podcastById(id).url) { [weak self] (result : Result<PodcastData>) in
                 guard let self = self else { return }
+                self.activityIndicator.stopAnimating()
                 switch result {
                 case .failure(error: let error):
                     error.showAlert(vc: self)
@@ -162,7 +176,7 @@ extension TabBarViewController {
     private func configureView() {
         configureTabBar()
         configureImageDarkMode()
-        downloadService.configureURLSession(delegate: self)
+        view.addSubview(activityIndicator)
     }
     
     private func fireBase() {
@@ -381,7 +395,7 @@ extension TabBarViewController: BigPlayerViewControllerDelegate {
         guard let podcast = track as? Podcast else { return }
         bigPlayerViewController.dismiss(animated: true)
         presentDetailViewController(podcast: podcast) { [weak self] in
-            self?.detailViewController.scrollToCell(id: track?.id)
+                self?.detailViewController.scrollToCell(id: track?.id)
         }
     }
     

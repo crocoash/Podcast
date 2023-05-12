@@ -168,7 +168,7 @@ extension DetailViewController: EpisodeTableViewDelegate {
     
     func episodeTableView(_ episodeTableView: EpisodeTableView, addToFavoriteButtonDidTouchFor podcast: Podcast) {
         delegate?.detailViewController(self, addToFavoriteButtonDidTouchFor: podcast)
-        MyToast.create(title: podcast.isFavorite ? "added" : "removed" ,  .bottom, for: view)
+        addToast(title: podcast.isFavorite ? "added" : "removed", smallPlayerView.isHidden ? .bottom : .bottomWithPlayer)
     }
     
     func episodeTableView(_ episodeTableView: EpisodeTableView, removeFromFavoriteButtonDidTouchFor selectedPodcast: Podcast) {
@@ -177,10 +177,6 @@ extension DetailViewController: EpisodeTableViewDelegate {
     
     func episodeTableViewDidSelectDownLoadImage(_ episodeTableView: EpisodeTableView, entity: DownloadServiceProtocol, completion: @escaping () -> Void) {
         delegate?.detailViewControllerDidSelectDownLoadImage(self, entity: entity, completion: completion)
-    }
-    
-    func episodeTableViewDidSelectCell(_ episodeTableView: EpisodeTableView, at indexPath: IndexPath) {
-        
     }
 }
 

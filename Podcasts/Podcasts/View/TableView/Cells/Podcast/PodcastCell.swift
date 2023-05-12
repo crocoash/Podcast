@@ -208,7 +208,7 @@ extension PodcastCell {
         setFavoriteStarImage(podcast: podcast)
         setDownloadImage(podcast)
         
-        DataProvider.shared.downloadImage(string: podcast.image60) { [weak self] image in
+        DataProvider.shared.downloadImage(string: podcast.image160) { [weak self] image in
             self?.podcastImage.image = image
         }
     }

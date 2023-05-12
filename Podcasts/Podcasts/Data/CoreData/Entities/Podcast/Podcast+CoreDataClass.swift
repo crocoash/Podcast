@@ -260,6 +260,7 @@ extension Podcast: InputPlayerProtocol {
     var image60: String? { artworkUrl60 }
 }
 
+//MARK: - DownloadServiceProtocol
 extension Podcast: DownloadServiceProtocol {
     
     var stateOfDownload: StateOfDownload {
@@ -281,7 +282,7 @@ extension Podcast: DownloadServiceProtocol {
 
 //MARK: - Common
 extension Podcast {
-
+    
     var isFavorite: Bool { getFavoritePodcast != nil }
     
     var releaseDateInformation: Date? {
@@ -313,16 +314,13 @@ extension Podcast {
             _ = FavoritePodcast(podcast: self)
         }
     }
-   
+    
     var getFavoritePodcast: FavoritePodcast? {
         return FavoritePodcast.allObjectsFromCoreData.filter { $0.podcast.id == id }.first
     }
 }
 
-typealias PlaylistByNewest  = [(key: String, podcasts: [Podcast])]
-typealias PlayListByOldest = PlaylistByNewest
-typealias PlayListByGenre = PlaylistByNewest
-
+//MARK: - extension Collection
 extension Collection where Element: Podcast {
     
     var sortPodcastsByGenre: [(key: String, podcasts: [Podcast])] {
@@ -330,7 +328,7 @@ extension Collection where Element: Podcast {
         
         for podcast in self {
             if let genres = podcast.genres?.allObjects as? [Genre] {
-                for genre in genres {
+                genreLoop: for genre in genres {
                     if let genreName = genre.name {
                         if array.isEmpty {
                             array.append((key: genreName, podcasts: [podcast]))
@@ -339,10 +337,10 @@ extension Collection where Element: Podcast {
                         for value in array.enumerated() {
                             if value.element.key == genreName {
                                 array[value.offset].podcasts.append(podcast)
-                                continue
+                                continue genreLoop
                             }
-                            array.append((key: genreName, podcasts: [podcast]))
                         }
+                        array.append((key: genreName, podcasts: [podcast]))
                     }
                 }
             }
@@ -380,6 +378,18 @@ extension Collection where Element: Podcast {
     }
 }
 
+//MARK: -
+extension Podcast: SearchCollectionViewCellType {
+    var image: String? {
+        return image600
+    }
+}
+
+typealias PlaylistByNewest  = [(key: String, podcasts: [Podcast])]
+typealias PlayListByOldest = PlaylistByNewest
+typealias PlayListByGenre = PlaylistByNewest
+
+//MARK: - extension Collection
 extension Collection where Element == (key: String, podcasts: [Podcast]) {
     
     var countOfValues: Int {
@@ -401,22 +411,19 @@ extension Collection where Element == (key: String, podcasts: [Podcast]) {
         return arrayOfIndexPath
     }
     
-//    func getPodcast(for indexPath: IndexPath) -> Podcast {
-//        let section = indexPath.section
-//        return self[section].podcasts[indexPath.row]
-//    }
-}
-
-
-
-extension Collection {
-    
-    func myReduce<T>(_ param1 :T,_ completion: (T,Element) -> (T)) -> T {
-        var param = param1
-        for i in self {
-            param = completion(param1,i)
-        }
-        return param
+    func getPodcast(for indexPath: IndexPath) -> Podcast {
+        return self[indexPath.section as! Self.Index].podcasts[indexPath.row]
     }
 }
+//
+//extension Collection {
+//
+//    func myReduce<T>(_ param1 :T,_ completion: (T,Element) -> (T)) -> T {
+//        var param = param1
+//        for i in self {
+//            param = completion(param1,i)
+//        }
+//        return param
+//    }
+//}
 

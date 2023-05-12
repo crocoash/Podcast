@@ -35,7 +35,7 @@ class FavoritePodcastTableViewController: UIViewController {
     
     weak var delegate: FavoritePodcastViewControllerDelegate?
     private var tableViewBottomConstraintConstant: CGFloat = 0
-    private let refreshControll = UIRefreshControl()
+    private let refreshControl = UIRefreshControl()
     
     private var playerIsSHidden = true {
         didSet {
@@ -98,12 +98,12 @@ class FavoritePodcastTableViewController: UIViewController {
             switch result {
             case .failure(error: let error) :
                 error.showAlert(vc: self) {
-                    self?.refreshControll.endRefreshing()
-                    self?.refreshControll.isHidden = true
+                    self?.refreshControl.endRefreshing()
+                    self?.refreshControl.isHidden = true
                 }
             case .success(result: _) :
-                self?.refreshControll.endRefreshing()
-                self?.refreshControll.isHidden = true
+                self?.refreshControl.endRefreshing()
+                self?.refreshControl.isHidden = true
             }
         }
     }
@@ -120,8 +120,8 @@ extension FavoritePodcastTableViewController {
     private func configureTableView() {
         tableView.rowHeight = 100
         tableView.allowsSelection = true
-        refreshControll.addTarget(self, action: #selector(refreshTableView), for: .valueChanged)
-        tableView.refreshControl = refreshControll
+        refreshControl.addTarget(self, action: #selector(refreshTableView), for: .valueChanged)
+        tableView.refreshControl = refreshControl
     }
     
     private func showEmptyImage() {
@@ -211,14 +211,14 @@ extension FavoritePodcastTableViewController: NSFetchedResultsControllerDelegate
             guard let indexPath = indexPath else { return }
             tableView.deleteRows(at: [indexPath], with: .left)
             let title = "podcast is removed from playlist"
-            MyToast.create(title: title, (playerIsSHidden ? .bottom : .bottomWithPlayer), for: view)
+            addToast(title: title, (playerIsSHidden ? .bottomWithTabBar : .bottomWithPlayerAndTabBar))
         case .insert :
             if let newIndexPath = newIndexPath {
                 tableView.insertRows(at: [newIndexPath], with: .left)
                 let favoritePodcast = FavoritePodcast.fetchResultController.object(at: newIndexPath)
                 let name = favoritePodcast.podcast.trackName ?? ""
                 let title = "\(name) podcast is added to playlist"
-                MyToast.create(title: title, (playerIsSHidden ? .bottom : .bottomWithPlayer), for: view)
+                addToast(title: title, (playerIsSHidden ? .bottom : .bottomWithPlayer))
             }
         case .move :
             if let indexPath = indexPath {

@@ -13,7 +13,6 @@ protocol EpisodeTableViewDelegate: AnyObject {
     func episodeTableView(_ episodeTableView: EpisodeTableView, addToFavoriteButtonDidTouchFor podcast: Podcast)
     func episodeTableView(_ episodeTableView: EpisodeTableView, removeFromFavoriteButtonDidTouchFor selectedPodcast: Podcast)
     func episodeTableViewDidSelectDownLoadImage(_ episodeTableView: EpisodeTableView, entity: DownloadServiceProtocol, completion: @escaping () -> Void)
-    func episodeTableViewDidSelectCell(_ episodeTableView: EpisodeTableView, at indexPath: IndexPath)
 }
 
 protocol EpisodeTableViewMyDataSource: AnyObject {
@@ -108,14 +107,8 @@ class EpisodeTableView: UITableView {
     func changeTypeOfSort(_ typeOfSort: TypeSortOfTableView) {
         self.typeOfSort = typeOfSort
         configureHeadersForSectionsAndCalculateHeightsOfAllHeaders()
-        reloadTableViewHeight()
         reloadData()
-    }
-    
-    private func reloadTableViewHeight() {
-        let allHeight = selectedCellAndHisHeight.arrayOfValues.reduce(into: 0) { $0 += $1 - defaultRowHeight }
-        let heightOfTableView = currentPlaylist.countOfValues.cgFloat * defaultRowHeight + allHeight + sumOfHeightsOfAllHeaders
-        myDataSource?.episodeTableViewDidChangeHeightTableView(self, height: heightOfTableView)
+        reloadTableViewHeight()
     }
     
     func updateDownloadInformation(progress: Float, totalSize: String, for podcast: Podcast) {
@@ -174,6 +167,12 @@ extension EpisodeTableView {
         guard let indexPath = indexPath(for: cell) else { return nil }
         return currentPlaylist[indexPath.section].podcasts[indexPath.row]
     }
+    
+    private func reloadTableViewHeight() {
+        let allHeight = selectedCellAndHisHeight.arrayOfValues.reduce(into: 0) { $0 += $1 - defaultRowHeight }
+        let heightOfTableView = currentPlaylist.countOfValues.cgFloat * defaultRowHeight + allHeight + sumOfHeightsOfAllHeaders
+        myDataSource?.episodeTableViewDidChangeHeightTableView(self, height: heightOfTableView)
+    }
 }
 
 //MARK: - EpisodeTableView
@@ -192,7 +191,7 @@ extension EpisodeTableView: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.getCell(cell: PodcastCell.self, indexPath: indexPath)
+        let cell = getCell(cell: PodcastCell.self, indexPath: indexPath)
         let podcast = currentPlaylist[indexPath.section].podcasts[indexPath.row]
         cell.configureCell(self, with: podcast)
         return cell
@@ -204,7 +203,7 @@ extension EpisodeTableView: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if selectedCellAndHisHeight[indexPath] != nil {
-            if let cell = tableView.cellForRow(at: indexPath) as? PodcastCell, cell.podcastDescription.maxNumberOfLines > 3 {
+            if let cell = cellForRow(at: indexPath) as? PodcastCell, cell.podcastDescription.maxNumberOfLines > 3 {
                 return UITableView.automaticDimension
             }
         }
@@ -218,15 +217,16 @@ extension EpisodeTableView: UITableViewDelegate {
         } else {
             selectedCellAndHisHeight[indexPath] = nil
         }
-        tableView.reloadRows(at: [indexPath], with: .automatic)
+        reloadRows(at: [indexPath], with: .automatic)
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         /// write value for calculate height of tableview
-        let offset = tableView.rectForRow(at: indexPath).height
+        let offset = rectForRow(at: indexPath).height
         if selectedCellAndHisHeight[indexPath] != nil {
             selectedCellAndHisHeight[indexPath] = offset
         }
+        reloadTableViewHeight()
     }
 }
 

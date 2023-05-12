@@ -19,7 +19,7 @@ protocol SearchViewControllerDelegate: AnyObject {
 class SearchViewController : UIViewController {
     
     @IBOutlet private weak var searchBar: UISearchBar!
-    @IBOutlet private weak var tableView: UITableView!
+    @IBOutlet private weak var searchCollectionView: SearchCollectionView!
     @IBOutlet private weak var cancelLabel: UILabel!
     @IBOutlet private weak var searchSegmentalControl: UISegmentedControl!
     
@@ -27,21 +27,25 @@ class SearchViewController : UIViewController {
     
     @IBOutlet private weak var emptyTableImageView: UIImageView!
     
-    private var tableViewBottomConstraintContstnt: CGFloat = 0
-    private let refreshControll = UIRefreshControl()
+    private var tableViewBottomConstraintConstant: CGFloat = 0
+    private let refreshControl = UIRefreshControl()
 
     private let activityIndicator = UIActivityIndicatorView()
     private var alert             = Alert()
-    private var podcasts          = Array<Podcast>()
-    private var authors           = Array<Author>()
+    private var podcasts          = Array<Podcast>() {
+        didSet {
+            searchCollectionView.setUp(podcasts: podcasts)
+        }
+    }
+    private var authors = Array<Author>()
     
     weak var delegate: SearchViewControllerDelegate?
     
     //MARK: - Methods
     private var playerIsSHidden = true {
         didSet {
-            tableViewBottomConstraintContstnt = playerIsSHidden ? 0 : 50
-            tableViewBottomConstraint?.constant = tableViewBottomConstraintContstnt
+            tableViewBottomConstraintConstant = playerIsSHidden ? 0 : 50
+            tableViewBottomConstraint?.constant = tableViewBottomConstraintConstant
         }
     }
     
@@ -51,18 +55,18 @@ class SearchViewController : UIViewController {
     }
     
     func updateDownloadInformation(progress: Float, totalSize: String, podcast: Podcast) {
-        guard let index = podcasts.firstIndex(matching: podcast) else { return }
-        
-        if let podcastCell = self.tableView?.cellForRow(at: IndexPath(row: index, section: 0)) as? PodcastCell {
-            podcastCell.updateDownloadInformation(progress: progress, totalSize: totalSize)
-        }
+//        guard let index = podcasts.firstIndex(matching: podcast) else { return }
+//
+//        if let podcastCell = self.tableView?.cellForRow(at: IndexPath(row: index, section: 0)) as? PodcastCell {
+//            podcastCell.updateDownloadInformation(progress: progress, totalSize: totalSize)
+//        }
     }
     
     func endDownloading(podcast: Podcast) {
-        guard let index = podcasts.firstIndex(matching: podcast) else { return }
-        if let cell = tableView.cellForRow(at: IndexPath(row: index, section: 0)) as? PodcastCell {
-            cell.endDownloading()
-        }
+//        guard let index = podcasts.firstIndex(matching: podcast) else { return }
+//        if let cell = tableView.cellForRow(at: IndexPath(row: index, section: 0)) as? PodcastCell {
+//            cell.endDownloading()
+//        }
     }
     
     private var isPodcast: Bool { searchSegmentalControl.selectedSegmentIndex == 0 }
@@ -79,9 +83,8 @@ class SearchViewController : UIViewController {
         configureUI()
         configureGesture()
         showEmptyImage()
-        tableViewBottomConstraint.constant = tableViewBottomConstraintContstnt
+        tableViewBottomConstraint.constant = tableViewBottomConstraintConstant
     }
-    
 
     override func motionBegan(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
         cancelSearchAction()
@@ -95,27 +98,11 @@ class SearchViewController : UIViewController {
     
     @objc func refresh() {
         getData()
-        refreshControll.endRefreshing()
+        refreshControl.endRefreshing()
     }
     
     @objc func changeTypeOfSearch(sender: UISegmentedControl) {
         getData()
-    }
-    
-    @objc func handlerTapAuthorCell(sender: UITapGestureRecognizer) {
-        guard let view = sender.view as? UITableViewCell,
-              let indexPath = tableView.indexPath(for: view) else { return }
-        
-        searchSegmentalControl.selectedSegmentIndex = 0
-        getData()
-        tableView.deselectRow(at: indexPath, animated: true)
-    }
-    
-    @objc func handlerTapPodcastCell(sender : UITapGestureRecognizer) {
-        guard let view = sender.view as? UITableViewCell,
-              let indexPath = tableView.indexPath(for: view) else { return }
-        let podcast = podcasts[indexPath.row]
-        delegate?.searchViewControllerDidSelectCell(self, podcast: podcast)
     }
     
     @objc func handlerSwipe(sender: UISwipeGestureRecognizer) {
@@ -132,23 +119,16 @@ class SearchViewController : UIViewController {
 extension SearchViewController {
     
     private func configureUI() {
-        configureTableView()
         configureCancelLabel()
         configureSegmentalControl()
         configureAlert()
         configureActivityIndicator()
-        AuthorDocument.shared.searchFRC.delegate = self
-    }
-    
-    private func configureTableView() {
-        tableView.rowHeight = 100
-        refreshControll.tintColor = .yellow
-        tableView.refreshControl = refreshControll
+        configureSearchCollectionView()
     }
     
     private func configureGesture() {
         view.addMyGestureRecognizer(self, type: .swipe(directions: [.left,.right]), #selector(handlerSwipe))
-        refreshControll.addTarget(self, action: #selector(refresh), for: .valueChanged)
+        refreshControl.addTarget(self, action: #selector(refresh), for: .valueChanged)
     }
     
     private func configureCancelLabel() {
@@ -177,19 +157,24 @@ extension SearchViewController {
         showEmptyImage()
     }
     
+    private func configureSearchCollectionView() {
+        searchCollectionView.setUp(podcasts: podcasts)
+        searchCollectionView.myDelegate = self
+    }
+    
     private func showEmptyImage() {
         let podcastsIsEmpty = podcasts.isEmpty
         let authorsIsEmpty = authors.isEmpty
+        let selectedFirstSegmentalControl = searchSegmentalControl?.selectedSegmentIndex == 0
+        let selectedSecondSegmentalControl = searchSegmentalControl?.selectedSegmentIndex == 1
         
-        if (searchSegmentalControl?.selectedSegmentIndex == 0 && podcastsIsEmpty) ||
-            (searchSegmentalControl?.selectedSegmentIndex == 1 && authorsIsEmpty) {
-            tableView.isHidden = true
+        if selectedFirstSegmentalControl && podcastsIsEmpty || selectedSecondSegmentalControl && authorsIsEmpty {
+            searchCollectionView.isHidden = true
             emptyTableImageView.isHidden = false
         }
         
-        if (searchSegmentalControl?.selectedSegmentIndex == 0 && !podcastsIsEmpty ||
-            (searchSegmentalControl?.selectedSegmentIndex == 1 && !authorsIsEmpty)) {
-            tableView.isHidden = false
+        if selectedFirstSegmentalControl && !podcastsIsEmpty || selectedSecondSegmentalControl && !authorsIsEmpty {
+            searchCollectionView.isHidden = false
             emptyTableImageView.isHidden = true
         }
     }
@@ -211,17 +196,17 @@ extension SearchViewController {
             self.alert.create(vc: self, title: "Ooops nothing search", withTimeIntervalToDismiss: 2)
         }
         self.showEmptyImage()
-        tableView.reloadData()
+        searchCollectionView.reloadData()
     }
     
     private func getData() {
-        tableView.setContentOffset(.zero, animated: true)
+        searchCollectionView.setContentOffset(.zero, animated: true)
         guard let request = searchBar.text?.conform, !request.isEmpty else { showEmptyImage(); return }
         activityIndicator.startAnimating()
         if searchSegmentalControl.selectedSegmentIndex == 0 {
-            getPodcasts(request: DinamicLinkManager.podcastEpisode(request).url)
+            getPodcasts(request: DynamicLinkManager.podcastEpisode(request).url)
         } else {
-            getAuthors(request: DinamicLinkManager.authors(request).url)
+            getAuthors(request: DynamicLinkManager.authors(request).url)
         }
     }
     
@@ -256,42 +241,24 @@ extension SearchViewController {
         }
     }
     
-    private func configurePodcastCell(_ indexPath: IndexPath,for tableView: UITableView) -> UITableViewCell {
-        let podcast = podcasts[indexPath.row]
-        let cell = tableView.getCell(cell: PodcastCell.self, indexPath: indexPath)
-//        DownloadService().resumeDownload(podcast)
-        cell.configureCell(nil, with: podcast)
-        cell.addMyGestureRecognizer(self, type: .tap(), #selector(handlerTapPodcastCell))
-        return cell
-    }
-    
-    private func configureAuthorCell(_ indexPath: IndexPath,for tableView: UITableView) -> UITableViewCell {
-        let author = authors[indexPath.row]
-        let cell = tableView.getCell(cell: PodcastByAuthorCell.self, indexPath: indexPath)
-        cell.configureCell(with: author)
-        cell.addMyGestureRecognizer(self, type: .tap(), #selector(handlerTapAuthorCell))
-       
-        return cell
-    }
-    
-    private func updateCell(for podcast: Podcast) {
-        if isPodcast, let index = podcasts.firstIndex(matching: podcast) {
-            tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .bottom)
-        }
-    }
+//    private func updateCell(for podcast: Podcast) {
+//        if isPodcast, let index = podcasts.firstIndex(matching: podcast) {
+//            tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .bottom)
+//        }
+//    }
 }
 
-// MARK: - TableView Data Source
-extension SearchViewController: UITableViewDataSource {
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return isPodcast ? podcasts.count : authors.count
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        return isPodcast ? configurePodcastCell(indexPath, for: tableView) : configureAuthorCell(indexPath, for: tableView)
-    }
-}
+//// MARK: - TableView Data Source
+//extension SearchViewController: UITableViewDataSource {
+//
+//    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+//        return isPodcast ? podcasts.count : authors.count
+//    }
+//
+//    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+//        return isPodcast ? configurePodcastCell(indexPath, for: tableView) : configureAuthorCell(indexPath, for: tableView)
+//    }
+//}
 
 
 //MARK: - UISearchBarDelegate
@@ -321,9 +288,9 @@ extension SearchViewController: AlertDelegate {
     }
 }
 
-//MARK: - NSFetchedResultsControllerDelegate
-extension SearchViewController: NSFetchedResultsControllerDelegate {
+extension SearchViewController: SearchCollectionViewDelegate {
     
-    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+    func searchCollectionView(_ searchCollectionView: SearchCollectionView, podcast: Podcast) {
+        delegate?.searchViewControllerDidSelectCell(self, podcast: podcast)
     }
 }

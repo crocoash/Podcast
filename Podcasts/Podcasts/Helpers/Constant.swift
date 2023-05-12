@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum DinamicLinkManager {
+enum DynamicLinkManager {
     
     case podcastEpisode(String)
     case authors(String)
