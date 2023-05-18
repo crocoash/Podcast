@@ -24,8 +24,4 @@ class SearchCollectionViewCell: UICollectionViewCell {
             self?.podcastImageView.image = image
         }
     }
-    
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-    }
 }

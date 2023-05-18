@@ -16,19 +16,18 @@ protocol EpisodeTableViewDelegate: AnyObject {
 }
 
 protocol EpisodeTableViewMyDataSource: AnyObject {
-    func episodeTableViewDidChangeHeightTableView(_ episodeTableView: EpisodeTableView, height: CGFloat)
+    func episodeTableViewDidChangeHeightTableView(_ episodeTableView: EpisodeTableView, height: CGFloat, withLastCell: Bool)
 }
 
 protocol EpisodeTableViewPlayableProtocol: PodcastCellPlayableProtocol {
     var id: NSNumber? { get }
 }
 
-@IBDesignable
 class EpisodeTableView: UITableView {
    
     private let defaultRowHeight: CGFloat = 100
     private var sumOfHeightsOfAllHeaders :CGFloat = 0
-    private var paddingBetweenSections: CGFloat = 0
+    private var paddingBetweenSections: CGFloat = 20
     
     weak var myDelegate: EpisodeTableViewDelegate?
     weak var myDataSource: EpisodeTableViewMyDataSource?
@@ -92,10 +91,6 @@ class EpisodeTableView: UITableView {
         reloadRows(at: indexPath, with: .none)
     }
     
-    private func setHeightOfEpisodeTableView() -> CGFloat {
-         return currentPlaylist.countOfValues.cgFloat * defaultRowHeight + sumOfHeightsOfAllHeaders
-    }
-    
     func getCell(id: NSNumber?) -> PodcastCell? {
         guard let indexPath = currentPlaylist.getIndexPath(for: id).first else { return nil }
         if let cell = cellForRow(at: indexPath) as? PodcastCell {
@@ -129,12 +124,10 @@ class EpisodeTableView: UITableView {
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         addObserverPlayerEventNotification()
-        
         delegate = self
         dataSource = self
         
         if #available(iOS 15.0, *) {
-            paddingBetweenSections = 20
             sectionHeaderTopPadding = paddingBetweenSections
         }
     }
@@ -168,10 +161,22 @@ extension EpisodeTableView {
         return currentPlaylist[indexPath.section].podcasts[indexPath.row]
     }
     
-    private func reloadTableViewHeight() {
+    private func reloadTableViewHeight(lastCelIsClosed: Bool = false) {
         let allHeight = selectedCellAndHisHeight.arrayOfValues.reduce(into: 0) { $0 += $1 - defaultRowHeight }
         let heightOfTableView = currentPlaylist.countOfValues.cgFloat * defaultRowHeight + allHeight + sumOfHeightsOfAllHeaders
-        myDataSource?.episodeTableViewDidChangeHeightTableView(self, height: heightOfTableView)
+        myDataSource?.episodeTableViewDidChangeHeightTableView(self, height: heightOfTableView, withLastCell: lastCelIsClosed)
+    }
+    
+    private func isLastSectionAndRow(indexPath: IndexPath) -> Bool {
+        return currentPlaylist.count - 1 == indexPath.section && currentPlaylist[indexPath.section].podcasts.count - 1 == indexPath.row
+    }
+    
+    private func setHeightOfEpisodeTableView() -> CGFloat {
+         return currentPlaylist.countOfValues.cgFloat * defaultRowHeight + sumOfHeightsOfAllHeaders
+    }
+    
+    private func isCellIsClosed(_ indexPath: IndexPath) -> Bool {
+        return selectedCellAndHisHeight[indexPath] == nil
     }
 }
 
@@ -193,6 +198,7 @@ extension EpisodeTableView: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = getCell(cell: PodcastCell.self, indexPath: indexPath)
         let podcast = currentPlaylist[indexPath.section].podcasts[indexPath.row]
+        cell.isSelected = isCellIsClosed(indexPath)
         cell.configureCell(self, with: podcast)
         return cell
     }
@@ -203,7 +209,7 @@ extension EpisodeTableView: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if selectedCellAndHisHeight[indexPath] != nil {
-            if let cell = cellForRow(at: indexPath) as? PodcastCell, cell.podcastDescription.maxNumberOfLines > 3 {
+            if let cell = cellForRow(at: indexPath) as? PodcastCell, cell.moreThanThreeLines {
                 return UITableView.automaticDimension
             }
         }
@@ -211,22 +217,33 @@ extension EpisodeTableView: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        /// check if the cell all ready selected
-        if selectedCellAndHisHeight[indexPath] == nil {
+        /// check if the cell allready selected
+       
+        guard let cell = cellForRow(at: indexPath) as? PodcastCell, cell.moreThanThreeLines else { return }
+        if isCellIsClosed(indexPath) {
+            /// open cell with default height calculate height in willDisplay method
             selectedCellAndHisHeight[indexPath] = 0 // default value
         } else {
+            /// close cell
             selectedCellAndHisHeight[indexPath] = nil
+            let isLastCell = isLastSectionAndRow(indexPath: indexPath)
+            reloadTableViewHeight(lastCelIsClosed: isLastCell)
+            ///offset scrollview for closed cell
         }
-        reloadRows(at: [indexPath], with: .automatic)
+        UIView.animate(withDuration: 0.4) { [weak self] in
+            self?.reloadRows(at: [indexPath], with: .automatic)
+        }
     }
-    
+   
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         /// write value for calculate height of tableview
-        let offset = rectForRow(at: indexPath).height
         if selectedCellAndHisHeight[indexPath] != nil {
+            
+            let offset = rectForRow(at: indexPath).height
+            let isLastCell = isLastSectionAndRow(indexPath: indexPath)
             selectedCellAndHisHeight[indexPath] = offset
+            reloadTableViewHeight(lastCelIsClosed: isLastCell)
         }
-        reloadTableViewHeight()
     }
 }
 

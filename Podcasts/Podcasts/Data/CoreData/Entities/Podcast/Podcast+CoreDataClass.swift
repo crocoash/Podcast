@@ -196,10 +196,7 @@ extension Podcast: CoreDataProtocol {
     func removeFromCoreDataWithOwnEntityRule() {
         guard let podcast = getFromCoreData else { return }
         if let genres = podcast.genres?.allObjects as? [Genre] {
-            genres.forEach {
-                $0.removePodcast(podcast: podcast)
-                $0.remove()
-            }
+            genres.remove(podcast: podcast)
         }
         podcast.myValidateDelete()
         
@@ -285,16 +282,16 @@ extension Podcast {
     
     var isFavorite: Bool { getFavoritePodcast != nil }
     
-    var releaseDateInformation: Date? {
-        guard let releaseDate = releaseDate else { return nil }
+    var releaseDateInformation: Date {
+        guard let releaseDate = releaseDate else { return Date() }
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
         let date = dateFormatter.date(from: releaseDate)
-        return date
+        return date ?? Date()
     }
     
     func formattedDate(dateFormat: String) -> String {
-        releaseDateInformation?.formattedDate(dateFormat: dateFormat) ?? ""
+        releaseDateInformation.formattedDate(dateFormat: dateFormat)
     }
     
     /// ListeningPodcast
@@ -328,33 +325,31 @@ extension Collection where Element: Podcast {
         
         for podcast in self {
             if let genres = podcast.genres?.allObjects as? [Genre] {
-                genreLoop: for genre in genres {
-                    if let genreName = genre.name {
-                        if array.isEmpty {
-                            array.append((key: genreName, podcasts: [podcast]))
-                            continue
-                        }
-                        for value in array.enumerated() {
-                            if value.element.key == genreName {
-                                array[value.offset].podcasts.append(podcast)
-                                continue genreLoop
-                            }
-                        }
+            loop: for genre in genres where let genreName = genre.name  {
+                    if array.isEmpty {
                         array.append((key: genreName, podcasts: [podcast]))
+                        continue
                     }
-                }
+                    for (index,value) in array.enumerated() {
+                        if value.key == genreName {
+                            array[index].podcasts.append(podcast)
+                            continue loop
+                        }
+                    }
+                    array.append((key: genreName, podcasts: [podcast]))
+            }
             }
         }
-        return array
+        return array.map { ($0.key, $0.podcasts.sorted { $0.releaseDateInformation < $1.releaseDateInformation }) }
     }
-    
+        
     var sortPodcastsByNewest: PlaylistByNewest {
-        let array = self.sorted { $0.releaseDateInformation ?? Date() > $1.releaseDateInformation ?? Date() }
+        let array = self.sorted { $0.releaseDateInformation > $1.releaseDateInformation }
         return array.conform
     }
     
     var sortPodcastsByOldest: PlayListByOldest {
-        let array = self.sorted { $0.releaseDateInformation ?? Date() < $1.releaseDateInformation ?? Date() }
+        let array = self.sorted { $0.releaseDateInformation < $1.releaseDateInformation }
         return array.conform
     }
     
@@ -366,11 +361,9 @@ extension Collection where Element: Podcast {
                 array.append((key: date, podcasts: [element]))
                 continue
             }
-            for value in array.enumerated() {
-                if value.element.key == date {
-                    array[value.offset].podcasts.append(element)
-                    continue loop
-                }
+            for value in array.enumerated() where value.element.key == date  {
+                array[value.offset].podcasts.append(element)
+                continue loop
             }
             array.append((key: date, podcasts: [element]))
         }
@@ -388,6 +381,8 @@ extension Podcast: SearchCollectionViewCellType {
 typealias PlaylistByNewest  = [(key: String, podcasts: [Podcast])]
 typealias PlayListByOldest = PlaylistByNewest
 typealias PlayListByGenre = PlaylistByNewest
+
+
 
 //MARK: - extension Collection
 extension Collection where Element == (key: String, podcasts: [Podcast]) {

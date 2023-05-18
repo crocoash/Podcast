@@ -33,13 +33,17 @@
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="GdD-5g-WGK" customClass="SearchCollectionView" customModule="Podcasts" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="151" width="393" height="667"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="0.0" minimumInteritemSpacing="0.0" id="l4K-2z-pD5">
+                                <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="0.0" minimumInteritemSpacing="0.0" id="8LH-pD-Rqr">
                                     <size key="itemSize" width="128" height="128"/>
-                                    <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                                    <size key="headerReferenceSize" width="50" height="50"/>
                                     <size key="footerReferenceSize" width="0.0" height="0.0"/>
                                     <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                 </collectionViewFlowLayout>
                                 <cells/>
+                                <collectionReusableView key="sectionHeaderView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="Zw4-mx-F8O">
+                                    <rect key="frame" x="0.0" y="0.0" width="393" height="50"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </collectionReusableView>
                             </collectionView>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" image="doc.text.magnifyingglass" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="f1A-p3-gZv">
                                 <rect key="frame" x="0.0" y="151.33333333333337" width="393" height="668"/>
@@ -91,7 +95,7 @@
         </scene>
     </scenes>
     <resources>
-        <image name="doc.text.magnifyingglass" catalog="system" width="110" height="128"/>
+        <image name="doc.text.magnifyingglass" catalog="system" width="32" height="32"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

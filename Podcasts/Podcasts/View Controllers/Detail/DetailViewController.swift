@@ -45,8 +45,7 @@ class DetailViewController: UIViewController {
     
     @IBOutlet private weak var episodeTableView: EpisodeTableView!
     @IBOutlet private weak var heightTableViewConstraint: NSLayoutConstraint!
-    @IBOutlet private weak var bottomPlayerConstraint:    NSLayoutConstraint!
-    
+    @IBOutlet private weak var bottomPlayerConstraint:NSLayoutConstraint!
     
 //    cell.setHighlighted(true, animated: true)
     
@@ -68,6 +67,7 @@ class DetailViewController: UIViewController {
         configureGestures()
         setupView()
     }
+
     
     //MARK: Public Methods
     func setUp(podcast: Podcast, playlist: [Podcast]) {
@@ -78,6 +78,7 @@ class DetailViewController: UIViewController {
     func updateConstraintForTableView(playerIsPresent: Bool) {
         smallPlayerView.isHidden = !playerIsPresent
         bottomPlayerConstraint.constant = playerIsPresent ? 50 : 0
+        view.layoutIfNeeded()
     }
     
     func setupView() {
@@ -86,15 +87,16 @@ class DetailViewController: UIViewController {
             self?.episodeImage.image = image
         }
         smallPlayerView.delegate = self
+        episodeTableView.translatesAutoresizingMaskIntoConstraints = false
         episodeTableView.configureEpisodeTableView(self, with: podcasts)
     
         episodeName        .text = podcast?.trackName
-        artistName         .text = podcast?.artistName
+        artistName         .text = podcast.artistName ?? "Artist Name"
         genresLabel        .text = podcast?.genresString
         descriptionTextView.text = podcast?.descriptionMy
         countryLabel       .text = podcast?.country
         advisoryRatingLabel.text = podcast?.contentAdvisoryRating
-        dateLabel          .text = podcast?.releaseDateInformation?.formattedDate(dateFormat: "d MMM YYY")
+        dateLabel          .text = podcast?.releaseDateInformation.formattedDate(dateFormat: "d MMM YYY")
         durationLabel      .text = podcast?.trackTimeMillis?.minute
     }
     
@@ -116,8 +118,9 @@ class DetailViewController: UIViewController {
     }
     
     //MARK: - Actions
-    @objc private func backAction(_ sender: Any) {
+    @IBAction private func backAction(_ sender: UITapGestureRecognizer) {
         dismiss(animated: true)
+        view.endEditing(true)
     }
     
     @IBAction private func refreshByGenre(_ sender: UICommand) {
@@ -131,33 +134,63 @@ class DetailViewController: UIViewController {
     @IBAction private func refreshByOldest(_ sender: UICommand) {
         episodeTableView.changeTypeOfSort(.byOldest)
     }
+    
+    @IBAction private func shareButtonOnTouch(_ sender: UITapGestureRecognizer) {
+        presentActivityViewController()
+    }
 }
 
 //MARK: - Private Methods
 extension DetailViewController {
     
     private func configureGestures() {
-        backImageView.addMyGestureRecognizer(self, type: .tap(),#selector(backAction))
         addMyGestureRecognizer(self, type: .screenEdgePanGestureRecognizer(directions: [.left]), #selector(backAction))
     }
     
     private func reloadTableViewHeightConstraint(newHeight: CGFloat) {
-        heightTableViewConstraint.constant = newHeight
-        episodeTableView.layoutIfNeeded()
+            heightTableViewConstraint.constant = newHeight
+            view.layoutIfNeeded()
+    }
+    
+    private func presentActivityViewController() {
+        guard let trackViewUrl = podcast.trackViewUrl,
+              let image = episodeImage.image else { return }
+        let text = "You should definitely listen to this!"
+        
+        let shareVC = UIActivityViewController(activityItems: [text, trackViewUrl, image], applicationActivities: [])
+    
+        if let popoverController = shareVC.popoverPresentationController {
+            popoverController.sourceView = view
+            popoverController.sourceRect = view.bounds
+        }
+        present(shareVC, animated: true)
     }
 }
 
 //MARK: - EpisodeTableViewControllerMyDataSource
 extension DetailViewController: EpisodeTableViewMyDataSource {
     
-    func episodeTableViewDidChangeHeightTableView(_ episodeTableView: EpisodeTableView, height: CGFloat) {
-        reloadTableViewHeightConstraint(newHeight: height)
+    func episodeTableViewDidChangeHeightTableView(_ episodeTableView: EpisodeTableView, height: CGFloat, withLastCell: Bool) {
+        if withLastCell {
+            UIView.animate(withDuration: 0.3) { [weak self] in
+                self?.reloadTableViewHeightConstraint(newHeight: height)
+                guard let self = self, let view = self.view else { return }
+                
+                let heightOfSmallPlayer = self.smallPlayerView.isHidden ? 0 : self.smallPlayerView.frame.height
+                let y = episodeTableView.frame.maxY - (view.bounds.height - view.safeAreaInsets.top - view.safeAreaInsets.bottom) + heightOfSmallPlayer
+                self.scrollView.setContentOffset(CGPoint(x: .zero, y: y), animated: true)
+            }
+        } else {
+            UIView.animate(withDuration: 0.4) { [weak self] in
+                self?.reloadTableViewHeightConstraint(newHeight: height)
+            }
+        }
     }
 }
 
 //MARK: - EpisodeTableViewControllerDelegate
 extension DetailViewController: EpisodeTableViewDelegate {
-   
+    
     func episodeTableViewPlayButtonDidTouchFor(_ episodeTableView: EpisodeTableView, podcast: Podcast, at moment: Double?, playlist: [Podcast]) {
         delegate?.detailViewControllerPlayButtonDidTouchFor(self, podcast: podcast, at: moment, playlist: playlist)
     }

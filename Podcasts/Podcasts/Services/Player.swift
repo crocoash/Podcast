@@ -49,7 +49,7 @@ extension Player: OutputPlayerProtocol {
     var id: NSNumber? { currentTrack?.track.id }
     var track: InputPlayerProtocol? { currentTrack?.track }
     var progress: Double? { currentTrack?.track.progress }
-    var trackImage: String? { currentTrack?.track.image60 }
+    var trackImage: String? { currentTrack?.track.image600 }
     var trackName: String? { currentTrack?.track.trackName }
     var currentTime: Float? { currentTrack?.track.currentTime }
     var duration: Double? { currentTrack?.track.duration }

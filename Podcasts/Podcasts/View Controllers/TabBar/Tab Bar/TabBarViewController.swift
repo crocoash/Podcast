@@ -113,21 +113,20 @@ extension TabBarViewController {
     }
     
     private func presentDetailViewController(podcast: Podcast, completion: (() -> Void)? = nil) {
-        activityIndicator.isHidden = false
-        activityIndicator.startAnimating()
         
         /// don't present new detail vc if it already present ( big player vc )
         guard presentedViewController as? DetailViewController == nil else {
             completion?()
-            activityIndicator.stopAnimating()
             return
         }
         
         if detailViewController.podcast == podcast {
             self.present(self.detailViewController, animated: true, completion: completion)
-            
         } else {
             guard let id = podcast.collectionId?.stringValue else { return }
+            activityIndicator.isHidden = false
+            activityIndicator.startAnimating()
+            
             ApiService.getData(for: DynamicLinkManager.podcastById(id).url) { [weak self] (result : Result<PodcastData>) in
                 guard let self = self else { return }
                 self.activityIndicator.stopAnimating()
@@ -421,7 +420,7 @@ extension TabBarViewController: BigPlayerViewControllerDelegate {
     
     func bigPlayerViewController(_ bigPlayerViewController: BigPlayerViewController, didLikeThis moment: Double) {
         if let podcast = player.currentTrack?.track as? Podcast {
-            _ = LikedMoment(podcast: podcast, moment: moment)
+            LikedMoment.saveInCoredataIfNotSaved(podcast: podcast, moment: moment)
         }
     }
 }

@@ -100,3 +100,13 @@ extension Genre {
         }
     }
 }
+
+extension Collection where Element: Genre {
+    
+    func remove(podcast: Podcast) {
+        self.forEach {
+            $0.removePodcast(podcast: podcast)
+            $0.remove()
+        }
+    }
+}

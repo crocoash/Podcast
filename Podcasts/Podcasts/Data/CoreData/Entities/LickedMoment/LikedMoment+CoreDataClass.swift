@@ -66,10 +66,19 @@ extension LikedMoment {
         return fetchResultController
     }()
     
-    var key: String { "\(podcast.id ?? 0)" }
+    var firebaseKey: String { "\(Int(moment))sec id\(podcast.id ?? 0)" }
     
     static func getLikedMoment(at indexPath: IndexPath) -> LikedMoment {
         return likedMomentFRC.object(at: indexPath)
+    }
+    
+    static func saveInCoredataIfNotSaved(podcast: Podcast, moment: Double) {
+        var likeMoments = allObjectsFromCoreData.filter { $0.podcast.id == podcast.id && $0.moment == moment }
+        if likeMoments.first == nil {
+            let podcast = podcast
+            let moment = moment
+            _ = LikedMoment(podcast: podcast, moment: moment)
+        }
     }
 }
 
@@ -118,7 +127,7 @@ extension LikedMoment: CoreDataProtocol {
 extension LikedMoment: FirebaseProtocol {
     
     func saveInFireBase() {
-        FirebaseDatabase.shared.add(object: self, key: key)
+        FirebaseDatabase.shared.add(object: self, key: firebaseKey)
     }
        
     func removeFromFireBase(key: String) {
@@ -133,15 +142,15 @@ extension LikedMoment: FirebaseProtocol {
                     removeAll()
                     return
                 }
-            case .success(let moments) :
+            case .success(let momentsFromFireBase) :
 
-                allObjectsFromCoreData.forEach {
-                    if $0.getFromCoreData != nil {
-                        $0.remove()
+                allObjectsFromCoreData.forEach { momentFromCoreDate in
+                    if !momentsFromFireBase.contains(where: { $0.podcast.id == momentFromCoreDate.podcast.id })  {
+                        momentFromCoreDate.remove()
                     }
                 }
 
-                moments.forEach {
+                momentsFromFireBase.forEach {
                     $0.saveInCoredataIfNotSaved()
                 }
             }

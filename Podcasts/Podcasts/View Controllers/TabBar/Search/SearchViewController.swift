@@ -127,7 +127,7 @@ extension SearchViewController {
     }
     
     private func configureGesture() {
-        view.addMyGestureRecognizer(self, type: .swipe(directions: [.left,.right]), #selector(handlerSwipe))
+//        addMyGestureRecognizer(self, type: .swipe(directions: [.left,.right]), #selector(handlerSwipe))
         refreshControl.addTarget(self, action: #selector(refresh), for: .valueChanged)
     }
     
