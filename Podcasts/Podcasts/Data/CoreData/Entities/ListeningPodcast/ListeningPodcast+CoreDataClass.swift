@@ -99,14 +99,14 @@ extension ListeningPodcast: CoreDataProtocol {
 //MARK: - FirebaseProtocol
 extension ListeningPodcast: FirebaseProtocol {
     
-    var key: String { "\(podcast.id ?? 0)" }
+    var firebaseKey: String { "\(podcast.id ?? 0)" }
     
     func removeFromFireBase(key: String) {
         FirebaseDatabase.shared.remove(object: Self.self, key: key)
     }
     
     func saveInFireBase() {
-        FirebaseDatabase.shared.add(object: self, key: key)
+        FirebaseDatabase.shared.add(object: self, key: firebaseKey)
     }
     
     static func updateFromFireBase(completion: ((Result<[ListeningPodcast]>) -> Void)?) {

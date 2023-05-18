@@ -15,19 +15,29 @@ extension Optional where Wrapped == UILabel {
         return self.maxNumberOfLines
     }
     
-    var textHeight: CGFloat {
+    var lineHeight: CGFloat {
         guard let self = self else { return 0 }
-        return self.font.lineHeight
+        return self.lineHeight
     }
 }
 
 extension UILabel {
     
+    var lineHeight: CGFloat {
+        return self.font.lineHeight
+    }
+    
     var maxNumberOfLines: Int {
+        return Int(ceil(textHeight / lineHeight))
+    }
+    
+    var textHeight: CGFloat {
         let maxSize = CGSize(width: self.frame.size.width, height: CGFloat(MAXFLOAT))
         let text = (self.text ?? "") as NSString
-        let textHeight = text.boundingRect(with: maxSize, options: .usesLineFragmentOrigin, attributes: [.font: self.font as Any], context: nil).height
-        let lineHeight = self.font.lineHeight
-        return Int(ceil(textHeight / lineHeight))
+        
+//        self.textRect(forBounds: CGRect(origin: .zero, size: CGSize(width:  self.frame.size.width, height: <#T##CGFloat#>)),limitedToNumberOfLines: 0)
+        
+        let textHeight = text.boundingRect(with: maxSize, options: .usesLineFragmentOrigin, attributes: [.font: self.font as Any ], context: nil).height
+        return textHeight
     }
 }

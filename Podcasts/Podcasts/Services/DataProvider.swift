@@ -14,7 +14,6 @@ class DataProvider {
     
     var imageCache = NSCache<NSString, UIImage>()
     
-    
     func downloadImage(string: String?, completion: @escaping (UIImage?) -> Void) {
         
         guard let string = string,
@@ -43,11 +42,12 @@ class DataProvider {
     }
 }
 
-//
-//extension String {
-//    var getImage: UIImage? {
-//        DataProvider.shared.downloadImage(string: self) {
-//            return $0
-//        }
-//    }
-//}
+extension String {
+    var getImage: UIImage? {
+        var image: UIImage?
+         DataProvider.shared.downloadImage(string: self) {
+            image = $0
+        }
+        return image
+    }
+}

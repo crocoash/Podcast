@@ -130,10 +130,10 @@ extension FavoritePodcast: NsManagedTableViewProtocol {
 //MARK: - FirebaseProtocol
 extension FavoritePodcast: FirebaseProtocol {
     
-    var key: String { "\(podcast.id ?? 0)" }
+    var firebaseKey: String { "\(podcast.id ?? 0)" }
     
     func saveInFireBase() {
-        FirebaseDatabase.shared.add(object: self, key: key)
+        FirebaseDatabase.shared.add(object: self, key: firebaseKey)
     }
     
     func removeFromFireBase(key: String) {

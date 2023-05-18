@@ -196,10 +196,7 @@ extension Podcast: CoreDataProtocol {
     func removeFromCoreDataWithOwnEntityRule() {
         guard let podcast = getFromCoreData else { return }
         if let genres = podcast.genres?.allObjects as? [Genre] {
-            genres.forEach {
-                $0.removePodcast(podcast: podcast)
-                $0.remove()
-            }
+            genres.remove(podcast: podcast)
         }
         podcast.myValidateDelete()
         
@@ -260,6 +257,7 @@ extension Podcast: InputPlayerProtocol {
     var image60: String? { artworkUrl60 }
 }
 
+//MARK: - DownloadServiceProtocol
 extension Podcast: DownloadServiceProtocol {
     
     var stateOfDownload: StateOfDownload {
@@ -281,19 +279,19 @@ extension Podcast: DownloadServiceProtocol {
 
 //MARK: - Common
 extension Podcast {
-
+    
     var isFavorite: Bool { getFavoritePodcast != nil }
     
-    var releaseDateInformation: Date? {
-        guard let releaseDate = releaseDate else { return nil }
+    var releaseDateInformation: Date {
+        guard let releaseDate = releaseDate else { return Date() }
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
         let date = dateFormatter.date(from: releaseDate)
-        return date
+        return date ?? Date()
     }
     
     func formattedDate(dateFormat: String) -> String {
-        releaseDateInformation?.formattedDate(dateFormat: dateFormat) ?? ""
+        releaseDateInformation.formattedDate(dateFormat: dateFormat)
     }
     
     /// ListeningPodcast
@@ -313,16 +311,13 @@ extension Podcast {
             _ = FavoritePodcast(podcast: self)
         }
     }
-   
+    
     var getFavoritePodcast: FavoritePodcast? {
         return FavoritePodcast.allObjectsFromCoreData.filter { $0.podcast.id == id }.first
     }
 }
 
-typealias PlaylistByNewest  = [(key: String, podcasts: [Podcast])]
-typealias PlayListByOldest = PlaylistByNewest
-typealias PlayListByGenre = PlaylistByNewest
-
+//MARK: - extension Collection
 extension Collection where Element: Podcast {
     
     var sortPodcastsByGenre: [(key: String, podcasts: [Podcast])] {
@@ -330,33 +325,31 @@ extension Collection where Element: Podcast {
         
         for podcast in self {
             if let genres = podcast.genres?.allObjects as? [Genre] {
-                for genre in genres {
-                    if let genreName = genre.name {
-                        if array.isEmpty {
-                            array.append((key: genreName, podcasts: [podcast]))
-                            continue
-                        }
-                        for value in array.enumerated() {
-                            if value.element.key == genreName {
-                                array[value.offset].podcasts.append(podcast)
-                                continue
-                            }
-                            array.append((key: genreName, podcasts: [podcast]))
+            loop: for genre in genres where let genreName = genre.name  {
+                    if array.isEmpty {
+                        array.append((key: genreName, podcasts: [podcast]))
+                        continue
+                    }
+                    for (index,value) in array.enumerated() {
+                        if value.key == genreName {
+                            array[index].podcasts.append(podcast)
+                            continue loop
                         }
                     }
-                }
+                    array.append((key: genreName, podcasts: [podcast]))
+            }
             }
         }
-        return array
+        return array.map { ($0.key, $0.podcasts.sorted { $0.releaseDateInformation < $1.releaseDateInformation }) }
     }
-    
+        
     var sortPodcastsByNewest: PlaylistByNewest {
-        let array = self.sorted { $0.releaseDateInformation ?? Date() > $1.releaseDateInformation ?? Date() }
+        let array = self.sorted { $0.releaseDateInformation > $1.releaseDateInformation }
         return array.conform
     }
     
     var sortPodcastsByOldest: PlayListByOldest {
-        let array = self.sorted { $0.releaseDateInformation ?? Date() < $1.releaseDateInformation ?? Date() }
+        let array = self.sorted { $0.releaseDateInformation < $1.releaseDateInformation }
         return array.conform
     }
     
@@ -368,11 +361,9 @@ extension Collection where Element: Podcast {
                 array.append((key: date, podcasts: [element]))
                 continue
             }
-            for value in array.enumerated() {
-                if value.element.key == date {
-                    array[value.offset].podcasts.append(element)
-                    continue loop
-                }
+            for value in array.enumerated() where value.element.key == date  {
+                array[value.offset].podcasts.append(element)
+                continue loop
             }
             array.append((key: date, podcasts: [element]))
         }
@@ -380,6 +371,20 @@ extension Collection where Element: Podcast {
     }
 }
 
+//MARK: -
+extension Podcast: SearchCollectionViewCellType {
+    var image: String? {
+        return image600
+    }
+}
+
+typealias PlaylistByNewest  = [(key: String, podcasts: [Podcast])]
+typealias PlayListByOldest = PlaylistByNewest
+typealias PlayListByGenre = PlaylistByNewest
+
+
+
+//MARK: - extension Collection
 extension Collection where Element == (key: String, podcasts: [Podcast]) {
     
     var countOfValues: Int {
@@ -401,22 +406,19 @@ extension Collection where Element == (key: String, podcasts: [Podcast]) {
         return arrayOfIndexPath
     }
     
-//    func getPodcast(for indexPath: IndexPath) -> Podcast {
-//        let section = indexPath.section
-//        return self[section].podcasts[indexPath.row]
-//    }
-}
-
-
-
-extension Collection {
-    
-    func myReduce<T>(_ param1 :T,_ completion: (T,Element) -> (T)) -> T {
-        var param = param1
-        for i in self {
-            param = completion(param1,i)
-        }
-        return param
+    func getPodcast(for indexPath: IndexPath) -> Podcast {
+        return self[indexPath.section as! Self.Index].podcasts[indexPath.row]
     }
 }
+//
+//extension Collection {
+//
+//    func myReduce<T>(_ param1 :T,_ completion: (T,Element) -> (T)) -> T {
+//        var param = param1
+//        for i in self {
+//            param = completion(param1,i)
+//        }
+//        return param
+//    }
+//}
 

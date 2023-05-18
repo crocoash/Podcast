@@ -33,7 +33,7 @@ protocol NsManagedTableViewProtocol: CoreDataProtocol {
 
 protocol FirebaseProtocol: CoreDataProtocol where T: Codable {
     
-    var key: String { get }
+    var firebaseKey: String { get }
     func removeFromFireBase(key: String)
     func saveInFireBase()
     static func updateFromFireBase(completion: ((Result<[T]>) -> Void)?)

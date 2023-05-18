@@ -24,14 +24,15 @@ protocol PodcastCellPlayableProtocol {
 //MARK: - PodcastCell
 class PodcastCell: UITableViewCell {
     
-    @IBOutlet private weak var podcastImage:          UIImageView!
-    @IBOutlet private weak var favoriteStarImageView: UIImageView!
-    @IBOutlet private weak var downLoadImageView:     UIImageView!
-    @IBOutlet private weak var playStopButton:        UIImageView!
-
+    @IBOutlet private weak var podcastImage:             UIImageView!
+    @IBOutlet private weak var favoriteStarImageView:    UIImageView!
+    @IBOutlet private weak var downLoadImageView:        UIImageView!
+    @IBOutlet private weak var playStopButton:           UIImageView!
+    @IBOutlet private weak var openDescriptionImageView: UIImageView!
+    
     @IBOutlet private weak var podcastName:           UILabel!
     @IBOutlet private weak var downloadProgressLabel: UILabel!
-    @IBOutlet private(set) weak var podcastDescription: UILabel!
+    @IBOutlet private weak var podcastDescription:    UILabel!
     @IBOutlet private weak var trackDuration:         UILabel!
     @IBOutlet private weak var dateLabel:             UILabel!
     
@@ -43,18 +44,25 @@ class PodcastCell: UITableViewCell {
 
     private let pauseImage = UIImage(systemName: "pause.circle.fill")!
     private let playImage = UIImage(systemName: "play.circle.fill")!
-    
+    private let downImage = UIImage(systemName: "chevron.down")!
+    private let upImage = UIImage(systemName: "chevron.up")!
+
     weak var delegate: PodcastCellDelegate?
     private var podcast: Podcast!
+    
+    var moreThanThreeLines: Bool {
+        return podcastDescription.maxNumberOfLines > 3
+    }
     
     //MARK: Public Methods
     func configureCell(_ delegate: PodcastCellDelegate?, with podcast: Podcast) {
         self.delegate = delegate
         configure(with: podcast)
+        favoriteStarImageView.addMyGestureRecognizer(self, type: .tap(), #selector(handlerTapFavoriteStar))
     }
-    
+
     //MARK: Actions
-    @IBAction func handlerTapFavoriteStar(_ sender: UIButton) {
+    @objc func handlerTapFavoriteStar(_ sender: UITapGestureRecognizer) {
         
         if !podcast.isFavorite {
             let imageArray = self.createImageArray(total: 5, imagePrafix: "star")
@@ -75,7 +83,7 @@ class PodcastCell: UITableViewCell {
         }
     }
     
-    @IBAction func tapPlayPauseButton(_ sender: UITapGestureRecognizer) {
+    @objc func tapPlayPauseButton(_ sender: UITapGestureRecognizer) {
         if playStopButton.image == pauseImage {
             delegate?.podcastCellDidTouchStopButton(self)
         } else {
@@ -92,6 +100,10 @@ class PodcastCell: UITableViewCell {
         }
         
         delegate?.podcastCellDidSelectDownLoadImage(self)
+    }
+    
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
     }
 }
 
@@ -200,15 +212,17 @@ extension PodcastCell {
         dateLabel.text = podcast.formattedDate(dateFormat: "d MMM YYY")
         trackDuration.text = podcast.trackTimeMillis?.minute
         podcastDescription.text = podcast.descriptionMy
-//        if isSelected {
-            podcastDescription.numberOfLines = podcastDescription.maxNumberOfLines
-//        }
+        
+        podcastDescription.numberOfLines = podcastDescription.maxNumberOfLines
+        openDescriptionImageView.isHidden = !moreThanThreeLines
+        openDescriptionImageView.image = isSelected ? downImage : upImage
+
         podcastName.text = podcast.trackName
         setListeningProgressView(progress: podcast.progress)
         setFavoriteStarImage(podcast: podcast)
         setDownloadImage(podcast)
         
-        DataProvider.shared.downloadImage(string: podcast.image60) { [weak self] image in
+        DataProvider.shared.downloadImage(string: podcast.image160) { [weak self] image in
             self?.podcastImage.image = image
         }
     }

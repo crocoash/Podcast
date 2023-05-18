@@ -27,19 +27,20 @@ extension NSManagedObject {
         do {
             try validateForDelete()
             removeFromViewContext()
+            saveCoreData()
         } catch let error {
             print("print \(error.localizedDescription)")
             print("print can not delete \(self)")
         }
-        saveCoreData()
+        
     }
     
     func remove() {
         if let self = self as? (any CoreDataProtocol) {
             if let self = self as? (any FirebaseProtocol)  {
-                let key = self.key
-                self.self.removeFromCoreDataWithOwnEntityRule()
-                self.self.removeFromFireBase(key: key)
+                let key = self.firebaseKey
+                self.removeFromCoreDataWithOwnEntityRule()
+                self.removeFromFireBase(key: key)
             } else {
                 self.removeFromCoreDataWithOwnEntityRule()
             }
