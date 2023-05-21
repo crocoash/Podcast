@@ -34,7 +34,7 @@ class FavoritePodcastTableViewController: UIViewController {
     @IBOutlet private weak var tableViewBottomConstraint: NSLayoutConstraint!
     
     weak var delegate: FavoritePodcastViewControllerDelegate?
-    private var tableViewBottomConstraintConstant: CGFloat = 0
+    private var tableViewBottomConstraintConstant = CGFloat(0)
     private let refreshControl = UIRefreshControl()
     
     private var playerIsSHidden = true {

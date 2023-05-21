@@ -19,9 +19,9 @@ class LikedMomentsViewController: UIViewController {
     @IBOutlet private weak var tableView: UITableView!
     @IBOutlet private weak var tableViewBottomConstraint: NSLayoutConstraint!
    
-    private var cellHeight: CGFloat = 75
+    private var cellHeight = CGFloat(75)
     
-    private var tableViewBottomConstraintConstant: CGFloat = 0
+    private var tableViewBottomConstraintConstant = CGFloat.zero
     weak var delegate: LikedMomentsViewControllerDelegate?
     
     private var playerIsSHidden = true {

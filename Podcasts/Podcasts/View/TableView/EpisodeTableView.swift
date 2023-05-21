@@ -25,9 +25,9 @@ protocol EpisodeTableViewPlayableProtocol: PodcastCellPlayableProtocol {
 
 class EpisodeTableView: UITableView {
    
-    private let defaultRowHeight: CGFloat = 100
-    private var sumOfHeightsOfAllHeaders :CGFloat = 0
-    private var paddingBetweenSections: CGFloat = 20
+    private let defaultRowHeight = CGFloat(100)
+    private var sumOfHeightsOfAllHeaders = CGFloat.zero
+    private var paddingBetweenSections = CGFloat(20)
     
     weak var myDelegate: EpisodeTableViewDelegate?
     weak var myDataSource: EpisodeTableViewMyDataSource?
