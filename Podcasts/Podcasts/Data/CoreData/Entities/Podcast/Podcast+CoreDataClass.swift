@@ -325,7 +325,8 @@ extension Collection where Element: Podcast {
         
         for podcast in self {
             if let genres = podcast.genres?.allObjects as? [Genre] {
-            loop: for genre in genres where let genreName = genre.name  {
+            loop: for genre in genres {
+                if let genreName = genre.name {
                     if array.isEmpty {
                         array.append((key: genreName, podcasts: [podcast]))
                         continue
@@ -337,12 +338,13 @@ extension Collection where Element: Podcast {
                         }
                     }
                     array.append((key: genreName, podcasts: [podcast]))
+                }
             }
             }
         }
         return array.map { ($0.key, $0.podcasts.sorted { $0.releaseDateInformation < $1.releaseDateInformation }) }
     }
-        
+    
     var sortPodcastsByNewest: PlaylistByNewest {
         let array = self.sorted { $0.releaseDateInformation > $1.releaseDateInformation }
         return array.conform

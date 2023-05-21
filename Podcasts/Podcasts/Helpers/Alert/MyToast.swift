@@ -36,7 +36,7 @@ class MyToast: UITextView {
     
     //MARK: - Settings
     private var textOfColor: UIColor = .white
-    private var cornerRadius: CGFloat = 20
+    private var cornerRadius = CGFloat(20)
     private var backgroundColorOfLayer: CGColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
     
     //MARK: - Inits
@@ -87,9 +87,9 @@ enum LocationOfPost {
     
     private var cgFloatValue: CGFloat {
         
-        let heightOfTabBar: CGFloat = 50
-        let heightOfPlayer: CGFloat = 50
-        let padding: CGFloat = 130
+        let heightOfTabBar = CGFloat(50)
+        let heightOfPlayer = CGFloat(50)
+        let padding = CGFloat(130)
         
         switch self {
         case .top: return 4
@@ -104,7 +104,7 @@ enum LocationOfPost {
     func createCGRect(for bounds: CGRect) -> CGRect {
         let safeAreaBottom = UIApplication.shared.windows.first?.safeAreaInsets.bottom ?? 0
         
-        var y: CGFloat = 0
+        var y = CGFloat(0)
         switch self {
         case .top:              y = safeAreaBottom + self.cgFloatValue
         case .center:           y = bounds.height / self.cgFloatValue
