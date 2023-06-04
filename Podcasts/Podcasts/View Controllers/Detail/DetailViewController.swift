@@ -17,7 +17,7 @@ protocol DetailViewControllerDelegate: AnyObject {
     func detailViewControllerDidSelectDownLoadImage(_ detailViewController: DetailViewController, entity: DownloadServiceProtocol, completion: @escaping () -> Void)
 }
 
-protocol DetailPlayableProtocol: SmallPlayerPlayableProtocol, EpisodeTableViewPlayableProtocol {
+protocol DetailPlayable {
     
 }
 
@@ -93,7 +93,7 @@ class DetailViewController: UIViewController {
         episodeName        .text = podcast?.trackName
         artistName         .text = podcast.artistName ?? "Artist Name"
         genresLabel        .text = podcast?.genresString
-        descriptionTextView.text = podcast?.descriptionMy
+        descriptionTextView.text = podcast?.description
         countryLabel       .text = podcast?.country
         advisoryRatingLabel.text = podcast?.contentAdvisoryRating
         dateLabel          .text = podcast?.releaseDateInformation.formattedDate(dateFormat: "d MMM YYY")

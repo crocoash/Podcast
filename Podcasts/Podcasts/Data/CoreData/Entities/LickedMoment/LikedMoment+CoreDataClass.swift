@@ -43,17 +43,21 @@ public class LikedMoment: NSManagedObject, Codable {
         
         saveInit()
     }
-}
-
-extension LikedMoment {
     
-    static var likedMomentFRC: NSFetchedResultsController<LikedMoment> = {
+    static func likedMomentFRC(sortDescription: [NSSortDescriptor] = [NSSortDescriptor(key: #keyPath(moment), ascending: true)], predicates: [NSPredicate]? = nil, sectionNameKeyPath: String? = nil) -> NSFetchedResultsController<LikedMoment> {
         let fetchRequest: NSFetchRequest<LikedMoment> = LikedMoment.fetchRequest()
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(LikedMoment.moment), ascending: true)]
+        
+        if let predicates = predicates {
+            for predicate in predicates {
+                fetchRequest.predicate = predicate
+            }
+        }
+        
+        fetchRequest.sortDescriptors = sortDescription
         let fetchResultController = NSFetchedResultsController(
             fetchRequest: fetchRequest,
             managedObjectContext: viewContext,
-            sectionNameKeyPath: nil,
+            sectionNameKeyPath: sectionNameKeyPath,
             cacheName: nil
         )
         
@@ -64,12 +68,16 @@ extension LikedMoment {
             fatalError("Unresolved error \(error), \(nserror.userInfo)")
         }
         return fetchResultController
-    }()
+    }
+}
+
+extension LikedMoment {
+    
     
     var firebaseKey: String { "\(Int(moment))sec id\(podcast.id ?? 0)" }
     
     static func getLikedMoment(at indexPath: IndexPath) -> LikedMoment {
-        return likedMomentFRC.object(at: indexPath)
+        return likedMomentFRC().object(at: indexPath)
     }
     
     static func saveInCoredataIfNotSaved(podcast: Podcast, moment: Double) {
@@ -127,8 +135,8 @@ extension LikedMoment: CoreDataProtocol {
 extension LikedMoment: FirebaseProtocol {
     
     func saveInFireBase() {
-        FirebaseDatabase.shared.add(object: self, key: firebaseKey)
-    }
+    FirebaseDatabase.shared.add(object: self, key: firebaseKey)
+}
        
     func removeFromFireBase(key: String) {
         FirebaseDatabase.shared.remove(object: Self.self, key: key)

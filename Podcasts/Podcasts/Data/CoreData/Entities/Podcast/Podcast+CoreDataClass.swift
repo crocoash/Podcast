@@ -8,6 +8,7 @@
 
 import Foundation
 import CoreData
+import UIKit
 
 @objc(Podcast)
 public class Podcast: NSManagedObject, Codable {
@@ -342,7 +343,9 @@ extension Collection where Element: Podcast {
             }
             }
         }
-        return array.map { ($0.key, $0.podcasts.sorted { $0.releaseDateInformation < $1.releaseDateInformation }) }
+        let filteredArray = array.filter { !$0.podcasts.isEmpty }
+        let sortedArray = filteredArray.map { (key: $0.key, podcasts: $0.podcasts.sorted { $0.releaseDateInformation < $1.releaseDateInformation })}
+        return sortedArray
     }
     
     var sortPodcastsByNewest: PlaylistByNewest {
@@ -373,17 +376,27 @@ extension Collection where Element: Podcast {
     }
 }
 
-//MARK: -
+//MARK: - SearchCollectionViewCellType
 extension Podcast: SearchCollectionViewCellType {
-    var image: String? {
+    var mainImageForSearchCollectionViewCell: String? {
         return image600
+    }
+}
+
+//MARK: - FavoritePodcastTableViewCellType
+extension Podcast: FavoritePodcastTableViewCellType {
+    var mainImageForFavoritePodcastTableViewCellType: String? {
+        return artworkUrl600
+    }
+    
+    var nameLabel: String? {
+        return self.trackName
     }
 }
 
 typealias PlaylistByNewest  = [(key: String, podcasts: [Podcast])]
 typealias PlayListByOldest = PlaylistByNewest
 typealias PlayListByGenre = PlaylistByNewest
-
 
 
 //MARK: - extension Collection
@@ -412,15 +425,6 @@ extension Collection where Element == (key: String, podcasts: [Podcast]) {
         return self[indexPath.section as! Self.Index].podcasts[indexPath.row]
     }
 }
-//
-//extension Collection {
-//
-//    func myReduce<T>(_ param1 :T,_ completion: (T,Element) -> (T)) -> T {
-//        var param = param1
-//        for i in self {
-//            param = completion(param1,i)
-//        }
-//        return param
-//    }
-//}
+
+
 

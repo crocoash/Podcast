@@ -23,6 +23,7 @@ protocol EpisodeTableViewPlayableProtocol: PodcastCellPlayableProtocol {
     var id: NSNumber? { get }
 }
 
+
 class EpisodeTableView: UITableView {
    
     private let defaultRowHeight = CGFloat(100)
@@ -180,7 +181,7 @@ extension EpisodeTableView {
     }
 }
 
-//MARK: - EpisodeTableView
+//MARK: - UITableViewDataSource
 extension EpisodeTableView: UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -200,6 +201,7 @@ extension EpisodeTableView: UITableViewDataSource {
         let podcast = currentPlaylist[indexPath.section].podcasts[indexPath.row]
         cell.isSelected = isCellIsClosed(indexPath)
         cell.configureCell(self, with: podcast)
+    
         return cell
     }
 }
@@ -323,7 +325,7 @@ extension EpisodeTableView: PlayerEventNotification {
     }
     
     func playerStateDidChanged(notification: NSNotification) {
-        guard let player = notification.object as? DetailPlayableProtocol else { return }
+        guard let player = notification.object as? EpisodeTableViewPlayableProtocol else { return }
         let id = player.id
         let cell = getCell(id: id)
         cell?.updatePlayStopButton(player: player)

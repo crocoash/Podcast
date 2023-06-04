@@ -41,7 +41,7 @@ protocol InputPlayerProtocol {
 }
 
 //MARK: - OutputPlayerProtocol
-protocol OutputPlayerProtocol: DetailPlayableProtocol, SmallPlayerPlayableProtocol, BigPlayerPlayableProtocol {
+protocol OutputPlayerProtocol:  SmallPlayerPlayableProtocol, BigPlayerPlayableProtocol {
     
 }
 
