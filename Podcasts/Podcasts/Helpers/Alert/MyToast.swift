@@ -106,12 +106,12 @@ enum LocationOfPost {
         
         var y = CGFloat(0)
         switch self {
-        case .top:              y = safeAreaBottom + self.cgFloatValue
-        case .center:           y = bounds.height / self.cgFloatValue
-        case .bottom:           y = safeAreaBottom + bounds.height - self.cgFloatValue
-        case .bottomWithPlayer: y = safeAreaBottom + bounds.height - self.cgFloatValue
-        case .bottomWithTabBar : y  = safeAreaBottom + bounds.height - self.cgFloatValue
-        case .bottomWithPlayerAndTabBar : y  = safeAreaBottom + bounds.height - self.cgFloatValue
+        case .top:              y = safeAreaBottom + cgFloatValue
+        case .center:           y = bounds.height / cgFloatValue
+        case .bottom:           y = safeAreaBottom + bounds.height - cgFloatValue
+        case .bottomWithPlayer: y = safeAreaBottom + bounds.height - cgFloatValue
+        case .bottomWithTabBar : y  = safeAreaBottom + bounds.height - cgFloatValue
+        case .bottomWithPlayerAndTabBar : y  = safeAreaBottom + bounds.height - cgFloatValue
         }
         return CGRect(x: 50, y: y, width: bounds.size.width - 100, height: 50)
     }

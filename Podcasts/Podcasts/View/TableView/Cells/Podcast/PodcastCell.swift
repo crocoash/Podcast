@@ -15,6 +15,7 @@ protocol PodcastCellDelegate: AnyObject {
     func podcastCellDidTouchStopButton(_ podcastCell: PodcastCell)
 }
 
+
 //MARK: - PlayableProtocol
 protocol PodcastCellPlayableProtocol {
     var isPlaying: Bool { get }
@@ -46,7 +47,9 @@ class PodcastCell: UITableViewCell {
     private let playImage = UIImage(systemName: "play.circle.fill")!
     private let downImage = UIImage(systemName: "chevron.down")!
     private let upImage = UIImage(systemName: "chevron.up")!
-
+    
+    var heightOfCell = CGFloat(100)
+    
     weak var delegate: PodcastCellDelegate?
     private var podcast: Podcast!
     
@@ -58,7 +61,6 @@ class PodcastCell: UITableViewCell {
     func configureCell(_ delegate: PodcastCellDelegate?, with podcast: Podcast) {
         self.delegate = delegate
         configure(with: podcast)
-        favoriteStarImageView.addMyGestureRecognizer(self, type: .tap(), #selector(handlerTapFavoriteStar))
     }
 
     //MARK: Actions
@@ -230,5 +232,6 @@ extension PodcastCell {
     private func configureGestures() {
         downLoadImageView.addMyGestureRecognizer(self, type: .tap(), #selector(handlerTapDownloadImage))
         playStopButton.addMyGestureRecognizer(self, type: .tap(), #selector(tapPlayPauseButton))
+        favoriteStarImageView.addMyGestureRecognizer(self, type: .tap(), #selector(handlerTapFavoriteStar))
     }
 }

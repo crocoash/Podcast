@@ -12,150 +12,105 @@ import UIKit
 }
 
 class SearchCollectionView: UICollectionView {
-
+    
     weak var myDelegate: SearchCollectionViewDelegate?
-    private var podcasts: PlayListByGenre!
+    private(set) var playlist: PlayListByGenre!
+    var diffableDataSource: UICollectionViewDiffableDataSource<String, Item>! = nil
+    var snapShot = NSDiffableDataSourceSnapshot<String, Item>()
+    
+    struct Item: Hashable {
+        let podcast: Podcast
+        let identifier = UUID()
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(identifier)
+        }
+    }
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        self.delegate = self
-        self.dataSource = self
-        register(SearchCollectionViewCell.self)
-//        let nib = UINib(nibName: SearchCollectionHeaderReusableView.identifier, bundle: nil)
-//        register(nib, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: SearchCollectionHeaderReusableView.identifier)
-        
-        let containerCellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, Int> { cell, indexPath, menuItem in
-            var contentConfiguration = cell.defaultContentConfiguration()
-            contentConfiguration.text = "menuItem.title"
-            contentConfiguration.textProperties.font = .preferredFont(forTextStyle: .headline)
-            cell.contentConfiguration = contentConfiguration
-            
-            let disclosureOptions = UICellAccessory.OutlineDisclosureOptions(style: .header)
-            cell.accessories = [.outlineDisclosure(options: disclosureOptions)]
-            cell.backgroundConfiguration = UIBackgroundConfiguration.clear()
-        }
-        
-        self.register(SearchCollectionHeaderReusableView.self, forSupplementaryViewOfKind: "22", withReuseIdentifier: "headerId")
-        
-//        let layout = UICollectionViewCompositionalLayout { sectionNumber, env in
-//
-////            if sectionNumber != 1 {
-////                let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1)))
-////                item.contentInsets.top = 10
-////                item.contentInsets.leading = 10
-////                item.contentInsets.trailing = 10
-////
-////                let group = NSCollectionLayoutGroup.horizontal(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(300)), subitems: [item])
-////
-////                let section = NSCollectionLayoutSection(group: group)
-////                section.orthogonalScrollingBehavior = .paging
-////                return section
-////
-////            }
-////
-//            let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1/4), heightDimension: .fractionalWidth(1/4)))
-//            item.contentInsets.top = 10
-//            item.contentInsets.leading = 2
-//            item.contentInsets.trailing = 2
-//
-//            let group = NSCollectionLayoutGroup.horizontal(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .estimated(0)), subitems: [item])
-//
-//
-//            let section = NSCollectionLayoutSection(group: group)
-//            section.boundarySupplementaryItems = [
-//                .init(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(50)), elementKind: "22", alignment: .topLeading)]
-//            return section
-//
-//        }
-        createDataSource()
-        
-        let listConfiguration = UICollectionLayoutListConfiguration(appearance: .sidebar)
-        let layout = UICollectionViewCompositionalLayout.list(using: listConfiguration)
-        self.collectionViewLayout = layout
-
+        self.collectionViewLayout = createLayout()
+        self.configureDataSource()
     }
+    
+    
     //MARK: - Public Methods
-    func setUp(podcasts: [Podcast]) {
-        self.podcasts = podcasts.sortPodcastsByGenre
-        reloadData()
+    func setUp(playlist: [Podcast]) {
+        self.playlist = playlist.sortPodcastsByGenre
+        reloadData1()
     }
     
-    func createDataSource() {
-        self.dataSource = UICollectionViewDiffableDataSource<String, Podcast>(collectionView: self) { collectionView, indexPath, podcast in
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SearchCollectionViewCell.identifier, for: indexPath) as? SearchCollectionViewCell
-            cell?.setUP(entity: podcast)
-            return cell
+    func createLayout() -> UICollectionViewLayout {
+        let sectionProvider = { (section: Int, invarement: NSCollectionLayoutEnvironment) in
+            let itemSize = CGFloat(0.25)
+            let items = NSCollectionLayoutItem(layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(itemSize), heightDimension: .fractionalWidth(itemSize)))
+            let group = NSCollectionLayoutGroup.horizontal(layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .estimated(10)), subitems: [items])
+            
+            let section = NSCollectionLayoutSection(group: group)
+//            section.orthogonalScrollingBehavior = .continuous
+            
+            let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
+                layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .estimated(50)),
+                elementKind: SearchCollectionHeaderReusableView.identifier, alignment: .top)
+            sectionHeader.pinToVisibleBounds = true
+            section.boundarySupplementaryItems = [sectionHeader]
+            return section
+        }
+        
+        let config = UICollectionViewCompositionalLayoutConfiguration()
+        config.interSectionSpacing = 0
+        let layout = UICollectionViewCompositionalLayout(sectionProvider: sectionProvider, configuration: config)
+  
+        return layout
+    }
+    
+    func configureDataSource() {
+        let cellRegistration = UICollectionView.CellRegistration<SearchCollectionViewCell, Podcast>{ cell, indexPath, item in
+            cell.setUP(entity: item)
+            cell.addMyGestureRecognizer(self, type: .tap(), #selector(self.selectCell))
+        }
+        
+        self.diffableDataSource = UICollectionViewDiffableDataSource<String, Item>(collectionView: self) { collectionView, indexPath, item in
+            return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: item.podcast)
+        }
+        
+        let supplementaryRegistration = UICollectionView.SupplementaryRegistration
+        <SearchCollectionHeaderReusableView>(elementKind: SearchCollectionHeaderReusableView.identifier) { (supplementaryView, string, indexPath) in
+            let title = self.playlist[indexPath.section].key + " " + String(self.playlist[indexPath.section].podcasts.count)
+//            let section = self.snapShot.sectionIdentifiers[indexPath.section]
+            
+            supplementaryView.setUp(title: title)
+        }
+        
+        self.diffableDataSource.supplementaryViewProvider = { (view, kind, index) in
+            return self.dequeueConfiguredReusableSupplementary(using: supplementaryRegistration, for: index)
         }
     }
     
-    override func reloadData() {
-        var snapShot = NSDiffableDataSourceSnapshot<String, Podcast>()
-        snapShot.appendSections(podcasts.map { $0.key} )
+    func reloadData1() {
         
+        snapShot = NSDiffableDataSourceSnapshot<String, Item>()
+        let items = playlist.map { (key: $0.key,items: $0.podcasts.map { Item(podcast: $0)})}
+       
+        for item in items {
+            snapShot.appendSections([item.key])
+            snapShot.appendItems(item.items)
+        }
+//
+        self.diffableDataSource.apply(snapShot ,animatingDifferences: false)
     }
+    
+//    override func supplementaryView(forElementKind elementKind: String, at indexPath: IndexPath) -> UICollectionReusableView? {
+//        return nil
+//    }
     
     //MARK: - Actions
     @objc func selectCell(sender: UITapGestureRecognizer) {
         guard let cell = sender.view as? SearchCollectionViewCell,
-              let indexPath = indexPath(for: cell)else { return }
+              let indexPath = indexPath(for: cell) else { return }
         
-        let podcast = podcasts[indexPath.section].podcasts[indexPath.row]
+        let podcast = playlist[indexPath.section].podcasts[indexPath.row]
         myDelegate?.searchCollectionView(self, podcast: podcast)
     }
 }
 
 
-//MARK: - UICollectionViewDataSource
-extension SearchCollectionView: UICollectionViewDataSource {
-    
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return podcasts[section].podcasts.count
-    }
-    
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return podcasts.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = getCell(cell: SearchCollectionViewCell.self, indexPath: indexPath)
-        let entity = podcasts[indexPath.section].podcasts[indexPath.row]
-        cell.addMyGestureRecognizer(self, type: .tap(), #selector(selectCell(sender: )))
-        cell.setUP(entity: entity)
-        return cell
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-            let headerView = collectionView.dequeueReusableSupplementaryView(
-                ofKind: kind,
-                withReuseIdentifier: "headerId",
-                for: indexPath)
-            
-            guard let header = headerView as? SearchCollectionHeaderReusableView else { return headerView }
-            let title = podcasts[indexPath.section].key
-            header.setUp(title: title)
-            return header
-    }
-}
-
-
-//MARK: -  UICollectionViewDelegate
-extension SearchCollectionView: UICollectionViewDelegate {
-    
-}
-
-//MARK: - UICollectionViewDelegateFlowLayout
-extension SearchCollectionView: UICollectionViewDelegateFlowLayout {
-    
-//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-//        let size = bounds.width / 3
-//        return CGSize(width: size, height: size)
-//    }
-//
-//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-//        return UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-//    }
-        
-//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-//        return CGSize(width: self.bounds.width, height: 50)
-//    }
-}

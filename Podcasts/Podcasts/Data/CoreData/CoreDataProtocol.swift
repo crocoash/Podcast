@@ -22,14 +22,14 @@ protocol CoreDataProtocol: NSManagedObject {
     static func removeAll()
 }
 
-protocol NsManagedTableViewProtocol: CoreDataProtocol {
-    
-    static var fetchResultController: NSFetchedResultsController<T> { get }
-    static func getObject(by indexPath: IndexPath)  -> T
-    static func getIndexPath(id: NSNumber?) -> IndexPath?
-    
-    var getIndexPath:IndexPath? { get }
-}
+//protocol NsManagedTableViewProtocol: CoreDataProtocol {
+//    
+//    static var fetchResultController: NSFetchedResultsController<T> { get }
+//    static func getObject(by indexPath: IndexPath)  -> T
+//    static func getIndexPath(id: NSNumber?) -> IndexPath?
+//    
+//    var getIndexPath:IndexPath? { get }
+//}
 
 protocol FirebaseProtocol: CoreDataProtocol where T: Codable {
     

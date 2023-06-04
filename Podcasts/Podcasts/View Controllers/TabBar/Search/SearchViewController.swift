@@ -27,14 +27,13 @@ class SearchViewController : UIViewController {
     
     @IBOutlet private weak var emptyTableImageView: UIImageView!
     
-    private var tableViewBottomConstraintConstant: CGFloat = 0
+    private var tableViewBottomConstraintConstant = CGFloat(0)
     private let refreshControl = UIRefreshControl()
 
-    private let activityIndicator = UIActivityIndicatorView()
     private var alert             = Alert()
     private var podcasts          = Array<Podcast>() {
         didSet {
-            searchCollectionView.setUp(podcasts: podcasts)
+            searchCollectionView.setUp(playlist: podcasts)
         }
     }
     private var authors = Array<Author>()
@@ -77,7 +76,7 @@ class SearchViewController : UIViewController {
         showEmptyImage()
         if podcasts.isEmpty { searchBar.becomeFirstResponder() }
     }
-    
+  
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
@@ -122,7 +121,7 @@ extension SearchViewController {
         configureCancelLabel()
         configureSegmentalControl()
         configureAlert()
-        configureActivityIndicator()
+//        configureActivityIndicator()
         configureSearchCollectionView()
     }
     
@@ -143,13 +142,13 @@ extension SearchViewController {
         alert.delegate = self
     }
     
-    private func configureActivityIndicator() {
-        activityIndicator.isHidden = true
-        activityIndicator.hidesWhenStopped = true
-        activityIndicator.style = .large
-        activityIndicator.center = view.center
-        view.addSubview(activityIndicator)
-    }
+//    private func configureActivityIndicator() {
+//        activityIndicator.isHidden = true
+//        activityIndicator.hidesWhenStopped = true
+//        activityIndicator.style = .large
+//        activityIndicator.center = view.center
+//        view.addSubview(activityIndicator)
+//    }
     
     private func cancelSearchAction() {
         searchBar.text?.removeAll()
@@ -158,7 +157,6 @@ extension SearchViewController {
     }
     
     private func configureSearchCollectionView() {
-        searchCollectionView.setUp(podcasts: podcasts)
         searchCollectionView.myDelegate = self
     }
     
@@ -202,7 +200,8 @@ extension SearchViewController {
     private func getData() {
         searchCollectionView.setContentOffset(.zero, animated: true)
         guard let request = searchBar.text?.conform, !request.isEmpty else { showEmptyImage(); return }
-        activityIndicator.startAnimating()
+//        activityIndicator.startAnimating()
+        view.showActivityIndicator()
         if searchSegmentalControl.selectedSegmentIndex == 0 {
             getPodcasts(request: DynamicLinkManager.podcastEpisode(request).url)
         } else {
@@ -222,7 +221,8 @@ extension SearchViewController {
             case .failure(error: let error) :
                 error.showAlert(vc: self)
             }
-            self?.activityIndicator.stopAnimating()
+//            self?.activityIndicator.stopAnimating()
+            self?.view.hideActivityIndicator()
         }
     }
     
@@ -237,7 +237,8 @@ extension SearchViewController {
             case .failure(error: let error) :
                 error.showAlert(vc: self)
             }
-            self?.activityIndicator.stopAnimating()
+//            self?.activityIndicator.stopAnimating()
+            self?.view.hideActivityIndicator()
         }
     }
     

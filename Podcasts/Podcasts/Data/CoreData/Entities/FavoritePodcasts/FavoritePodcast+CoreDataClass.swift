@@ -53,8 +53,7 @@ extension FavoritePodcast: CoreDataProtocol {
     
     typealias T = FavoritePodcast
     
-    static var allObjectsFromCoreData: [FavoritePodcast] { fetchResultController.fetchedObjects ?? [] }
-    
+    static var allObjectsFromCoreData: [FavoritePodcast] { viewContext.fetchObjects(FavoritePodcast.self) }
     
     func removeFromCoreDataWithOwnEntityRule() {
         guard let favoritePodcast = getFromCoreData else { return }
@@ -82,16 +81,44 @@ extension FavoritePodcast: CoreDataProtocol {
     }
 }
 
-extension FavoritePodcast: NsManagedTableViewProtocol {
-    static var fetchResultController: NSFetchedResultsController<FavoritePodcast> = {
-        let fetchRequest = FavoritePodcast.fetchRequest()
+extension FavoritePodcast {
+    
+//    static var fetchResultController: NSFetchedResultsController<FavoritePodcast> = {
+//        let fetchRequest = FavoritePodcast.fetchRequest()
+//
+//        fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(podcast.trackName), ascending: true)]
+//
+//        let fetchResultController = NSFetchedResultsController(
+//            fetchRequest: fetchRequest,
+//            managedObjectContext: viewContext,
+//            sectionNameKeyPath: #keyPath(podcast.collectionName),
+//            cacheName: nil
+//        )
+//
+//        do {
+//            try fetchResultController.performFetch()
+//        } catch {
+//            let nserror = error as NSError
+//            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+//        }
+//
+//        return fetchResultController
+//    }()
+    
+    static func fetchResultController(sortDescription: [NSSortDescriptor] = [NSSortDescriptor(key: #keyPath(podcast.trackName), ascending: true)], predicates: [NSPredicate]? = nil, sectionNameKeyPath: String? = nil) -> NSFetchedResultsController<FavoritePodcast> {
+        let fetchRequest: NSFetchRequest<FavoritePodcast> = FavoritePodcast.fetchRequest()
         
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(FavoritePodcast.date), ascending: true)]
+        if let predicates = predicates {
+            for predicate in predicates {
+                fetchRequest.predicate = predicate
+            }
+        }
         
+        fetchRequest.sortDescriptors = sortDescription
         let fetchResultController = NSFetchedResultsController(
             fetchRequest: fetchRequest,
             managedObjectContext: viewContext,
-            sectionNameKeyPath: nil,
+            sectionNameKeyPath: sectionNameKeyPath,
             cacheName: nil
         )
         
@@ -99,14 +126,15 @@ extension FavoritePodcast: NsManagedTableViewProtocol {
             try fetchResultController.performFetch()
         } catch {
             let nserror = error as NSError
-            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+            fatalError("Unresolved error \(error), \(nserror.userInfo)")
         }
-        
         return fetchResultController
-    }()
+    }
+    
+    
     
     static func getObject(by indexPath: IndexPath) -> FavoritePodcast {
-        return fetchResultController.object(at: indexPath)
+        return fetchResultController().object(at: indexPath)
     }
     
     static func getIndexPath(id: NSNumber?) -> IndexPath? {
@@ -123,7 +151,7 @@ extension FavoritePodcast: NsManagedTableViewProtocol {
     }
     
     var getIndexPath: IndexPath? {
-        return Self.fetchResultController.indexPath(forObject: self)
+        return Self.fetchResultController().indexPath(forObject: self)
     }
 }
 
@@ -175,6 +203,5 @@ class BasicFireBaseClass<S>  where S: NSManagedObject & Identifiable {
     var test: String { S.entityName + "r"}
     
 }
-
 
 

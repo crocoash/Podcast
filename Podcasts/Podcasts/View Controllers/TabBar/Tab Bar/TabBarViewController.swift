@@ -20,16 +20,6 @@ class TabBarViewController: UITabBarController {
         return $0
     }(UIImageView())
     
-    lazy private var activityIndicator: UIActivityIndicatorView = {
-        $0.hidesWhenStopped = true
-        $0.isHidden = true
-        $0.stopAnimating()
-        $0.style = .large
-        $0.color = .white
-        $0.center = view.center
-        return $0
-    }(UIActivityIndicatorView())
-    
     lazy private var smallPlayer: SmallPlayerView = {
         $0.delegate = self
         $0.isHidden = true
@@ -46,10 +36,8 @@ class TabBarViewController: UITabBarController {
     lazy private var favoritePodcastVC = createTabBar(FavoritePodcastTableViewController.self , title: "Playlist", imageName: "folder.fill") {
         $0.delegate = self
     }
+    
     lazy private var searchVC = createTabBar(SearchViewController.self, title: "Search", imageName: "magnifyingglass") {
-        $0.delegate = self
-    }
-    lazy private var likedMomentVc = createTabBar(LikedMomentsViewController.self , title: "Liked", imageName: "heart.fill") {
         $0.delegate = self
     }
     
@@ -108,7 +96,6 @@ extension TabBarViewController {
         smallPlayer.isHidden = !value
         favoritePodcastVC.updateConstraintForTableView(playerIsPresent: value)
         searchVC.updateConstraintForTableView(playerIsPresent: value)
-        likedMomentVc.updateConstraintForTableView(playerIsPresent: value)
         detailViewController.updateConstraintForTableView(playerIsPresent: value)
     }
     
@@ -124,12 +111,11 @@ extension TabBarViewController {
             self.present(self.detailViewController, animated: true, completion: completion)
         } else {
             guard let id = podcast.collectionId?.stringValue else { return }
-            activityIndicator.isHidden = false
-            activityIndicator.startAnimating()
+            self.view.showActivityIndicator()
             
             ApiService.getData(for: DynamicLinkManager.podcastById(id).url) { [weak self] (result : Result<PodcastData>) in
                 guard let self = self else { return }
-                self.activityIndicator.stopAnimating()
+                self.view.hideActivityIndicator()
                 switch result {
                 case .failure(error: let error):
                     error.showAlert(vc: self)
@@ -149,7 +135,8 @@ extension TabBarViewController {
     
     //MARK: configureView
     private func configureTabBar() {
-        self.viewControllers = [favoritePodcastVC, searchVC, likedMomentVc, settingsVC]
+        let navigationController = UINavigationController(rootViewController: favoritePodcastVC)
+        self.viewControllers = [navigationController, searchVC, settingsVC]
     }
     
     private func createTabBar<T: UIViewController>(_ type: T.Type, title: String, imageName: String, completion: ((T) -> Void)? = nil) -> T {
@@ -175,7 +162,6 @@ extension TabBarViewController {
     private func configureView() {
         configureTabBar()
         configureImageDarkMode()
-        view.addSubview(activityIndicator)
     }
     
     private func fireBase() {
@@ -290,16 +276,6 @@ extension TabBarViewController: SettingsTableViewControllerDelegate {
         if self.player.currentTrack != nil {
             self.smallPlayer.isHidden = false
         }
-    }
-}
-
-//MARK: - LikedMomentsViewControllerDelegate
-extension TabBarViewController: LikedMomentsViewControllerDelegate {
-    
-    func likedMomentViewController(_ likedMomentViewController: LikedMomentsViewController, didSelectMomentAt index: Int, likedMoments: [LikedMoment]) {
-        let moment = likedMoments[index].moment
-        let podcast = likedMoments[index].podcast
-        startPlay(track: podcast, at: moment, playlist: [podcast])
     }
 }
 
