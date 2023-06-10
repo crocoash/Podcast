@@ -22,20 +22,22 @@ class FirebaseDatabase {
    lazy private var userStorage = ref.child(userID)
    private let connectedRef = Database.database(url: "https://podcast-app-8fcd2-default-rtdb.europe-west1.firebasedatabase.app").reference(withPath: ".info/connected")
    
-   func add<T: NSManagedObject>(object: T, key: String) {
+   func add<T: NSManagedObject>(object: T, key: String?) {
+      guard let key = key else { return }
       let serialization = object.convert
       userStorage.child(T.entityName).child(key).setValue(serialization)
    }
    
-   func remove<T: NSManagedObject>(object: T.Type, key: String) {
-      userStorage.child(T.entityName).child(key).removeValue()
+   func remove(entityName: String, key: String?) {
+      guard let key = key, key != "", entityName != "" else { return }
+      userStorage.child(entityName).child(key).removeValue()
    }
    
    func update<T: Decodable & NSManagedObject>(completion: @escaping (Result<[T]>) -> Void) {
       userStorage.child(T.entityName).getData { [weak self] error, snapShot in
          
-         guard error == nil, let value = snapShot.value, !(snapShot.value is NSNull), let self = self else {
-            if snapShot.value is NSNull {
+         guard error == nil, let value = snapShot?.value, !(snapShot?.value is NSNull), let self = self else {
+            if snapShot?.value is NSNull {
                completion(.failure(error: MyError.noData))
                return
             }

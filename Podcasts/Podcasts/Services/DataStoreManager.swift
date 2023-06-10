@@ -11,6 +11,7 @@ class DataStoreManager {
     
     static var shared: DataStoreManager = DataStoreManager()
     lazy var viewContext = persistentContainer.viewContext
+    lazy var backgroundContext = persistentContainer.newBackgroundContext()
     
     private init() {}
     

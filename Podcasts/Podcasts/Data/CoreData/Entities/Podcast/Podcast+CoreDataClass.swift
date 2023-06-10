@@ -90,7 +90,7 @@ public class Podcast: NSManagedObject, Codable {
                 if ids.count == names.count {
                     for i in 0 ..< ids.count {
 
-                        let genre = Genre(id: ids[i], name:  names[i])
+                        let genre = Genre(id: ids[i], name:  names[i], viewContext: nil)
                         genres.append(genre)
                     }
                 }
@@ -133,10 +133,11 @@ public class Podcast: NSManagedObject, Codable {
     }
     
     //MARK: init
-    convenience init(podcast: Podcast) {
-     
-        self.init(entity: Self.entity(), insertInto: Self.viewContext)
+    @discardableResult
+    required convenience init(_ podcast: Podcast) {
         
+        self.init(entity: Self.entity(), insertInto: Self.viewContext)
+
         self.previewUrl =            podcast.previewUrl
         self.episodeFileExtension =  podcast.episodeFileExtension
         self.artworkUrl160 =         podcast.artworkUrl160
@@ -168,46 +169,21 @@ public class Podcast: NSManagedObject, Codable {
         self.wrapperType =        podcast.wrapperType
         self.artistName =         podcast.artistName
         self.trackCount =         podcast.trackCount
-        
-        saveInit()
     }
 }
 
 //MARK: - CoreDataProtocol
 extension Podcast: CoreDataProtocol {
+ 
+    var searchId: Int? { id?.intValue }
     
-    typealias T = Podcast
-
-    static var allObjectsFromCoreData: [Podcast] { Self.viewContext.fetchObjects(Self.self) }
-    
-    var getFromCoreData: Podcast? {
-        return Self.allObjectsFromCoreData.first(matching: id)
-    }
-    
-    var getFromCoreDataIfNoSavedNew: Podcast {
-        return getFromCoreData ?? Podcast(podcast: self)
-    }
-
-    func saveInCoredataIfNotSaved() {
-        if getFromCoreData == nil {
-            _ = Podcast(podcast: self)
-        }
-    }
-    
-    func removeFromCoreDataWithOwnEntityRule() {
-        guard let podcast = getFromCoreData else { return }
-        if let genres = podcast.genres?.allObjects as? [Genre] {
-            genres.remove(podcast: podcast)
-        }
-        podcast.myValidateDelete()
-        
-    }
-    
-    static func removeAll() {
-        allObjectsFromCoreData.forEach {
-            $0.remove()
-        }
-    }
+//    func removeFromCoreDataWithOwnEntityRule() {
+//        guard let podcast = getFromCoreData else { return }
+//        if let genres = podcast.genres?.allObjects as? [Genre] {
+//            genres.remove(podcast: podcast)
+//        }
+//        podcast.myValidateDelete()
+//    }
 }
 
 //MARK: - InputPlayerProtocol
@@ -223,7 +199,7 @@ extension Podcast: InputPlayerProtocol {
         set {
             let listeningPodcast = getOrCreateListeningPodcast
             listeningPodcast.currentTime = newValue ?? 0
-            saveCoreData()
+            mySave()
             listeningPodcast.saveInFireBase()
         }
     }
@@ -235,7 +211,7 @@ extension Podcast: InputPlayerProtocol {
         set {
             let listeningPodcast = getOrCreateListeningPodcast
             listeningPodcast.progress = newValue ?? 0
-            saveCoreData()
+            mySave()
             listeningPodcast.saveInFireBase()
         }
     }
@@ -247,7 +223,7 @@ extension Podcast: InputPlayerProtocol {
         set {
             let listeningPodcast = getOrCreateListeningPodcast
             listeningPodcast.duration = newValue ?? 0
-            saveCoreData()
+            mySave()
             listeningPodcast.saveInFireBase()
         }
     }
@@ -297,24 +273,36 @@ extension Podcast {
     
     /// ListeningPodcast
     private var getOrCreateListeningPodcast: ListeningPodcast {
-        return getListeningPodcast ?? ListeningPodcast(podcast: self)
+        return getListeningPodcast ?? ListeningPodcast(self)
     }
     
     private var getListeningPodcast: ListeningPodcast? {
-        return ListeningPodcast.allObjectsFromCoreData.filter { $0.podcast.id == id }.first
+        guard let id = id?.intValue else { return nil }
+        return ListeningPodcast.getFromCoreData(searchId: id)
     }
     
     /// Favorite
     func addOrRemoveToFavorite() {
         if let favoritePodcast = getFavoritePodcast {
-            favoritePodcast.remove()
+            
+//            for key in favoritePodcast.entity.propertiesByName.keys {
+//                let value: Any? = favoritePodcast.value(forKey: key)
+//                if let item = value as? (any CoreDataProtocol) {
+//                    item.remove()
+//                }
+//            }
+//
+            
+            favoritePodcast.removeFromCoreData()
         } else {
-            _ = FavoritePodcast(podcast: self)
+            FavoritePodcast(podcast: self)
         }
     }
     
     var getFavoritePodcast: FavoritePodcast? {
-        return FavoritePodcast.allObjectsFromCoreData.filter { $0.podcast.id == id }.first
+        guard let id = id else { return nil }
+        let predicate = NSPredicate(format: "podcast.id == %@", "\(id)")
+        return FavoritePodcast.fetchResultController(predicates: [predicate], fetchLimit: 1).fetchedObjects?.first
     }
 }
 
@@ -384,7 +372,7 @@ extension Podcast: SearchCollectionViewCellType {
 }
 
 //MARK: - FavoritePodcastTableViewCellType
-extension Podcast: FavoritePodcastTableViewCellType {
+extension Podcast: LikedPodcastTableViewCellType {
     var mainImageForFavoritePodcastTableViewCellType: String? {
         return artworkUrl600
     }

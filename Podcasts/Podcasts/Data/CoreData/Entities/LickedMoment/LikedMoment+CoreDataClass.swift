@@ -36,15 +36,38 @@ public class LikedMoment: NSManagedObject, Codable {
     }
     
     //MARK: init
+    
+    @discardableResult
     convenience init(podcast: Podcast, moment: Double) {
         self.init(entity: Self.entity(), insertInto: Self.viewContext)
+        
         self.moment = moment
         self.podcast = podcast.getFromCoreDataIfNoSavedNew
         
-        saveInit()
+        mySave()
     }
     
-    static func likedMomentFRC(sortDescription: [NSSortDescriptor] = [NSSortDescriptor(key: #keyPath(moment), ascending: true)], predicates: [NSPredicate]? = nil, sectionNameKeyPath: String? = nil) -> NSFetchedResultsController<LikedMoment> {
+    @discardableResult
+    required convenience init(_ likedMoment: LikedMoment) {
+        
+        self.init(entity: Self.entity(), insertInto: Self.viewContext)
+        
+        self.moment = likedMoment.moment
+        self.podcast = likedMoment.podcast
+    }
+    
+    @discardableResult
+    required convenience init(_ likedMoment: LikedMoment, viewContext: NSManagedObjectContext) {
+        
+        self.init(entity: Self.entity(), insertInto: Self.viewContext)
+        
+        self.moment = likedMoment.moment
+        self.podcast = likedMoment.podcast
+        
+        mySave()
+    }
+    
+     static func likedMomentFRC(sortDescription: [NSSortDescriptor] = [NSSortDescriptor(key: #keyPath(moment), ascending: true)], predicates: [NSPredicate]? = nil, sectionNameKeyPath: String? = nil) -> NSFetchedResultsController<LikedMoment> {
         let fetchRequest: NSFetchRequest<LikedMoment> = LikedMoment.fetchRequest()
         
         if let predicates = predicates {
@@ -71,76 +94,25 @@ public class LikedMoment: NSManagedObject, Codable {
     }
 }
 
-extension LikedMoment {
-    
-    
-    var firebaseKey: String { "\(Int(moment))sec id\(podcast.id ?? 0)" }
-    
-    static func getLikedMoment(at indexPath: IndexPath) -> LikedMoment {
-        return likedMomentFRC().object(at: indexPath)
-    }
-    
-    static func saveInCoredataIfNotSaved(podcast: Podcast, moment: Double) {
-        var likeMoments = allObjectsFromCoreData.filter { $0.podcast.id == podcast.id && $0.moment == moment }
-        if likeMoments.first == nil {
-            let podcast = podcast
-            let moment = moment
-            _ = LikedMoment(podcast: podcast, moment: moment)
-        }
-    }
-}
-
 
 //MARK: - CoreDataProtocol
 extension LikedMoment: CoreDataProtocol {
     
-    typealias T = LikedMoment
+    var searchId : Int? { podcast.searchId }
     
-    static var allObjectsFromCoreData: [LikedMoment] {
-        viewContext.fetchObjects(Self.self)
-    }
-    
-    var getFromCoreData: LikedMoment? {
-        return Self.allObjectsFromCoreData.filter { $0.podcast.id == podcast.id && $0.moment == moment }.first
-    }
-    
-    var getFromCoreDataIfNoSavedNew: LikedMoment {
-        return getFromCoreData ?? LikedMoment(podcast: podcast, moment: moment)
-    }
-   
-    func saveInCoredataIfNotSaved() {
-        if getFromCoreData == nil {
-            let podcast = podcast
-            let moment = moment
-            _ = LikedMoment(podcast: podcast, moment: moment)
-        }
-    }
-    
-    func removeFromCoreDataWithOwnEntityRule() {
-        if let likedMoment = getFromCoreData {
-            let podcast = likedMoment.podcast
-            likedMoment.removeFromViewContext()
-            podcast.remove()
-        }
-    }
-    
-    static func removeAll() {
-        allObjectsFromCoreData.forEach {
-            $0.remove()
-        }
-    }
+//    func removeFromCoreDataWithOwnEntityRule() {
+//        if let likedMoment = getFromCoreData {
+//            let podcast = likedMoment.podcast
+//            likedMoment.removeFromViewContext()
+//            podcast.remove()
+//        }
+//    }
 }
 
 //MARK: - FirebaseProtocol
 extension LikedMoment: FirebaseProtocol {
     
-    func saveInFireBase() {
-    FirebaseDatabase.shared.add(object: self, key: firebaseKey)
-}
-       
-    func removeFromFireBase(key: String) {
-        FirebaseDatabase.shared.remove(object: Self.self, key: key)
-    }
+    var firebaseKey: String? { "\(Int(moment))sec id \(podcast.id ?? 0)" }
     
     static func updateFromFireBase(completion: ((Result<[LikedMoment]>) -> Void)?) {
         FirebaseDatabase.shared.update { (result: Result<[LikedMoment]>) in
@@ -154,7 +126,7 @@ extension LikedMoment: FirebaseProtocol {
 
                 allObjectsFromCoreData.forEach { momentFromCoreDate in
                     if !momentsFromFireBase.contains(where: { $0.podcast.id == momentFromCoreDate.podcast.id })  {
-                        momentFromCoreDate.remove()
+                        momentFromCoreDate.removeFromCoreData()
                     }
                 }
 

@@ -9,9 +9,6 @@
 import UIKit
 import CoreData
 
-//protocol
-
-
 
 public class FavoritePodcast: NSManagedObject, Codable {
     
@@ -21,6 +18,7 @@ public class FavoritePodcast: NSManagedObject, Codable {
         case id
     }
     
+    //MARK: decoder
     required convenience public init(from decoder: Decoder) throws {
         self.init(entity: Self.entity(), insertInto: nil)
         
@@ -29,21 +27,44 @@ public class FavoritePodcast: NSManagedObject, Codable {
         date = try values.decode(Date.self, forKey: .date)
     }
     
+    //MARK: encode
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         
-        try container.encode(podcast,forKey: .podcast)
-        try container.encode(date,forKey: .date)
+        try container.encode(podcast, forKey: .podcast)
+        try container.encode(date, forKey: .date)
     }
     
+    @discardableResult
     convenience init(podcast: Podcast) {
+        self.init(entity: Self.entity(), insertInto: Self.viewContext)
+        
+        self.date = Date()
+        self.podcast = podcast.getFromCoreDataIfNoSavedNew
+        
+        mySave()
+    }
+
+    ///init to viewContext
+    @discardableResult
+    required convenience init(_ favoritePodcast: FavoritePodcast) {
         
         self.init(entity: Self.entity(), insertInto: Self.viewContext)
         
+        self.date = favoritePodcast.date
         self.podcast = podcast.getFromCoreDataIfNoSavedNew
-        self.date = Date()
+    }
+    
+    ///init to viewContext
+    @discardableResult
+    required convenience init(_ favoritePodcast: FavoritePodcast, viewContext: NSManagedObjectContext) {
         
-        saveInit()
+        self.init(entity: Self.entity(), insertInto: viewContext)
+        
+        self.date = favoritePodcast.date
+        self.podcast = podcast.getFromCoreDataIfNoSavedNew
+        
+        mySave()
     }
 }
 
@@ -51,62 +72,28 @@ public class FavoritePodcast: NSManagedObject, Codable {
 //MARK: - CoreDataProtocol
 extension FavoritePodcast: CoreDataProtocol {
     
-    typealias T = FavoritePodcast
     
-    static var allObjectsFromCoreData: [FavoritePodcast] { viewContext.fetchObjects(FavoritePodcast.self) }
+    var searchId: Int? { podcast.searchId }
     
-    func removeFromCoreDataWithOwnEntityRule() {
-        guard let favoritePodcast = getFromCoreData else { return }
-        let podcast = favoritePodcast.podcast
-        favoritePodcast.removeFromViewContext()
-        podcast.remove()
-    }
-  
-    func saveInCoredataIfNotSaved() {
-        if getFromCoreData == nil {  _ = FavoritePodcast(podcast: podcast) }
-    }
-    
-    static func removeAll() {
-        allObjectsFromCoreData.forEach {
-            $0.remove()
-        }
-    }
-    
-    var getFromCoreData: FavoritePodcast? {
-        Self.allObjectsFromCoreData.filter { $0.podcast.id == podcast.id }.first
-    }
-    
-    var getFromCoreDataIfNoSavedNew: FavoritePodcast {
-        return getFromCoreData ?? FavoritePodcast(podcast: podcast)
-    }
+//    func removeFromCoreDataWithOwnEntityRule() {
+//        guard let favoritePodcast = getFromCoreData else { return }
+//        let podcast = favoritePodcast.podcast
+//        favoritePodcast.removeFromViewContext()
+//        podcast.remove()
+//    }
 }
 
 extension FavoritePodcast {
     
-//    static var fetchResultController: NSFetchedResultsController<FavoritePodcast> = {
-//        let fetchRequest = FavoritePodcast.fetchRequest()
-//
-//        fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(podcast.trackName), ascending: true)]
-//
-//        let fetchResultController = NSFetchedResultsController(
-//            fetchRequest: fetchRequest,
-//            managedObjectContext: viewContext,
-//            sectionNameKeyPath: #keyPath(podcast.collectionName),
-//            cacheName: nil
-//        )
-//
-//        do {
-//            try fetchResultController.performFetch()
-//        } catch {
-//            let nserror = error as NSError
-//            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
-//        }
-//
-//        return fetchResultController
-//    }()
-    
-    static func fetchResultController(sortDescription: [NSSortDescriptor] = [NSSortDescriptor(key: #keyPath(podcast.trackName), ascending: true)], predicates: [NSPredicate]? = nil, sectionNameKeyPath: String? = nil) -> NSFetchedResultsController<FavoritePodcast> {
+    static func fetchResultController(
+        sortDescription: [NSSortDescriptor] = [NSSortDescriptor(key: #keyPath(podcast.trackName),ascending: true)],
+        predicates: [NSPredicate]? = nil,
+        sectionNameKeyPath: String? = nil,
+        fetchLimit: Int? = nil
+    ) -> NSFetchedResultsController<FavoritePodcast> {
+        
         let fetchRequest: NSFetchRequest<FavoritePodcast> = FavoritePodcast.fetchRequest()
+        
         
         if let predicates = predicates {
             for predicate in predicates {
@@ -114,6 +101,9 @@ extension FavoritePodcast {
             }
         }
         
+        fetchRequest.fetchLimit = fetchLimit ?? Int.max
+        fetchRequest.fetchLimit = 3
+        fetchRequest.returnsObjectsAsFaults = false
         fetchRequest.sortDescriptors = sortDescription
         let fetchResultController = NSFetchedResultsController(
             fetchRequest: fetchRequest,
@@ -158,15 +148,7 @@ extension FavoritePodcast {
 //MARK: - FirebaseProtocol
 extension FavoritePodcast: FirebaseProtocol {
     
-    var firebaseKey: String { "\(podcast.id ?? 0)" }
-    
-    func saveInFireBase() {
-        FirebaseDatabase.shared.add(object: self, key: firebaseKey)
-    }
-    
-    func removeFromFireBase(key: String) {
-        FirebaseDatabase.shared.remove(object: Self.self, key: key)
-    }
+    var firebaseKey: String? { String(describing: podcast.id) }
     
     static func updateFromFireBase(completion: ((Result<[FavoritePodcast]>) -> Void)?) {
         FirebaseDatabase.shared.update {  (result: Result<[FavoritePodcast]>) in
@@ -187,7 +169,7 @@ extension FavoritePodcast: FirebaseProtocol {
     static func updateFavoritePodcast(by podcastsFromFireBase: [FavoritePodcast]) {
         for favoritePodcast in Self.allObjectsFromCoreData {
             if !podcastsFromFireBase.contains(where: { $0.podcast.id == favoritePodcast.podcast.id }) {
-                favoritePodcast.remove()
+                favoritePodcast.removeFromCoreData()
             }
         }
         
@@ -196,12 +178,3 @@ extension FavoritePodcast: FirebaseProtocol {
         }
     }
 }
-
-
-class BasicFireBaseClass<S>  where S: NSManagedObject & Identifiable {
-    
-    var test: String { S.entityName + "r"}
-    
-}
-
-

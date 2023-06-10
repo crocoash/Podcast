@@ -37,57 +37,39 @@ public class Genre: NSManagedObject, Codable {
     }
     
     //MARK: init
-    /// to nil
-    convenience init(id: String?, name: String?) {
+
+    convenience init(id: String?, name: String?, viewContext: NSManagedObjectContext? = viewContext) {
         
-        self.init(entity: Self.entity(), insertInto: nil)
+        self.init(entity: Self.entity(), insertInto: viewContext)
         
         self.id = id
         self.name = name
+        
+        if viewContext != nil {
+            mySave()
+        }
     }
     
     /// to viewContext
-    convenience init(genre: Genre) {
+    required convenience init(_ genre: Genre) {
         
         self.init(entity: Self.entity(), insertInto: Self.viewContext)
-        
         self.id = genre.id
+        
         self.name = genre.name
         self.podcasts = genre.podcasts
-        
-        saveInit()
     }
 }
 
 extension Genre: CoreDataProtocol {
     
-    typealias T = Genre
-    
-    static var allObjectsFromCoreData: [Genre] { viewContext.fetchObjects(Genre.self) }
-    
-    static func removeAll() {
-        allObjectsFromCoreData.forEach {
-            $0.remove()
-        }
-    }
+    var searchId: Int? { Int(id ?? "") }
 
-    func removeFromCoreDataWithOwnEntityRule() {
-        if let genre = getFromCoreData {
-            genre.myValidateDelete()
-        }
-    }
-    
-    func saveInCoredataIfNotSaved() {
-        if let _ = getFromCoreData  { _ = Genre(genre: self) }
-    }
-   
-    var getFromCoreData: Genre? {
-        return Self.allObjectsFromCoreData.first(matching: self)
-    }
-    
-    var getFromCoreDataIfNoSavedNew: Genre {
-        return Self.allObjectsFromCoreData.first(matching: self) ?? Genre(genre: self)
-    }
+//    func removeFromCoreDataWithOwnEntityRule() {
+//        if let genre = getFromCoreData {
+//            genre.myValidateDelete()
+//        }
+//    }
 }
 
 //MARK: - Common
@@ -106,7 +88,7 @@ extension Collection where Element: Genre {
     func remove(podcast: Podcast) {
         self.forEach {
             $0.removePodcast(podcast: podcast)
-            $0.remove()
+            $0.removeFromCoreData()
         }
     }
 }

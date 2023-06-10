@@ -28,6 +28,9 @@ protocol FavoritePodcastViewControllerProtocol {
 
 class FavoritePodcastTableViewController: UIViewController {
     
+    typealias SnapShot = NSDiffableDataSourceSnapshot<Section, NSManagedObject>
+    typealias DiffableDataSource = UITableViewDiffableDataSource<Section, NSManagedObject>
+    
     @IBOutlet private weak var tableView: UITableView!
     @IBOutlet private weak var tableViewBottomConstraint: NSLayoutConstraint!
     
@@ -45,7 +48,7 @@ class FavoritePodcastTableViewController: UIViewController {
     
     private var diffableDataSource: DataSource!
     
-    private var mySnapShot: NSDiffableDataSourceSnapshot<Section, NSManagedObject>! = nil
+    private var mySnapShot: SnapShot! = nil
     
     private var playerIsSHidden = true {
         didSet {
@@ -54,7 +57,7 @@ class FavoritePodcastTableViewController: UIViewController {
         }
     }
     
-    class DataSource: UITableViewDiffableDataSource<Section, NSManagedObject> {
+    class DataSource: DiffableDataSource {
         
         override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
             return Section[section + 1]
@@ -65,7 +68,7 @@ class FavoritePodcastTableViewController: UIViewController {
         
         case favourite([FavoritePodcast])
         case liked([LikedMoment])
-        
+       
         var nameOfSection: String {
             switch self {
             case .favourite(_) :
@@ -75,12 +78,38 @@ class FavoritePodcastTableViewController: UIViewController {
             }
         }
        
-        static subscript (_ int: Int) -> String? {
+        static subscript(_ int: Int) -> String? {
             switch int {
             case 0 : return nil
             case 1: return allCases[0].nameOfSection
             case 2: return allCases[1].nameOfSection
             default: fatalError()
+            }
+        }
+        
+        static subscript(getNSManagedObjectBy indexPath: IndexPath) -> NSManagedObject {
+           
+            switch indexPath.section {
+            case 0:
+                return favoriteFRC.object(at: IndexPath(item: indexPath.row, section: 0))
+            case 1:
+                return likeMomentFRC.object(at: IndexPath(item: indexPath.row, section: 0))
+            default: fatalError()
+            }
+        }
+        
+        static subscript(_ indexPath: IndexPath) -> Section {
+            switch indexPath.section {
+            case 0: return .favourite([])
+            case 1: return .liked([])
+            default: fatalError()
+            }
+        }
+        
+        var identifier: Section {
+            switch self {
+            case .favourite(_): return .favourite([])
+            case .liked(_): return .liked([])
             }
         }
         
@@ -163,6 +192,7 @@ class FavoritePodcastTableViewController: UIViewController {
     //MARK: View Methods
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        super.viewWillAppear(animated)
         showEmptyImage()
     }
     
@@ -194,11 +224,9 @@ class FavoritePodcastTableViewController: UIViewController {
     }
     
     @objc func tapFavoritePodcastCell(sender: UITapGestureRecognizer) {
-        guard let cell = sender.view as? FavoritePodcastTableViewCell,
-              let indexPath = tableView.indexPath(for: cell),
-              let favoritePodcast = diffableDataSource.itemIdentifier(for: indexPath) as? FavoritePodcast else { return }
+        guard let cell = sender.view as? PodcastCell,
+              let podcast = getPodcast(cell) else { return }
        
-        let podcast = favoritePodcast.podcast
         self.delegate?.favoritePodcastTableViewControllerDidSelectCell(self, podcast: podcast)
     }
     
@@ -250,27 +278,34 @@ extension FavoritePodcastTableViewController {
     }
     
     private func getPodcast(_ cell: UITableViewCell) -> Podcast? {
-        guard let indexPath = tableView.indexPath(for: cell) else { return nil }
-        return FavoritePodcast.getObject(by: indexPath).podcast
+        guard let indexPath = tableView.indexPath(for: cell),
+              let item = diffableDataSource.itemIdentifier(for: indexPath) else { return nil }
+       
+        if let favourite = item as? FavoritePodcast {
+            return favourite.podcast
+        } else if let liked = item as? LikedMoment {
+            return liked.podcast
+        }
+        fatalError()
     }
     
-    private func getPodcast(by indexPath: IndexPath) -> Podcast {
-        return FavoritePodcast.getObject(by: indexPath).podcast
-    }
+//    private func getPodcast(by indexPath: IndexPath) -> Podcast {
+//        return FavoritePodcast.getObject(by: indexPath).podcast
+//    }
     
     private func configureDataSource() {
         self.diffableDataSource = DataSource(tableView: tableView) { [weak self] tableView, indexPath, item in
             
             if let favoritePodcast = item as? FavoritePodcast {
-                let cell = tableView.getCell(cell: FavoritePodcastTableViewCell.self, indexPath: indexPath)
-                cell.configureCell(with: favoritePodcast.podcast)
+                let cell = tableView.getCell(cell: PodcastCell.self, indexPath: indexPath)
+                cell.configureCell(self, with: favoritePodcast.podcast)
                 cell.addMyGestureRecognizer(self, type: .tap(), #selector(self?.tapFavoritePodcastCell(sender:)))
                 return cell
             }
             
             if let likedMoment = item as? LikedMoment {
-                let cell = tableView.getCell(cell: PodcastCell.self, indexPath: indexPath)
-                cell.configureCell(self, with: likedMoment.podcast)
+                let cell = tableView.getCell(cell: LikedPodcastTableViewCell.self, indexPath: indexPath)
+                cell.configureCell(with: likedMoment.podcast)
                 cell.addMyGestureRecognizer(self, type: .tap(), #selector(self?.tapLikedCell(sender:)))
                 return cell
             }
@@ -281,16 +316,16 @@ extension FavoritePodcastTableViewController {
     
     
     private func reloadData() {
-        self.mySnapShot = NSDiffableDataSourceSnapshot<Section, NSManagedObject>()
+        self.mySnapShot = SnapShot()
         
         for section in Section.allCases {
             if searchSection == nil || searchSection == section.nameOfSection {
                 switch section {
                 case .favourite(let items):
-                    mySnapShot.appendSections([section])
+                    mySnapShot.appendSections([section.identifier])
                     mySnapShot.appendItems(items)
                 case .liked(let items):
-                    mySnapShot.appendSections([section])
+                    mySnapShot.appendSections([section.identifier])
                     mySnapShot.appendItems(items)
                 }
             }
@@ -353,88 +388,36 @@ extension FavoritePodcastTableViewController: PodcastCellDelegate {
 extension FavoritePodcastTableViewController: NSFetchedResultsControllerDelegate {
     
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        tableView?.beginUpdates()
+//        tableView?.beginUpdates()
     }
     
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        print("print \(type) \(anObject)")
+        switch type {
+            
+        case .delete:
+            guard let indexPath = indexPath else { return }
+            guard let item = diffableDataSource.itemIdentifier(for: indexPath) else { return }
+            mySnapShot.deleteItems([item])
 
-//        switch type {
-//        case .delete :
+        case .insert:
+            guard let indexPath = newIndexPath else { return }
+            let item = Section[getNSManagedObjectBy: indexPath]
+            if let oldItem = diffableDataSource.itemIdentifier(for: indexPath) {
+                mySnapShot.insertItems([item], beforeItem: oldItem)
+            } else {
+                mySnapShot.appendItems([item], toSection: Section[indexPath])
+            }
             
-//            let typeOfSection = Item.Category(rawValue: indexPath!.section)
-//            let items = mySnapShot.itemIdentifiers(inSection: typeOfSection!)
-//            let item = items[indexPath!.row]
-            
-//            switch item.section {
-//            case .favourite:
-//                guard let favoritePodcast = item.entity as? FavoritePodcast else { return }
-//                self.delegate?.favoritePodcastTableViewControllerDidSelectCell(self, podcast: favoritePodcast.podcast)
-//            case .liked:
-//                guard let _ = item.entity as? LikedMoment else { return }
-//                print("print +++++")
-//            }
-//            mySnapShot.deleteItems([item])
-            
-//            guard let indexPath = indexPath else { return }
-//            guard let itemIdentifier = diffableDataSource.itemIdentifier(for: indexPath) else { return }
-//            snapShot.deleteItems([itemIdentifier])
-//            let title = "podcast is removed from playlist"
-//            addToast(title: title, (playerIsSHidden ? .bottomWithTabBar : .bottomWithPlayerAndTabBar))
-//        case .insert :
-//            if let newIndexPath = newIndexPath {
-////                tableView.insertRows(at: [newIndexPath], with: .left)
-//                snapShot.appendItems(<#T##identifiers: [Item<NSManagedObject>]##[Item<NSManagedObject>]#>)
-////                snapShot.appendItems([Item(item: <#T##NSManagedObject#>, section: <#T##Item<NSManagedObject>.Category#>)])
-//                let favoritePodcast = FavoritePodcast.fetchResultController.object(at: newIndexPath)
-//                let name = favoritePodcast.podcast.trackName ?? ""
-//                let title = "\(name) podcast is added to playlist"
-//                addToast(title: title, (playerIsSHidden ? .bottom : .bottomWithPlayer))
-//            }
-//        case .move :
-//            if let indexPath = indexPath { 
-//                tableView.deleteRows(at: [indexPath], with: .left)
-//            }
-//            if let newIndexPath = newIndexPath {
-//                tableView.insertRows(at: [newIndexPath], with: .left)
-//            }
-//        case .update :
-//            if let indexPath = indexPath {
-//                let podcast = getPodcast(by: indexPath)
-//                if let cell = tableView.cellForRow(at: indexPath) as? PodcastCell {
-//                    cell.configureCell(nil, with: podcast)
-//                }
-//        }
-//        default : break
-//        }
-//        showEmptyImage()
+        default : break
+        }
+        print("print mySnapShot")
+        diffableDataSource.apply(mySnapShot)
+        showEmptyImage()
     }
     
-    
-//    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChangeContentWith snapshot: NSDiffableDataSourceSnapshotReference) {
-//
-//        let reloadIdentifiers: [Item] = snapshot.itemIdentifiers.compactMap { itemIdentifier in
-//                guard let currentIndex = currentSnapshot.indexOfItem(itemIdentifier), let index = snapshot.indexOfItem(itemIdentifier), index == currentIndex else {
-//                    return nil
-//                }
-//                guard let existingObject = try? controller.managedObjectContext.existingObject(with: itemIdentifier), existingObject.isUpdated else { return nil }
-//                return itemIdentifier
-//            }
-        
-        
-//        guard let snapshot1 = snapshot as? NSDiffableDataSourceSnapshot<Item.Category, Item> else { return }
-//
-//        let itemsIdentifier: [Item] = snapshot1.itemIdentifiers.map {
-//            return $0
-////            controller.managedObjectContext.existingObject(with: )
-//        }
-        
-
-          
-//        self.diffableDataSource.apply(snapshot as NSDiffableDataSourceSnapshot<Item.Category, Item>, animatingDifferences: true)
-//}
-    
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        tableView?.endUpdates()
+//        tableView?.endUpdates()
     }
 }
 
@@ -444,7 +427,6 @@ extension FavoritePodcastTableViewController: UISearchResultsUpdating {
         let searchText = searchController.searchBar.text
         if searchText != "" || Section.searchText != nil {
             Section.searchText = searchText
-            reloadData()
         }
        
     }

@@ -45,7 +45,9 @@ public class ListeningPodcast: NSManagedObject, Codable {
     }
     
     ///init
-    convenience init(podcast: Podcast) {
+    
+    @discardableResult
+    convenience init(_ podcast: Podcast) {
         
         self.init(entity: Self.entity(), insertInto: Self.viewContext)
         
@@ -54,60 +56,54 @@ public class ListeningPodcast: NSManagedObject, Codable {
         self.progress = 0
         self.podcast = podcast.getFromCoreDataIfNoSavedNew
         
-        saveInit()
+        mySave()
     }
+    
+    @discardableResult
+    required convenience init(_ listeningPodcast: ListeningPodcast) {
+        
+        self.init(entity: Self.entity(), insertInto: Self.viewContext)
+        
+        self.currentTime = listeningPodcast.currentTime
+        self.duration = listeningPodcast.duration
+        self.progress = listeningPodcast.progress
+        self.podcast = podcast.getFromCoreDataIfNoSavedNew
+    }
+    
+    @discardableResult
+    required convenience init(_ listeningPodcast: ListeningPodcast, viewContext: NSManagedObjectContext) {
+        
+        self.init(entity: Self.entity(), insertInto: Self.viewContext)
+        
+        self.currentTime = listeningPodcast.currentTime
+        self.duration = listeningPodcast.duration
+        self.progress = listeningPodcast.progress
+        self.podcast = podcast.getFromCoreDataIfNoSavedNew
+        
+        mySave()
+    }
+    
+    
 }
 
 //MARK: - CoreDataProtocol
 extension ListeningPodcast: CoreDataProtocol {
     
-    typealias T = ListeningPodcast
-    
-    static var allObjectsFromCoreData: [ListeningPodcast] {
-        return Self.viewContext.fetchObjects(Self.self)
-    }
-    
-    func removeFromCoreDataWithOwnEntityRule() {
-        if let listeningPodcast = getFromCoreData {
-            let podcast = listeningPodcast.podcast
-            listeningPodcast.removeFromViewContext()
-            podcast.remove()
-        }
-    }
-    
-    func saveInCoredataIfNotSaved() {
-        if getFromCoreData == nil {
-            _ = ListeningPodcast(podcast: podcast)
-        }
-    }
-    
-    var getFromCoreData: ListeningPodcast? {
-        return Self.allObjectsFromCoreData.first(matching: self)
-    }
-    
-    var getFromCoreDataIfNoSavedNew: ListeningPodcast {
-        return getFromCoreData ?? ListeningPodcast(podcast: podcast)
-    }
-    
-    static func removeAll() {
-        Self.allObjectsFromCoreData.forEach {
-            $0.remove()
-        }
-    }
+    var searchId: Int? { podcast.searchId }
+  
+//    func removeFromCoreDataWithOwnEntityRule() {
+//        if let listeningPodcast = getFromCoreData {
+//            let podcast = listeningPodcast.podcast
+//            listeningPodcast.removeFromViewContext()
+//            podcast.remove()
+//        }
+//    }
 }
 
 //MARK: - FirebaseProtocol
 extension ListeningPodcast: FirebaseProtocol {
-    
-    var firebaseKey: String { "\(podcast.id ?? 0)" }
-    
-    func removeFromFireBase(key: String) {
-        FirebaseDatabase.shared.remove(object: Self.self, key: key)
-    }
-    
-    func saveInFireBase() {
-        FirebaseDatabase.shared.add(object: self, key: firebaseKey)
-    }
+
+    var firebaseKey: String? { "\(podcast.id ?? 0)" }
     
     static func updateFromFireBase(completion: ((Result<[ListeningPodcast]>) -> Void)?) {
         FirebaseDatabase.shared.update { (result: Result<[ListeningPodcast]>) in
@@ -127,7 +123,7 @@ extension ListeningPodcast: FirebaseProtocol {
     static func update(by entities: [ListeningPodcast]) {
         Self.allObjectsFromCoreData.forEach { entity in
             if !entities.contains(where: { $0.id == entity.id }) {
-                entity.remove()
+                entity.removeFromCoreData()
             }
         }
         

@@ -50,8 +50,8 @@ class RegistrationViewController: UIViewController {
     private let alert = Alert()
     
     //MARK: - Settings
-    lazy private var email: String = userViewModel.userDocument.user.userName ?? ""
-    private var password: String = ""
+    lazy private var email: String = userViewModel.userDocument.user.userName ?? "crocoash@gmail.com"
+    private var password: String = "123456"
     
     private let colorFails = #colorLiteral(red: 0.5807225108, green: 0.066734083, blue: 0, alpha: 1)
     private let colorOk = #colorLiteral(red: 0.6000000238, green: 0.6000000238, blue: 0.6000000238, alpha: 1)

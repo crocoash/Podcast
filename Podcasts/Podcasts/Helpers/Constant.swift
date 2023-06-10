@@ -22,7 +22,7 @@ enum DynamicLinkManager {
         case .podcastById(let string):
             return "https://itunes.apple.com/lookup?id=\(string)&entity=podcastEpisode"
         }
-    }
+    } //https://itunes.apple.com/search?term="30141"&entity=podcast
 }
 
 //TODO: change name

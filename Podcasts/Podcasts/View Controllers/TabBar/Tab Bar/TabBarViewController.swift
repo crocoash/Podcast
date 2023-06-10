@@ -5,6 +5,7 @@ import CoreData
 
 class TabBarViewController: UITabBarController {
     
+  
     private var downloadService = DownloadService.shared
     
     // MARK: - variables
@@ -170,26 +171,28 @@ extension TabBarViewController {
             add: { [weak self] (result: Result<FavoritePodcast>) in
                 switch result {
                 case .success(result: let favoritePodcast) :
-                    favoritePodcast.saveInCoredataIfNotSaved()
+//                    favoritePodcast.addFromFireBase()
+                    return
                 case .failure(error: let error):
                     error.showAlert(vc: self, tittle: "Can't add FavoritePodcast")
                 }
             }, remove: { [weak self] (result: Result<FavoritePodcast>) in
                 switch result {
                 case .success(result: let favoritePodcast):
-                    favoritePodcast.remove()
+//                    favoritePodcast.remove()
+                    return
                 case .failure(error: let error):
                     error.showAlert(vc: self, tittle: "Can't remove FavoritePodcast")
                 }
             })
         
-        FavoritePodcast.updateFromFireBase { [weak self] result in
-            switch result {
-            case .failure(error: let error) :
-                error.showAlert(vc: self)
-            default: break
-            }
-        }
+//        FavoritePodcast.updateFromFireBase { [weak self] result in
+//            switch result {
+//            case .failure(error: let error) :
+//                error.showAlert(vc: self)
+//            default: break
+//            }
+//        }
         
         ///LikedMoment
         FirebaseDatabase.shared.observe(
@@ -203,7 +206,7 @@ extension TabBarViewController {
             }, remove: { [weak self] (result: Result<LikedMoment>) in
                 switch result {
                 case .success(result: let likedMoment):
-                    likedMoment.remove()
+                    likedMoment.removeFromCoreData()
                 case .failure(error: let error):
                     error.showAlert(vc: self, tittle: "Can't remove likedMoment")
                 }
@@ -396,7 +399,7 @@ extension TabBarViewController: BigPlayerViewControllerDelegate {
     
     func bigPlayerViewController(_ bigPlayerViewController: BigPlayerViewController, didLikeThis moment: Double) {
         if let podcast = player.currentTrack?.track as? Podcast {
-            LikedMoment.saveInCoredataIfNotSaved(podcast: podcast, moment: moment)
+            LikedMoment(podcast: podcast, moment: moment)
         }
     }
 }
