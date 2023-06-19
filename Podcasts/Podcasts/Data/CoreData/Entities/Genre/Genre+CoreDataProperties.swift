@@ -2,7 +2,7 @@
 //  Genre+CoreDataProperties.swift
 //  Podcasts
 //
-//  Created by Anton on 23.02.2023.
+//  Created by Anton on 11.06.2023.
 //
 //
 
@@ -16,26 +16,26 @@ extension Genre {
         return NSFetchRequest<Genre>(entityName: "Genre")
     }
 
-    @NSManaged public var id: String?
+    @NSManaged public var identifier: String?
     @NSManaged public var name: String?
     @NSManaged public var podcasts: NSSet?
 
 }
 
-// MARK: Generated accessors for podcast
+// MARK: Generated accessors for podcasts
 extension Genre {
 
-    @objc(addPodcastObject:)
-    @NSManaged public func addToPodcast(_ value: Podcast)
+    @objc(addPodcastsObject:)
+    @NSManaged public func addToPodcasts(_ value: Podcast)
 
-    @objc(removePodcastObject:)
-    @NSManaged public func removeFromPodcast(_ value: Podcast)
+    @objc(removePodcastsObject:)
+    @NSManaged public func removeFromPodcasts(_ value: Podcast)
 
-    @objc(addPodcast:)
-    @NSManaged public func addToPodcast(_ values: NSSet)
+    @objc(addPodcasts:)
+    @NSManaged public func addToPodcasts(_ values: NSSet)
 
-    @objc(removePodcast:)
-    @NSManaged public func removeFromPodcast(_ values: NSSet)
+    @objc(removePodcasts:)
+    @NSManaged public func removeFromPodcasts(_ values: NSSet)
 
 }
 
