@@ -52,7 +52,8 @@ class SettingsTableViewController: UITableViewController {
         ApiService.getData(for: URLS.api.rawValue) { [weak self] (result: Result<IpModel>) in
             switch result {
                 
-            case .failure(error: let error):
+            case .failure(let error):
+                
                 error.showAlert(vc: self)
                 
             case .success(result: let result) :

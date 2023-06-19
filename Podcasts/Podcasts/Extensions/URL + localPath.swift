@@ -18,3 +18,19 @@ extension URL {
     }
 }
 
+extension Optional where Wrapped == URL {
+    var isDownload: Bool {
+        if let self = self {
+            return self.isDownLoad
+        }
+        return false
+    }
+    
+    var localPath: URL? {
+        if let self = self {
+            return self.localPath
+        }
+        return nil
+    }
+}
+

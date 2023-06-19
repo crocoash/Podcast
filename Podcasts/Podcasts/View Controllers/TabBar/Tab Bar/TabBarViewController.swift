@@ -4,9 +4,8 @@ import UIKit
 import CoreData
 
 class TabBarViewController: UITabBarController {
-    
   
-    private var downloadService = DownloadService.shared
+    private var downloadService = DownloadService()
     
     // MARK: - variables
     private var trailConstraint: NSLayoutConstraint?
@@ -71,25 +70,29 @@ class TabBarViewController: UITabBarController {
         super.viewDidLoad()
         configureView()
         fireBase()
-        downloadService.configureURLSession(delegate: self)
+        downloadService.delegate = self
     }
 }
 
 //MARK: - Private methods
 extension TabBarViewController {
     
-    private func addOrRemoveFavoritePodcast(podcast: Podcast) {
-        podcast.addOrRemoveToFavorite()
-        if podcast.stateOfDownload == .isDownload { downloadService.cancelDownload(podcast) }
+    private func addOrRemoveFavoritePodcast(vc: UIViewController, podcast: Podcast) {
+        if let favoritePodcast = podcast.getFavoritePodcast {
+            favoritePodcast.removeFromCoreData()
+            downloadService.cancelDownload(podcast)
+        } else {
+            FavoritePodcast(podcast: podcast)
+        }
         feedbackGenerator()
     }
     
-    private func downloadOrRemovePodcast(for vc: UIViewController, entity: DownloadServiceProtocol ,completion: @escaping () -> Void) {
-        downloadService.conform(vc: vc, entity: entity, completion: completion)
+    private func downloadOrRemovePodcast(vc: UIViewController, entity: DownloadProtocol) {
+        downloadService.conform(vc: vc, entity: entity)
     }
     
-    private func startPlay(track: InputPlayerProtocol, at moment: Double? = nil, playlist: [InputPlayerProtocol]) {
-        player.startPlay(track: track, playList: playlist, at: moment)
+    private func startPlay(track: InputPlayerProtocol, playlist: [InputPlayerProtocol]) {
+        player.startPlay(track: track, playList: playlist)
         playerIsPresent(true)
     }
     
@@ -118,7 +121,7 @@ extension TabBarViewController {
                 guard let self = self else { return }
                 self.view.hideActivityIndicator()
                 switch result {
-                case .failure(error: let error):
+                case .failure(let error):
                     error.showAlert(vc: self)
                 case .success(result: let podcastData) :
                     let podcasts = podcastData.podcasts.filter { $0.wrapperType == "podcastEpisode"}
@@ -168,31 +171,25 @@ extension TabBarViewController {
     private func fireBase() {
         ///FavoritePodcast
         FirebaseDatabase.shared.observe(
+            
             add: { [weak self] (result: Result<FavoritePodcast>) in
                 switch result {
-                case .success(result: let favoritePodcast) :
-//                    favoritePodcast.addFromFireBase()
+                case .success(result: _) :
                     return
                 case .failure(error: let error):
-                    error.showAlert(vc: self, tittle: "Can't add FavoritePodcast")
+                    error.showAlert(vc: self)
                 }
-            }, remove: { [weak self] (result: Result<FavoritePodcast>) in
+            },
+            
+            remove: { [weak self] (result: Result<FavoritePodcast>) in
                 switch result {
-                case .success(result: let favoritePodcast):
-//                    favoritePodcast.remove()
+                case .success(result: _):
                     return
                 case .failure(error: let error):
-                    error.showAlert(vc: self, tittle: "Can't remove FavoritePodcast")
+                    error.showAlert(vc: self)
                 }
+                
             })
-        
-//        FavoritePodcast.updateFromFireBase { [weak self] result in
-//            switch result {
-//            case .failure(error: let error) :
-//                error.showAlert(vc: self)
-//            default: break
-//            }
-//        }
         
         ///LikedMoment
         FirebaseDatabase.shared.observe(
@@ -201,24 +198,34 @@ extension TabBarViewController {
                 case .success(result: let likedMoment) :
                     likedMoment.saveInCoredataIfNotSaved()
                 case .failure(error: let error):
-                    error.showAlert(vc: self, tittle: "Can't add likedMoment")
+                    error.showAlert(vc: self)
                 }
             }, remove: { [weak self] (result: Result<LikedMoment>) in
                 switch result {
                 case .success(result: let likedMoment):
                     likedMoment.removeFromCoreData()
                 case .failure(error: let error):
-                    error.showAlert(vc: self, tittle: "Can't remove likedMoment")
+                    error.showAlert(vc: self)
                 }
             })
-
-        LikedMoment.updateFromFireBase { [weak self] result in
-            switch result {
-            case .failure(error: let error) :
-                error.showAlert(vc: self)
-            default: break
-            }
-        }
+        
+        ///LikedMoment
+        FirebaseDatabase.shared.observe(
+            add: { [weak self] (result: Result<ListeningPodcast>) in
+                switch result {
+                case .success(result: let listeningPodcast) :
+                    listeningPodcast.saveInCoredataIfNotSaved()
+                case .failure(error: let error):
+                    error.showAlert(vc: self)
+                }
+            }, remove: { [weak self] (result: Result<ListeningPodcast>) in
+                switch result {
+                case .success(result: let listeningPodcast):
+                    listeningPodcast.removeFromCoreData()
+                case .failure(error: let error):
+                    error.showAlert(vc: self)
+                }
+            })
     }
     
     private func feedbackGenerator() {
@@ -236,11 +243,11 @@ extension TabBarViewController: FavoritePodcastViewControllerDelegate {
     }
     
     func favoritePodcastTableViewControllerDidSelectDownLoadImage(_ favoritePodcastTableViewController: FavoritePodcastTableViewController, podcast: Podcast) {
-//        downloadOrRemovePodcast(for: favoritePodcastTableViewController, podcast, completion: completion)
+        downloadOrRemovePodcast(vc: favoritePodcastTableViewController, entity: podcast)
     }
     
     func favoritePodcastTableViewControllerDidSelectStar(_ favoritePodcastTableViewController: FavoritePodcastTableViewController, podcast: Podcast) {
-        addOrRemoveFavoritePodcast(podcast: podcast)
+        addOrRemoveFavoritePodcast(vc: favoritePodcastTableViewController,podcast: podcast)
     }
     
     func favoritePodcastTableViewControllerDidSelectCell(_ favoritePodcastTableViewController: FavoritePodcastTableViewController, podcast: Podcast) {
@@ -256,11 +263,11 @@ extension TabBarViewController: SearchViewControllerDelegate {
     }
     
     func searchViewControllerDidSelectFavoriteStar(_ searchViewController: SearchViewController, podcast: Podcast) {
-        addOrRemoveFavoritePodcast(podcast: podcast)
+        addOrRemoveFavoritePodcast(vc: searchViewController,podcast: podcast)
     }
     
-    func searchViewControllerDidSelectDownLoadImage(_ searchViewController: SearchViewController, entity: DownloadServiceProtocol, completion: @escaping () -> Void) {
-        downloadOrRemovePodcast(for: self, entity: entity, completion: completion)
+    func searchViewControllerDidSelectDownLoadImage(_ searchViewController: SearchViewController, entity: DownloadProtocol, completion: @escaping () -> Void) {
+        downloadOrRemovePodcast(vc: searchViewController, entity: entity)
     }
     
     func searchViewController(_ searchViewController: SearchViewController, _ playlist: [InputPlayerProtocol], track: InputPlayerProtocol) {
@@ -282,77 +289,7 @@ extension TabBarViewController: SettingsTableViewControllerDelegate {
     }
 }
 
-//MARK: - URLSessionDownloadDelegate
-extension TabBarViewController: URLSessionDownloadDelegate {
-    
-    ///downloadTask
-    func urlSession(_ session                  : URLSession,
-                    downloadTask               : URLSessionDownloadTask,
-                    didWriteData bytesWritten  : Int64,
-                    totalBytesWritten          : Int64,
-                    totalBytesExpectedToWrite  : Int64) {
-        
-        guard let url = downloadTask.originalRequest?.url,
-              let entity = downloadService.activeDownloads[url] else { return }
-        
-        let progress = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite)
-        let totalSize = ByteCountFormatter.string(fromByteCount: totalBytesExpectedToWrite, countStyle: .file)
-        
-        if let podcast = entity.downloadServiceProtocol as? Podcast {
-            DispatchQueue.main.async {
-                self.searchVC.updateDownloadInformation(progress: progress, totalSize: totalSize, podcast: podcast)
-                self.favoritePodcastVC.updateDownloadInformation(progress: progress, totalSize: totalSize, podcast: podcast)
-                self.detailViewController.updateDownloadInformation(progress: progress, totalSize: totalSize, for: podcast)
-            }
-        }
-    }
-    
-    ///didFinishDownloadingTo
-    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
-        let fileManager = FileManager.default
-        
-        guard let url = downloadTask.originalRequest?.url else { return }
-        let localPath = url.localPath
-        
-        do {
-            try fileManager.copyItem(at: location, to: localPath)
-        } catch {
-            print("Could not copy file to disk: \(error.localizedDescription)")
-        }
-        
-        do {
-            try fileManager.removeItem(at: location)
-        } catch {
-            print("Could not remove item at disk: \(error.localizedDescription)")
-        }
-        
-        guard let entity = downloadService.activeDownloads[url]?.downloadServiceProtocol else { return }
-        
-        DispatchQueue.main.async {
-            self.downloadService.endDownload(entity)
-            
-            if let podcast = entity as? Podcast {
-                self.favoritePodcastVC.endDownloading(podcast: podcast)
-                self.searchVC.endDownloading(podcast: podcast)
-                self.detailViewController.endDownloading(podcast: podcast)
-            }
-        }
-    }
-}
 
-//MARK: - URLSessionDelegate
-extension TabBarViewController: URLSessionDelegate {
-    
-    func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {
-        DispatchQueue.main.async {
-            if let appDelegate = UIApplication.shared.delegate as? AppDelegate,
-               let completionHandler = appDelegate.backgroundSessionCompletionHandler {
-                appDelegate.backgroundSessionCompletionHandler = nil
-                completionHandler()
-            }
-        }
-    }
-}
 
 //MARK: - SmallPlayerViewControllerDelegate
 extension TabBarViewController: SmallPlayerViewControllerDelegate {
@@ -373,7 +310,7 @@ extension TabBarViewController: BigPlayerViewControllerDelegate {
         guard let podcast = track as? Podcast else { return }
         bigPlayerViewController.dismiss(animated: true)
         presentDetailViewController(podcast: podcast) { [weak self] in
-                self?.detailViewController.scrollToCell(id: track?.id)
+                self?.detailViewController.scrollToCell(id: podcast.identifier)
         }
     }
     
@@ -416,9 +353,9 @@ extension TabBarViewController : DetailViewControllerDelegate {
         presentBigPlayer(for: detailViewController)
     }
     
-    func detailViewControllerPlayButtonDidTouchFor(_ detailViewController: DetailViewController, podcast: Podcast, at moment: Double?, playlist: [Podcast]) {
+    func detailViewControllerPlayButtonDidTouchFor(_ detailViewController: DetailViewController, podcast: Podcast, playlist: [Podcast]) {
         playerIsPresent(true)
-        startPlay(track: podcast, at: moment, playlist: playlist)
+        startPlay(track: podcast, playlist: playlist)
     }
     
     func detailViewControllerStopButtonDidTouchFor(_ detailViewController: DetailViewController, podcast: Podcast) {
@@ -426,15 +363,15 @@ extension TabBarViewController : DetailViewControllerDelegate {
     }
     
     func detailViewController(_ detailViewController: DetailViewController, addToFavoriteButtonDidTouchFor podcast: Podcast) {
-        addOrRemoveFavoritePodcast(podcast: podcast)
+        addOrRemoveFavoritePodcast(vc: detailViewController, podcast: podcast)
     }
     
     func detailViewController(_ detailViewController: DetailViewController, removeFromFavoriteButtonDidTouchFor selectedPodcast: Podcast) {
-        addOrRemoveFavoritePodcast(podcast: selectedPodcast)
+        addOrRemoveFavoritePodcast(vc: detailViewController, podcast: selectedPodcast)
     }
     
-    func detailViewControllerDidSelectDownLoadImage(_ detailViewController: DetailViewController, entity: DownloadServiceProtocol, completion: @escaping () -> Void) {
-        downloadOrRemovePodcast(for: detailViewController, entity: entity ,completion: completion)
+    func detailViewControllerDidSelectDownLoadImage(_ detailViewController: DetailViewController, entity: DownloadProtocol) {
+        downloadOrRemovePodcast(vc: detailViewController, entity: entity)
     }
 }
 
@@ -449,3 +386,59 @@ extension TabBarViewController: UIViewControllerTransitioningDelegate {
         return DismissTransition()
     }
 }
+
+extension TabBarViewController: DownloadServiceDelegate {
+    
+    private var downloadViewControllers: [DownloadServiceDelegate] {
+        var viewControllers = [UIViewController]()
+        
+        self.viewControllers?.forEach {
+            if let navigationController = $0 as? UINavigationController {
+                navigationController.viewControllers.forEach {
+                    viewControllers.append($0)
+                    return
+                }
+            }
+            viewControllers.append($0)
+        }
+        viewControllers.append(detailViewController)
+        return viewControllers.compactMap { $0 as? DownloadServiceDelegate }
+    }
+    
+    func updateDownloadInformation(_ downloadService: DownloadService, entity: DownloadServiceType) {
+        downloadViewControllers.forEach {
+            $0.updateDownloadInformation(downloadService, entity: entity)
+        }
+    }
+    
+    func didEndDownloading(_ downloadService: DownloadService, entity: DownloadServiceType) {
+        downloadViewControllers.forEach {
+            $0.didEndDownloading(downloadService, entity: entity)
+        }
+    }
+    
+    func didPauseDownload(_ downloadService: DownloadService, entity: DownloadServiceType) {
+        downloadViewControllers.forEach {
+            $0.didPauseDownload(downloadService, entity: entity)
+        }
+    }
+    
+    func didContinueDownload(_ downloadService: DownloadService, entity: DownloadServiceType) {
+        downloadViewControllers.forEach {
+            $0.didContinueDownload(downloadService, entity: entity)
+        }
+    }
+    
+    func didStartDownload(_ downloadService: DownloadService, entity: DownloadServiceType) {
+        downloadViewControllers.forEach {
+            $0.didStartDownload(downloadService, entity: entity)
+        }
+    }
+    
+    func didRemoveEntity(_ downloadService: DownloadService, entity: DownloadServiceType) {
+        downloadViewControllers.forEach {
+            $0.didRemoveEntity(downloadService, entity: entity)
+        }
+    }
+}
+

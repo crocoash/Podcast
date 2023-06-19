@@ -32,6 +32,13 @@ extension Optional where Wrapped == String  {
           let url = URL(string: stringUrl) else { return nil }
     return url
   }
+      
+  var isDownloaded: Bool {
+    if let url = self.url.localPath {
+      return url.isDownLoad
+    }
+    return false
+  }
 }
 
 extension Optional where Wrapped == String {

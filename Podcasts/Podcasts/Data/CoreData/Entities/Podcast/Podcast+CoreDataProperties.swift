@@ -32,7 +32,7 @@ extension Podcast {
     @NSManaged public var episodeGuid: String?
     @NSManaged public var episodeUrl: String?
     @NSManaged public var feedUrl: String?
-    @NSManaged public var identifier: String?
+    @NSManaged public var identifier: String
     @NSManaged public var kind: String?
     @NSManaged public var previewUrl: String?
     @NSManaged public var releaseDate: String?
@@ -42,7 +42,6 @@ extension Podcast {
     @NSManaged public var trackTimeMillis: NSNumber?
     @NSManaged public var trackViewUrl: String?
     @NSManaged public var wrapperType: String?
-    @NSManaged public var isDownloaded: Bool
     @NSManaged public var favoritePodcast: FavoritePodcast?
     @NSManaged public var genres: NSSet?
     @NSManaged public var likedMoment: NSSet?

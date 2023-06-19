@@ -26,6 +26,8 @@ protocol FavoritePodcastViewControllerProtocol {
     func updateFavoritePodcastFromFireBase(completion: ((Result<[FavoritePodcast]>) -> Void)?)
 }
 
+protocol FavoritePodcastTableViewPlayableController: PodcastCellPlayableProtocol { }
+
 class FavoritePodcastTableViewController: UIViewController {
     
     typealias SnapShot = NSDiffableDataSourceSnapshot<Section, NSManagedObject>
@@ -64,6 +66,7 @@ class FavoritePodcastTableViewController: UIViewController {
         }
     }
     
+    
     enum Section: CaseIterable, Hashable {
         
         case favourite([FavoritePodcast])
@@ -97,6 +100,7 @@ class FavoritePodcastTableViewController: UIViewController {
             default: fatalError()
             }
         }
+        
         
         static subscript(_ indexPath: IndexPath) -> Section {
             switch indexPath.section {
@@ -139,6 +143,15 @@ class FavoritePodcastTableViewController: UIViewController {
         }
     }
     
+    
+    
+    
+    
+    
+    
+    
+    
+    //MARK: Variables
     lazy private var searchController: UISearchController = {
         $0.searchBar.placeholder = "Localized.search"
         $0.searchBar.scopeButtonTitles = Section.allCases.map { $0.nameOfSection }
@@ -173,25 +186,8 @@ class FavoritePodcastTableViewController: UIViewController {
         playerIsSHidden = !value
     }
     
-    /// Download
-    func updateDownloadInformation(progress: Float, totalSize: String, podcast: Podcast) {
-        guard let favoritePodcast = podcast.getFavoritePodcast,
-              let indexPath = favoritePodcast.getIndexPath,
-              let podcastCell = tableView?.cellForRow(at: indexPath) as? PodcastCell
-        else { return }
-        podcastCell.updateDownloadInformation(progress: progress, totalSize: totalSize)
-    }
-    
-    func endDownloading(podcast: Podcast) {
-        guard let indexPath = FavoritePodcast.getIndexPath(id: podcast.id) else { return }
-        if let cell = tableView.cellForRow(at: indexPath) as? PodcastCell {
-            cell.endDownloading()
-        }
-    }
-    
     //MARK: View Methods
     override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
         super.viewWillAppear(animated)
         showEmptyImage()
     }
@@ -206,16 +202,12 @@ class FavoritePodcastTableViewController: UIViewController {
         
         Section.favoriteFRC.delegate = self
         Section.likeMomentFRC.delegate = self
-      
+        addObserverPlayerEventNotification()
         tableViewBottomConstraint.constant = tableViewBottomConstraintConstant
     }
 
-    override func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
-        tableView.invalidateIntrinsicContentSize()
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
+    deinit {
+        removeObserverEventNotification()
     }
     
     //MARK: Actions
@@ -235,7 +227,7 @@ class FavoritePodcastTableViewController: UIViewController {
     }
     
     @objc func refreshTableView() {
-        FavoritePodcast.updateFromFireBase { [weak self] result in
+        FirebaseDatabase.shared.update { [weak self] (result: FavoritePodcast.ResultType) in
             switch result {
             case .failure(error: let error) :
                 error.showAlert(vc: self) {
@@ -245,6 +237,7 @@ class FavoritePodcastTableViewController: UIViewController {
             case .success(result: _) :
                 self?.refreshControl.endRefreshing()
                 self?.refreshControl.isHidden = true
+                self?.reloadData()
             }
         }
     }
@@ -288,17 +281,14 @@ extension FavoritePodcastTableViewController {
         }
         fatalError()
     }
-    
-//    private func getPodcast(by indexPath: IndexPath) -> Podcast {
-//        return FavoritePodcast.getObject(by: indexPath).podcast
-//    }
+
     
     private func configureDataSource() {
         self.diffableDataSource = DataSource(tableView: tableView) { [weak self] tableView, indexPath, item in
             
             if let favoritePodcast = item as? FavoritePodcast {
                 let cell = tableView.getCell(cell: PodcastCell.self, indexPath: indexPath)
-                cell.configureCell(self, with: favoritePodcast.podcast)
+                cell.configureCell(self, with: PodcastCellType(favoritePodcast: favoritePodcast))
                 cell.addMyGestureRecognizer(self, type: .tap(), #selector(self?.tapFavoritePodcastCell(sender:)))
                 return cell
             }
@@ -333,54 +323,77 @@ extension FavoritePodcastTableViewController {
 
         self.diffableDataSource.apply(mySnapShot, animatingDifferences: true)
     }
+    
+    private func updateDownloadInformation(with entity: DownloadServiceType) {
+        guard let podcast = entity.downloadProtocol as? Podcast else { return }
+        
+        if let favoritePodcast = podcast.favoritePodcast {
+            if let indexPath = diffableDataSource.indexPath(for: favoritePodcast) {
+                if let cell = tableView.cellForRow(at: indexPath) as? PodcastCell {
+                    cell.updateDownloadInformation(with: entity)
+                    mySnapShot.reloadItems([favoritePodcast])
+                }
+            }
+        }
+        
+        if let listeningPodcast = podcast.listeningPodcast {
+            
+        }
+        
+        if let likedMoment = podcast.likedMoment {
+            
+        }
+    }
+    
+    private func updatePlayerInformation(with notification: NSNotification) {
+        guard let podcast = notification.object as? Podcast,
+              let podcast = podcast.getFromCoreData else { return }
+        
+        if let favoritePodcast = podcast.favoritePodcast {
+            if let indexPath = diffableDataSource.indexPath(for: favoritePodcast) {
+                if let cell = tableView.cellForRow(at: indexPath) as? PodcastCell {
+//                    cell.updatePlayerInformation(with: PodcastCellPlayableProtocol)
+                    mySnapShot.reloadItems([favoritePodcast])
+                }
+            }
+        }
+        
+        if let listeningPodcast = podcast.listeningPodcast {
+            
+        }
+        
+        if let likedMoment = podcast.likedMoment {
+            
+        }
+        
+    }
 }
-
-// MARK: - UITableViewDataSource
-//extension FavoritePodcastTableViewController: UITableViewDataSource {
-//
-//    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-//        if editingStyle == .delete {
-//            let podcast = getPodcast(by: indexPath)
-//            delegate?.favoritePodcastTableViewControllerDidSelectStar(self, podcast: podcast)
-//        }
-//    }
-//
-//    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-//        return FavoritePodcast.fetchResultController.sections?[section].numberOfObjects ?? 0
-//    }
-//
-//    func numberOfSections(in tableView: UITableView) -> Int {
-//        return FavoritePodcast.fetchResultController.sections?.count ?? 0
-//    }
-//
-//    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-//        let cell = tableView.getCell(cell: PodcastCell.self, indexPath: indexPath)
-//        let podcast = getPodcast(by: indexPath)
-//        cell.configureCell(self,with: podcast)
-//        return cell
-//    }
-//}
 
 //MARK: - PodcastCellDelegate
 extension FavoritePodcastTableViewController: PodcastCellDelegate {
     
-    func podcastCellDidSelectStar(_ podcastCell: PodcastCell) {
+    func podcastCellDidSelectStar(_ podcastCell: PodcastCell, entity: PodcastCellType) {
         guard let podcast = getPodcast(podcastCell) else { return }
         delegate?.favoritePodcastTableViewControllerDidSelectStar(self, podcast: podcast)
     }
     
-    func podcastCellDidSelectDownLoadImage(_ podcastCell: PodcastCell) {
+    func podcastCellDidSelectDownLoadImage(_ podcastCell: PodcastCell, entity: PodcastCellType) {
         guard let podcast = getPodcast(podcastCell) else { return }
         delegate?.favoritePodcastTableViewControllerDidSelectDownLoadImage(self, podcast: podcast)
     }
     
-    func podcastCellDidTouchPlayButton(_ podcastCell: PodcastCell) {
+    func podcastCellDidTouchPlayButton(_ podcastCell: PodcastCell, entity: PodcastCellType) {
+        guard let podcast = getPodcast(podcastCell) else { return }
         
+        let podcasts = Section.favoriteFRC.fetchedObjects?.map { $0.podcast } ?? []
+        let playlist = podcasts.filter { $0.identifier != podcast.identifier }
+        
+        delegate?.favoritePodcastTableViewController(self, playlist: playlist, podcast: podcast)
     }
     
-    func podcastCellDidTouchStopButton(_ podcastCell: PodcastCell) {
-        
-    }
+    func podcastCellDidTouchStopButton(_ podcastCell: PodcastCell, entity: PodcastCellType) {  }
+    
+    func podcastCellDidSelectStar(_ podcast: Podcast, podcastCell: PodcastCell) { }
 }
 
 
@@ -388,11 +401,11 @@ extension FavoritePodcastTableViewController: PodcastCellDelegate {
 extension FavoritePodcastTableViewController: NSFetchedResultsControllerDelegate {
     
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-//        tableView?.beginUpdates()
+        tableView?.beginUpdates()
     }
     
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        print("print \(type) \(anObject)")
+
         switch type {
             
         case .delete:
@@ -411,13 +424,13 @@ extension FavoritePodcastTableViewController: NSFetchedResultsControllerDelegate
             
         default : break
         }
-        print("print mySnapShot")
+        
         diffableDataSource.apply(mySnapShot)
         showEmptyImage()
     }
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-//        tableView?.endUpdates()
+        tableView?.endUpdates()
     }
 }
 
@@ -428,7 +441,6 @@ extension FavoritePodcastTableViewController: UISearchResultsUpdating {
         if searchText != "" || Section.searchText != nil {
             Section.searchText = searchText
         }
-       
     }
 }
 
@@ -438,5 +450,64 @@ extension FavoritePodcastTableViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, selectedScopeButtonIndexDidChange selectedScope: Int) {
         self.searchSection = Section[selectedScope]
         self.reloadData()
+    }
+}
+
+//MARK: - DownloadServiceDelegate
+extension FavoritePodcastTableViewController: DownloadServiceDelegate {
+    
+    func didRemoveEntity(_ downloadService: DownloadService, entity: DownloadServiceType) {
+        updateDownloadInformation(with: entity)
+    }
+
+    func updateDownloadInformation(_ downloadService: DownloadService, entity: DownloadServiceType) {
+        updateDownloadInformation(with: entity)
+    }
+    
+    func didEndDownloading(_ downloadService: DownloadService, entity: DownloadServiceType) {
+        updateDownloadInformation(with: entity)
+    }
+    
+    func didPauseDownload(_ downloadService: DownloadService, entity: DownloadServiceType) {
+        updateDownloadInformation(with: entity)
+    }
+    
+    func didContinueDownload(_ downloadService: DownloadService, entity: DownloadServiceType) {
+        updateDownloadInformation(with: entity)
+    }
+    
+    func didStartDownload(_ downloadService: DownloadService, entity: DownloadServiceType) {
+        updateDownloadInformation(with: entity)
+    }
+}
+
+extension FavoritePodcastTableViewController: PlayerEventNotification {
+    
+    func addObserverPlayerEventNotification() {
+        Player.addObserverPlayerPlayerEventNotification(for: self)
+    }
+    
+    func removeObserverEventNotification() {
+        Player.removeObserverEventNotification(for: self)
+    }
+    
+    func playerDidEndPlay(notification: NSNotification) {
+        updatePlayerInformation(with: notification)
+    }
+    
+    func playerStartLoading(notification: NSNotification) {
+        updatePlayerInformation(with: notification)
+    }
+    
+    func playerDidEndLoading(notification: NSNotification) {
+        updatePlayerInformation(with: notification)
+    }
+    
+    func playerUpdatePlayingInformation(notification: NSNotification) {
+        updatePlayerInformation(with: notification)
+    }
+    
+    func playerStateDidChanged(notification: NSNotification) {
+        updatePlayerInformation(with: notification)
     }
 }

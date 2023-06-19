@@ -14,10 +14,10 @@ protocol InputPlayerProtocol {
     var image160: String?              { get }
     var image60: String?               { get }
     var trackName: String?             { get }
-    var id: NSNumber?                  { get }
+    var identifier: String             { get }
 //    var isFavorite: Bool               { get }
     var descriptionMy: String?         { get }
-    var genresString: String?          { get }
+//    var genresString: String?          { get }
     var releaseDate: String?           { get }
     var trackTimeMillisString: String? { get }
     var trackTimeMillis: NSNumber?     { get }
@@ -26,13 +26,15 @@ protocol InputPlayerProtocol {
     var country: String?               { get }
     
     var currentTime: Float?            { get set }
-    var progress: Double?              { get set }
+    var listeningProgress: Double?     { get set }
     var duration: Double?              { get set }
 }
 
 @objc protocol PlayerEventNotification {
+    
     func addObserverPlayerEventNotification()
     func removeObserverEventNotification()
+    
     func playerDidEndPlay(notification: NSNotification)
     func playerStartLoading(notification: NSNotification)
     func playerDidEndLoading(notification: NSNotification)
@@ -41,18 +43,18 @@ protocol InputPlayerProtocol {
 }
 
 //MARK: - OutputPlayerProtocol
-protocol OutputPlayerProtocol:  SmallPlayerPlayableProtocol, BigPlayerPlayableProtocol {
-    
-}
+protocol OutputPlayerProtocol:  SmallPlayerPlayableProtocol, BigPlayerPlayableProtocol, EpisodeTableViewPlayableProtocol { }
 
 extension Player: OutputPlayerProtocol {
-    var id: NSNumber? { currentTrack?.track.id }
+    
+    var isGoingPlaying: Bool { playerIsLoadingNewTrack }
+    var identifier: String { currentTrack?.track.identifier ?? "" }
     var track: InputPlayerProtocol? { currentTrack?.track }
-    var progress: Double? { currentTrack?.track.progress }
+    var listeningProgress: Double? { currentTrack?.track.listeningProgress }
     var trackImage: String? { currentTrack?.track.image600 }
     var trackName: String? { currentTrack?.track.trackName }
     var currentTime: Float? { currentTrack?.track.currentTime }
-    var duration: Double? { currentTrack?.track.duration }
+    var playingDuration: Double? { currentTrack?.track.duration }
 }
 
 class Player {
@@ -90,7 +92,8 @@ class Player {
         NotificationCenter.default.removeObserver(object)
     }
     
-    var playlist: [InputPlayerProtocol] = []
+    private(set) var playlist: [InputPlayerProtocol] = []
+    
     var currentTrack: (track: InputPlayerProtocol, index: Int)?
     private var mpRemoteCommandCenter = MPRemoteCommandCenter.shared()
     private var mPNowPlayingInfoCenter = MPNowPlayingInfoCenter.default()
@@ -161,11 +164,11 @@ class Player {
         playerSeek(to: currentTime + seconds)
     }
     
-    func startPlay(track: InputPlayerProtocol, playList: [InputPlayerProtocol], at moment: Double? = nil) {
-        guard track.id != currentTrack?.track.id else { playOrPause(); return }
+    func startPlay(track: InputPlayerProtocol, playList: [InputPlayerProtocol]) {
+        guard track.identifier != currentTrack?.track.identifier else { playOrPause(); return }
         self.playlist = playList
-        if let index = playList.firstIndex(where: { track.id == $0.id }) {
-            startPlay(track: track, indexInPlaylist: index, at: moment)
+        if let index = playList.firstIndex(where: { track.identifier == $0.identifier }) {
+            startPlay(track: track, indexInPlaylist: index)
         }
     }
     
@@ -187,7 +190,7 @@ class Player {
 // MARK: - Private Methods
 extension Player {
     
-    private func startPlay(track: InputPlayerProtocol, indexInPlaylist: Int, at moment: Double? = nil) {
+    private func startPlay(track: InputPlayerProtocol, indexInPlaylist: Int) {
         pause()
         NotificationCenter.default.post(name: PlayerEvent.playerEndPlay.notificationName, object: self)
         currentTrack = (track: track, index: indexInPlaylist)
@@ -212,7 +215,7 @@ extension Player {
         guard let url = track.url else { return }
         let item = AVPlayerItem(url: url.isDownLoad ? url.localPath : url)
         self.playerAVP.replaceCurrentItem(with: item)
-        if let moment = moment { self.playerSeek(to: moment) }
+        if let moment = track.listeningProgress { self.playerSeek(to: moment) }
         
         play()
         
@@ -234,7 +237,7 @@ extension Player {
             self.playerIsLoadingNewTrack = false
             
             self.currentTrack?.track.currentTime = currentTime
-            self.currentTrack?.track.progress = progress
+            self.currentTrack?.track.listeningProgress = progress
             self.currentTrack?.track.duration = duration
             
             NotificationCenter.default.post(name: PlayerEvent.playerUpdatePlayingInformation.notificationName, object: self)

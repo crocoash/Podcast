@@ -15,7 +15,7 @@ import UIKit
 protocol SmallPlayerPlayableProtocol {
     var trackImage: String? { get }
     var trackName: String? { get }
-    var progress: Double? { get }
+    var listeningProgress: Double? { get }
     var isPlaying: Bool { get }
 }
 
@@ -35,7 +35,7 @@ class SmallPlayerView: UIView {
    
     
     func playerIsGoingPlay(player: SmallPlayerPlayableProtocol) {
-        if player.progress == 0 { progressView.progress = 1 }
+        if player.listeningProgress == 0 { progressView.progress = 1 }
         activityIndicator.isHidden = false
         activityIndicator.startAnimating()
         trackNameLabel.text = player.trackName
@@ -93,8 +93,7 @@ extension SmallPlayerView {
     }
     
     private func configureGesture() {
-        addMyGestureRecognizer(self, type: .swipe(directions: [.up]), #selector(respondToSwipeOrTouch))
-        addMyGestureRecognizer(self, type: .tap()                   , #selector(respondToSwipeOrTouch))
+        addMyGestureRecognizer(self, type: [.swipe(directions: [.up]),.tap()], #selector(respondToSwipeOrTouch))
     }
 }
 
@@ -124,7 +123,7 @@ extension SmallPlayerView: PlayerEventNotification {
     
     func playerUpdatePlayingInformation(notification: NSNotification) {
         guard let player = notification.object as? SmallPlayerPlayableProtocol else { return }
-        progressView.progress = Float(player.progress ?? 0)
+        progressView.progress = Float(player.listeningProgress ?? 0)
     }
     
     func playerStateDidChanged(notification: NSNotification) {

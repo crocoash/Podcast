@@ -15,24 +15,27 @@ public class LikedMoment: NSManagedObject, Codable {
     private enum CodingKeys: String, CodingKey {
         case moment
         case podcast
+        case identifier
     }
     
-    //MARK: encode
+    //MARK: decoder
     required convenience public init(from decoder: Decoder) throws {
         
         self.init(entity: Self.entity(), insertInto: nil)
         let values = try decoder.container(keyedBy: CodingKeys.self)
         
-        moment =    try values.decode(Double .self, forKey: .moment)
-        podcast =   try values.decode(Podcast.self, forKey: .podcast)
+        moment =     try values.decode(Double .self, forKey: .moment)
+        podcast =    try values.decode(Podcast.self, forKey: .podcast)
+        identifier = try values.decode(String.self , forKey: .identifier)
     }
     
     //MARK: encode
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         
-        try container.encode(moment, forKey: .moment)
-        try container.encode(podcast,forKey: .podcast)
+        try container.encode(moment,     forKey: .moment)
+        try container.encode(podcast,    forKey: .podcast)
+        try container.encode(identifier, forKey: .identifier)
     }
     
     //MARK: init
@@ -41,8 +44,9 @@ public class LikedMoment: NSManagedObject, Codable {
     convenience init(podcast: Podcast, moment: Double) {
         self.init(entity: Self.entity(), insertInto: Self.viewContext)
         
-        self.moment = moment
-        self.podcast = podcast.getFromCoreDataIfNoSavedNew
+        self.moment     = moment
+        self.podcast    = podcast.getFromCoreDataIfNoSavedNew
+        self.identifier = UUID().uuidString
         
         mySave()
     }
@@ -52,8 +56,9 @@ public class LikedMoment: NSManagedObject, Codable {
         
         self.init(entity: Self.entity(), insertInto: Self.viewContext)
         
-        self.moment = likedMoment.moment
-        self.podcast = likedMoment.podcast
+        self.moment     = likedMoment.moment
+        self.podcast    = likedMoment.podcast
+        self.identifier = likedMoment.identifier
     }
     
     @discardableResult
@@ -96,45 +101,7 @@ public class LikedMoment: NSManagedObject, Codable {
 
 
 //MARK: - CoreDataProtocol
-extension LikedMoment: CoreDataProtocol {
-    
-    var searchId : Int? { podcast.searchId }
-    
-//    func removeFromCoreDataWithOwnEntityRule() {
-//        if let likedMoment = getFromCoreData {
-//            let podcast = likedMoment.podcast
-//            likedMoment.removeFromViewContext()
-//            podcast.remove()
-//        }
-//    }
-}
+extension LikedMoment: CoreDataProtocol { }
 
 //MARK: - FirebaseProtocol
-extension LikedMoment: FirebaseProtocol {
-    
-    var firebaseKey: String? { "\(Int(moment))sec id \(podcast.id ?? 0)" }
-    
-    static func updateFromFireBase(completion: ((Result<[LikedMoment]>) -> Void)?) {
-        FirebaseDatabase.shared.update { (result: Result<[LikedMoment]>) in
-            switch result {
-            case .failure(let error) :
-                if error == .noData {
-                    removeAll()
-                    return
-                }
-            case .success(let momentsFromFireBase) :
-
-                allObjectsFromCoreData.forEach { momentFromCoreDate in
-                    if !momentsFromFireBase.contains(where: { $0.podcast.id == momentFromCoreDate.podcast.id })  {
-                        momentFromCoreDate.removeFromCoreData()
-                    }
-                }
-
-                momentsFromFireBase.forEach {
-                    $0.saveInCoredataIfNotSaved()
-                }
-            }
-            completion?(result)
-        }
-    }
-}
+extension LikedMoment: FirebaseProtocol { }

@@ -27,7 +27,7 @@ public class Podcast: NSManagedObject, Codable {
         case episodeUrl
         case collectionId
         case collectionName
-        case id = "trackId"
+        case identifier = "trackId"
         case trackName
         case releaseDate
         case shortDescriptionMy = "shortDescription"
@@ -54,32 +54,39 @@ public class Podcast: NSManagedObject, Codable {
         
         let container = try decoder.container(keyedBy: CodingKeys.self)
         
-        previewUrl =            try container.decodeIfPresent(String.self,forKey: .previewUrl)
-        episodeFileExtension =  try container.decodeIfPresent(String.self,forKey: .episodeFileExtension)
-        artworkUrl160 =         try container.decodeIfPresent(String.self,forKey: .artworkUrl160)
-        episodeContentType =    try container.decodeIfPresent(String.self,forKey: .episodeContentType)
-        artworkUrl600 =         try container.decodeIfPresent(String.self,forKey: .artworkUrl600)
-        artworkUrl60 =          try container.decodeIfPresent(String.self,forKey: .artworkUrl60)
-        contentAdvisoryRating = try container.decodeIfPresent(String.self,forKey: .contentAdvisoryRating)
-        trackViewUrl =          try container.decodeIfPresent(String.self,forKey: .trackViewUrl)
-        trackTimeMillis =       try container.decodeIfPresent(Int   .self,forKey: .trackTimeMillis) as? NSNumber
-        collectionViewUrl =     try container.decodeIfPresent(String.self,forKey: .collectionViewUrl)
-        episodeUrl =            try container.decodeIfPresent(String.self,forKey: .episodeUrl)
-        collectionId =          try container.decodeIfPresent(Int   .self,forKey: .collectionId) as? NSNumber
-        collectionName =        try container.decodeIfPresent(String.self,forKey: .collectionName)
-        id =                    try container.decodeIfPresent(Int   .self,forKey: .id) as? NSNumber
-        trackName =             try container.decodeIfPresent(String.self,forKey: .trackName)
-        releaseDate =           try container.decodeIfPresent(String.self,forKey: .releaseDate)
-        shortDescriptionMy =    try container.decodeIfPresent(String.self,forKey: .shortDescriptionMy)
-        feedUrl =               try container.decodeIfPresent(String.self,forKey: .feedUrl)
-        trackCount =            try container.decodeIfPresent(Int   .self,forKey: .trackCount) as? NSNumber
-        closedCaptioning =      try container.decodeIfPresent(String.self,forKey: .closedCaptioning)
-        country =               try container.decodeIfPresent(String.self,forKey: .country)
-        descriptionMy =         try container.decodeIfPresent(String.self,forKey: .descriptionMy)
-        episodeGuid =           try container.decodeIfPresent(String.self,forKey: .episodeGuid)
-        kind =                  try container.decodeIfPresent(String.self,forKey: .kind)
-        artistName =            try container.decodeIfPresent(String.self,forKey: .artistName)
-        wrapperType =           try container.decodeIfPresent(String.self,forKey: .wrapperType)
+        self.previewUrl =            try container.decodeIfPresent(String.self,forKey: .previewUrl)
+        self.episodeFileExtension =  try container.decodeIfPresent(String.self,forKey: .episodeFileExtension)
+        self.artworkUrl160 =         try container.decodeIfPresent(String.self,forKey: .artworkUrl160)
+        self.episodeContentType =    try container.decodeIfPresent(String.self,forKey: .episodeContentType)
+        self.artworkUrl600 =         try container.decodeIfPresent(String.self,forKey: .artworkUrl600)
+        self.artworkUrl60 =          try container.decodeIfPresent(String.self,forKey: .artworkUrl60)
+        self.contentAdvisoryRating = try container.decodeIfPresent(String.self,forKey: .contentAdvisoryRating)
+        self.trackViewUrl =          try container.decodeIfPresent(String.self,forKey: .trackViewUrl)
+        self.trackTimeMillis =       try container.decodeIfPresent(Int   .self,forKey: .trackTimeMillis) as? NSNumber
+        self.collectionViewUrl =     try container.decodeIfPresent(String.self,forKey: .collectionViewUrl)
+        self.episodeUrl =            try container.decodeIfPresent(String.self,forKey: .episodeUrl)
+        self.collectionId =          try container.decodeIfPresent(Int   .self,forKey: .collectionId) as? NSNumber
+        self.collectionName =        try container.decodeIfPresent(String.self,forKey: .collectionName)
+        
+        let intId = try container.decodeIfPresent(Int.self, forKey: .identifier)
+        
+        if let intId = intId {
+            self.identifier = String(intId)
+        } else {
+            self.identifier = UUID().uuidString
+        }
+        self.trackName =             try container.decodeIfPresent(String.self,forKey: .trackName)
+        self.releaseDate =           try container.decodeIfPresent(String.self,forKey: .releaseDate)
+        self.shortDescriptionMy =    try container.decodeIfPresent(String.self,forKey: .shortDescriptionMy)
+        self.feedUrl =               try container.decodeIfPresent(String.self,forKey: .feedUrl)
+        self.trackCount =            try container.decodeIfPresent(Int   .self,forKey: .trackCount) as? NSNumber
+        self.closedCaptioning =      try container.decodeIfPresent(String.self,forKey: .closedCaptioning)
+        self.country =               try container.decodeIfPresent(String.self,forKey: .country)
+        self.descriptionMy =         try container.decodeIfPresent(String.self,forKey: .descriptionMy)
+        self.episodeGuid =           try container.decodeIfPresent(String.self,forKey: .episodeGuid)
+        self.kind =                  try container.decodeIfPresent(String.self,forKey: .kind)
+        self.artistName =            try container.decodeIfPresent(String.self,forKey: .artistName)
+        self.wrapperType =           try container.decodeIfPresent(String.self,forKey: .wrapperType)
         
         
         if let genres = try? container.decode(Set<Genre>.self, forKey: .genres) as NSSet {
@@ -90,13 +97,14 @@ public class Podcast: NSManagedObject, Codable {
                 if ids.count == names.count {
                     for i in 0 ..< ids.count {
 
-                        let genre = Genre(id: ids[i], name:  names[i], viewContext: nil)
+                        let genre = Genre(identifier: ids[i], name:  names[i], viewContext: nil)
                         genres.append(genre)
                     }
                 }
             }
             self.genres = NSSet(array: genres)
         }
+        
     }
     
     //MARK: encode
@@ -116,7 +124,7 @@ public class Podcast: NSManagedObject, Codable {
         try container.encode(episodeUrl,                forKey: .episodeUrl)
         try container.encode(collectionId?.intValue,    forKey: .collectionId)
         try container.encode(collectionName,            forKey: .collectionName)
-        try container.encode(id?.intValue,              forKey: .id)
+        try container.encode(Int(identifier),           forKey: .identifier)
         try container.encode(genres as? Set<Genre>,     forKey: .genres)
         try container.encode(trackName,                 forKey: .trackName)
         try container.encode(releaseDate,               forKey: .releaseDate)
@@ -151,7 +159,7 @@ public class Podcast: NSManagedObject, Codable {
         self.episodeUrl =            podcast.episodeUrl
         self.collectionId =          podcast.collectionId
         self.collectionName =        podcast.collectionName
-        self.id =                    podcast.id
+        self.identifier =            podcast.identifier
         
         if let genres = podcast.genres?.allObjects as? [Genre] {
             self.genres = NSSet(array: genres.compactMap { $0.getFromCoreDataIfNoSavedNew } ) as NSSet
@@ -169,26 +177,23 @@ public class Podcast: NSManagedObject, Codable {
         self.wrapperType =        podcast.wrapperType
         self.artistName =         podcast.artistName
         self.trackCount =         podcast.trackCount
+        
+//        self.favoritePodcast  = getFavoritePodcast
+//        self.listeningPodcast = getListeningPodcast
+//
+//        if let likedMoment = getLikedMoment {
+//            self.likedMoment = NSSet(array: likedMoment)
+//        }
+        
     }
 }
 
 //MARK: - CoreDataProtocol
-extension Podcast: CoreDataProtocol {
- 
-    var searchId: Int? { id?.intValue }
-    
-//    func removeFromCoreDataWithOwnEntityRule() {
-//        guard let podcast = getFromCoreData else { return }
-//        if let genres = podcast.genres?.allObjects as? [Genre] {
-//            genres.remove(podcast: podcast)
-//        }
-//        podcast.myValidateDelete()
-//    }
-}
+extension Podcast: CoreDataProtocol { }
 
 //MARK: - InputPlayerProtocol
 extension Podcast: InputPlayerProtocol {
-    
+
     var genresString: String? {  genres?.allObjects.reduce(into: "") { $0 += (($1 as? Genre)?.name ?? "") + ", " }  }
     var trackTimeMillisString: String? { trackTimeMillis?.minute }
   
@@ -200,11 +205,10 @@ extension Podcast: InputPlayerProtocol {
             let listeningPodcast = getOrCreateListeningPodcast
             listeningPodcast.currentTime = newValue ?? 0
             mySave()
-            listeningPodcast.saveInFireBase()
         }
     }
     
-    var progress: Double? {
+    var listeningProgress: Double? {
         get {
             getListeningPodcast?.progress
         }
@@ -212,7 +216,6 @@ extension Podcast: InputPlayerProtocol {
             let listeningPodcast = getOrCreateListeningPodcast
             listeningPodcast.progress = newValue ?? 0
             mySave()
-            listeningPodcast.saveInFireBase()
         }
     }
     
@@ -224,7 +227,6 @@ extension Podcast: InputPlayerProtocol {
             let listeningPodcast = getOrCreateListeningPodcast
             listeningPodcast.duration = newValue ?? 0
             mySave()
-            listeningPodcast.saveInFireBase()
         }
     }
     
@@ -235,22 +237,10 @@ extension Podcast: InputPlayerProtocol {
 }
 
 //MARK: - DownloadServiceProtocol
-extension Podcast: DownloadServiceProtocol {
-    
-    var stateOfDownload: StateOfDownload {
-        
-        if DownloadService.shared.isDownLoad(self) {
-            return .isDownload
-        }
-        
-        if DownloadService.shared.isDownloading(self) {
-            return .isDownloading
-        }
-        return .notDownloaded
-    }
-    
-    var downloadUrl: URL? {
-        return episodeUrl.url
+extension Podcast: DownloadProtocol {
+   
+    var downloadUrl: String? {
+        return episodeUrl
     }
 }
 
@@ -273,36 +263,27 @@ extension Podcast {
     
     /// ListeningPodcast
     private var getOrCreateListeningPodcast: ListeningPodcast {
-        return getListeningPodcast ?? ListeningPodcast(self)
-    }
-    
-    private var getListeningPodcast: ListeningPodcast? {
-        guard let id = id?.intValue else { return nil }
-        return ListeningPodcast.getFromCoreData(searchId: id)
+        let predicate = NSPredicate(format: "podcast.identifier == %@", "\(identifier)")
+        let listeningPodcast = ListeningPodcast.fetchObject(predicates: [predicate])
+        return listeningPodcast ?? ListeningPodcast(self)
     }
     
     /// Favorite
-    func addOrRemoveToFavorite() {
-        if let favoritePodcast = getFavoritePodcast {
-            
-//            for key in favoritePodcast.entity.propertiesByName.keys {
-//                let value: Any? = favoritePodcast.value(forKey: key)
-//                if let item = value as? (any CoreDataProtocol) {
-//                    item.remove()
-//                }
-//            }
-//
-            
-            favoritePodcast.removeFromCoreData()
-        } else {
-            FavoritePodcast(podcast: self)
-        }
-    }
+    
     
     var getFavoritePodcast: FavoritePodcast? {
-        guard let id = id else { return nil }
-        let predicate = NSPredicate(format: "podcast.id == %@", "\(id)")
-        return FavoritePodcast.fetchResultController(predicates: [predicate], fetchLimit: 1).fetchedObjects?.first
+        let predicate = NSPredicate(format: "podcast.identifier == %@", "\(identifier)")
+        return FavoritePodcast.fetchObject(predicates: [predicate])
+    }
+    
+    var getListeningPodcast: ListeningPodcast? {
+        let predicate = NSPredicate(format: "podcast.identifier == %@", "\(identifier)")
+        return ListeningPodcast.fetchObject(predicates: [predicate])
+    }
+    
+    var getLikedMoment: [LikedMoment]? {
+        let predicate = NSPredicate(format: "podcast.identifier == %@", "\(identifier)")
+        return LikedMoment.fetchObjects(predicates: [predicate])
     }
 }
 
@@ -334,6 +315,7 @@ extension Collection where Element: Podcast {
         let filteredArray = array.filter { !$0.podcasts.isEmpty }
         let sortedArray = filteredArray.map { (key: $0.key, podcasts: $0.podcasts.sorted { $0.releaseDateInformation < $1.releaseDateInformation })}
         return sortedArray
+        
     }
     
     var sortPodcastsByNewest: PlaylistByNewest {
@@ -395,15 +377,18 @@ extension Collection where Element == (key: String, podcasts: [Podcast]) {
     }
     
     func getIndexPath(for podcast: Podcast) -> [IndexPath] {
-        return getIndexPath(for: podcast.id)
+        return getIndexPaths(for: podcast.identifier)
     }
     
-    func getIndexPath(for id: NSNumber?) -> [IndexPath] {
+    func getIndexPaths(for identifier: String) -> [IndexPath] {
         var arrayOfIndexPath: [IndexPath] = []
-        for i in self.enumerated() {
-            if let index = i.element.podcasts.firstIndex(matching: id) {
-                let indexPath = IndexPath(row: index, section: i.offset)
-                arrayOfIndexPath.append(indexPath)
+        for (section, values) in self.enumerated() {
+            for (row,podcast) in values.podcasts.enumerated() {
+                if podcast.identifier == identifier {
+                    let indexPath = IndexPath(row: row, section: section)
+                    arrayOfIndexPath.append(indexPath)
+                }
+                
             }
         }
         return arrayOfIndexPath
@@ -412,7 +397,50 @@ extension Collection where Element == (key: String, podcasts: [Podcast]) {
     func getPodcast(for indexPath: IndexPath) -> Podcast {
         return self[indexPath.section as! Self.Index].podcasts[indexPath.row]
     }
+    
+    
 }
 
-
-
+extension LikedMoment: InputPlayerProtocol {
+    
+    var currentTime: Float? {
+        get {
+            return Float(moment)
+        }
+        set {
+            
+        }
+    }
+    
+    var listeningProgress: Double? {
+        get {
+            return podcast.listeningProgress
+        }
+        set {
+            
+        }
+    }
+    
+    var duration: Double? {
+        get {
+            return podcast.duration
+        }
+        
+        set {
+        }
+    }
+    
+    
+    var url: URL? { podcast.url }
+    var image600: String? { podcast.image600 }
+    var image160: String? { podcast.image160 }
+    var image60: String? { podcast.image60 }
+    var trackName: String? { podcast.trackName }
+    var descriptionMy: String? { podcast.descriptionMy }
+    var releaseDate: String? { podcast.releaseDate }
+    var trackTimeMillisString: String? { podcast.trackTimeMillisString }
+    var trackTimeMillis: NSNumber? { podcast.trackTimeMillis }
+    var contentAdvisoryRating: String? { podcast.contentAdvisoryRating }
+    var artistName: String? { podcast.artistName }
+    var country: String? { podcast.country }
+}

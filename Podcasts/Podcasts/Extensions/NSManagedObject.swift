@@ -66,21 +66,30 @@ extension NSManagedObject {
 //        viewContext.delete(self)
 //        mySave()
 //    }
+    
+    func isPropertiesConform<T>(to protocol: T) -> Bool {
+        
+        for selfKey in self.entity.propertiesByName.keys {
+            let value = self.value(forKey: selfKey)
+            if value is T {
+                return true
+            }
+        }
+        return false
+    }
 }
 
 extension NSManagedObject {
   var convert: [String: Any]? {
     if let self = self as? Encodable {
-      if let data = try? JSONEncoder().encode(self) {
-        if let result = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any] {
-          return result
-        }
+        if let data = try? JSONEncoder().encode(self) {
+            if let result = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any] {
+                return result
+            } else {
+                fatalError("Cannot conver object")
+            }
       }
     }
     return nil
   }
 }
-
-
-
-

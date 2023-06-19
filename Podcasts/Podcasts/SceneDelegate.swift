@@ -19,15 +19,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
     
     func sceneDidEnterBackground(_ scene: UIScene) {
-      if let videoViewController = videoViewController {
+//      if let videoViewController = videoViewController {
 //        avPlayerSavedReference = videoViewController.playerAVP
-      }
+//      }
     }
     
     func sceneWillEnterForeground(_ scene: UIScene) {
-        if let videoViewController = videoViewController, let avPlayerSavedReference = avPlayerSavedReference {
+//        if let videoViewController = videoViewController, let avPlayerSavedReference = avPlayerSavedReference {
 //            videoViewController.setPlayer(player: avPlayerSavedReference)
 //            self.avPlayerSavedReference = nil 
-        }
+//        }
     }
 }

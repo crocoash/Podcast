@@ -42,6 +42,11 @@ class RegistrationViewController: UIViewController {
         configureView()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+    }
+    
     //MARK: - Varibels
     private var firstSegmentedControl: Bool {
         segmentedControl.selectedSegmentIndex == 0

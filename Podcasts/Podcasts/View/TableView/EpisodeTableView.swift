@@ -8,11 +8,11 @@
 import UIKit
 
 protocol EpisodeTableViewDelegate: AnyObject {
-    func episodeTableViewPlayButtonDidTouchFor(_ episodeTableView: EpisodeTableView, podcast: Podcast, at moment: Double?, playlist: [Podcast])
+    func episodeTableViewPlayButtonDidTouchFor(_ episodeTableView: EpisodeTableView, podcast: Podcast, playlist: [Podcast])
     func episodeTableViewStopButtonDidTouchFor(_ episodeTableView: EpisodeTableView)
     func episodeTableView(_ episodeTableView: EpisodeTableView, addToFavoriteButtonDidTouchFor podcast: Podcast)
     func episodeTableView(_ episodeTableView: EpisodeTableView, removeFromFavoriteButtonDidTouchFor selectedPodcast: Podcast)
-    func episodeTableViewDidSelectDownLoadImage(_ episodeTableView: EpisodeTableView, entity: DownloadServiceProtocol, completion: @escaping () -> Void)
+    func episodeTableViewDidSelectDownLoadImage(_ episodeTableView: EpisodeTableView, entity: DownloadProtocol)
 }
 
 protocol EpisodeTableViewMyDataSource: AnyObject {
@@ -20,13 +20,12 @@ protocol EpisodeTableViewMyDataSource: AnyObject {
 }
 
 protocol EpisodeTableViewPlayableProtocol: PodcastCellPlayableProtocol {
-    var id: NSNumber? { get }
+    var identifier: String { get }
 }
-
 
 class EpisodeTableView: UITableView {
    
-    private let defaultRowHeight = CGFloat(100)
+    lazy private var defaultRowHeight = frame.width / 3.5
     private var sumOfHeightsOfAllHeaders = CGFloat.zero
     private var paddingBetweenSections = CGFloat(20)
     
@@ -78,22 +77,14 @@ class EpisodeTableView: UITableView {
         reloadData()
         reloadTableViewHeight()
     }
-    
-    //MARK: Downloading
-    func endDownloading(podcast: Podcast) {
-        guard let indexPath = currentPlaylist.getIndexPath(for: podcast).first else { return }
-        if let cell = cellForRow(at: indexPath) as? PodcastCell {
-            cell.endDownloading()
-        }
-    }
-        
-    func reloadCell(for id: NSNumber?) {
-        let indexPath = currentPlaylist.getIndexPath(for: id)
+   
+    func reloadCell(for id: String) {
+        let indexPath = currentPlaylist.getIndexPaths(for: id)
         reloadRows(at: indexPath, with: .none)
     }
     
-    func getCell(id: NSNumber?) -> PodcastCell? {
-        guard let indexPath = currentPlaylist.getIndexPath(for: id).first else { return nil }
+    func getCell(id: String) -> PodcastCell? {
+        guard let indexPath = currentPlaylist.getIndexPaths(for: id).first else { return nil }
         if let cell = cellForRow(at: indexPath) as? PodcastCell {
             return cell
         }
@@ -107,16 +98,8 @@ class EpisodeTableView: UITableView {
         reloadTableViewHeight()
     }
     
-    func updateDownloadInformation(progress: Float, totalSize: String, for podcast: Podcast) {
-        guard let indexPath = currentPlaylist.getIndexPath(for: podcast).first,
-              let podcastCell = cellForRow(at: indexPath) as? PodcastCell
-        else { return }
-        
-        podcastCell.updateDownloadInformation(progress: progress, totalSize: totalSize)
-    }
-    
     ///BigPlayer
-    func positionYOfCell(id: NSNumber?) -> CGFloat {
+    func positionYOfCell(id: String) -> CGFloat {
         guard let cell = getCell(id: id) ,let indexPath = indexPath(for: cell) else { return 0 }
         return rectForRow(at: indexPath).origin.y
     }
@@ -135,6 +118,33 @@ class EpisodeTableView: UITableView {
     
     deinit {
         removeObserverEventNotification()
+    }
+    
+    //MARK: Actions
+    @objc func tapCell(sender: UITapGestureRecognizer) {
+        guard let cell = sender.view as? PodcastCell,
+              cell.moreThanThreeLines,
+              let indexPath = indexPath(for: cell) else { return }
+        
+        if selectedCellAndHisHeight[indexPath] == nil {
+            selectedCellAndHisHeight[indexPath] = 0 // default value
+        } else {
+            selectedCellAndHisHeight[indexPath] = nil
+        }
+        
+        UIView.animate(withDuration: 0.4) {
+            self.beginUpdates()
+            self.endUpdates()
+            if self.selectedCellAndHisHeight[indexPath] != nil {
+                let offset = self.rectForRow(at: indexPath).height
+                self.selectedCellAndHisHeight[indexPath] = offset // default value
+            }
+            
+            let isLastCell = self.isLastSectionAndRow(indexPath: indexPath)
+            self.reloadTableViewHeight(lastCelIsClosed: isLastCell)
+        }
+        
+        cell.isSelected = selectedCellAndHisHeight[indexPath] == nil
     }
 }
 
@@ -176,8 +186,15 @@ extension EpisodeTableView {
          return currentPlaylist.countOfValues.cgFloat * defaultRowHeight + sumOfHeightsOfAllHeaders
     }
     
-    private func isCellIsClosed(_ indexPath: IndexPath) -> Bool {
-        return selectedCellAndHisHeight[indexPath] == nil
+    private func updateDownloadInformation(for entity: DownloadServiceType) {
+        if let podcast = entity.downloadProtocol as? Podcast {
+            currentPlaylist.getIndexPath(for: podcast).forEach {
+                let cell = cellForRow(at: $0)
+                if let cell = cell as? PodcastCell {
+                    cell.updateDownloadInformation(with: entity)
+                }
+            }
+        }
     }
 }
 
@@ -199,9 +216,9 @@ extension EpisodeTableView: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = getCell(cell: PodcastCell.self, indexPath: indexPath)
         let podcast = currentPlaylist[indexPath.section].podcasts[indexPath.row]
-        cell.isSelected = isCellIsClosed(indexPath)
-        cell.configureCell(self, with: podcast)
-    
+        cell.isSelected = selectedCellAndHisHeight[indexPath] != nil
+        cell.addMyGestureRecognizer(self, type: .tap(), #selector(tapCell))
+        cell.configureCell(self, with: PodcastCellType(podcast: podcast))
         return cell
     }
 }
@@ -217,78 +234,40 @@ extension EpisodeTableView: UITableViewDelegate {
         }
         return defaultRowHeight
     }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        /// check if the cell allready selected
-       
-        guard let cell = cellForRow(at: indexPath) as? PodcastCell, cell.moreThanThreeLines else { return }
-        if isCellIsClosed(indexPath) {
-            /// open cell with default height calculate height in willDisplay method
-            selectedCellAndHisHeight[indexPath] = 0 // default value
-        } else {
-            /// close cell
-            selectedCellAndHisHeight[indexPath] = nil
-            let isLastCell = isLastSectionAndRow(indexPath: indexPath)
-            reloadTableViewHeight(lastCelIsClosed: isLastCell)
-            ///offset scrollview for closed cell
-        }
-        UIView.animate(withDuration: 0.4) { [weak self] in
-            self?.reloadRows(at: [indexPath], with: .automatic)
-        }
-    }
-   
-    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        /// write value for calculate height of tableview
-        if selectedCellAndHisHeight[indexPath] != nil {
-            
-            let offset = rectForRow(at: indexPath).height
-            let isLastCell = isLastSectionAndRow(indexPath: indexPath)
-            selectedCellAndHisHeight[indexPath] = offset
-            reloadTableViewHeight(lastCelIsClosed: isLastCell)
-        }
-    }
 }
 
 //MARK: - PodcastCellDelegate
 extension EpisodeTableView: PodcastCellDelegate {
     
-    func podcastCellDidTouchPlayButton(_ podcastCell: PodcastCell) {
-        guard let podcast = getPodcast(podcastCell) else { return }
-        myDelegate?.episodeTableViewPlayButtonDidTouchFor(self, podcast: podcast, at: Double(podcast.currentTime ?? 0), playlist: currentPlaylist.flatMap { $0.podcasts })
-    }
-    
-    func podcastCellDidTouchStopButton(_ podcastCell: PodcastCell) {
-        myDelegate?.episodeTableViewStopButtonDidTouchFor(self)
-    }
-    
-    func podcastCellDidSelectStar(_ podcastCell: PodcastCell) {
-        guard let podcast = getPodcast(podcastCell) else { return }
+    func podcastCellDidSelectStar(_ podcastCell: PodcastCell, entity: PodcastCellType) {
+        guard let indexPath = indexPath(for: podcastCell) else { return }
+        let podcast = currentPlaylist[indexPath.section].podcasts[indexPath.row]
         myDelegate?.episodeTableView(self, addToFavoriteButtonDidTouchFor: podcast)
+        podcastCell.updateFavoriteStar(with: podcast.isFavorite)
     }
     
-    func podcastCellDidSelectDownLoadImage(_ podcastCell: PodcastCell) {
-        guard let podcast = getPodcast(podcastCell) else { return }
-        
-        myDelegate?.episodeTableViewDidSelectDownLoadImage(self, entity: podcast) {
-            
-            switch podcast.stateOfDownload {
-                
-            case .isDownload:
-                podcastCell.endDownloading()
-                
-            case .notDownloaded:
-                podcastCell.removePodcastFromDownloads()
-                
-            case .isDownloading:
-                podcastCell.startDownloading()
-            }
-        }
+    func podcastCellDidSelectDownLoadImage(_ podcastCell: PodcastCell, entity: PodcastCellType) {
+        guard let indexPath = indexPath(for: podcastCell) else { return }
+        let podcast = currentPlaylist[indexPath.section].podcasts[indexPath.row]
+        myDelegate?.episodeTableViewDidSelectDownLoadImage(self, entity: podcast)
+    }
+    
+    func podcastCellDidTouchPlayButton(_ podcastCell: PodcastCell, entity: PodcastCellType) {
+        guard let indexPath = indexPath(for: podcastCell) else { return }
+        let podcast = currentPlaylist[indexPath.section].podcasts[indexPath.row]
+        myDelegate?.episodeTableViewPlayButtonDidTouchFor(self, podcast: podcast, playlist: currentPlaylist.flatMap { $0.podcasts })
+    }
+    
+    func podcastCellDidTouchStopButton(_ podcastCell: PodcastCell, entity: PodcastCellType) {
+//        guard let indexPath = indexPath(for: podcastCell) else { return }
+//        let podcast = currentPlaylist[indexPath.section].podcasts[indexPath.row]
+        myDelegate?.episodeTableViewStopButtonDidTouchFor(self)
     }
 }
 
 //MARK: - PlayerEventNotification
 extension EpisodeTableView: PlayerEventNotification {
-    
+   
     func addObserverPlayerEventNotification() {
         Player.addObserverPlayerPlayerEventNotification(for: self)
     }
@@ -299,35 +278,67 @@ extension EpisodeTableView: PlayerEventNotification {
     
     func playerDidEndPlay(notification: NSNotification) {
         guard let player = notification.object as? EpisodeTableViewPlayableProtocol else { return }
-        let id = player.id
-        reloadCell(for: id)
+        if let cell = getCell(id: player.identifier) {
+            cell.updatePlayerInformation(with: player)
+        }
     }
     
     func playerStartLoading(notification: NSNotification) {
         guard let player = notification.object as? EpisodeTableViewPlayableProtocol else { return }
-        let id = player.id
-        let cell = getCell(id: id)
-        cell?.playerIsGoingPlay(player: player)
+        if let cell = getCell(id: player.identifier) {
+            cell.updatePlayerInformation(with: player)
+        }
+        
     }
     
     func playerDidEndLoading(notification: NSNotification) {
         guard let player = notification.object as? EpisodeTableViewPlayableProtocol else { return }
-        let id = player.id
-        let cell = getCell(id: id)
-        cell?.playerIsEndLoading(player: player)
+        if let cell = getCell(id: player.identifier) {
+            cell.updatePlayerInformation(with: player)
+        }
     }
     
     func playerUpdatePlayingInformation(notification: NSNotification) {
         guard let player = notification.object as? EpisodeTableViewPlayableProtocol else { return }
-        let id = player.id
-        let cell = getCell(id: id)
-        cell?.updateListeningProgressView(player: player)
+        if let cell = getCell(id: player.identifier) {
+            cell.updatePlayerInformation(with: player)
+        }
     }
     
     func playerStateDidChanged(notification: NSNotification) {
         guard let player = notification.object as? EpisodeTableViewPlayableProtocol else { return }
-        let id = player.id
-        let cell = getCell(id: id)
-        cell?.updatePlayStopButton(player: player)
+        if let cell = getCell(id: player.identifier) {
+            cell.updatePlayerInformation(with: player)
+        }
     }
 }
+
+//MARK: - DownloadServiceDelegate
+extension EpisodeTableView: DownloadServiceDelegate {
+  
+    func updateDownloadInformation(_ downloadService: DownloadService, entity: DownloadServiceType) {
+        updateDownloadInformation(for: entity)
+    }
+    
+    func didEndDownloading(_ downloadService: DownloadService, entity: DownloadServiceType) {
+        updateDownloadInformation(for: entity)
+    }
+    
+    func didPauseDownload(_ downloadService: DownloadService, entity: DownloadServiceType) {
+        updateDownloadInformation(for: entity)
+    }
+    
+    func didContinueDownload(_ downloadService: DownloadService, entity: DownloadServiceType) {
+        updateDownloadInformation(for: entity)
+    }
+    
+    func didStartDownload(_ downloadService: DownloadService, entity: DownloadServiceType) {
+        updateDownloadInformation(for: entity)
+    }
+    
+    func didRemoveEntity(_ downloadService: DownloadService, entity: DownloadServiceType) {
+        updateDownloadInformation(for: entity)
+    }
+}
+
+

@@ -16,7 +16,7 @@ extension Genre {
         return NSFetchRequest<Genre>(entityName: "Genre")
     }
 
-    @NSManaged public var identifier: String?
+    @NSManaged public var identifier: String
     @NSManaged public var name: String?
     @NSManaged public var podcasts: NSSet?
 

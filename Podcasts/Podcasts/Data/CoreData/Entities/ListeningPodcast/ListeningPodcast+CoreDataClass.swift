@@ -12,12 +12,12 @@ import CoreData
 @objc(ListeningPodcast)
 public class ListeningPodcast: NSManagedObject, Codable {
     
-    
     private enum CodingKeys: String, CodingKey {
         case currentTime
         case duration
         case progress
         case podcast
+        case identifier
     }
     
     ///decoder
@@ -28,9 +28,10 @@ public class ListeningPodcast: NSManagedObject, Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         
         currentTime = try container.decode(Float.self, forKey: .currentTime)
-        duration =    try container.decode(Double.self, forKey: .duration)
-        progress =    try container.decode(Double.self, forKey: .progress)
-        podcast =     try container.decode(Podcast.self, forKey: .podcast)
+        duration    = try container.decode(Double.self, forKey: .duration)
+        progress    = try container.decode(Double.self, forKey: .progress)
+        podcast     = try container.decode(Podcast.self, forKey: .podcast)
+        identifier  = try container.decode(String.self, forKey: .identifier)
     }
     
     ///encode
@@ -38,23 +39,21 @@ public class ListeningPodcast: NSManagedObject, Codable {
         
         var container = encoder.container(keyedBy: CodingKeys.self)
         
-        try container.encode(currentTime,                      forKey: .currentTime)
-        try container.encode(duration,                      forKey: .duration)
-        try container.encode(progress,                      forKey: .progress)
-        try container.encode(podcast,                      forKey: .podcast)
+        try container.encode(currentTime, forKey: .currentTime)
+        try container.encode(duration,    forKey: .duration)
+        try container.encode(progress,    forKey: .progress)
+        try container.encode(podcast,     forKey: .podcast)
+        try container.encode(identifier,  forKey: .identifier)
     }
     
     ///init
-    
     @discardableResult
     convenience init(_ podcast: Podcast) {
         
         self.init(entity: Self.entity(), insertInto: Self.viewContext)
         
-        self.currentTime = 0
-        self.duration = 0
-        self.progress = 0
-        self.podcast = podcast.getFromCoreDataIfNoSavedNew
+        self.podcast    = podcast.getFromCoreDataIfNoSavedNew
+        self.identifier = UUID().uuidString
         
         mySave()
     }
@@ -65,9 +64,10 @@ public class ListeningPodcast: NSManagedObject, Codable {
         self.init(entity: Self.entity(), insertInto: Self.viewContext)
         
         self.currentTime = listeningPodcast.currentTime
-        self.duration = listeningPodcast.duration
-        self.progress = listeningPodcast.progress
-        self.podcast = podcast.getFromCoreDataIfNoSavedNew
+        self.duration    = listeningPodcast.duration
+        self.progress    = listeningPodcast.progress
+        self.podcast     = listeningPodcast.podcast.getFromCoreDataIfNoSavedNew
+        self.identifier  = listeningPodcast.identifier
     }
     
     @discardableResult
@@ -76,9 +76,10 @@ public class ListeningPodcast: NSManagedObject, Codable {
         self.init(entity: Self.entity(), insertInto: Self.viewContext)
         
         self.currentTime = listeningPodcast.currentTime
-        self.duration = listeningPodcast.duration
-        self.progress = listeningPodcast.progress
-        self.podcast = podcast.getFromCoreDataIfNoSavedNew
+        self.duration    = listeningPodcast.duration
+        self.progress    = listeningPodcast.progress
+        self.podcast     = listeningPodcast.podcast.getFromCoreDataIfNoSavedNew
+        self.identifier  = listeningPodcast.identifier
         
         mySave()
     }
@@ -87,48 +88,7 @@ public class ListeningPodcast: NSManagedObject, Codable {
 }
 
 //MARK: - CoreDataProtocol
-extension ListeningPodcast: CoreDataProtocol {
-    
-    var searchId: Int? { podcast.searchId }
-  
-//    func removeFromCoreDataWithOwnEntityRule() {
-//        if let listeningPodcast = getFromCoreData {
-//            let podcast = listeningPodcast.podcast
-//            listeningPodcast.removeFromViewContext()
-//            podcast.remove()
-//        }
-//    }
-}
+extension ListeningPodcast: CoreDataProtocol { }
 
 //MARK: - FirebaseProtocol
-extension ListeningPodcast: FirebaseProtocol {
-
-    var firebaseKey: String? { "\(podcast.id ?? 0)" }
-    
-    static func updateFromFireBase(completion: ((Result<[ListeningPodcast]>) -> Void)?) {
-        FirebaseDatabase.shared.update { (result: Result<[ListeningPodcast]>) in
-            switch result {
-            case .failure(let error) :
-                if error == .noData {
-                    removeAll()
-                }
-            case .success(let entities) :
-                update(by: entities)
-            }
-            completion?(result)
-        }
-    }
-    
-    
-    static func update(by entities: [ListeningPodcast]) {
-        Self.allObjectsFromCoreData.forEach { entity in
-            if !entities.contains(where: { $0.id == entity.id }) {
-                entity.removeFromCoreData()
-            }
-        }
-        
-        entities.forEach { entity in
-            entity.saveInCoredataIfNotSaved()
-        }
-    }
-}
+extension ListeningPodcast: FirebaseProtocol { }

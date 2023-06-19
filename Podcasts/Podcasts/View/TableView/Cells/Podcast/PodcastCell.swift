@@ -9,17 +9,63 @@ import UIKit
 
 //MARK: - Delegate
 protocol PodcastCellDelegate: AnyObject {
-    func podcastCellDidSelectStar(_ podcastCell: PodcastCell)
-    func podcastCellDidSelectDownLoadImage(_ podcastCell: PodcastCell)
-    func podcastCellDidTouchPlayButton(_ podcastCell: PodcastCell)
-    func podcastCellDidTouchStopButton(_ podcastCell: PodcastCell)
+    func podcastCellDidSelectStar         (_ podcastCell: PodcastCell, entity: PodcastCellType)
+    func podcastCellDidSelectDownLoadImage(_ podcastCell: PodcastCell, entity: PodcastCellType)
+    func podcastCellDidTouchPlayButton    (_ podcastCell: PodcastCell, entity: PodcastCellType)
+    func podcastCellDidTouchStopButton    (_ podcastCell: PodcastCell, entity: PodcastCellType)
 }
-
 
 //MARK: - PlayableProtocol
 protocol PodcastCellPlayableProtocol {
     var isPlaying: Bool { get }
-    var progress: Double? { get }
+    var isGoingPlaying: Bool { get }
+    var listeningProgress: Double? { get }
+}
+
+struct PodcastCellType: DownloadProtocol {
+    var identifier: String
+    var isFavorite: Bool
+    var trackDuration: String?
+    var dateDuration: String
+    var descriptionMy: String?
+    var trackName: String?
+    var downloadUrl: String?
+    var image: String?
+    
+    ///DownloadServiceInformation
+    var isDownloading: Bool = false
+    var isGoingDownload: Bool = false
+    var downloadingProgress: Float = 0
+    var downloadTotalSize : String = ""
+
+    ///Player
+    var player: PodcastCellPlayableProtocol?
+    
+    init(podcast: Podcast) {
+        self.identifier = podcast.identifier
+        self.isFavorite = podcast.isFavorite
+        self.trackDuration = podcast.trackTimeMillis?.minute
+        self.dateDuration = podcast.formattedDate(dateFormat: "d MMM YYY")
+        self.descriptionMy = podcast.descriptionMy
+        self.trackName = podcast.trackName
+        self.downloadUrl = podcast.downloadUrl
+        self.image = podcast.image160
+    }
+    
+    init(favoritePodcast: FavoritePodcast) {
+        self.init(podcast: favoritePodcast.podcast)
+    }
+    
+    mutating func updateDownloadingInformation(_ downloadServiceType: DownloadServiceType) {
+        self.isDownloading  = downloadServiceType.isDownloading
+        self.isGoingDownload = downloadServiceType.isGoingDownload
+        self.downloadingProgress = downloadServiceType.downloadingProgress
+        self.downloadTotalSize = downloadServiceType.downloadTotalSize
+    }
+    
+    mutating func updatePlayableInformation(_ podcastCellPlayableProtocol: PodcastCellPlayableProtocol) {
+        self.player = podcastCellPlayableProtocol
+    }
 }
 
 //MARK: - PodcastCell
@@ -43,144 +89,52 @@ class PodcastCell: UITableViewCell {
     @IBOutlet private weak var listeningProgressView: UIProgressView!
     @IBOutlet private weak var downloadProgressView:  UIProgressView!
 
+    @IBOutlet private weak var heightOfImageView: NSLayoutConstraint!
+    
     private let pauseImage = UIImage(systemName: "pause.circle.fill")!
     private let playImage = UIImage(systemName: "play.circle.fill")!
     private let downImage = UIImage(systemName: "chevron.down")!
     private let upImage = UIImage(systemName: "chevron.up")!
     
-    var heightOfCell = CGFloat(100)
+    private let isFavoriteImage = UIImage(named: "star5")!
+    private let isNotFavoriteImage = UIImage(named: "star1")!
+    
     
     weak var delegate: PodcastCellDelegate?
-    private var podcast: Podcast!
+    private var podcast: PodcastCellType!
     
     var moreThanThreeLines: Bool {
         return podcastDescription.maxNumberOfLines > 3
     }
     
+    override var isSelected: Bool {
+        didSet {
+           updateSelectState()
+        }
+    }
+    
     //MARK: Public Methods
-    func configureCell(_ delegate: PodcastCellDelegate?, with podcast: Podcast) {
+    func configureCell(_ delegate: PodcastCellDelegate?, with podcast: PodcastCellType) {
         self.delegate = delegate
         configure(with: podcast)
     }
 
     //MARK: Actions
     @objc func handlerTapFavoriteStar(_ sender: UITapGestureRecognizer) {
-        
-        if !podcast.isFavorite {
-            let imageArray = self.createImageArray(total: 5, imagePrafix: "star")
-            favoriteStarImageView.animationImages = imageArray
-            favoriteStarImageView.animationDuration = 1.0
-            favoriteStarImageView.animationRepeatCount = 1
-            favoriteStarImageView.startAnimating()
-            favoriteStarImageView.image = UIImage(named: "star5")
-            Timer.scheduledTimer(withTimeInterval: 0.9, repeats: false) { [weak self] _ in
-                guard let self = self else { return }
-                self.delegate?.podcastCellDidSelectStar(self)
-                self.setDownloadImage(self.podcast)
-            }
-        } else {
-            favoriteStarImageView.image = UIImage(named: "star1")
-            delegate?.podcastCellDidSelectStar(self)
-            setDownloadImage(podcast)
-        }
+        delegate?.podcastCellDidSelectStar(self, entity: podcast)
     }
     
     @objc func tapPlayPauseButton(_ sender: UITapGestureRecognizer) {
-        if playStopButton.image == pauseImage {
-            delegate?.podcastCellDidTouchStopButton(self)
-        } else {
-            delegate?.podcastCellDidTouchPlayButton(self)
-        }
+        delegate?.podcastCellDidTouchPlayButton(self, entity: podcast)
     }
     
     @objc func handlerTapDownloadImage(_ sender: UITapGestureRecognizer) {
-        
-        switch podcast.stateOfDownload {
-        case .notDownloaded:
-            startDownloading()
-        default: break
-        }
-        
-        delegate?.podcastCellDidSelectDownLoadImage(self)
+        delegate?.podcastCellDidSelectDownLoadImage(self, entity: podcast)
     }
-    
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-    }
-}
-
-//MARK: - Player update methods
-extension PodcastCell {
-    
-    func updatePlayStopButton(player: PodcastCellPlayableProtocol) {
-        playStopButton.image = player.isPlaying ? pauseImage : playImage
-    }
-    
-    func playerIsGoingPlay(player: PodcastCellPlayableProtocol) {
-        if listeningProgressView.progress == 0 {
-            listeningProgressView.isHidden = false
-            listeningProgressView.progress = 1
-        }
-        
-        playerActivityIndicator.isHidden = false
-        playerActivityIndicator.startAnimating()
-        playStopButton.isHidden = true
-    }
-    
-    func playerIsEndLoading(player: PodcastCellPlayableProtocol) {
-        playerActivityIndicator.stopAnimating()
-        playStopButton.isHidden = false
-        playStopButton.image = pauseImage
-    }
-    
-    func updateListeningProgressView(player: PodcastCellPlayableProtocol) {
-        updatePlayStopButton(player: player)
-        setListeningProgressView(progress: player.progress)
-    }
-}
-
-//MARK: - Download updating
-extension PodcastCell {
-    
-    func updateDownloadInformation(progress: Float, totalSize : String) {
-        
-        if !downloadActivityIndicator.isHidden { downloadActivityIndicator.stopAnimating() }
-        if downLoadImageView.isHidden { downLoadImageView.isHidden = false }
-        if downloadProgressView.isHidden { downloadProgressView.isHidden = false }
-        if downloadProgressLabel.isHidden { downloadProgressLabel.isHidden = false }
-        
-        downloadProgressView.progress = progress
-        downloadProgressLabel.text = String(format: "%.1f%% of %@", progress * 100, totalSize)
-    }
-    
-    func endDownloading() {
-        downloadProgressView.isHidden = true
-        downloadProgressLabel.isHidden = true
-        downLoadImageView.image = UIImage(systemName: "checkmark.icloud.fill")
-    }
-    
-    func startDownloading() {
-        downloadActivityIndicator.isHidden = false
-        downloadActivityIndicator.startAnimating()
-        downLoadImageView.isHidden = true
-    }
-        
-    func removePodcastFromDownloads() {
-        downloadActivityIndicator.stopAnimating()
-        downloadProgressView.isHidden = true
-        downloadProgressLabel.isHidden = true
-        downLoadImageView.image = UIImage(systemName: "icloud.and.arrow.down")
-    }
-
 }
 
 //MARK: - Private Methods
 extension PodcastCell {
-
-    private func setListeningProgressView(progress: Double?) {
-        listeningProgressView.progress = Float(progress ?? 0)
-        listeningProgressView.isHidden = (listeningProgressView.progress == 0)
-    }
     
     private func createImageArray(total: Int, imagePrafix: String) -> [UIImage] {
         var imageArray = [UIImage]()
@@ -193,41 +147,107 @@ extension PodcastCell {
         return imageArray
     }
     
-    private func setDownloadImage(_ podcast: Podcast) {
-        let trackIsAvailableForPlaying = (podcast.episodeUrl != nil)
-        if trackIsAvailableForPlaying {
-            downLoadImageView.isHidden = !podcast.isFavorite
-            downLoadImageView.image = UIImage(systemName: podcast.stateOfDownload == .isDownload ? "checkmark.icloud.fill" : "icloud.and.arrow.down")
-        } else {
-            downLoadImageView.isHidden = true
-            playStopButton.isHidden = true
-        }
-    }
     
-    private func setFavoriteStarImage(podcast: Podcast) {
-        favoriteStarImageView.image = UIImage(named: podcast.isFavorite ? "star5" : "star1")
-    }
     
-    private func configure(with podcast: Podcast) {
+    func configure(with podcast: PodcastCellType) {
         self.podcast = podcast
+        
+        heightOfImageView.constant = bounds.height * 0.8
         configureGestures()
-        dateLabel.text = podcast.formattedDate(dateFormat: "d MMM YYY")
-        trackDuration.text = podcast.trackTimeMillis?.minute
+        dateLabel.text = podcast.dateDuration
+        trackDuration.text = podcast.trackDuration
         podcastDescription.text = podcast.descriptionMy
         
         podcastDescription.numberOfLines = podcastDescription.maxNumberOfLines
         openDescriptionImageView.isHidden = !moreThanThreeLines
-        openDescriptionImageView.image = isSelected ? downImage : upImage
-
-        podcastName.text = podcast.trackName
-        setListeningProgressView(progress: podcast.progress)
-        setFavoriteStarImage(podcast: podcast)
-        setDownloadImage(podcast)
         
-        DataProvider.shared.downloadImage(string: podcast.image160) { [weak self] image in
+        
+        podcastName.text = podcast.trackName
+        
+        DataProvider.shared.downloadImage(string: podcast.image) { [weak self] image in
             self?.podcastImage.image = image
         }
+     
+        updateSelectState()
+        updatePlayerUI()
+        updateFavoriteStar()
+        updateDownloadUI()
     }
+    
+    func updateSelectState() {
+        openDescriptionImageView.image = isSelected ? downImage : upImage
+    }
+    
+    func updateFavoriteStar() {
+        favoriteStarImageView.image = podcast.isFavorite ? isFavoriteImage : isNotFavoriteImage
+        updateDownloadUI()
+    }
+    
+    func updateFavoriteStar(with value: Bool) {
+        self.podcast.isFavorite = value
+        updateFavoriteStar()
+    }
+    
+    func updatePlayerInformation(with podcastCellPlayableProtocol: PodcastCellPlayableProtocol) {
+        self.podcast.player = podcastCellPlayableProtocol
+        updatePlayerUI()
+    }
+    
+    func updatePlayerUI() {
+        guard let player = podcast.player else { return }
+        playStopButton.image = player.isPlaying ? pauseImage : playImage
+        playStopButton.isHidden = player.isGoingPlaying
+        
+        listeningProgressView.progress = Float(player.listeningProgress ?? 0)
+        listeningProgressView.isHidden = player.listeningProgress == 0
+        
+        if player.isGoingPlaying {
+            playerActivityIndicator.startAnimating()
+        } else {
+            playerActivityIndicator.stopAnimating()
+        }
+        
+        playerActivityIndicator.isHidden = !player.isGoingPlaying
+    }
+    
+    func updateDownloadInformation(with downloadServiceType: DownloadServiceType) {
+        self.podcast.updateDownloadingInformation(downloadServiceType)
+        updateDownloadUI()
+    }
+    
+    func updateDownloadUI() {
+        
+        let isFavorite = podcast.isFavorite
+        
+        let isDownloaded = podcast.isDownloaded
+        let isGoingDownload = podcast.isGoingDownload
+        let isDownloading  = podcast.isDownloading
+        
+        if isFavorite {
+            downloadProgressView.isHidden = !podcast.isDownloading  ///+++
+            downloadActivityIndicator.isHidden = !podcast.isGoingDownload ///+++
+            downLoadImageView.isHidden = isGoingDownload
+            downloadProgressLabel.isHidden = !isDownloading
+            
+            downloadProgressView.progress = podcast.downloadingProgress
+            downloadProgressLabel.text = String(format: "%.1f%% of %@", podcast.downloadingProgress * 100, podcast.downloadTotalSize)
+            downLoadImageView.image = UIImage(systemName: isDownloaded ? "checkmark.icloud.fill" : "icloud.and.arrow.down")
+            
+            if isGoingDownload {
+                downloadActivityIndicator.startAnimating()
+            } else {
+                downloadActivityIndicator.stopAnimating()
+            }
+            
+        } else {
+            downloadProgressView.isHidden = true
+            downloadActivityIndicator.isHidden = true
+            downLoadImageView.isHidden = true
+            downloadProgressLabel.isHidden = true
+            downloadActivityIndicator.stopAnimating()
+        }
+    }
+    
     
     private func configureGestures() {
         downLoadImageView.addMyGestureRecognizer(self, type: .tap(), #selector(handlerTapDownloadImage))

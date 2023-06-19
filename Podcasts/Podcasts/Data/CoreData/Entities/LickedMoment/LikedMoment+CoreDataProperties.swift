@@ -17,8 +17,8 @@ extension LikedMoment {
     }
 
     @NSManaged public var moment: Double
-    @NSManaged public var id: String?
-    @NSManaged public var podcast: Podcast?
+    @NSManaged public var identifier: String
+    @NSManaged public var podcast: Podcast
 
 }
 

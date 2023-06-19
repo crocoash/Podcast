@@ -20,15 +20,26 @@ class ApiService {
         URLSession.shared.dataTask(with: url) { data, response, error in
             
             var result: Result<T>
-            
+
             defer {
                 DispatchQueue.main.async {
                     completion(result)
                 }
             }
             
-            guard let data = data, response != nil, error == nil else {
-                result = .failure(error: .error(error?.localizedDescription ?? "No Data" ))
+            if let error = error {
+                result = .failure(.apiService(.error(error.localizedDescription)))
+                return
+            }
+            
+            if let response = response as? HTTPURLResponse {
+                if response.statusCode != 200 {
+                    result = .failure(.apiService(.error("\(response.statusCode)")))
+                }
+            }
+            
+            guard let data = data else {
+                result = .failure(.apiService(.noData))
                 return
             }
             
@@ -39,7 +50,7 @@ class ApiService {
                 
             } catch let error {
                 print(error)
-                result = .failure(error: .error(error.localizedDescription.debugDescription))
+                result = .failure(.apiService(.error(error.localizedDescription.debugDescription)))
             }
         }.resume()
     }

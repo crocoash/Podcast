@@ -8,18 +8,16 @@
 import UIKit
 
 protocol DetailViewControllerDelegate: AnyObject {
-    func detailViewControllerPlayButtonDidTouchFor(_ detailViewController: DetailViewController, podcast: Podcast, at moment: Double?, playlist: [Podcast])
+    func detailViewControllerPlayButtonDidTouchFor(_ detailViewController: DetailViewController, podcast: Podcast, playlist: [Podcast])
     func detailViewControllerPlayStopButtonDidTouchInSmallPlayer(_ detailViewController: DetailViewController)
     func detailViewControllerDidSwipeOnPlayer(_ detailViewController: DetailViewController)
     func detailViewControllerStopButtonDidTouchFor(_ detailViewController: DetailViewController, podcast: Podcast)
     func detailViewController(_ detailViewController: DetailViewController, addToFavoriteButtonDidTouchFor podcast: Podcast)
     func detailViewController(_ detailViewController: DetailViewController, removeFromFavoriteButtonDidTouchFor selectedPodcast: Podcast)
-    func detailViewControllerDidSelectDownLoadImage(_ detailViewController: DetailViewController, entity: DownloadServiceProtocol, completion: @escaping () -> Void)
+    func detailViewControllerDidSelectDownLoadImage(_ detailViewController: DetailViewController, entity: DownloadProtocol)
 }
 
-protocol DetailPlayable {
-    
-}
+protocol DetailPlayable { }
 
 class DetailViewController: UIViewController {
     
@@ -44,16 +42,16 @@ class DetailViewController: UIViewController {
     @IBOutlet private weak var playImageView             : UIImageView!
     
     @IBOutlet private weak var episodeTableView: EpisodeTableView!
+    
     @IBOutlet private weak var heightTableViewConstraint: NSLayoutConstraint!
     @IBOutlet private weak var bottomPlayerConstraint:NSLayoutConstraint!
-    
-//    cell.setHighlighted(true, animated: true)
+
     
     //MARK: Variables
     private(set) var podcast: Podcast!
     private(set) var podcasts: [Podcast]! {
         didSet {
-            if let _ = oldValue {
+            if oldValue != nil {
                 setupView()
             }
         }
@@ -67,7 +65,6 @@ class DetailViewController: UIViewController {
         configureGestures()
         setupView()
     }
-
     
     //MARK: Public Methods
     func setUp(podcast: Podcast, playlist: [Podcast]) {
@@ -101,20 +98,11 @@ class DetailViewController: UIViewController {
     }
     
     ///BigPlayer
-    func scrollToCell(id: NSNumber?) {
+    func scrollToCell(id: String) {
         let positionOfCell = episodeTableView.positionYOfCell(id: id)
         let positionOfTableView = episodeTableView.frame.origin.y
         let position = positionOfTableView + positionOfCell
         scrollView.setContentOffset(CGPoint(x: .zero, y: position), animated: true)
-    }
-    
-    //MARK: Downloading
-    func updateDownloadInformation(progress: Float, totalSize: String, for podcast: Podcast) {
-        episodeTableView.updateDownloadInformation(progress: progress, totalSize: totalSize, for: podcast)
-    }
-    
-    func endDownloading(podcast: Podcast) {
-        episodeTableView.endDownloading(podcast: podcast)
     }
     
     //MARK: - Actions
@@ -190,9 +178,9 @@ extension DetailViewController: EpisodeTableViewMyDataSource {
 
 //MARK: - EpisodeTableViewControllerDelegate
 extension DetailViewController: EpisodeTableViewDelegate {
-    
-    func episodeTableViewPlayButtonDidTouchFor(_ episodeTableView: EpisodeTableView, podcast: Podcast, at moment: Double?, playlist: [Podcast]) {
-        delegate?.detailViewControllerPlayButtonDidTouchFor(self, podcast: podcast, at: moment, playlist: playlist)
+  
+    func episodeTableViewPlayButtonDidTouchFor(_ episodeTableView: EpisodeTableView, podcast: Podcast, playlist: [Podcast]) {
+        delegate?.detailViewControllerPlayButtonDidTouchFor(self, podcast: podcast, playlist: playlist)
     }
     
     func episodeTableViewStopButtonDidTouchFor(_ episodeTableView: EpisodeTableView) {
@@ -208,8 +196,8 @@ extension DetailViewController: EpisodeTableViewDelegate {
         delegate?.detailViewController(self, removeFromFavoriteButtonDidTouchFor: selectedPodcast)
     }
     
-    func episodeTableViewDidSelectDownLoadImage(_ episodeTableView: EpisodeTableView, entity: DownloadServiceProtocol, completion: @escaping () -> Void) {
-        delegate?.detailViewControllerDidSelectDownLoadImage(self, entity: entity, completion: completion)
+    func episodeTableViewDidSelectDownLoadImage(_ episodeTableView: EpisodeTableView, entity: DownloadProtocol) {
+        delegate?.detailViewControllerDidSelectDownLoadImage(self, entity: entity)
     }
 }
 
@@ -222,5 +210,32 @@ extension DetailViewController: SmallPlayerViewControllerDelegate {
     
     func smallPlayerViewControllerDidTouchPlayStopButton(_ smallPlayerViewController: SmallPlayerView) {
         delegate?.detailViewControllerPlayStopButtonDidTouchInSmallPlayer(self)
+    }
+}
+
+extension DetailViewController: DownloadServiceDelegate {
+    
+    func updateDownloadInformation(_ downloadService: DownloadService, entity: DownloadServiceType) {
+        episodeTableView?.updateDownloadInformation(downloadService, entity: entity)
+    }
+    
+    func didEndDownloading(_ downloadService: DownloadService, entity: DownloadServiceType) {
+        episodeTableView?.didEndDownloading(downloadService, entity: entity)
+    }
+    
+    func didPauseDownload(_ downloadService: DownloadService, entity: DownloadServiceType) {
+        episodeTableView?.didPauseDownload(downloadService, entity: entity)
+    }
+    
+    func didContinueDownload(_ downloadService: DownloadService, entity: DownloadServiceType) {
+        episodeTableView?.didContinueDownload(downloadService, entity: entity)
+    }
+    
+    func didStartDownload(_ downloadService: DownloadService, entity: DownloadServiceType) {
+        episodeTableView?.didStartDownload(downloadService, entity: entity)
+    }
+    
+    func didRemoveEntity(_ downloadService: DownloadService, entity: DownloadServiceType) {
+        episodeTableView?.didRemoveEntity(downloadService, entity: entity)
     }
 }

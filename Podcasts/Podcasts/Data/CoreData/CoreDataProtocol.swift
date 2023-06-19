@@ -7,30 +7,25 @@
 
 import CoreData
 
-protocol CoreDataProtocol where Self: NSManagedObject & Hashable {
+protocol CoreDataProtocol where Self: NSManagedObject & Hashable & Identifiable {
     
-    associatedtype T: NSManagedObject, Identifiable
+//    associatedtype T: NSManagedObject, Identifiable
     
-    static var allObjectsFromCoreData: [T] { get }
+//    static var allObjectsFromCoreData: [T] { get }
     
-    var searchId: Int? { get }
-    
+    var identifier: String { get }
     func saveInCoredataIfNotSaved()
     
-    var getFromCoreData: Self? { get }
-    var getFromCoreDataIfNoSavedNew: T { get }
+//    var getFromCoreData: Self? { get }
+//    var getFromCoreDataIfNoSavedNew: T { get }
    
     
-    static func removeAll()
-    func removeFromCoreData()
+//    static func removeAll()
+//    func removeFromCoreData()
     @discardableResult init(_: Self)
 }
 
 extension CoreDataProtocol where Self: NSManagedObject & Identifiable & Hashable  {
-
-    static var allObjectsFromCoreData: [Self] {
-        viewContext.fetchObjects(Self.self)
-    }
 
     static func removeAll() {
         allObjectsFromCoreData.forEach {
@@ -38,37 +33,115 @@ extension CoreDataProtocol where Self: NSManagedObject & Identifiable & Hashable
         }
     }
 
-    var getFromCoreData: Self? {
-        return Self.allObjectsFromCoreData.first(matching: self)
+    static var allObjectsFromCoreData: Set<Self> {
+        viewContext.fetchObjects(Self.self)
     }
-
+    
+    var getFromCoreData: Self? {
+        return fetchObject()
+    }
+    
+    /// LikedMoments dont have save init
     func saveInCoredataIfNotSaved() {
         if getFromCoreData == nil {
             Self.init(self)
         }
     }
-
+    
     var getFromCoreDataIfNoSavedNew: Self {
-        return Self.allObjectsFromCoreData.first(matching: self) ?? Self.init(self)
+        return getFromCoreData ?? Self.init(self)
+    }
+    
+//    static func getFromCoreData(searchId: Int) -> Self? {
+////        allObjectsFromCoreData.filter { $0.searchId == searchId }.first
+//    }
+    
+    var defaultPredicate: NSPredicate {
+        return NSPredicate(format: "identifier == %@", "\(identifier)")
+    }
+    
+    func fetchObject(predicates: [NSPredicate]? = nil) -> Self? {
+        
+        let fetchRequest: NSFetchRequest<Self> = Self.fetchRequest() as! NSFetchRequest<Self>
+       
+        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: predicates ?? [defaultPredicate])
+        
+        fetchRequest.fetchLimit = 1
+        let result = try? Self.viewContext.fetch(fetchRequest)
+        return result?.first
+    }
+    
+    static func fetchObjects(predicates: [NSPredicate]) -> [Self]? {
+        
+        let fetchRequest: NSFetchRequest<Self> = Self.fetchRequest() as! NSFetchRequest<Self>
+       
+        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
+        
+        return try? viewContext.fetch(fetchRequest)
+    }
+    
+    static func fetchObject(predicates: [NSPredicate]) -> Self? {
+        
+        let fetchRequest: NSFetchRequest<Self> = Self.fetchRequest() as! NSFetchRequest<Self>
+       
+        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: predicates )
+        
+        fetchRequest.fetchLimit = 1
+        let result = try? viewContext.fetch(fetchRequest)
+        return result?.first
+    }
+    
+    func fetchResultController(
+        sortDescription: [NSSortDescriptor]?,
+        predicates: [NSPredicate]? = nil,
+        sectionNameKeyPath: String? = nil,
+        fetchLimit: Int? = nil
+    ) -> NSFetchedResultsController<Self> {
+        
+        let fetchRequest: NSFetchRequest<Self> = Self.fetchRequest() as! NSFetchRequest<Self>
+        
+        if let predicates = predicates {
+            for predicate in predicates {
+                fetchRequest.predicate = predicate
+            }
+        }
+        
+        fetchRequest.fetchLimit = fetchLimit ?? Int.max
+        fetchRequest.sortDescriptors = sortDescription
+        let fetchResultController = NSFetchedResultsController(
+            fetchRequest: fetchRequest,
+            managedObjectContext: viewContext,
+            sectionNameKeyPath: sectionNameKeyPath,
+            cacheName: nil
+        )
+        
+        do {
+            try fetchResultController.performFetch()
+        } catch {
+            let nserror = error as NSError
+            fatalError("Unresolved error \(error), \(nserror.userInfo)")
+        }
+        return fetchResultController
     }
 
-    static func getFromCoreData(searchId: Int) -> Self? {
-        allObjectsFromCoreData.filter { $0.searchId == searchId }.first
+    
+    func updateEntity() {
+        
     }
     
     func removeFromCoreData() {
-        print("print1 \(Self.self)")
-        for selfKey in self.entity.propertiesByName.keys {
+
+        guard let self = getFromCoreData else { return  }
+        
+        for key in self.entity.relationshipsByName.keys {
             
-            let selfValue = self.value(forKey: selfKey)
+            let value = self.value(forKey: key)
             
-            if let subItem = selfValue as? (any CoreDataProtocol) {
-                print("print 1.2` \(String(describing: subItem.entityName))")
-                checkSubItem(item: subItem)
-            } else if let subItems = selfValue as? Set<NSManagedObject> {
-                subItems.forEach {
-                    print("print 1.3 \($0.entityName)")
-                        checkSubItem(item: $0)
+            if let value = value as? NSManagedObject {
+                checkSubItem(item: value, with: self)
+            } else if let values = value as? Set<NSManagedObject> {
+                values.forEach {
+                    checkSubItem(item: $0, with: self)
                 }
             }
         }
@@ -77,50 +150,38 @@ extension CoreDataProtocol where Self: NSManagedObject & Identifiable & Hashable
         mySave()
     }
     
-    private func checkSubItem(item: NSManagedObject) {
-        
-        let relationshipsKeys = item.entity.relationshipsByName.keys
-        
+    private func checkSubItem<T: NSManagedObject>(item: NSManagedObject, with checkItem: T) {
+
+        let keys = item.entity.relationshipsByName.keys
         
         var isEmptyLink = true
         
-        for key in relationshipsKeys {
-            
-            let value = item.value(forKey: key)
-            
+        for key in keys {
+                        
             guard let relationship = item.entity.relationshipsByName[key],
                   let destinationEntity = relationship.destinationEntity,
                   let destinationEntityName = destinationEntity.name else { fatalError() }
             
             let deleteRule = relationship.deleteRule
-            
-//            let destinationEntityManagedObjectClassName = destinationEntity.managedObjectClassName
-            
-//            print("print destinationEntityName \(destinationEntityName) --- \(Self.entityName)")
-//            print("print relationship \(relationship)")
-//            print("print destinationEntity \(destinationEntity) ")
-           
-
-
-            if destinationEntityName == Self.entityName {
+                  
+            if destinationEntityName == checkItem.entityName {
                 
-                if value is Self {
+                if item.value(forKey: key) is T {
                     
                     item.setNilValueForKey(key)
-                    
-                } else if let set = value as? Set<Self> {
-                    
-                    let set = set.filter { $0.entityName != self.entityName }
+                    mySave()
+                } else if let set = item.value(forKey: key) as? Set<T> {
+                    let set = set.filter { $0.objectID != checkItem.objectID }
                     item.setValue(set, forKey: key)
-                    
+                    mySave()
                 }
             }
             
             if deleteRule == .denyDeleteRule {
                 
-                if  value is NSManagedObject {
+                if let _ = item.value(forKey: key) as? NSManagedObject {
                     isEmptyLink = false
-                } else if let set = value as? Set<NSManagedObject> {
+                } else if let set = item.value(forKey: key) as? Set<NSManagedObject> {
                     if !set.isEmpty {
                         isEmptyLink = false
                     }
@@ -129,38 +190,67 @@ extension CoreDataProtocol where Self: NSManagedObject & Identifiable & Hashable
         }
 
         if isEmptyLink {
-            for key in relationshipsKeys {
+            for key in keys {
                 guard let deleteRule = item.entity.relationshipsByName[key]?.deleteRule else { fatalError() }
+                
                 let value = item.value(forKey: key)
                 
                 if deleteRule == .nullifyDeleteRule {
-                    if let entity = value as? (any CoreDataProtocol) {
-                        checkSubItem(item: entity)
+                    if let entity = value as? NSManagedObject {
+                        checkSubItem(item: entity, with: entity)
+                    } else if let set = value as? Set<NSManagedObject> {
+                        set.forEach {
+                            checkSubItem(item: $0, with: item)
+                        }
                     }
+                    item.setNilValueForKey(key)
+                    mySave()
                 }
             }
-            if let item = item as? (any CoreDataProtocol) {
-                item.removeFromCoreData()
-            }
+            
+            viewContext.delete(item)
+            mySave()
         }
     }
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /// ---------------------------------------------------------------------------------------------
-protocol FirebaseProtocol: CoreDataProtocol {
+protocol FirebaseProtocol: CoreDataProtocol & Decodable  {
     
-    var firebaseKey: String? { get }
-    
+    var firebaseKey: String { get }
     
     func removeFromFireBase(key: String?, entityName: String)
     func addFromFireBase()
     func saveInFireBase()
-    static func updateFromFireBase(completion: ((Result<[T]>) -> Void)?)
+    
     var entityName: String { get }
     @discardableResult init(_: Self, viewContext: NSManagedObjectContext)
 }
 
-extension FirebaseProtocol {
+extension FirebaseProtocol where Self: Decodable {
+    
+    typealias ResultType = Result<Set<Self>>
+    
+    var firebaseKey: String { identifier }
     
     func removeFromFireBase(key: String?, entityName: String) {
         FirebaseDatabase.shared.remove(entityName: entityName, key: key)
@@ -173,6 +263,28 @@ extension FirebaseProtocol {
     func addFromFireBase() {
         if getFromCoreData == nil {
             Self.init(self, viewContext: viewContext)
+        }
+    }
+}
+
+extension Set where Element: FirebaseProtocol {
+    
+    func updateCoreData() {
+        
+        let allObjectsFromCoreData = Element.allObjectsFromCoreData
+        
+        let newObjects = self.filter { $0.fetchObject() == nil }
+        
+        ///create new
+        newObjects.forEach {
+            Element.init($0)
+        }
+        
+        let removedObjects = allObjectsFromCoreData.filter {  $0.fetchObject() == nil }
+        
+        /// remove
+        removedObjects.forEach {
+            $0.removeFromCoreData()
         }
     }
 }

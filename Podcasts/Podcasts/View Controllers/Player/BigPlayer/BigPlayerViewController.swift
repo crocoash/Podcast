@@ -26,7 +26,7 @@ protocol BigPlayerPlayableProtocol {
     var trackName: String? { get }
     var trackImage: String? { get }
     var currentTime: Float? { get }
-    var duration: Double? { get }
+    var playingDuration: Double? { get }
     var track: InputPlayerProtocol? { get }
 }
 
@@ -58,11 +58,11 @@ class BigPlayerViewController: UIViewController {
     func setUpUI(with player: BigPlayerPlayableProtocol) {
         self.bigPlayerPlayableProtocol = player
         
-        progressSlider.maximumValue = Float(player.duration ?? 0)
+        progressSlider.maximumValue = Float(player.playingDuration ?? 0)
         progressSlider.value = player.currentTime ?? 0
         
         currentTimeLabel  .text = player.currentTime?.formatted ?? defaultTime
-        durationTrackLabel.text = player.duration?.formatted ?? defaultTime
+        durationTrackLabel.text = player.playingDuration?.formatted ?? defaultTime
         podcastNameLabel  .text = player.trackName
         
         activityIndicator.isHidden = !player.playerIsLoadingNewTrack
@@ -145,9 +145,9 @@ extension BigPlayerViewController {
     
     private func updateProgressSlider(player: BigPlayerPlayableProtocol) {
         progressSlider.value = player.currentTime ?? 0
-        progressSlider.maximumValue = Float(player.duration ?? 0)
+        progressSlider.maximumValue = Float(player.playingDuration ?? 0)
         currentTimeLabel.text = player.currentTime?.formatted ?? defaultTime
-        durationTrackLabel.text = player.duration?.formatted ?? defaultTime
+        durationTrackLabel.text = player.playingDuration?.formatted ?? defaultTime
         if !likedButton.isEnabled { likedButton.isEnabled = true }
     }
     
