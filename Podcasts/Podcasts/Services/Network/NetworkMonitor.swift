@@ -14,7 +14,6 @@ protocol NetworkMonitiorDelegate: AnyObject {
 
 class NetworkMonitor {
     
-    static let shared: NetworkMonitor = NetworkMonitor()
     weak var delegate: NetworkMonitiorDelegate?
     
     private let queue = DispatchQueue.global()
@@ -25,13 +24,12 @@ class NetworkMonitor {
             DispatchQueue.main.async {
                 if oldValue != self.isConnection {
                     self.delegate?.internetConnectionDidRestore(self)
-//                    MyToast.create(title: "internet connection " + (self.isConnection ? "restored" : "lost"), .top)
                 }
             }
         }
     }
     
-    private init() {
+    init() {
         self.monitor = NWPathMonitor()
         monitor.start(queue: queue)
     }
@@ -47,10 +45,13 @@ class NetworkMonitor {
     
     func starMonitor() {
         monitor.pathUpdateHandler = { [weak self] path in
-            guard let self = self else { return }
-            DispatchQueue.main.async {
-                self.isConnection = path.status == .satisfied
-                self.getConnectionType(path)
+            
+            DispatchQueue.main.async { [weak self] in
+                
+                guard let self = self else { return }
+
+                isConnection = path.status == .satisfied
+                getConnectionType(path)
             }
         }
     }

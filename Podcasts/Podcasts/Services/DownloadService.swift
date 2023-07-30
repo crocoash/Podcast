@@ -8,43 +8,39 @@
 import UIKit
 import CoreData
 
-//enum Props {
-//    case podcast
-//}
+protocol InputDownloadProtocol {
+    var downloadEntity: DownloadProtocol { get }
+}
 
 protocol DownloadProtocol {
     var downloadUrl: String? { get }
-    var identifier: String { get }
+    var downloadEntityIdentifier: String { get }
 }
 
-extension DownloadProtocol {
+struct DownloadServiceType: PodcastCellDownloadProtocol {
     
-    var isDownloaded: Bool {
-        downloadUrl.isDownloaded
-    }
     
-    func cust<T>(_ type: T.Type) -> T? {
-        return self as? T
-    }
-}
-//TODO: Download Event
-
-struct DownloadServiceType {
-    var downloadProtocol: DownloadProtocol
-        
-    var downloadDataTask: URLSessionDownloadTask?
+    var downloadIdentifier: String
+    var inputDownloadProtocol: InputDownloadProtocol
+    var downloadDataTask: URLSessionDownloadTask
+    var isDownloaded: Bool = false
     var isDownloading: Bool = false
     var isGoingDownload: Bool = false
     var downloadingProgress: Float = 0
     var downloadTotalSize : String = ""
     
-    var downloadUrl: URL? {
-        downloadProtocol.downloadUrl.url
+    var downloadUrl: URL?
+    
+    init(inputDownloadProtocol: InputDownloadProtocol, downloadDataTask: URLSessionDownloadTask) {
+        self.downloadIdentifier = inputDownloadProtocol.downloadEntity.downloadEntityIdentifier
+        self.inputDownloadProtocol = inputDownloadProtocol
+        self.downloadDataTask = downloadDataTask
+        self.downloadUrl = inputDownloadProtocol.downloadEntity.downloadUrl.url
     }
 }
 
-protocol DownloadServiceDelegate where Self: AnyObject {
-    
+protocol DownloadEventNotifications where Self: AnyObject {
+        
     func updateDownloadInformation (_ downloadService: DownloadService, entity: DownloadServiceType)
     func didEndDownloading         (_ downloadService: DownloadService, entity: DownloadServiceType)
     func didPauseDownload          (_ downloadService: DownloadService, entity: DownloadServiceType)
@@ -57,8 +53,22 @@ class DownloadService: NSObject {
     
     typealias DownloadsSession = [URL: DownloadServiceType]
     
-    var delegate: DownloadServiceDelegate?
+    private let dataStoreManagerInput: DataStoreManagerInput
+    private let networkMonitor: NetworkMonitor
     
+    init(dataStoreManagerInput: DataStoreManagerInput, networkMonitor: NetworkMonitor) {
+        self.networkMonitor = networkMonitor
+        self.dataStoreManagerInput = dataStoreManagerInput
+    }
+    
+    private(set) var delegates: [WeakObject] = []
+    class WeakObject {
+        weak var weakObject: (any DownloadEventNotifications)?
+        init(object: any DownloadEventNotifications) {
+            self.weakObject = object
+        }
+    }
+   
     lazy var downloadsSession: URLSession = {
         let configuration = URLSessionConfiguration.background(withIdentifier: "BackGroundSession")
         let downloadsSession = URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
@@ -67,55 +77,65 @@ class DownloadService: NSObject {
     
     private(set) var activeDownloads: DownloadsSession = [:]
     
-    func conform(vc: UIViewController, entity: DownloadProtocol) {
+    func addObserverDownloadEventNotifications(for object: DownloadEventNotifications) {
+        let weakObject = WeakObject(object: object)
+        delegates.append(weakObject)
+    }
+    
+    func isDownloaded(entity: InputDownloadProtocol) -> Bool {
+        return entity.downloadEntity.downloadUrl.isDownloaded
+    }
+    
+    func conform(entity: InputDownloadProtocol) {
         var entity = entity
 
         if let coreDataProtocol = entity as? (any CoreDataProtocol) {
-            if let entityFromCoreData = coreDataProtocol.getFromCoreData as? DownloadProtocol {
+            if let entityFromCoreData = dataStoreManagerInput.getFromCoreData(entity: coreDataProtocol.self) as? InputDownloadProtocol {
                 entity = entityFromCoreData
             }
         }
-        guard let url = entity.downloadUrl.url else { fatalError() }
+        guard let url = entity.downloadEntity.downloadUrl.url else { fatalError() }
         
         if var activeDownload = activeDownloads[url] {
-            let downloadState = activeDownload.downloadDataTask?.state
+            let downloadState = activeDownload.downloadDataTask.state
 
             switch downloadState {
             case .running:
-                suspendDownload(for: vc, &activeDownload)
-            case .canceling:
-                fatalError("interesting")
-            case .completed:
-                fatalError("interesting")
+                suspendDownload(&activeDownload)
             case .suspended:
-                continueDownload(for: vc, &activeDownload)
+                continueDownload(&activeDownload)
             default: break
             }
             activeDownloads[url] = activeDownload
         } else {
-            if entity.isDownloaded {
-                cancelDownload(for: vc, entity)
+            if isDownloaded(entity: entity) {
+                cancelDownload(entity)
             } else {
-                startDownload(vc: vc, entity)
+                startDownload(InputDownloadProtocol: entity)
             }
         }
     }
     
-    func cancelDownload(_ entity: DownloadProtocol) {
-        guard let url = entity.downloadUrl.localPath else { return }
+    func cancelDownload(_ entity: InputDownloadProtocol) {
+        guard let url = entity.downloadEntity.downloadUrl.localPath else { return }
         
         do {
             try FileManager.default.removeItem(atPath: url.path)
+            
         } catch {
             print(error)
         }
-        if let downloadServiceType = self.activeDownloads[url] {
-            downloadServiceType.downloadDataTask?.cancel()
+        if var downloadServiceType = self.activeDownloads[url] {
+            downloadServiceType.downloadDataTask.cancel()
             self.activeDownloads[url] = nil
-            self.delegate?.didRemoveEntity(self, entity: downloadServiceType)
+            delegates.forEach {
+                $0.weakObject?.didRemoveEntity(self, entity: downloadServiceType)
+            }
         } else {
-            let downloadServiceType = DownloadServiceType(downloadProtocol: entity)
-            self.delegate?.didRemoveEntity(self, entity: downloadServiceType)
+            let downloadServiceType = DownloadServiceType(inputDownloadProtocol: entity, downloadDataTask: downloadsSession.downloadTask(with: url))
+            delegates.forEach {
+                $0.weakObject?.didRemoveEntity(self, entity: downloadServiceType)
+            }
         }
     }
 }
@@ -123,57 +143,65 @@ class DownloadService: NSObject {
 //MARK: - Private Methods
 extension DownloadService {
 
-    private func startDownload(vc: UIViewController,_ downloadProtocol: DownloadProtocol) {
+    private func startDownload(InputDownloadProtocol: InputDownloadProtocol) {
         
-        if !NetworkMonitor.shared.isConnection {
-            Alert().create(for: vc, title: "No Internet") { _ in
-                [UIAlertAction(title: "Ok", style: .cancel) { _ in
-                    return
-                }]
-            }
-        } else if NetworkMonitor.shared.connectionType == .cellular {
-            Alert().create(for: vc, title: "Use Mobile intertnet for downLoad? ") { _ in
-                [ UIAlertAction(title: "No", style: .cancel) { _ in
-                    return
-                }, UIAlertAction(title: "Yes", style: .default) { _ in
-                }]
-            }
-        }
+//        if !networkMonitor.isConnection {
+//            Alert().create(for: vc, title: "No Internet") { _ in
+//                [UIAlertAction(title: "Ok", style: .cancel) { _ in
+//                    return
+//                }]
+//            }
+//        } else if networkMonitor.connectionType == .cellular {
+//            Alert().create(for: vc, title: "Use Mobile intertnet for downLoad? ") { _ in
+//                [ UIAlertAction(title: "No", style: .cancel) { _ in
+//                    return
+//                }, UIAlertAction(title: "Yes", style: .default) { _ in
+//                }]
+//            }
+//        }
         
-        guard let url = downloadProtocol.downloadUrl.url else { fatalError() }
+        guard let url = InputDownloadProtocol.downloadEntity.downloadUrl.url else { fatalError() }
 
         let downloadDataTask = downloadsSession.downloadTask(with: url)
         downloadDataTask.resume()
-        var downloadServiceType = DownloadServiceType(downloadProtocol: downloadProtocol, downloadDataTask: downloadDataTask)
+        var downloadServiceType = DownloadServiceType(inputDownloadProtocol: InputDownloadProtocol, downloadDataTask: downloadDataTask)
         downloadServiceType.isGoingDownload = true
         activeDownloads[url] = downloadServiceType
-        delegate?.didStartDownload(self, entity: downloadServiceType)
-    }
-    
-    private func continueDownload(for vc: UIViewController,_ downloadServiceType: inout DownloadServiceType) {
-        downloadServiceType.downloadDataTask?.resume()
-        downloadServiceType.isGoingDownload = true
-        delegate?.didContinueDownload(self, entity: downloadServiceType)
-    }
-    
-    private func suspendDownload(for vc: UIViewController, _ downloadServiceType: inout DownloadServiceType) {
-        downloadServiceType.downloadDataTask?.suspend()
-        downloadServiceType.isDownloading = false
-        delegate?.didPauseDownload(self, entity: downloadServiceType)
-    }
-    
-    private func cancelDownload(for vc: UIViewController,_ entity: DownloadProtocol) {
-        
-        Alert().create(for: vc, title: "Do you want remove podcast from your device?") {_ in
-            [UIAlertAction(title: "yes", style: .destructive) { [weak self] _ in
-                guard let self = self else { return }
-                self.cancelDownload(entity)
-            },
-             UIAlertAction(title: "Cancel", style: .cancel) {_ in
-                return
-            }]
+        delegates.forEach {
+            $0.weakObject?.didStartDownload(self, entity: downloadServiceType)
         }
     }
+    
+    private func continueDownload(_ downloadServiceType: inout DownloadServiceType) {
+        downloadServiceType.downloadDataTask.resume()
+        downloadServiceType.isGoingDownload = true
+        delegates.forEach {
+            $0.weakObject?.didContinueDownload(self, entity: downloadServiceType)
+        }
+    }
+    
+    private func suspendDownload(_ downloadServiceType: inout DownloadServiceType) {
+        downloadServiceType.downloadDataTask.suspend()
+        downloadServiceType.isDownloading = false
+        
+        delegates.forEach {
+            $0.weakObject?.didPauseDownload(self, entity: downloadServiceType)
+        }
+        
+    }
+    
+//    private func cancelDownload(_ entity: InputDownloadProtocol) {
+        
+//        Alert().create(for: vc, title: "Do you want remove podcast from your device?") {_ in
+//            [UIAlertAction(title: "yes", style: .destructive) { [weak self] _ in
+//                guard let self = self else { return }
+//                self.cancelDownload(entity)
+//            },
+//             UIAlertAction(title: "Cancel", style: .cancel) {_ in
+//                return
+//            }]
+//        }
+//    }
 }
 
 //MARK: - URLSessionDownloadDelegate
@@ -199,7 +227,9 @@ extension DownloadService: URLSessionDelegate, URLSessionDownloadDelegate {
         activeDownloads[url] = downloadServiceType
         
         DispatchQueue.main.async {
-            self.delegate?.updateDownloadInformation(self, entity: downloadServiceType)
+            self.delegates.forEach {
+             $0.weakObject?.updateDownloadInformation(self, entity: downloadServiceType)
+            }
         }
     }
     
@@ -226,9 +256,11 @@ extension DownloadService: URLSessionDelegate, URLSessionDownloadDelegate {
         activeDownloads[url] = nil
         
         downloadServiceType.isDownloading = false
-        
+        downloadServiceType.isDownloaded = true
         DispatchQueue.main.async {
-            self.delegate?.didEndDownloading(self, entity: downloadServiceType)
+            self.delegates.forEach {
+                $0.weakObject?.didEndDownloading(self, entity: downloadServiceType)
+            }
         }
     }
     

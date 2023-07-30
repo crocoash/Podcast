@@ -21,18 +21,61 @@ class RegistrationViewController: UIViewController {
     @IBOutlet private weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet private weak var backGroundView: UIView!
     
-    private(set) var userViewModel: UserViewModel!
+    private let userViewModel: UserViewModel
+    private let addToFavoriteManager: FavoriteManager
+    private let addToLikeManager: AddToLikeManager
+    private let firebaseDataBase: FirebaseDatabase
+    private let player: Player
+    private let apiService: ApiService
+    private let downloadService: DownloadService
+    private let dataStoreManagerInput: DataStoreManagerInput
     
-    lazy private var tabBarVC: TabBarViewController = {
-        let vc = TabBarViewController.loadFromStoryboard
-        vc.modalPresentationStyle = .custom
-        vc.setUserViewModel(userViewModel)
-        vc.transitioningDelegate = self
-        return vc
-    }()
+    lazy private var tabBarVc = TabBarViewController.create { [weak self] coder in
+        guard let self = self else { fatalError() }
+              
+        let tabBar = TabBarViewController( coder: coder,
+                                           userViewModel: userViewModel,
+                                           firestorageDatabase: FirestorageDatabase(),
+                                           player: player,
+                                           downloadService: downloadService,
+                                           addToFavoriteManager: addToFavoriteManager,
+                                           addToLikeManager: addToLikeManager,
+                                           firebaseDataBase: firebaseDataBase,
+                                           apiService: apiService,
+                                           dataStoreManagerInput: dataStoreManagerInput)
+        
+        guard let tabBar = tabBar else { fatalError() }
+        
+        tabBar.transitioningDelegate = self
+        tabBar.modalPresentationStyle = .custom
+        
+        return tabBar
+    }
     
-    func configure(userViewModel: UserViewModel) {
+    init?(coder: NSCoder,
+          userViewModel: UserViewModel,
+          addToFavoriteManager: FavoriteManager,
+          addToLikeManager: AddToLikeManager,
+          player: Player,
+          firebaseDataBase: FirebaseDatabase,
+          apiService: ApiService,
+          downloadService: DownloadService,
+          dataStoreManagerInput: DataStoreManagerInput) {
+        
         self.userViewModel = userViewModel
+        self.addToFavoriteManager = addToFavoriteManager
+        self.addToLikeManager = addToLikeManager
+        self.player = player
+        self.firebaseDataBase = firebaseDataBase
+        self.apiService = apiService
+        self.downloadService = downloadService
+        self.dataStoreManagerInput = dataStoreManagerInput
+        
+        super.init(coder: coder)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     // MARK: - View Methods
@@ -40,11 +83,9 @@ class RegistrationViewController: UIViewController {
         super.viewDidLoad()
         configureGestures()
         configureView()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
         
+        self.modalPresentationStyle = .custom
+        self.transitioningDelegate = self
     }
     
     //MARK: - Varibels
@@ -211,7 +252,7 @@ extension RegistrationViewController {
             }
         } else {
             userViewModel.changeUserName(newName: email)
-            present(tabBarVC, animated: true)
+            present(tabBarVc, animated: true)
         }
     }
     
@@ -311,11 +352,11 @@ extension RegistrationViewController: AlertDelegate {
 
 // MARK: - UIViewControllerTransitioningDelegate
 extension RegistrationViewController: UIViewControllerTransitioningDelegate {
-    
+
     func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         return PresentTransition()
     }
-    
+
     func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         return DismissTransition()
     }

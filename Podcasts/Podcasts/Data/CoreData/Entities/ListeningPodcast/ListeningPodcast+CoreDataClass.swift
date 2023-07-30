@@ -48,43 +48,29 @@ public class ListeningPodcast: NSManagedObject, Codable {
     
     ///init
     @discardableResult
-    convenience init(_ podcast: Podcast) {
+    convenience init(_ podcast: Podcast, viewContext: NSManagedObjectContext, dataStoreManagerInput: DataStoreManagerInput) {
         
-        self.init(entity: Self.entity(), insertInto: Self.viewContext)
+        self.init(entity: Self.entity(), insertInto: viewContext)
         
-        self.podcast    = podcast.getFromCoreDataIfNoSavedNew
+        self.podcast    = dataStoreManagerInput.getFromCoreDataIfNoSavedNew(entity: podcast)
         self.identifier = UUID().uuidString
         
-        mySave()
+        dataStoreManagerInput.mySave()
     }
     
     @discardableResult
-    required convenience init(_ listeningPodcast: ListeningPodcast) {
+    required convenience init(_ entity: ListeningPodcast, viewContext: NSManagedObjectContext?, dataStoreManagerInput: DataStoreManagerInput?) {
         
-        self.init(entity: Self.entity(), insertInto: Self.viewContext)
+        self.init(entity: Self.entity(), insertInto: viewContext)
         
-        self.currentTime = listeningPodcast.currentTime
-        self.duration    = listeningPodcast.duration
-        self.progress    = listeningPodcast.progress
-        self.podcast     = listeningPodcast.podcast.getFromCoreDataIfNoSavedNew
-        self.identifier  = listeningPodcast.identifier
+        self.currentTime = entity.currentTime
+        self.duration    = entity.duration
+        self.progress    = entity.progress
+        self.podcast     = dataStoreManagerInput?.getFromCoreDataIfNoSavedNew(entity: entity.podcast) ?? entity.podcast
+        self.identifier  = entity.identifier
+        
+        dataStoreManagerInput?.mySave()
     }
-    
-    @discardableResult
-    required convenience init(_ listeningPodcast: ListeningPodcast, viewContext: NSManagedObjectContext) {
-        
-        self.init(entity: Self.entity(), insertInto: Self.viewContext)
-        
-        self.currentTime = listeningPodcast.currentTime
-        self.duration    = listeningPodcast.duration
-        self.progress    = listeningPodcast.progress
-        self.podcast     = listeningPodcast.podcast.getFromCoreDataIfNoSavedNew
-        self.identifier  = listeningPodcast.identifier
-        
-        mySave()
-    }
-    
-    
 }
 
 //MARK: - CoreDataProtocol
@@ -92,3 +78,13 @@ extension ListeningPodcast: CoreDataProtocol { }
 
 //MARK: - FirebaseProtocol
 extension ListeningPodcast: FirebaseProtocol { }
+
+extension ListeningPodcast: ListeningPodcastCellProtocol {
+    
+    var podcastName: String? {
+        podcast.trackName
+    }
+    
+    var progressForCell: Float { return Float(progress) }
+    var imageForCell: String? { return podcast.image600 }
+}

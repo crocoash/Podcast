@@ -6,18 +6,10 @@
 //
 
 import UIKit
+import CoreData
 
 protocol DetailViewControllerDelegate: AnyObject {
-    func detailViewControllerPlayButtonDidTouchFor(_ detailViewController: DetailViewController, podcast: Podcast, playlist: [Podcast])
-    func detailViewControllerPlayStopButtonDidTouchInSmallPlayer(_ detailViewController: DetailViewController)
-    func detailViewControllerDidSwipeOnPlayer(_ detailViewController: DetailViewController)
-    func detailViewControllerStopButtonDidTouchFor(_ detailViewController: DetailViewController, podcast: Podcast)
-    func detailViewController(_ detailViewController: DetailViewController, addToFavoriteButtonDidTouchFor podcast: Podcast)
-    func detailViewController(_ detailViewController: DetailViewController, removeFromFavoriteButtonDidTouchFor selectedPodcast: Podcast)
-    func detailViewControllerDidSelectDownLoadImage(_ detailViewController: DetailViewController, entity: DownloadProtocol)
 }
-
-protocol DetailPlayable { }
 
 class DetailViewController: UIViewController {
     
@@ -46,60 +38,72 @@ class DetailViewController: UIViewController {
     @IBOutlet private weak var heightTableViewConstraint: NSLayoutConstraint!
     @IBOutlet private weak var bottomPlayerConstraint:NSLayoutConstraint!
 
-    
     //MARK: Variables
-    private(set) var podcast: Podcast!
-    private(set) var podcasts: [Podcast]! {
-        didSet {
-            if oldValue != nil {
-                setupView()
-            }
-        }
-    }
-
+    private(set) var podcast: Podcast
+    private(set) var podcasts: [Podcast]
+    
+    private var player: Player
+    private var downloadService: DownloadService
+    private var bigPlayerViewController: BigPlayerViewController?
+    private var addToLikeManager: AddToLikeManager
+    private var favoritePodcast: FavoriteManager
+    
     weak var delegate: DetailViewControllerDelegate?
+    
+    enum TypeSortOfTableView {
+        case byNewest
+        case byOldest
+        case byGenre
+    }
+    
+    lazy private var typeOfSort: TypeSortOfTableView = .byGenre
+
     
     //MARK: View Methods
     override func viewDidLoad() {
         super.viewDidLoad()
         configureGestures()
         setupView()
+        addObserverPlayerEventNotification()
+        addDownloadEventNotifications()
+        let height = getHeightOfTableView()
+        reloadTableViewHeightConstraint(newHeight: height)
     }
     
     //MARK: Public Methods
-    func setUp(podcast: Podcast, playlist: [Podcast]) {
+    init?<T: DetailViewControllerDelegate & UIViewControllerTransitioningDelegate>(
+        coder: NSCoder,
+        _ vc : T,
+        podcast: Podcast,
+        playlist: [Podcast],
+        player: Player,
+        downloadService: DownloadService,
+        addToLikeManager: AddToLikeManager,
+        addToFavoritePodcast: FavoriteManager
+    ) {
+      
         self.podcast = podcast
         self.podcasts = playlist
+        self.delegate = vc
+        self.player = player
+        self.downloadService = downloadService
+        self.addToLikeManager = addToLikeManager
+        self.favoritePodcast = addToFavoritePodcast
+        
+        super.init(coder: coder)
+        
+        modalPresentationStyle = .custom
+        self.transitioningDelegate = vc
     }
     
-    func updateConstraintForTableView(playerIsPresent: Bool) {
-        smallPlayerView.isHidden = !playerIsPresent
-        bottomPlayerConstraint.constant = playerIsPresent ? 50 : 0
-        view.layoutIfNeeded()
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
-    func setupView() {
-        episodeImage.image = nil
-        DataProvider.shared.downloadImage(string: podcast?.image600) { [weak self] image in
-            self?.episodeImage.image = image
-        }
-        smallPlayerView.delegate = self
-        episodeTableView.translatesAutoresizingMaskIntoConstraints = false
-        episodeTableView.configureEpisodeTableView(self, with: podcasts)
-    
-        episodeName        .text = podcast?.trackName
-        artistName         .text = podcast.artistName ?? "Artist Name"
-        genresLabel        .text = podcast?.genresString
-        descriptionTextView.text = podcast?.description
-        countryLabel       .text = podcast?.country
-        advisoryRatingLabel.text = podcast?.contentAdvisoryRating
-        dateLabel          .text = podcast?.releaseDateInformation.formattedDate(dateFormat: "d MMM YYY")
-        durationLabel      .text = podcast?.trackTimeMillis?.minute
-    }
-    
-    ///BigPlayer
-    func scrollToCell(id: String) {
-        let positionOfCell = episodeTableView.positionYOfCell(id: id)
+    //MARK: Public Methods
+    func scrollToCell(podcast: Podcast) {
+        guard let index = podcasts.firstIndex(matching: podcast) else { fatalError() }
+        let positionOfCell = episodeTableView.getYPositionYFor(indexPath: IndexPath(row: index, section: 1))
         let positionOfTableView = episodeTableView.frame.origin.y
         let position = positionOfTableView + positionOfCell
         scrollView.setContentOffset(CGPoint(x: .zero, y: position), animated: true)
@@ -112,19 +116,29 @@ class DetailViewController: UIViewController {
     }
     
     @IBAction private func refreshByGenre(_ sender: UICommand) {
-        episodeTableView.changeTypeOfSort(.byGenre)
+        episodeTableView.reloadData()
     }
     
     @IBAction private func refreshByNewest(_ sender: UICommand) {
-        episodeTableView.changeTypeOfSort(.byNewest)
+        episodeTableView.reloadData()
     }
     
     @IBAction private func refreshByOldest(_ sender: UICommand) {
-        episodeTableView.changeTypeOfSort(.byOldest)
+        episodeTableView.reloadData()
     }
     
     @IBAction private func shareButtonOnTouch(_ sender: UITapGestureRecognizer) {
         presentActivityViewController()
+    }
+    
+    //MARK: Actions
+    @objc func tapCell(sender: UITapGestureRecognizer) {
+        guard let cell = sender.view as? PodcastCell,
+              cell.moreThanThreeLines
+        else { return }
+        
+        cell.isSelected = !cell.isSelected
+        episodeTableView.openCell(cell)
     }
 }
 
@@ -146,96 +160,234 @@ extension DetailViewController {
         let text = "You should definitely listen to this!"
         
         let shareVC = UIActivityViewController(activityItems: [text, trackViewUrl, image], applicationActivities: [])
-    
+        
         if let popoverController = shareVC.popoverPresentationController {
             popoverController.sourceView = view
             popoverController.sourceRect = view.bounds
         }
         present(shareVC, animated: true)
     }
+    
+    private func presentSmallPlayer(with inputType: SmallPlayerPlayableProtocol) {
+        
+        if smallPlayerView.isHidden {
+                let model = SmallPlayerViewModel(inputType)
+                self.smallPlayerView.configure(with: model, player: player)
+                smallPlayerView.isHidden = false
+                bottomPlayerConstraint.constant = 50
+                view.layoutIfNeeded()
+        }
+    }
+    
+    private func presentBigPlayer(with track: BigPlayerPlayableProtocol) {
+        let bigPlayerViewController = BigPlayerViewController(self, player: player, track: track, addToLikeManager: addToLikeManager)
+        self.bigPlayerViewController = bigPlayerViewController
+        bigPlayerViewController.modalPresentationStyle = .fullScreen
+        self.present(bigPlayerViewController, animated: true)
+    }
+    
+    private func setupView() {
+        episodeImage.image = nil
+        DataProvider.shared.downloadImage(string: podcast.image600) { [weak self] image in
+            self?.episodeImage.image = image
+        }
+        smallPlayerView.delegate = self
+        episodeTableView.translatesAutoresizingMaskIntoConstraints = false
+        episodeTableView.configureEpisodeTableView(self)
+        
+        episodeName        .text = podcast.trackName
+        artistName         .text = podcast.artistName ?? "Artist Name"
+        genresLabel        .text = podcast.genresString
+        descriptionTextView.text = podcast.description
+        countryLabel       .text = podcast.country
+        advisoryRatingLabel.text = podcast.contentAdvisoryRating
+        dateLabel          .text = podcast.releaseDateInformation.formattedDate(dateFormat: "d MMM YYY")
+        durationLabel      .text = podcast.trackTimeMillis?.minute
+    }
+    
+    private func getPodcast(for indexPath: IndexPath) -> Podcast {
+        return podcasts[indexPath.row]
+    }
+    
+    private func getHeightOfTableView() -> CGFloat {
+        podcasts.count * episodeTableView.defaultRowHeight
+    }
 }
 
 //MARK: - EpisodeTableViewControllerMyDataSource
 extension DetailViewController: EpisodeTableViewMyDataSource {
-    
-    func episodeTableViewDidChangeHeightTableView(_ episodeTableView: EpisodeTableView, height: CGFloat, withLastCell: Bool) {
-        if withLastCell {
+//
+    func episodeTableViewDidChangeHeightTableView(_ episodeTableView: EpisodeTableView, height: CGFloat, with lastCell: Bool) {
+        if lastCell {
             UIView.animate(withDuration: 0.3) { [weak self] in
                 self?.reloadTableViewHeightConstraint(newHeight: height)
-                guard let self = self, let view = self.view else { return }
-                
-                let heightOfSmallPlayer = self.smallPlayerView.isHidden ? 0 : self.smallPlayerView.frame.height
+                guard let self = self, let view = view else { return }
+
+                let heightOfSmallPlayer = smallPlayerView.isHidden ? 0 : smallPlayerView.frame.height
                 let y = episodeTableView.frame.maxY - (view.bounds.height - view.safeAreaInsets.top - view.safeAreaInsets.bottom) + heightOfSmallPlayer
-                self.scrollView.setContentOffset(CGPoint(x: .zero, y: y), animated: true)
+                scrollView.setContentOffset(CGPoint(x: .zero, y: y), animated: true)
             }
         } else {
             UIView.animate(withDuration: 0.4) { [weak self] in
-                self?.reloadTableViewHeightConstraint(newHeight: height)
+                guard let self = self else { return }
+                reloadTableViewHeightConstraint(newHeight: height)
             }
         }
     }
 }
 
-//MARK: - EpisodeTableViewControllerDelegate
-extension DetailViewController: EpisodeTableViewDelegate {
-  
-    func episodeTableViewPlayButtonDidTouchFor(_ episodeTableView: EpisodeTableView, podcast: Podcast, playlist: [Podcast]) {
-        delegate?.detailViewControllerPlayButtonDidTouchFor(self, podcast: podcast, playlist: playlist)
+//MARK: - UITableViewDataSource
+extension DetailViewController: UITableViewDataSource {
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 1
     }
     
-    func episodeTableViewStopButtonDidTouchFor(_ episodeTableView: EpisodeTableView) {
-        delegate?.detailViewControllerPlayStopButtonDidTouchInSmallPlayer(self)
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return podcasts.count
     }
+
+//    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+//        return headers[section]
+//    }
     
-    func episodeTableView(_ episodeTableView: EpisodeTableView, addToFavoriteButtonDidTouchFor podcast: Podcast) {
-        delegate?.detailViewController(self, addToFavoriteButtonDidTouchFor: podcast)
-        addToast(title: podcast.isFavorite ? "added" : "removed", smallPlayerView.isHidden ? .bottom : .bottomWithPlayer)
-    }
-    
-    func episodeTableView(_ episodeTableView: EpisodeTableView, removeFromFavoriteButtonDidTouchFor selectedPodcast: Podcast) {
-        delegate?.detailViewController(self, removeFromFavoriteButtonDidTouchFor: selectedPodcast)
-    }
-    
-    func episodeTableViewDidSelectDownLoadImage(_ episodeTableView: EpisodeTableView, entity: DownloadProtocol) {
-        delegate?.detailViewControllerDidSelectDownLoadImage(self, entity: entity)
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.getCell(cell: PodcastCell.self, indexPath: indexPath)
+        let podcast = getPodcast(for: indexPath)
+
+//        cell.isSelected = episodeTableView.selectedCellAndHisHeight[indexPath] != nil
+        cell.addMyGestureRecognizer(self, type: .tap(), #selector(tapCell))
+        
+        let isFavorite = favoritePodcast.isFavorite(podcast)
+        let isDownloaded = downloadService.isDownloaded(entity: podcast)
+        cell.configureCell(self, with: podcast, isFavorite: isFavorite, isDownloaded: isDownloaded)
+        
+        return cell
     }
 }
+
 
 //MARK: - SmallPlayerViewControllerDelegate
 extension DetailViewController: SmallPlayerViewControllerDelegate {
     
     func smallPlayerViewControllerSwipeOrTouch(_ smallPlayerViewController: SmallPlayerView) {
-        delegate?.detailViewControllerDidSwipeOnPlayer(self)
-    }
-    
-    func smallPlayerViewControllerDidTouchPlayStopButton(_ smallPlayerViewController: SmallPlayerView) {
-        delegate?.detailViewControllerPlayStopButtonDidTouchInSmallPlayer(self)
+        guard let track = player.currentTrack?.track else { return }
+        presentBigPlayer(with: track)
     }
 }
 
-extension DetailViewController: DownloadServiceDelegate {
+//MARK: - DownloadServiceDelegate
+extension DetailViewController: DownloadEventNotifications {
+    
+    func addDownloadEventNotifications() {
+        downloadService.addObserverDownloadEventNotifications(for: self)
+    }
     
     func updateDownloadInformation(_ downloadService: DownloadService, entity: DownloadServiceType) {
-        episodeTableView?.updateDownloadInformation(downloadService, entity: entity)
+        episodeTableView.update(with: entity)
     }
     
     func didEndDownloading(_ downloadService: DownloadService, entity: DownloadServiceType) {
-        episodeTableView?.didEndDownloading(downloadService, entity: entity)
+        episodeTableView.update(with: entity)
     }
     
     func didPauseDownload(_ downloadService: DownloadService, entity: DownloadServiceType) {
-        episodeTableView?.didPauseDownload(downloadService, entity: entity)
+        episodeTableView.update(with: entity)
     }
     
     func didContinueDownload(_ downloadService: DownloadService, entity: DownloadServiceType) {
-        episodeTableView?.didContinueDownload(downloadService, entity: entity)
+        episodeTableView.update(with: entity)
     }
     
     func didStartDownload(_ downloadService: DownloadService, entity: DownloadServiceType) {
-        episodeTableView?.didStartDownload(downloadService, entity: entity)
+        episodeTableView.update(with: entity)
     }
     
     func didRemoveEntity(_ downloadService: DownloadService, entity: DownloadServiceType) {
-        episodeTableView?.didRemoveEntity(downloadService, entity: entity)
+        episodeTableView.update(with: entity)
+    }
+}
+
+//MARK: - BigPlayerViewControllerDelegate
+extension DetailViewController: BigPlayerViewControllerDelegate {
+    
+    func bigPlayerViewControllerDidTouchPodcastNameLabel(_ bigPlayerViewController: BigPlayerViewController, entity: NSManagedObject) {
+        bigPlayerViewController.dismiss(animated: true, completion: { [weak self] in
+            guard let self = self else { return }
+            
+        })
+    }
+}
+
+//MARK: - PlayerEventNotification
+extension DetailViewController: PlayerEventNotification {
+    
+    func addObserverPlayerEventNotification() {
+        player.addObserverPlayerEventNotification(for: self)
+    }
+    
+    func playerDidEndPlay(with track: OutputPlayerProtocol) {
+        episodeTableView.update(with: track)
+    }
+    
+    func playerStartLoading(with track: OutputPlayerProtocol) {
+        presentSmallPlayer(with: track)
+        episodeTableView.update(with: track)
+    }
+    
+    func playerDidEndLoading(with track: OutputPlayerProtocol) {
+        episodeTableView.update(with: track)
+    }
+    
+    func playerUpdatePlayingInformation(with track: OutputPlayerProtocol) {
+        presentSmallPlayer(with: track)
+        episodeTableView.update(with: track)
+    }
+    
+    func playerStateDidChanged(with track: OutputPlayerProtocol) {
+        episodeTableView.update(with: track)
+    }
+}
+
+
+//MARK: - PodcastCellDelegate
+extension DetailViewController: PodcastCellDelegate {
+
+    func podcastCellDidSelectStar(_ podcastCell: PodcastCell) {
+        guard let indexPath = episodeTableView.indexPath(for: podcastCell) else { return }
+        let podcast = getPodcast(for: indexPath)
+        favoritePodcast.addOrRemoveFavoritePodcast(entity: podcast)
+        episodeTableView.reloadRows(at: [indexPath], with: .automatic)
+    }
+    
+    func podcastCellDidSelectDownLoadImage(_ podcastCell: PodcastCell) {
+        guard let indexPath = episodeTableView.indexPath(for: podcastCell) else { return }
+        let podcast = getPodcast(for: indexPath)
+        downloadService.conform(entity: podcast)
+    }
+    
+    func podcastCellDidTouchPlayButton(_ podcastCell: PodcastCell) {
+        guard let indexPath = episodeTableView.indexPath(for: podcastCell) else { return }
+        let podcast = getPodcast(for: indexPath)
+        player.conform(entity: podcast, entities: podcasts)
+    }
+    
+    func podcastCellDidTouchStopButton(_ podcastCell: PodcastCell) {
+        player.playOrPause()
+    }
+}
+
+//MARK: - UITableViewDelegate
+extension DetailViewController: UITableViewDelegate {
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        
+        if let cell = episodeTableView.cellForRow(at: indexPath), cell.isSelected {
+            if let cell = cell as? PodcastCell, cell.moreThanThreeLines {
+                return UITableView.automaticDimension
+            }
+        }
+        
+        return episodeTableView.defaultRowHeight
     }
 }

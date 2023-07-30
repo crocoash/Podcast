@@ -9,7 +9,6 @@
 import UIKit
 import CoreData
 
-
 public class FavoritePodcast: NSManagedObject, Codable {
     
     private enum CodingKeys: String, CodingKey {
@@ -25,9 +24,9 @@ public class FavoritePodcast: NSManagedObject, Codable {
         
         let values = try decoder.container(keyedBy: CodingKeys.self)
         
-        podcast = try values.decode(Podcast.self, forKey: .podcast)
-        date = try values.decode(Date.self, forKey: .date)
-        identifier = try values.decode(String.self, forKey: .identifier)
+        self.podcast = try values.decode(Podcast.self, forKey: .podcast)
+        self.date = try values.decode(Date.self, forKey: .date)
+        self.identifier = try values.decode(String.self, forKey: .identifier)
     }
     
     //MARK: encode
@@ -40,109 +39,68 @@ public class FavoritePodcast: NSManagedObject, Codable {
     }
     
     @discardableResult
-    convenience init(podcast: Podcast) {
-        self.init(entity: Self.entity(), insertInto: Self.viewContext)
-        print("print init podcast")
+    required convenience init(_ entity: Podcast, viewContext: NSManagedObjectContext?, dataStoreManagerInput: DataStoreManagerInput?) {
+            
+       self.init(entity: Self.entity(), insertInto: viewContext)
+        
         self.date = Date()
-        self.podcast = podcast.getFromCoreDataIfNoSavedNew
+        self.podcast = dataStoreManagerInput?.getFromCoreDataIfNoSavedNew(entity: entity) ?? entity
         self.identifier = UUID().uuidString
         
-        mySave()
-    }
-
-    ///init to viewContext
-    @discardableResult
-    required convenience init(_ favoritePodcast: FavoritePodcast) {
-        
-        self.init(entity: Self.entity(), insertInto: Self.viewContext)
-        
-        self.date = favoritePodcast.date
-        self.podcast = favoritePodcast.podcast.getFromCoreDataIfNoSavedNew
-        self.identifier = favoritePodcast.identifier
+        dataStoreManagerInput?.mySave()
     }
     
-    ///init to viewContext
-    @discardableResult
-    required convenience init(_ favoritePodcast: FavoritePodcast, viewContext: NSManagedObjectContext) {
-        
+    required convenience init(_ entity: FavoritePodcast, viewContext: NSManagedObjectContext?, dataStoreManagerInput: DataStoreManagerInput?) {
+            
         self.init(entity: Self.entity(), insertInto: viewContext)
         
-            self.date = favoritePodcast.date
-            self.podcast = favoritePodcast.podcast.getFromCoreDataIfNoSavedNew
-            self.identifier = favoritePodcast.identifier
+        self.date = Date()
+        self.podcast = dataStoreManagerInput?.getFromCoreDataIfNoSavedNew(entity: entity.podcast) ?? entity.podcast
+        self.identifier = UUID().uuidString
         
-        mySave()
+        dataStoreManagerInput?.mySave()
     }
 }
 
 //MARK: - CoreDataProtocol
 extension FavoritePodcast: CoreDataProtocol { }
 
-extension FavoritePodcast {
-    
-    static func fetchResultController(
-        sortDescription: [NSSortDescriptor] = [NSSortDescriptor(key: #keyPath(podcast.trackName),ascending: true)],
-        predicates: [NSPredicate]? = nil,
-        sectionNameKeyPath: String? = nil,
-        fetchLimit: Int? = nil
-    ) -> NSFetchedResultsController<FavoritePodcast> {
-        
-        let fetchRequest: NSFetchRequest<FavoritePodcast> = FavoritePodcast.fetchRequest()
-        
-        
-        if let predicates = predicates {
-            for predicate in predicates {
-                fetchRequest.predicate = predicate
-            }
-        }
-        
-        fetchRequest.fetchLimit = fetchLimit ?? Int.max
-//        fetchRequest.fetchLimit = 3
-        fetchRequest.returnsObjectsAsFaults = false
-        fetchRequest.sortDescriptors = sortDescription
-        let fetchResultController = NSFetchedResultsController(
-            fetchRequest: fetchRequest,
-            managedObjectContext: viewContext,
-            sectionNameKeyPath: sectionNameKeyPath,
-            cacheName: nil
-        )
-        
-        do {
-            try fetchResultController.performFetch()
-        } catch {
-            let nserror = error as NSError
-            fatalError("Unresolved error \(error), \(nserror.userInfo)")
-        }
-        return fetchResultController
-    }
-    
-    static func getObject(by indexPath: IndexPath) -> FavoritePodcast {
-        return fetchResultController().object(at: indexPath)
-    }
-    
-//    static func getIndexPath(identifier: String) -> IndexPath? {
-//        let fetchRequest = FavoritePodcast.fetchRequest()
-//        let predicate = NSPredicate(format: "podcast.identifier == %@", identifier)
-//        fetchRequest.predicate = predicate
-//        fetchRequest.fetchLimit = 1
-//        
-//        if let favoritePodcast = try? viewContext.fetch(fetchRequest).first {
-//            return favoritePodcast.getIndexPath
-//        }
-//        return nil
-//    }
-    
-//    //TODO: - check
-//    var getIndexPath: IndexPath? {
-//        return Self.fetchResultController().indexPath(forObject: self)
-//    }
-}
-
 //MARK: - FirebaseProtocol
 extension FavoritePodcast: FirebaseProtocol { }
 
-//extension FavoritePodcast: DownloadProtocol {
-//    var downloadUrl: String? {
-//        podcast.downloadUrl
-//    }
-//}
+//MARK: - InputFavoriteType
+extension FavoritePodcast: InputFavoriteType {
+    
+    var favoriteInputTypeIdentifier: String {
+        return podcast.identifier
+    }
+}
+
+//MARK: - InputPodcastCell
+extension FavoritePodcast: InputPodcastCell {
+    
+    var inputPodcastCell: PodcastCellProtocol {
+        return podcast
+    }
+}
+
+//MARK: - InputDownloadProtocol
+extension FavoritePodcast: InputDownloadProtocol {
+    
+    var downloadEntity: DownloadProtocol {
+        return podcast
+    }
+}
+
+//MARK: - InputTrackProtocol
+extension FavoritePodcast: InputTrackProtocol {
+    
+    var track: TrackProtocol {
+        return podcast
+    }
+}
+
+//MARK: - InputListeningManager
+extension FavoritePodcast: InputListeningManager {
+    
+}

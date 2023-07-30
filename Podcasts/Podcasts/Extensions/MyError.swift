@@ -12,6 +12,7 @@ enum Result<T> {
     case failure(MyError)
 }
 
+
 enum MyError {
     
     case apiService(ApiService)
@@ -110,7 +111,7 @@ enum MyError {
             
             switch self {
             case .NSNull:
-                Alert().create(for: vc, title: "FirebaseDatabase error", message: "No Internet") { _ in
+                Alert().create(for: vc, title: "FirebaseDatabase error", message: "NSNull") { _ in
                     [UIAlertAction(title: "Ok", style: .cancel) { _ in
                         completion?()
                     }]

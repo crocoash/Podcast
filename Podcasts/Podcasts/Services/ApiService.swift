@@ -10,14 +10,20 @@ import UIKit
 import CoreData
 
 class ApiService {
+   
+    private var viewContext: NSManagedObjectContext
     
-    static func getData<T: Decodable>(for request: String, completion: @escaping (Result<T>) -> Void) {
+    init(viewContext: NSManagedObjectContext) {
+        self.viewContext = viewContext
+    }
+    
+    func getData<T: Decodable>(for request: String, completion: @escaping (Result<T>) -> Void) {
         
         guard let url = URL(string: request.encodeUrl) else { fatalError() }
-        
-        let viewContext = DataStoreManager.shared.viewContext
-        
-        URLSession.shared.dataTask(with: url) { data, response, error in
+                
+        URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
+            
+            guard let self = self else { return }
             
             var result: Result<T>
 
@@ -55,5 +61,3 @@ class ApiService {
         }.resume()
     }
 }
-
-

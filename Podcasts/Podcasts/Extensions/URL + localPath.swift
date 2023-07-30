@@ -19,6 +19,7 @@ extension URL {
 }
 
 extension Optional where Wrapped == URL {
+    
     var isDownload: Bool {
         if let self = self {
             return self.isDownLoad

@@ -41,61 +41,27 @@ public class LikedMoment: NSManagedObject, Codable {
     //MARK: init
     
     @discardableResult
-    convenience init(podcast: Podcast, moment: Double) {
-        self.init(entity: Self.entity(), insertInto: Self.viewContext)
+    convenience init(podcast: Podcast, moment: Double, viewContext: NSManagedObjectContext?, dataStoreManagerInput: DataStoreManagerInput?) {
+        
+        self.init(entity: Self.entity(), insertInto: viewContext)
         
         self.moment     = moment
-        self.podcast    = podcast.getFromCoreDataIfNoSavedNew
+        self.podcast    = dataStoreManagerInput?.getFromCoreDataIfNoSavedNew(entity: podcast) ?? podcast
         self.identifier = UUID().uuidString
         
-        mySave()
+        dataStoreManagerInput?.mySave()
     }
     
     @discardableResult
-    required convenience init(_ likedMoment: LikedMoment) {
+    required convenience init(_ likedMoment: LikedMoment, viewContext: NSManagedObjectContext?, dataStoreManagerInput: DataStoreManagerInput?) {
         
-        self.init(entity: Self.entity(), insertInto: Self.viewContext)
+        self.init(entity: Self.entity(), insertInto: viewContext)
         
         self.moment     = likedMoment.moment
         self.podcast    = likedMoment.podcast
         self.identifier = likedMoment.identifier
-    }
-    
-    @discardableResult
-    required convenience init(_ likedMoment: LikedMoment, viewContext: NSManagedObjectContext) {
         
-        self.init(entity: Self.entity(), insertInto: Self.viewContext)
-        
-        self.moment = likedMoment.moment
-        self.podcast = likedMoment.podcast
-        
-        mySave()
-    }
-    
-     static func likedMomentFRC(sortDescription: [NSSortDescriptor] = [NSSortDescriptor(key: #keyPath(moment), ascending: true)], predicates: [NSPredicate]? = nil, sectionNameKeyPath: String? = nil) -> NSFetchedResultsController<LikedMoment> {
-        let fetchRequest: NSFetchRequest<LikedMoment> = LikedMoment.fetchRequest()
-        
-        if let predicates = predicates {
-            for predicate in predicates {
-                fetchRequest.predicate = predicate
-            }
-        }
-        
-        fetchRequest.sortDescriptors = sortDescription
-        let fetchResultController = NSFetchedResultsController(
-            fetchRequest: fetchRequest,
-            managedObjectContext: viewContext,
-            sectionNameKeyPath: sectionNameKeyPath,
-            cacheName: nil
-        )
-        
-        do {
-            try fetchResultController.performFetch()
-        } catch {
-            let nserror = error as NSError
-            fatalError("Unresolved error \(error), \(nserror.userInfo)")
-        }
-        return fetchResultController
+        dataStoreManagerInput?.mySave()
     }
 }
 

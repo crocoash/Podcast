@@ -31,7 +31,7 @@
         <attribute name="duration" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="identifier" attributeType="String"/>
         <attribute name="progress" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
-        <relationship name="podcast" maxCount="1" deletionRule="Deny" destinationEntity="Podcast" inverseName="listeningPodcast" inverseEntity="Podcast"/>
+        <relationship name="podcast" maxCount="1" deletionRule="Nullify" destinationEntity="Podcast" inverseName="listeningPodcast" inverseEntity="Podcast"/>
     </entity>
     <entity name="Podcast" representedClassName=".Podcast" syncable="YES">
         <attribute name="artistName" optional="YES" attributeType="String"/>

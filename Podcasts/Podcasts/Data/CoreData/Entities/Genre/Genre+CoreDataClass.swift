@@ -37,27 +37,24 @@ public class Genre: NSManagedObject, Codable {
     }
     
     //MARK: init
-
-    convenience init(identifier: String, name: String?, viewContext: NSManagedObjectContext? = viewContext) {
+    convenience init(identifier: String, name: String?, viewContext: NSManagedObjectContext?, dataStoreManagerInput: DataStoreManagerInput? = nil) {
         
         self.init(entity: Self.entity(), insertInto: viewContext)
         
         self.identifier = identifier
         self.name = name
         
-        if viewContext != nil {
-            mySave()
-        }
+        dataStoreManagerInput?.mySave()
     }
     
-    /// to viewContext
-    required convenience init(_ genre: Genre) {
+    //TODO: <---
+    required convenience init(_ entity: Genre, viewContext: NSManagedObjectContext?, dataStoreManagerInput: DataStoreManagerInput?) {
         
-        self.init(entity: Self.entity(), insertInto: Self.viewContext)
-        self.identifier = genre.identifier
+        self.init(entity: Self.entity(), insertInto: viewContext)
+        self.identifier = entity.identifier
         
-        self.name = genre.name
-        self.podcasts = genre.podcasts
+        self.name = entity.name
+        self.podcasts = entity.podcasts /// <-------
     }
 }
 

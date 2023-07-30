@@ -11,6 +11,10 @@ import UIKit
     func searchCollectionView(_ searchCollectionView: SearchCollectionView, podcast: Podcast)
 }
 
+typealias PlaylistByNewest  = [(key: String, podcasts: [Podcast])]
+typealias PlayListByOldest = PlaylistByNewest
+typealias PlayListByGenre = PlaylistByNewest
+
 class SearchCollectionView: UICollectionView {
     
     weak var myDelegate: SearchCollectionViewDelegate?
@@ -89,11 +93,10 @@ class SearchCollectionView: UICollectionView {
     func reloadData1() {
         
         snapShot = NSDiffableDataSourceSnapshot<String, Item>()
-        let items = playlist.map { (key: $0.key,items: $0.podcasts.map { Item(podcast: $0)})}
        
-        for item in items {
-            snapShot.appendSections([item.key])
-            snapShot.appendItems(item.items)
+        for list in playlist {
+            snapShot.appendSections([list.key])
+            snapShot.appendItems(list.podcasts.map { Item(podcast: $0)})
         }
 //
         self.diffableDataSource.apply(snapShot ,animatingDifferences: false)

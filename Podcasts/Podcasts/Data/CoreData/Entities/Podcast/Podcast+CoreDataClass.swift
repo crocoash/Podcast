@@ -142,49 +142,41 @@ public class Podcast: NSManagedObject, Codable {
     
     //MARK: init
     @discardableResult
-    required convenience init(_ podcast: Podcast) {
-        
-        self.init(entity: Self.entity(), insertInto: Self.viewContext)
+    required convenience init(_ entity: Podcast, viewContext: NSManagedObjectContext?, dataStoreManagerInput: DataStoreManagerInput?) {
 
-        self.previewUrl =            podcast.previewUrl
-        self.episodeFileExtension =  podcast.episodeFileExtension
-        self.artworkUrl160 =         podcast.artworkUrl160
-        self.episodeContentType =    podcast.episodeContentType
-        self.artworkUrl600 =         podcast.artworkUrl600
-        self.artworkUrl60 =          podcast.artworkUrl60
-        self.contentAdvisoryRating = podcast.contentAdvisoryRating
-        self.trackViewUrl =          podcast.trackViewUrl
-        self.trackTimeMillis =       podcast.trackTimeMillis
-        self.collectionViewUrl =     podcast.collectionViewUrl
-        self.episodeUrl =            podcast.episodeUrl
-        self.collectionId =          podcast.collectionId
-        self.collectionName =        podcast.collectionName
-        self.identifier =            podcast.identifier
+        self.init(entity: Self.entity(), insertInto: viewContext)
+
+        self.previewUrl =            entity.previewUrl
+        self.episodeFileExtension =  entity.episodeFileExtension
+        self.artworkUrl160 =         entity.artworkUrl160
+        self.episodeContentType =    entity.episodeContentType
+        self.artworkUrl600 =         entity.artworkUrl600
+        self.artworkUrl60 =          entity.artworkUrl60
+        self.contentAdvisoryRating = entity.contentAdvisoryRating
+        self.trackViewUrl =          entity.trackViewUrl
+        self.trackTimeMillis =       entity.trackTimeMillis
+        self.collectionViewUrl =     entity.collectionViewUrl
+        self.episodeUrl =            entity.episodeUrl
+        self.collectionId =          entity.collectionId
+        self.collectionName =        entity.collectionName
+        self.identifier =            entity.identifier
         
-        if let genres = podcast.genres?.allObjects as? [Genre] {
-            self.genres = NSSet(array: genres.compactMap { $0.getFromCoreDataIfNoSavedNew } ) as NSSet
+        if let genres = entity.genres?.allObjects as? [Genre] {
+            self.genres = NSSet(array: genres.compactMap { dataStoreManagerInput?.getFromCoreDataIfNoSavedNew(entity: $0) } ) as NSSet
         }
         
-        self.trackName =          podcast.trackName
-        self.releaseDate =        podcast.releaseDate
-        self.shortDescriptionMy = podcast.shortDescriptionMy
-        self.feedUrl =            podcast.feedUrl
-        self.closedCaptioning =   podcast.closedCaptioning
-        self.country =            podcast.country
-        self.descriptionMy =      podcast.descriptionMy
-        self.episodeGuid =        podcast.episodeGuid
-        self.kind =               podcast.kind
-        self.wrapperType =        podcast.wrapperType
-        self.artistName =         podcast.artistName
-        self.trackCount =         podcast.trackCount
-        
-//        self.favoritePodcast  = getFavoritePodcast
-//        self.listeningPodcast = getListeningPodcast
-//
-//        if let likedMoment = getLikedMoment {
-//            self.likedMoment = NSSet(array: likedMoment)
-//        }
-        
+        self.trackName =          entity.trackName
+        self.releaseDate =        entity.releaseDate
+        self.shortDescriptionMy = entity.shortDescriptionMy
+        self.feedUrl =            entity.feedUrl
+        self.closedCaptioning =   entity.closedCaptioning
+        self.country =            entity.country
+        self.descriptionMy =      entity.descriptionMy
+        self.episodeGuid =        entity.episodeGuid
+        self.kind =               entity.kind
+        self.wrapperType =        entity.wrapperType
+        self.artistName =         entity.artistName
+        self.trackCount =         entity.trackCount
     }
 }
 
@@ -192,42 +184,33 @@ public class Podcast: NSManagedObject, Codable {
 extension Podcast: CoreDataProtocol { }
 
 //MARK: - InputPlayerProtocol
-extension Podcast: InputPlayerProtocol {
+extension Podcast: InputTrackProtocol, TrackProtocol {
+    
+    var track: TrackProtocol {
+        return self
+    }
+    
+    var trackIdentifier: String {
+        return identifier
+    }
+    
+    var imageForBigPlayer: String? { image600 }
+    var imageForSmallPlayer: String? { image60 }
+    var imageForMpPlayer: String? { image160 }
 
-    var genresString: String? {  genres?.allObjects.reduce(into: "") { $0 += (($1 as? Genre)?.name ?? "") + ", " }  }
+    var genresString: String? { genres?.allObjects.reduce(into: "") { $0 += (($1 as? Genre)?.name ?? "") + ", " }  }
     var trackTimeMillisString: String? { trackTimeMillis?.minute }
   
     var currentTime: Float? {
-        get {
-            getListeningPodcast?.currentTime
-        }
-        set {
-            let listeningPodcast = getOrCreateListeningPodcast
-            listeningPodcast.currentTime = newValue ?? 0
-            mySave()
-        }
+        return listeningPodcast?.currentTime
     }
     
     var listeningProgress: Double? {
-        get {
-            getListeningPodcast?.progress
-        }
-        set {
-            let listeningPodcast = getOrCreateListeningPodcast
-            listeningPodcast.progress = newValue ?? 0
-            mySave()
-        }
+        return listeningPodcast?.progress
     }
     
     var duration: Double? {
-        get {
-            getListeningPodcast?.duration
-        }
-        set {
-            let listeningPodcast = getOrCreateListeningPodcast
-            listeningPodcast.duration = newValue ?? 0
-            mySave()
-        }
+        return 0
     }
     
     var url: URL? { episodeUrl.url }
@@ -237,7 +220,15 @@ extension Podcast: InputPlayerProtocol {
 }
 
 //MARK: - DownloadServiceProtocol
-extension Podcast: DownloadProtocol {
+extension Podcast: DownloadProtocol, InputDownloadProtocol {
+    
+    var downloadEntity: DownloadProtocol {
+        return self
+    }
+    
+    var downloadEntityIdentifier: String {
+        return identifier
+    }
    
     var downloadUrl: String? {
         return episodeUrl
@@ -246,8 +237,6 @@ extension Podcast: DownloadProtocol {
 
 //MARK: - Common
 extension Podcast {
-    
-    var isFavorite: Bool { getFavoritePodcast != nil }
     
     var releaseDateInformation: Date {
         guard let releaseDate = releaseDate else { return Date() }
@@ -259,31 +248,6 @@ extension Podcast {
     
     func formattedDate(dateFormat: String) -> String {
         releaseDateInformation.formattedDate(dateFormat: dateFormat)
-    }
-    
-    /// ListeningPodcast
-    private var getOrCreateListeningPodcast: ListeningPodcast {
-        let predicate = NSPredicate(format: "podcast.identifier == %@", "\(identifier)")
-        let listeningPodcast = ListeningPodcast.fetchObject(predicates: [predicate])
-        return listeningPodcast ?? ListeningPodcast(self)
-    }
-    
-    /// Favorite
-    
-    
-    var getFavoritePodcast: FavoritePodcast? {
-        let predicate = NSPredicate(format: "podcast.identifier == %@", "\(identifier)")
-        return FavoritePodcast.fetchObject(predicates: [predicate])
-    }
-    
-    var getListeningPodcast: ListeningPodcast? {
-        let predicate = NSPredicate(format: "podcast.identifier == %@", "\(identifier)")
-        return ListeningPodcast.fetchObject(predicates: [predicate])
-    }
-    
-    var getLikedMoment: [LikedMoment]? {
-        let predicate = NSPredicate(format: "podcast.identifier == %@", "\(identifier)")
-        return LikedMoment.fetchObjects(predicates: [predicate])
     }
 }
 
@@ -318,12 +282,12 @@ extension Collection where Element: Podcast {
         
     }
     
-    var sortPodcastsByNewest: PlaylistByNewest {
+    var sortPodcastsByNewest: [(key: String, podcasts: [Podcast])] {
         let array = self.sorted { $0.releaseDateInformation > $1.releaseDateInformation }
         return array.conform
     }
     
-    var sortPodcastsByOldest: PlayListByOldest {
+    var sortPodcastsByOldest: [(key: String, podcasts: [Podcast])] {
         let array = self.sorted { $0.releaseDateInformation < $1.releaseDateInformation }
         return array.conform
     }
@@ -348,6 +312,7 @@ extension Collection where Element: Podcast {
 
 //MARK: - SearchCollectionViewCellType
 extension Podcast: SearchCollectionViewCellType {
+    
     var mainImageForSearchCollectionViewCell: String? {
         return image600
     }
@@ -355,6 +320,7 @@ extension Podcast: SearchCollectionViewCellType {
 
 //MARK: - FavoritePodcastTableViewCellType
 extension Podcast: LikedPodcastTableViewCellType {
+    
     var mainImageForFavoritePodcastTableViewCellType: String? {
         return artworkUrl600
     }
@@ -364,83 +330,37 @@ extension Podcast: LikedPodcastTableViewCellType {
     }
 }
 
-typealias PlaylistByNewest  = [(key: String, podcasts: [Podcast])]
-typealias PlayListByOldest = PlaylistByNewest
-typealias PlayListByGenre = PlaylistByNewest
-
-
-//MARK: - extension Collection
-extension Collection where Element == (key: String, podcasts: [Podcast]) {
+//MARK: - PodcastCell
+extension Podcast: PodcastCellProtocol, InputPodcastCell {
     
-    var countOfValues: Int {
-        return self.reduce(0,{ $0 + $1.podcasts.count })
+    var inputPodcastCell: PodcastCellProtocol {
+        return self
     }
     
-    func getIndexPath(for podcast: Podcast) -> [IndexPath] {
-        return getIndexPaths(for: podcast.identifier)
+    var isFavorite: Bool {
+        return favoritePodcast != nil
     }
     
-    func getIndexPaths(for identifier: String) -> [IndexPath] {
-        var arrayOfIndexPath: [IndexPath] = []
-        for (section, values) in self.enumerated() {
-            for (row,podcast) in values.podcasts.enumerated() {
-                if podcast.identifier == identifier {
-                    let indexPath = IndexPath(row: row, section: section)
-                    arrayOfIndexPath.append(indexPath)
-                }
-                
-            }
-        }
-        return arrayOfIndexPath
+    var trackDuration: String? { return trackTimeMillis?.minute }
+    
+    var dateDuration: String {
+        return formattedDate(dateFormat: "d MMM YYY")
     }
     
-    func getPodcast(for indexPath: IndexPath) -> Podcast {
-        return self[indexPath.section as! Self.Index].podcasts[indexPath.row]
-    }
-    
-    
+    var imageForPodcastCell: String? { return image600 }
 }
 
-extension LikedMoment: InputPlayerProtocol {
+//MARK: - InputFavoriteType
+extension Podcast: InputFavoriteType {
     
-    var currentTime: Float? {
-        get {
-            return Float(moment)
-        }
-        set {
-            
-        }
+    var favoriteInputTypeIdentifier: String {
+        return downloadEntityIdentifier
     }
+}
+
+extension Podcast: InputListeningManager {
     
-    var listeningProgress: Double? {
-        get {
-            return podcast.listeningProgress
-        }
-        set {
-            
-        }
+    var podcast: Podcast {
+        return self
     }
-    
-    var duration: Double? {
-        get {
-            return podcast.duration
-        }
-        
-        set {
-        }
-    }
-    
-    
-    var url: URL? { podcast.url }
-    var image600: String? { podcast.image600 }
-    var image160: String? { podcast.image160 }
-    var image60: String? { podcast.image60 }
-    var trackName: String? { podcast.trackName }
-    var descriptionMy: String? { podcast.descriptionMy }
-    var releaseDate: String? { podcast.releaseDate }
-    var trackTimeMillisString: String? { podcast.trackTimeMillisString }
-    var trackTimeMillis: NSNumber? { podcast.trackTimeMillis }
-    var contentAdvisoryRating: String? { podcast.contentAdvisoryRating }
-    var artistName: String? { podcast.artistName }
-    var country: String? { podcast.country }
 }

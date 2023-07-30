@@ -7,94 +7,100 @@
 
 import Foundation
 import MediaPlayer
+import CoreData
 
-protocol InputPlayerProtocol {
+protocol InputPlayer {
+    func playOrPause()
+    func playPreviewsTrack()
+    func playNextPodcast()
+    
+    func playerSeek(to seconds: Double)
+    
+    func playerRewindSeek(to seconds: Double)
+    func conform(entity: any InputTrackProtocol, entities: [any InputTrackProtocol])
+    func addObserverPlayerEventNotification <T: PlayerEventNotification>(for object: T)
+}
+
+protocol InputTrackProtocol {
+    var track: TrackProtocol { get }
+}
+
+protocol TrackProtocol: NSManagedObject {
     var url: URL?                      { get }
-    var image600: String?              { get }
-    var image160: String?              { get }
-    var image60: String?               { get }
+    var imageForMpPlayer: String?      { get }
+    var imageForBigPlayer: String?     { get }
+    var imageForSmallPlayer: String?   { get }
     var trackName: String?             { get }
-    var identifier: String             { get }
-//    var isFavorite: Bool               { get }
     var descriptionMy: String?         { get }
-//    var genresString: String?          { get }
-    var releaseDate: String?           { get }
-    var trackTimeMillisString: String? { get }
-    var trackTimeMillis: NSNumber?     { get }
-    var contentAdvisoryRating: String? { get }
-    var artistName: String?            { get }
-    var country: String?               { get }
-    
-    var currentTime: Float?            { get set }
-    var listeningProgress: Double?     { get set }
-    var duration: Double?              { get set }
+    var trackIdentifier: String        { get }
+    var listeningProgress: Double?     { get }
+    var currentTime: Float?            { get }
 }
 
-@objc protocol PlayerEventNotification {
+struct Track: OutputPlayerProtocol {
     
-    func addObserverPlayerEventNotification()
-    func removeObserverEventNotification()
+    var inputType: TrackProtocol
     
-    func playerDidEndPlay(notification: NSNotification)
-    func playerStartLoading(notification: NSNotification)
-    func playerDidEndLoading(notification: NSNotification)
-    func playerUpdatePlayingInformation(notification: NSNotification)
-    func playerStateDidChanged(notification: NSNotification)
+    var imageForBigPlayer: String?
+    var imageForSmallPlayer: String?
+    
+    var duration: Double = 0
+    var trackImageForBigPlayer: String?
+    var currentTime: Float?
+    var listeningProgress: Double = 0
+    var isPlaying: Bool = false
+    var isGoingPlaying: Bool = false
+    var trackIdentifier: String
+    var imageForMpPlayer: String?
+    var trackName: String?
+    var url: URL?
+    var isLast: Bool
+    var isFirst: Bool = false
+    
+    init(input: any TrackProtocol, isLast: Bool, isFirst: Bool) {
+        self.currentTime = input.currentTime
+        self.listeningProgress = input.listeningProgress ?? 0
+        self.trackIdentifier = input.trackIdentifier
+        self.imageForMpPlayer = input.imageForMpPlayer
+        self.trackName = input.trackName
+        self.url = input.url
+        self.inputType = input
+        self.isLast = isLast
+        self.isFirst = isFirst
+        self.imageForSmallPlayer = input.imageForSmallPlayer
+        self.imageForBigPlayer = input.imageForBigPlayer
+    }
 }
 
-//MARK: - OutputPlayerProtocol
-protocol OutputPlayerProtocol:  SmallPlayerPlayableProtocol, BigPlayerPlayableProtocol, EpisodeTableViewPlayableProtocol { }
+protocol OutputPlayerProtocol: PodcastCellPlayableProtocol, BigPlayerPlayableProtocol, SmallPlayerPlayableProtocol {}
 
-extension Player: OutputPlayerProtocol {
-    
-    var isGoingPlaying: Bool { playerIsLoadingNewTrack }
-    var identifier: String { currentTrack?.track.identifier ?? "" }
-    var track: InputPlayerProtocol? { currentTrack?.track }
-    var listeningProgress: Double? { currentTrack?.track.listeningProgress }
-    var trackImage: String? { currentTrack?.track.image600 }
-    var trackName: String? { currentTrack?.track.trackName }
-    var currentTime: Float? { currentTrack?.track.currentTime }
-    var playingDuration: Double? { currentTrack?.track.duration }
+protocol PlayerEventNotification: AnyObject {
+
+    func playerDidEndPlay               (with track: OutputPlayerProtocol)
+    func playerStartLoading             (with track: OutputPlayerProtocol)
+    func playerDidEndLoading            (with track: OutputPlayerProtocol)
+    func playerUpdatePlayingInformation (with track: OutputPlayerProtocol)
+    func playerStateDidChanged          (with track: OutputPlayerProtocol)
 }
 
 class Player {
     
-    private enum PlayerEvent: String {
-        case playerEndPlay
-        case playerStartLoading
-        case playerDidEndLoading
-        case playerUpdatePlayingInformation
-        case playerStateDidChanged
-        
-        var notificationName: NSNotification.Name {
-            return NSNotification.Name(rawValue: self.rawValue)
+    //MARK: init
+    init() {
+        addObserverForEndTrack()
+        configureMPRemoteCommandCenter()
+    }
+    
+    class WeakObject {
+        weak var weakObject: (any PlayerEventNotification)?
+        init(object: any PlayerEventNotification) {
+            self.weakObject = object
         }
     }
+    private(set) var delegates: [WeakObject] = []
     
-    static func addObserverPlayerPlayerEventNotification <T: PlayerEventNotification>(for object: T) {
-        let playerEndPlay = PlayerEvent.playerEndPlay.notificationName
-        NotificationCenter.default.addObserver(object, selector: #selector(object.playerDidEndPlay(notification: )), name: playerEndPlay, object: nil)
-        
-        let playerStartLoading = PlayerEvent.playerStartLoading.notificationName
-        NotificationCenter.default.addObserver(object, selector: #selector(object.playerStartLoading(notification: )), name: playerStartLoading, object: nil)
-        
-        let playerDidEndLoading = PlayerEvent.playerDidEndLoading.notificationName
-        NotificationCenter.default.addObserver(object, selector: #selector(object.playerDidEndLoading(notification: )), name: playerDidEndLoading, object: nil)
-        
-        let playerUpdatePlayingInformation = PlayerEvent.playerUpdatePlayingInformation.notificationName
-        NotificationCenter.default.addObserver(object, selector: #selector(object.playerUpdatePlayingInformation(notification: )), name: playerUpdatePlayingInformation, object: nil)
-        
-        let playerStateDidChanged = PlayerEvent.playerStateDidChanged.notificationName
-        NotificationCenter.default.addObserver(object, selector: #selector(object.playerStateDidChanged(notification: )), name: playerStateDidChanged, object: nil)
-    }
-    
-    static func removeObserverEventNotification<T: PlayerEventNotification>(for object: T) {
-        NotificationCenter.default.removeObserver(object)
-    }
-    
-    private(set) var playlist: [InputPlayerProtocol] = []
-    
-    var currentTrack: (track: InputPlayerProtocol, index: Int)?
+    private(set) var playlist: [Track] = []
+    private(set) var currentTrack: (track: Track, index: Int)?
     private var mpRemoteCommandCenter = MPRemoteCommandCenter.shared()
     private var mPNowPlayingInfoCenter = MPNowPlayingInfoCenter.default()
     
@@ -105,55 +111,54 @@ class Player {
     private(set) var isPlaying = false {
         didSet {
             if oldValue != isPlaying {
-                NotificationCenter.default.post(name: PlayerEvent.playerStateDidChanged.notificationName, object: self)
+                currentTrack?.track.isPlaying = isPlaying
+                playerStateDidChanged(track: currentTrack?.track)
             }
         }
     }
     
-    var isLast: Bool { (currentTrack?.index ?? (Int.max - 1)) + 1 == playlist.count }
-    var isFirst: Bool { currentTrack?.index ?? 1 == 0 }
+    private var isLast: Bool { (currentTrack?.index ?? (Int.max - 1)) + 1 == playlist.count }
+    private var isFirst: Bool { currentTrack?.index ?? 1 == 0 }
     
     private(set) var playerIsLoadingNewTrack: Bool = false {
         didSet {
-            if playerIsLoadingNewTrack != oldValue {
+            if oldValue != playerIsLoadingNewTrack {
+                currentTrack?.track.isGoingPlaying = playerIsLoadingNewTrack
                 if playerIsLoadingNewTrack {
-                    NotificationCenter.default.post(name: PlayerEvent.playerStartLoading.notificationName, object: self)
+                    playerStartLoading(track: currentTrack?.track)
                 } else {
-                    NotificationCenter.default.post(name: PlayerEvent.playerDidEndLoading.notificationName, object: self)
+                    playerDidEndLoading(track: currentTrack?.track)
                 }
             }
         }
     }
+}
+
+extension Player: InputPlayer {
     
-    init() {
-        addObserverForEndTrack()
-        configureMPRemoteCommandCenter ()
-    }
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self)
+    func addObserverPlayerEventNotification <T: PlayerEventNotification>(for object: T) {
+        let weakObject = WeakObject(object: object)
+        delegates.append(weakObject)
     }
     
     //MARK: - public Methods
-    func pause() {
-        playerAVP.pause()
-        removeTimeObserve()
-        isPlaying = false
-    }
+    //MARK: Actions
     
-    func play() {
-        playerAVP.play()
-        isPlaying = true
-        addTimeObserve()
+    func conform(entity: any InputTrackProtocol, entities: [any InputTrackProtocol]) {
+        let track = entity.track
+        if currentTrack?.track.trackIdentifier == track.trackIdentifier {
+            playOrPause()
+        } else {
+            startPlay(track: track, tracks: entities.map { $0.track })
+        }
     }
     
     func playOrPause() {
         playerAVP.rate == 1 ? pause() : play()
     }
-
+    
     func playerSeek(to seconds: Double) {
         playerAVP.pause()
-        isPlaying = false
         self.playerAVP.seek(to: CMTime(seconds: seconds, preferredTimescale: 60))
         playerAVP.play()
         isPlaying = true
@@ -162,14 +167,6 @@ class Player {
     func playerRewindSeek(to seconds: Double) {
         let currentTime = playerAVP.currentTime().seconds
         playerSeek(to: currentTime + seconds)
-    }
-    
-    func startPlay(track: InputPlayerProtocol, playList: [InputPlayerProtocol]) {
-        guard track.identifier != currentTrack?.track.identifier else { playOrPause(); return }
-        self.playlist = playList
-        if let index = playList.firstIndex(where: { track.identifier == $0.identifier }) {
-            startPlay(track: track, indexInPlaylist: index)
-        }
     }
     
     func playPreviewsTrack() {
@@ -190,18 +187,18 @@ class Player {
 // MARK: - Private Methods
 extension Player {
     
-    private func startPlay(track: InputPlayerProtocol, indexInPlaylist: Int) {
+    private func startPlay(track: Track, indexInPlaylist: Int) {
         pause()
-        NotificationCenter.default.post(name: PlayerEvent.playerEndPlay.notificationName, object: self)
+       
+        playerDidEndPlay(track: currentTrack?.track)
         currentTrack = (track: track, index: indexInPlaylist)
         
-        playerIsLoadingNewTrack = true
         playerAVP.replaceCurrentItem(with: nil)
         
         mpRemoteCommandCenter.previousTrackCommand.isEnabled = !isFirst
         mpRemoteCommandCenter.nextTrackCommand.isEnabled = !isLast
         
-        if let image = trackImage?.getImage {
+        if let image = track.imageForMpPlayer?.getImage {
             let size = CGSize(width: image.size.width, height: image.size.height)
             let item = MPMediaItemArtwork(boundsSize: size) { _ in
                 return image
@@ -215,37 +212,37 @@ extension Player {
         guard let url = track.url else { return }
         let item = AVPlayerItem(url: url.isDownLoad ? url.localPath : url)
         self.playerAVP.replaceCurrentItem(with: item)
-        if let moment = track.listeningProgress { self.playerSeek(to: moment) }
+        self.playerSeek(to: 1)
         
         play()
         
         if let sceneDelegate = UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate  {
-            sceneDelegate.videoViewController = self
+            //TODO: - 
+//            sceneDelegate.videoViewController = self
         }
     }
     
     private func addTimeObserve() {
-        observe = playerAVP.addPeriodicTimeObserver(forInterval: CMTimeMakeWithSeconds(1, preferredTimescale: Int32(NSEC_PER_SEC)), queue: .main ) { [weak self] time in
+        observe = playerAVP.addPeriodicTimeObserver(forInterval: CMTimeMakeWithSeconds(2, preferredTimescale: Int32(NSEC_PER_SEC)), queue: .main ) { [weak self] time in
             guard let self = self,
-                  let duration = self.playerAVP.currentItem?.duration.seconds,
+                  let duration = playerAVP.currentItem?.duration.seconds,
                   !duration.isNaN
             else { return }
             
             let currentTime = Float(self.playerAVP.currentTime().seconds)
             let progress = CMTimeGetSeconds(time) / duration
             
-            self.playerIsLoadingNewTrack = false
+            playerIsLoadingNewTrack = false
             
-            self.currentTrack?.track.currentTime = currentTime
-            self.currentTrack?.track.listeningProgress = progress
-            self.currentTrack?.track.duration = duration
+            currentTrack?.track.currentTime = currentTime
+            currentTrack?.track.listeningProgress = progress
+            currentTrack?.track.duration = duration
             
-            NotificationCenter.default.post(name: PlayerEvent.playerUpdatePlayingInformation.notificationName, object: self)
-            
+            playerUpdatePlayingInformation(track: currentTrack?.track)
             /// ---------------
-            self.mPNowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyPlaybackProgress] = currentTime
-            self.mPNowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyElapsedPlaybackTime] = currentTime
-            self.mPNowPlayingInfoCenter.nowPlayingInfo?[MPMediaItemPropertyPlaybackDuration] = duration
+            mPNowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyPlaybackProgress] = currentTime
+            mPNowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyElapsedPlaybackTime] = currentTime
+            mPNowPlayingInfoCenter.nowPlayingInfo?[MPMediaItemPropertyPlaybackDuration] = duration
         }
     }
     
@@ -257,7 +254,7 @@ extension Player {
     }
     
     private func configureMPRemoteCommandCenter () {
-    
+        
         mpRemoteCommandCenter.nextTrackCommand.addTarget { [weak self] _ in
             self?.playNextPodcast()
             return .success
@@ -282,10 +279,72 @@ extension Player {
             self?.playerRewindSeek(to: -60)
             return .success
         }
-        
     }
     
     private func addObserverForEndTrack() {
         NotificationCenter.default.addObserver(self, selector: #selector(playNextPodcast), name: .AVPlayerItemDidPlayToEndTime, object: nil)
+    }
+    
+    private func playerDidEndPlay(track: Track?) {
+        guard let track = track else { return }
+        delegates.forEach {
+            $0.weakObject?.playerDidEndPlay(with: track)
+        }
+    }
+    
+    private func playerStartLoading(track: Track?) {
+        guard let track = track else { return }
+        delegates.forEach {
+            $0.weakObject?.playerStartLoading(with: track)
+        }
+    }
+    
+    private func playerDidEndLoading(track: Track?) {
+        guard let track = track else { return }
+        delegates.forEach {
+            $0.weakObject?.playerDidEndLoading(with: track)
+        }
+    }
+    
+    private func playerUpdatePlayingInformation(track: Track?) {
+        guard let track = track else { return }
+        delegates.forEach {
+            $0.weakObject?.playerUpdatePlayingInformation(with: track)
+        }
+    }
+    
+    private func playerStateDidChanged(track: Track?) {
+        guard let track = track else { return }
+        delegates.forEach {
+            $0.weakObject?.playerStateDidChanged(with: track)
+        }
+    }
+    
+    private func pause() {
+        playerIsLoadingNewTrack = false
+        playerAVP.pause()
+        removeTimeObserve()
+        isPlaying = false
+    }
+    
+    private func play() {
+        playerIsLoadingNewTrack = true
+        addTimeObserve()
+        playerAVP.play()
+        isPlaying = true
+    }
+    
+    private func startPlay(track: (any TrackProtocol), tracks: [any TrackProtocol]) {
+        guard track.trackIdentifier != currentTrack?.track.trackIdentifier else { playOrPause(); return }
+
+        let isLast = tracks.firstIndex { $0.trackIdentifier == track.trackIdentifier } ?? Int.max - 1 == tracks.count - 1
+        let isFirst = tracks.firstIndex { $0.trackIdentifier == track.trackIdentifier } ?? 1 == 0
+        
+        self.playlist = tracks.map { Track(input: $0, isLast: isLast, isFirst: isFirst) }
+        let track = Track(input: track, isLast: isLast, isFirst: isFirst)
+        
+        if let index = tracks.firstIndex(where: { track.trackIdentifier == $0.trackIdentifier }) {
+            startPlay(track: track, indexInPlaylist: index)
+        }
     }
 }
