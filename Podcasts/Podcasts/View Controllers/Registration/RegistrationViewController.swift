@@ -23,26 +23,26 @@ class RegistrationViewController: UIViewController {
     
     private let userViewModel: UserViewModel
     private let addToFavoriteManager: FavoriteManager
-    private let addToLikeManager: AddToLikeManager
+    private let likeManager: InputLikeManager
     private let firebaseDataBase: FirebaseDatabase
-    private let player: Player
+    private let player: InputPlayer
     private let apiService: ApiService
-    private let downloadService: DownloadService
+    private let downloadService: DownloadServiceInput
     private let dataStoreManagerInput: DataStoreManagerInput
     
     lazy private var tabBarVc = TabBarViewController.create { [weak self] coder in
         guard let self = self else { fatalError() }
-              
-        let tabBar = TabBarViewController( coder: coder,
-                                           userViewModel: userViewModel,
-                                           firestorageDatabase: FirestorageDatabase(),
-                                           player: player,
-                                           downloadService: downloadService,
-                                           addToFavoriteManager: addToFavoriteManager,
-                                           addToLikeManager: addToLikeManager,
-                                           firebaseDataBase: firebaseDataBase,
-                                           apiService: apiService,
-                                           dataStoreManagerInput: dataStoreManagerInput)
+        
+        let tabBar = TabBarViewController(coder: coder,
+                                          userViewModel: userViewModel,
+                                          firestorageDatabase: FirestorageDatabase(),
+                                          player: player,
+                                          downloadService: downloadService,
+                                          addToFavoriteManager: addToFavoriteManager,
+                                          likeManager: likeManager,
+                                          firebaseDataBase: firebaseDataBase,
+                                          apiService: apiService,
+                                          dataStoreManagerInput: dataStoreManagerInput)
         
         guard let tabBar = tabBar else { fatalError() }
         
@@ -55,16 +55,16 @@ class RegistrationViewController: UIViewController {
     init?(coder: NSCoder,
           userViewModel: UserViewModel,
           addToFavoriteManager: FavoriteManager,
-          addToLikeManager: AddToLikeManager,
-          player: Player,
+          likeManager: InputLikeManager,
+          player: InputPlayer,
           firebaseDataBase: FirebaseDatabase,
           apiService: ApiService,
-          downloadService: DownloadService,
+          downloadService: DownloadServiceInput,
           dataStoreManagerInput: DataStoreManagerInput) {
         
         self.userViewModel = userViewModel
         self.addToFavoriteManager = addToFavoriteManager
-        self.addToLikeManager = addToLikeManager
+        self.likeManager = likeManager
         self.player = player
         self.firebaseDataBase = firebaseDataBase
         self.apiService = apiService

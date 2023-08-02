@@ -225,7 +225,6 @@ extension FavoriteTableView {
     
     private func configureTableView() {
         backgroundView = emptyTableImageView
-//        self.delegate = self
         rowHeight = 100
         self.refreshControl = refreshControl
     }
@@ -247,6 +246,7 @@ extension FavoriteTableView {
             return titles[section]
         }
     }
+
 }
 
 ////MARK: - UITableViewDelegate

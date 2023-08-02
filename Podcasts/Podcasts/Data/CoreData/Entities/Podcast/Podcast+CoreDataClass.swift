@@ -184,7 +184,7 @@ public class Podcast: NSManagedObject, Codable {
 extension Podcast: CoreDataProtocol { }
 
 //MARK: - InputPlayerProtocol
-extension Podcast: InputTrackProtocol, TrackProtocol {
+extension Podcast: InputTrackType, TrackProtocol {
     
     var track: TrackProtocol {
         return self

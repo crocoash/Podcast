@@ -97,6 +97,7 @@ class FirebaseDatabase {
    
    func observe<T: FirebaseProtocol>(viewContext: NSManagedObjectContext, add: @escaping (Result<T>) -> Void, remove: @escaping (Result<T>) -> Void) {
       
+      
       Database.database().isPersistenceEnabled = true
       
       connectedRef.observe(.value, with: { [weak self] snapshot in

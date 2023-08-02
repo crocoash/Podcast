@@ -20,10 +20,10 @@ class TabBarViewController: UITabBarController {
     
     private let userViewModel: UserViewModel
     private let firestorageDatabase: FirestorageDatabase
-    private let player: Player
-    private let downloadService: DownloadService
+    private let player: InputPlayer
+    private let downloadService: DownloadServiceInput
     private let addToFavoriteManager: FavoriteManager
-    private let addToLikeManager: AddToLikeManager
+    private let likeManager: InputLikeManager
     private let firebaseDataBase: FirebaseDatabase
     private let apiService: ApiService
     private let dataStoreManagerInput: DataStoreManagerInput
@@ -78,10 +78,10 @@ class TabBarViewController: UITabBarController {
                 self,
                 podcast: podcast,
                 playlist: playList,
-                player: self.player,
-                downloadService: self.downloadService,
-                addToLikeManager: self.addToLikeManager,
-                addToFavoritePodcast: self.addToFavoriteManager)
+                player: player,
+                downloadService: downloadService,
+                likeManager: self.likeManager,
+                addToFavoritePodcast: addToFavoriteManager)
             
             return detailViewController
         }
@@ -94,10 +94,10 @@ class TabBarViewController: UITabBarController {
     init?(coder: NSCoder,
                                userViewModel: UserViewModel,
                                firestorageDatabase: FirestorageDatabase,
-                               player: Player,
-                               downloadService: DownloadService,
+                               player: InputPlayer,
+                               downloadService: DownloadServiceInput,
                                addToFavoriteManager: FavoriteManager,
-                               addToLikeManager: AddToLikeManager,
+                               likeManager: InputLikeManager,
                                firebaseDataBase: FirebaseDatabase,
                                apiService: ApiService,
                                dataStoreManagerInput: DataStoreManagerInput) {
@@ -107,7 +107,7 @@ class TabBarViewController: UITabBarController {
         self.player = player
         self.downloadService = downloadService
         self.addToFavoriteManager = addToFavoriteManager
-        self.addToLikeManager = addToLikeManager
+        self.likeManager = likeManager
         self.firebaseDataBase = firebaseDataBase
         self.apiService = apiService
         self.dataStoreManagerInput = dataStoreManagerInput
@@ -231,7 +231,7 @@ extension TabBarViewController: SmallPlayerViewControllerDelegate {
     
     func smallPlayerViewControllerSwipeOrTouch(_ smallPlayerViewController: SmallPlayerView) {
         guard let track = player.currentTrack?.track  else { return }
-        let bigPlayerViewController = BigPlayerViewController(self, player: player, track: track, addToLikeManager: addToLikeManager)
+        let bigPlayerViewController = BigPlayerViewController(self, player: player, track: track, likeManager: likeManager)
         bigPlayerViewController.modalPresentationStyle = .fullScreen
         self.present(bigPlayerViewController, animated: true)
     }

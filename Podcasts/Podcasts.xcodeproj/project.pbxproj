@@ -78,7 +78,7 @@
 		3A4A3757280164DC000C80E4 /* PodcastData+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4A3755280164DC000C80E4 /* PodcastData+CoreDataClass.swift */; };
 		3A4A3758280164DC000C80E4 /* PodcastData+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4A3756280164DC000C80E4 /* PodcastData+CoreDataProperties.swift */; };
 		3A5022532A6BD7CE00600422 /* FavoriteManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A5022522A6BD7CE00600422 /* FavoriteManager.swift */; };
-		3A5022552A6BD90C00600422 /* AddToLikeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A5022542A6BD90C00600422 /* AddToLikeManager.swift */; };
+		3A5022552A6BD90C00600422 /* LikeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A5022542A6BD90C00600422 /* LikeManager.swift */; };
 		3A5022592A6C294D00600422 /* ListeningPodcastCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A5022572A6C294D00600422 /* ListeningPodcastCell.swift */; };
 		3A50225A2A6C294D00600422 /* ListeningPodcastCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3A5022582A6C294D00600422 /* ListeningPodcastCell.xib */; };
 		3A50225C2A6E474200600422 /* FavoriteTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A50225B2A6E474200600422 /* FavoriteTableView.swift */; };
@@ -93,7 +93,6 @@
 		3A69EA0628B26E2800241414 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A69EA0528B26E2800241414 /* String.swift */; };
 		3A69EA0828B2B09200241414 /* NSManagedObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A69EA0728B2B09200241414 /* NSManagedObject.swift */; };
 		3A69EA0A28B2B9C600241414 /* NsManagedObjectContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A69EA0928B2B9C600241414 /* NsManagedObjectContext.swift */; };
-		3A6EC24329A7A01400383D12 /* CoreDataProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A6EC24229A7A01400383D12 /* CoreDataProtocol.swift */; };
 		3A6EC24C29B5361600383D12 /* UILabel + maxNumberOfLines.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A6EC24B29B5361500383D12 /* UILabel + maxNumberOfLines.swift */; };
 		3AA59DC528142C0D00FF2D19 /* FirebaseDataBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA59DC428142C0D00FF2D19 /* FirebaseDataBase.swift */; };
 		3AA82D1E29EAB5CC00557A94 /* NsNumber + minute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA82D1D29EAB5CC00557A94 /* NsNumber + minute.swift */; };
@@ -192,7 +191,7 @@
 		3A4A3755280164DC000C80E4 /* PodcastData+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PodcastData+CoreDataClass.swift"; sourceTree = "<group>"; };
 		3A4A3756280164DC000C80E4 /* PodcastData+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PodcastData+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		3A5022522A6BD7CE00600422 /* FavoriteManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteManager.swift; sourceTree = "<group>"; };
-		3A5022542A6BD90C00600422 /* AddToLikeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddToLikeManager.swift; sourceTree = "<group>"; };
+		3A5022542A6BD90C00600422 /* LikeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LikeManager.swift; sourceTree = "<group>"; };
 		3A5022572A6C294D00600422 /* ListeningPodcastCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListeningPodcastCell.swift; sourceTree = "<group>"; };
 		3A5022582A6C294D00600422 /* ListeningPodcastCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ListeningPodcastCell.xib; sourceTree = "<group>"; };
 		3A50225B2A6E474200600422 /* FavoriteTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteTableView.swift; sourceTree = "<group>"; };
@@ -207,7 +206,6 @@
 		3A69EA0528B26E2800241414 /* String.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
 		3A69EA0728B2B09200241414 /* NSManagedObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSManagedObject.swift; sourceTree = "<group>"; };
 		3A69EA0928B2B9C600241414 /* NsManagedObjectContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NsManagedObjectContext.swift; sourceTree = "<group>"; };
-		3A6EC24229A7A01400383D12 /* CoreDataProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataProtocol.swift; sourceTree = "<group>"; };
 		3A6EC24B29B5361500383D12 /* UILabel + maxNumberOfLines.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UILabel + maxNumberOfLines.swift"; sourceTree = "<group>"; };
 		3AA59DC428142C0D00FF2D19 /* FirebaseDataBase.swift */ = {isa = PBXFileReference; indentWidth = 3; lastKnownFileType = sourcecode.swift; path = FirebaseDataBase.swift; sourceTree = "<group>"; tabWidth = 4; };
 		3AA82D1D29EAB5CC00557A94 /* NsNumber + minute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NsNumber + minute.swift"; sourceTree = "<group>"; };
@@ -536,8 +534,7 @@
 				3A1FB25A280C85A600C3091C /* FavoriteDocument.swift */,
 				181F5BC327E6718A00AC27EB /* DataStoreManager.swift */,
 				3A5022522A6BD7CE00600422 /* FavoriteManager.swift */,
-				3A5022542A6BD90C00600422 /* AddToLikeManager.swift */,
-				3A6EC24229A7A01400383D12 /* CoreDataProtocol.swift */,
+				3A5022542A6BD90C00600422 /* LikeManager.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -900,7 +897,6 @@
 				189C1FBC272EE6F100A8480E /* UIView + loadFromNib.swift in Sources */,
 				184CE18927270C8D0088044C /* ApiService.swift in Sources */,
 				1828F9BB2738798F00761CD5 /* DataProvider.swift in Sources */,
-				3A6EC24329A7A01400383D12 /* CoreDataProtocol.swift in Sources */,
 				3A50225C2A6E474200600422 /* FavoriteTableView.swift in Sources */,
 				181F5BD627E6850500AC27EB /* Author+CoreDataProperties.swift in Sources */,
 				3A123CD62A1CF17600A237AE /* CustomActivityIndicator.swift in Sources */,
@@ -930,7 +926,7 @@
 				18478128272C8B460036B89E /* Alert.swift in Sources */,
 				3A69EA0A28B2B9C600241414 /* NsManagedObjectContext.swift in Sources */,
 				3AA99B582966E4A300721136 /* PodcastDocument.swift in Sources */,
-				3A5022552A6BD90C00600422 /* AddToLikeManager.swift in Sources */,
+				3A5022552A6BD90C00600422 /* LikeManager.swift in Sources */,
 				1831DEDD27319E3900EC09E2 /* SettingsTableViewController.swift in Sources */,
 				181F5BC427E6718A00AC27EB /* DataStoreManager.swift in Sources */,
 				189C1FAD272D496F00A8480E /* UIViewController + identifier.swift in Sources */,

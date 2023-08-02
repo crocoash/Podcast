@@ -93,7 +93,7 @@ extension FavoritePodcast: InputDownloadProtocol {
 }
 
 //MARK: - InputTrackProtocol
-extension FavoritePodcast: InputTrackProtocol {
+extension FavoritePodcast: InputTrackType {
     
     var track: TrackProtocol {
         return podcast

@@ -10,6 +10,10 @@ import MediaPlayer
 import CoreData
 
 protocol InputPlayer {
+    
+    var currentTrack: (track: Track, index: Int)? { get }
+
+    
     func playOrPause()
     func playPreviewsTrack()
     func playNextPodcast()
@@ -17,11 +21,11 @@ protocol InputPlayer {
     func playerSeek(to seconds: Double)
     
     func playerRewindSeek(to seconds: Double)
-    func conform(entity: any InputTrackProtocol, entities: [any InputTrackProtocol])
+    func conform(entity: any InputTrackType, entities: [any InputTrackType])
     func addObserverPlayerEventNotification <T: PlayerEventNotification>(for object: T)
 }
 
-protocol InputTrackProtocol {
+protocol InputTrackType {
     var track: TrackProtocol { get }
 }
 
@@ -144,7 +148,7 @@ extension Player: InputPlayer {
     //MARK: - public Methods
     //MARK: Actions
     
-    func conform(entity: any InputTrackProtocol, entities: [any InputTrackProtocol]) {
+    func conform(entity: any InputTrackType, entities: [any InputTrackType]) {
         let track = entity.track
         if currentTrack?.track.trackIdentifier == track.trackIdentifier {
             playOrPause()
@@ -216,7 +220,7 @@ extension Player {
         
         play()
         
-        if let sceneDelegate = UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate  {
+        if let _ = UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate  {
             //TODO: - 
 //            sceneDelegate.videoViewController = self
         }

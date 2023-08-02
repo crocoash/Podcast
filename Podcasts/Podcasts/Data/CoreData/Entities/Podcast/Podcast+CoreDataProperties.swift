@@ -84,5 +84,9 @@ extension Podcast {
 }
 
 extension Podcast : Identifiable {
-
 }
+
+
+//protocol Identifiable {
+//    var id: String { get }
+//}

@@ -42,10 +42,10 @@ class DetailViewController: UIViewController {
     private(set) var podcast: Podcast
     private(set) var podcasts: [Podcast]
     
-    private var player: Player
-    private var downloadService: DownloadService
+    private var player: InputPlayer
+    private var downloadService: DownloadServiceInput
     private var bigPlayerViewController: BigPlayerViewController?
-    private var addToLikeManager: AddToLikeManager
+    private var likeManager: InputLikeManager
     private var favoritePodcast: FavoriteManager
     
     weak var delegate: DetailViewControllerDelegate?
@@ -76,9 +76,9 @@ class DetailViewController: UIViewController {
         _ vc : T,
         podcast: Podcast,
         playlist: [Podcast],
-        player: Player,
-        downloadService: DownloadService,
-        addToLikeManager: AddToLikeManager,
+        player: InputPlayer,
+        downloadService: DownloadServiceInput,
+        likeManager: InputLikeManager,
         addToFavoritePodcast: FavoriteManager
     ) {
       
@@ -87,7 +87,7 @@ class DetailViewController: UIViewController {
         self.delegate = vc
         self.player = player
         self.downloadService = downloadService
-        self.addToLikeManager = addToLikeManager
+        self.likeManager = likeManager
         self.favoritePodcast = addToFavoritePodcast
         
         super.init(coder: coder)
@@ -180,7 +180,7 @@ extension DetailViewController {
     }
     
     private func presentBigPlayer(with track: BigPlayerPlayableProtocol) {
-        let bigPlayerViewController = BigPlayerViewController(self, player: player, track: track, addToLikeManager: addToLikeManager)
+        let bigPlayerViewController = BigPlayerViewController(self, player: player, track: track, likeManager: likeManager)
         self.bigPlayerViewController = bigPlayerViewController
         bigPlayerViewController.modalPresentationStyle = .fullScreen
         self.present(bigPlayerViewController, animated: true)
@@ -283,27 +283,27 @@ extension DetailViewController: DownloadEventNotifications {
         downloadService.addObserverDownloadEventNotifications(for: self)
     }
     
-    func updateDownloadInformation(_ downloadService: DownloadService, entity: DownloadServiceType) {
+    func updateDownloadInformation(_ downloadService: DownloadServiceInput, entity: DownloadServiceType) {
         episodeTableView.update(with: entity)
     }
     
-    func didEndDownloading(_ downloadService: DownloadService, entity: DownloadServiceType) {
+    func didEndDownloading(_ downloadService: DownloadServiceInput, entity: DownloadServiceType) {
         episodeTableView.update(with: entity)
     }
     
-    func didPauseDownload(_ downloadService: DownloadService, entity: DownloadServiceType) {
+    func didPauseDownload(_ downloadService: DownloadServiceInput, entity: DownloadServiceType) {
         episodeTableView.update(with: entity)
     }
     
-    func didContinueDownload(_ downloadService: DownloadService, entity: DownloadServiceType) {
+    func didContinueDownload(_ downloadService: DownloadServiceInput, entity: DownloadServiceType) {
         episodeTableView.update(with: entity)
     }
     
-    func didStartDownload(_ downloadService: DownloadService, entity: DownloadServiceType) {
+    func didStartDownload(_ downloadService: DownloadServiceInput, entity: DownloadServiceType) {
         episodeTableView.update(with: entity)
     }
     
-    func didRemoveEntity(_ downloadService: DownloadService, entity: DownloadServiceType) {
+    func didRemoveEntity(_ downloadService: DownloadServiceInput, entity: DownloadServiceType) {
         episodeTableView.update(with: entity)
     }
 }
@@ -382,7 +382,7 @@ extension DetailViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         
-        if let cell = episodeTableView.cellForRow(at: indexPath), cell.isSelected {
+        if let cell = tableView.cellForRow(at: indexPath), cell.isSelected {
             if let cell = cell as? PodcastCell, cell.moreThanThreeLines {
                 return UITableView.automaticDimension
             }

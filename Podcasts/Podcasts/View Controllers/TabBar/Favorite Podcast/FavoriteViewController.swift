@@ -10,8 +10,8 @@ import CoreData
 
 class FavoriteViewController: UIViewController {
     
-    private let downloadService: DownloadService
-    private let player: Player
+    private let downloadService: DownloadServiceInput
+    private let player: InputPlayer
     private let firebaseDataBase: FirebaseDatabase
     private let favoriteManager: FavoriteManager
     private let dataStoreManagerInput: DataStoreManagerInput
@@ -26,7 +26,6 @@ class FavoriteViewController: UIViewController {
         
         let tableView = FavoriteTableView(self)
         tableView.frame = view.frame
-//        tableView.delegate = self
         refreshControl.addTarget(self, action: #selector(refreshTableView), for: .valueChanged)
         tableView.refreshControl = refreshControl
         return tableView
@@ -38,15 +37,11 @@ class FavoriteViewController: UIViewController {
     
     lazy var listeningFRC = dataStoreManagerInput.conFigureFRC(for: ListeningPodcast.self, with: [NSSortDescriptor(key: #keyPath(ListeningPodcast.duration),ascending: true)])
     
-    lazy private var entities: [[NSManagedObject]] = [likeMomentFRC.fetchedObjects ?? [], favoriteFRC.fetchedObjects ?? [], listeningFRC.fetchedObjects ?? []]
-    
-    private var filteredEntities: [[NSManagedObject]] {
-        return entities.filter { !$0.isEmpty }
-    }
+    lazy private var entities: [[NSManagedObject]] = []
     
     //MARK: init
-    init(downloadService: DownloadService,
-         player: Player,
+    init(downloadService: DownloadServiceInput,
+         player: InputPlayer,
          addToFavoriteManager: FavoriteManager,
          firebaseDataBase: FirebaseDatabase,
          dataStoreManagerInput: DataStoreManagerInput) {
@@ -62,6 +57,17 @@ class FavoriteViewController: UIViewController {
         favoriteFRC.delegate = self
         likeMomentFRC.delegate = self
         listeningFRC.delegate = self
+        
+        let array: [[NSManagedObject]] = [favoriteFRC.fetchedObjects ?? [], listeningFRC.fetchedObjects ?? [], likeMomentFRC.fetchedObjects ?? []]
+        array.forEach {
+            if !$0.isEmpty {
+                entities.append($0)
+            }
+        }
+    }
+    
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        return .all
     }
     
     required init?(coder: NSCoder) {
@@ -147,24 +153,35 @@ class FavoriteViewController: UIViewController {
         guard let cell = sender.view as? UITableViewCell,
               let indexPath = favoriteTableView.indexPath(for: cell) else { return }
         
-        let entity = getObject(for: indexPath)
+        let _ = getObject(for: indexPath)
+        
     }
     
     @objc func refreshTableView() {
         let viewContext = dataStoreManagerInput.viewContext
-        
+       
         firebaseDataBase.update(viewContext: viewContext) { [weak self] (result: FavoritePodcast.ResultType) in
             switch result {
             case .failure(error: let error) :
                 error.showAlert(vc: self) {
-                    self?.refreshControl.endRefreshing()
-                    self?.refreshControl.isHidden = true
                 }
-            case .success(result: _) :
-                self?.refreshControl.endRefreshing()
-                self?.refreshControl.isHidden = true
-                self?.favoriteTableView.reloadData()
+            default: break
             }
+        }
+        
+        firebaseDataBase.update(viewContext: viewContext) { [weak self] (result: ListeningPodcast.ResultType) in
+            
+            guard let self = self else { return }
+            
+            switch result {
+            case .failure(error: let error) :
+                error.showAlert(vc: self) {
+                }
+            default: break
+            }
+            
+            refreshControl.endRefreshing()
+            refreshControl.isHidden = true
         }
     }
 }
@@ -173,11 +190,11 @@ class FavoriteViewController: UIViewController {
 extension FavoriteViewController {
     
     private func getObject(for indexPath: IndexPath) -> NSManagedObject {
-        return filteredEntities[indexPath.section][indexPath.row]
+        return entities[indexPath.section][indexPath.row]
     }
     
     private func getObjects(for indexPath: IndexPath) -> [NSManagedObject] {
-        return filteredEntities[indexPath.section]
+        return entities[indexPath.section]
     }
     
     private func removeAllAction() {
@@ -189,10 +206,10 @@ extension FavoriteViewController {
         //            tableViewBottomConstraintConstant = playerIsSHidden ? 0 : 50
         //            tableViewBottomConstraint?.constant = tableViewBottomConstraintConstant
     }
-        
+    
     private func configureCell(for tableView: UITableView, at indexPath: IndexPath) -> UITableViewCell {
         
-        let item = filteredEntities[indexPath.section][indexPath.row]
+        let item = entities[indexPath.section][indexPath.row]
         
         if let item = item as? FavoritePodcast {
             let cell = tableView.getCell(cell: PodcastCell.self, indexPath: indexPath)
@@ -216,11 +233,11 @@ extension FavoriteViewController {
     }
     
     private func getSection(for index: Int) -> String? {
-        filteredEntities[index].first?.entityName
+        entities[index].first?.entityName
     }
     
     private func getCountOfRowsInSection(section index: Int) -> Int {
-        filteredEntities[index].count
+        entities[index].count
     }
 }
 
@@ -274,27 +291,27 @@ extension FavoriteViewController: PlayerEventNotification {
 //MARK: - DownloadEventNotifications
 extension FavoriteViewController: DownloadEventNotifications {
     
-    func updateDownloadInformation(_ downloadService: DownloadService, entity: DownloadServiceType) {
+    func updateDownloadInformation(_ downloadService: DownloadServiceInput, entity: DownloadServiceType) {
         favoriteTableView.updateTableView(with: entity)
     }
     
-    func didEndDownloading(_ downloadService: DownloadService, entity: DownloadServiceType) {
+    func didEndDownloading(_ downloadService: DownloadServiceInput, entity: DownloadServiceType) {
         favoriteTableView.updateTableView(with: entity)
     }
     
-    func didPauseDownload(_ downloadService: DownloadService, entity: DownloadServiceType) {
+    func didPauseDownload(_ downloadService: DownloadServiceInput, entity: DownloadServiceType) {
         favoriteTableView.updateTableView(with: entity)
     }
     
-    func didContinueDownload(_ downloadService: DownloadService, entity: DownloadServiceType) {
+    func didContinueDownload(_ downloadService: DownloadServiceInput, entity: DownloadServiceType) {
         favoriteTableView.updateTableView(with: entity)
     }
     
-    func didStartDownload(_ downloadService: DownloadService, entity: DownloadServiceType) {
+    func didStartDownload(_ downloadService: DownloadServiceInput, entity: DownloadServiceType) {
         favoriteTableView.updateTableView(with: entity)
     }
     
-    func didRemoveEntity(_ downloadService: DownloadService, entity: DownloadServiceType) {
+    func didRemoveEntity(_ downloadService: DownloadServiceInput, entity: DownloadServiceType) {
         favoriteTableView.updateTableView(with: entity)
     }
 }
@@ -311,56 +328,38 @@ extension FavoriteViewController: NSFetchedResultsControllerDelegate {
         switch type {
             
         case .delete:
-            guard var indexPath = indexPath else { return }
+            guard var indexPath = indexPath,
+                  let sec = getSection(for: anObject) else { return }
             
-            if anObject is FavoritePodcast {
-                if let sec = entities.firstIndex(where: { $0 is [FavoritePodcast] }) {
-                    indexPath.section = sec
-                }
-            } else if anObject is ListeningPodcast {
-                if let sec = entities.firstIndex(where: { $0 is [ListeningPodcast] }) {
-                    indexPath.section = sec
-                }
-            } else if anObject is LikedMoment {
-                if let sec = entities.firstIndex(where: { $0 is [LikedMoment] }) {
-                    indexPath.section = sec
-                }
-            }
+            indexPath.section = sec
             entities[indexPath.section].remove(at: indexPath.row)
             favoriteTableView.deleteItem(at: indexPath)
             
         case .insert:
             
-            guard var newIndexPath = newIndexPath else { return }
+            guard var newIndexPath = newIndexPath,
+                  let sec = getSection(for: anObject) else { return }
             
-            if let object = anObject as? FavoritePodcast {
-                if let sec = getSection(for: object)  {
-                    newIndexPath.section = sec
-                    entities[sec].append(object)
-                }
-            } else if let object = anObject as? ListeningPodcast {
-                if let sec = getSection(for: object) {
-                    newIndexPath.section = sec
-                    entities[sec].append(object)
-                }
-            } else if let object = anObject as? LikedMoment {
-                if let sec = getSection(for: object)  {
-                    newIndexPath.section = sec
-                    entities[sec].append(object)
-                }
-            }
+            newIndexPath.section = sec
             
-            let isFirstElementInSection = filteredEntities[newIndexPath.section].count == 1
-            let isLastSection = filteredEntities.count == newIndexPath.section + 1
+            let previousSection = sec - 1
+            let nextSection = sec + 1
+            
+            let isFirstElementInSection = entities[newIndexPath.section].count == 0
+            let isLastSection = entities.count == newIndexPath.section + 1
+            let isOnlyOneSection = entities.count == 1
             
             var insertSection = ""
-            if isFirstElementInSection, filteredEntities.count != 1 {
+            
+            if isFirstElementInSection, !isOnlyOneSection {
                 if isLastSection {
-                    insertSection = getSection(for: newIndexPath.section - 1) ?? ""
+                    insertSection = getSection(for: previousSection) ?? ""
                 } else {
-                    insertSection = getSection(for: newIndexPath.section + 1) ?? ""
+                    insertSection = getSection(for: nextSection) ?? ""
                 }
             }
+            
+            entities[sec].insert(anObject as! NSManagedObject, at: newIndexPath.row)
             
             favoriteTableView.insertCell(isLast: isLastSection, insertSection: insertSection, at: newIndexPath, before: indexPath)
             
@@ -372,15 +371,36 @@ extension FavoriteViewController: NSFetchedResultsControllerDelegate {
         }
     }
     
-    private func getSection<T: NSManagedObject>(for object: T) -> Int? {
-        for (index,value) in filteredEntities.enumerated() {
-            if let entity = value.first as? T {
-                return index
+    private func getSection(for object: Any) -> Int? {
+        var section: Int? = nil
+        
+        if let object = object as? FavoritePodcast {
+            if let sec = getSection(for: object)  {
+                section = sec
+            }
+        } else if let object = object as? ListeningPodcast {
+            if let sec = getSection(for: object) {
+                section = sec
+            }
+        } else if let object = object as? LikedMoment {
+            if let sec = getSection(for: object) {
+                section = sec
             }
         }
-        return nil
+        
+        return section
+        
+        func getSection<T: NSManagedObject>(for object: T) -> Int? {
+            for (index,value) in entities.enumerated() {
+                if value.first is T {
+                    return index
+                }
+            }
+            return nil
+        }
+        
     }
- 
+    
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         favoriteTableView.endUpdates()
     }
@@ -394,7 +414,7 @@ extension FavoriteViewController: FavoriteTableDataSource {
     }
     
     func favoriteTableViewCountOfSections(_ favoriteTableView: FavoriteTableView) -> Int {
-        return filteredEntities.count
+        return entities.count
     }
     
     func favoriteTableView(_ favoriteTableView: FavoriteTableView, countOfRowsInSection index: Int) -> Int {
@@ -424,8 +444,8 @@ extension FavoriteViewController: PodcastCellDelegate {
     
     func podcastCellDidTouchPlayButton(_ podcastCell: PodcastCell) {
         guard let indexPath = favoriteTableView.indexPath(for: podcastCell),
-              let entity = getObject(for: indexPath) as? (any InputTrackProtocol),
-              let entities = getObjects(for: indexPath) as? [any InputTrackProtocol] else { fatalError() }
+              let entity = getObject(for: indexPath) as? (any InputTrackType),
+              let entities = getObjects(for: indexPath) as? [any InputTrackType] else { fatalError() }
         
         player.conform(entity: entity, entities: entities)
     }
@@ -445,8 +465,6 @@ extension FavoriteViewController: PodcastCellDelegate {
 //        self.sectionName = T.entityName
 //    }
 //}
-
-
 
 
 

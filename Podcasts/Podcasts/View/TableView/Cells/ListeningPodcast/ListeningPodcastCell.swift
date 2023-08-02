@@ -35,6 +35,8 @@ class ListeningPodcastCell: UITableViewCell {
         super.awakeFromNib()
     }
     
+    
+    
     func configure(with model: ListeningPodcastCellProtocol ) {
         self.progressView.progress = model.progressForCell
         self.name.text = model.podcastName

@@ -91,8 +91,8 @@ class BigPlayerViewController: UIViewController {
         }
     }
     
-    private var player: Player
-    private var addToLikeManager: AddToLikeManager
+    private var player: InputPlayer
+    private var likeManager: InputLikeManager
     
     private let defaultTime = "0:00"
     private var pauseImage = UIImage(systemName: "pause.fill")!
@@ -100,11 +100,11 @@ class BigPlayerViewController: UIViewController {
     private var bigPlayerPlayableProtocol: BigPlayerPlayableProtocol!
     
     //MARK: init
-    init<T: BigPlayerViewControllerDelegate>(_ vc: T, player: Player, track: BigPlayerPlayableProtocol, addToLikeManager: AddToLikeManager) {
+    init<T: BigPlayerViewControllerDelegate>(_ vc: T, player: InputPlayer, track: BigPlayerPlayableProtocol, likeManager: InputLikeManager) {
         self.player = player
         self.model = BigPlayerModel(model: track)
         self.delegate = vc
-        self.addToLikeManager = addToLikeManager
+        self.likeManager = likeManager
         
         super.init(nibName: Self.identifier, bundle: nil)
     }
@@ -183,7 +183,7 @@ class BigPlayerViewController: UIViewController {
     
     @IBAction func likedButton(_ sender: UIButton) {
         let moment = Double(progressSlider.value)
-        addToLikeManager.addToLikedMoments(entity: model.inputType, moment: moment)
+        likeManager.addToLikedMoments(entity: model.inputType, moment: moment)
     }
     
     @IBAction func dissmisButtonTouchUpInside(_ sender: UIButton) {

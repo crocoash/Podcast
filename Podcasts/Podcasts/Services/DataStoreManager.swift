@@ -7,15 +7,17 @@
 
 import CoreData
 
-
+//MARK: - DataStoreManagerDelegate
 protocol DataStoreManagerDelegate: AnyObject {
     func dataStoreManager(_ dataStoreManagerInput: DataStoreManagerInput, didRemoveEntity entities: [NSManagedObject])
     func dataStoreManager(_ dataStoreManagerInput: DataStoreManagerInput, didUpdateEntity entities: [NSManagedObject])
     func dataStoreManager(_ dataStoreManagerInput: DataStoreManagerInput, didAdd entities: [NSManagedObject])
 }
 
+//MARK: - DataStoreManagerInput
 protocol DataStoreManagerInput {
     var viewContext: NSManagedObjectContext { get }
+    var backgroundViewContext: NSManagedObjectContext { get }
     
     func getFromCoreData<T: CoreDataProtocol>(entity: T) -> T?
     
@@ -28,7 +30,6 @@ protocol DataStoreManagerInput {
     
     func updateCoreData<T: CoreDataProtocol>(entity: T)
     func updateCoreData<T: CoreDataProtocol>(set: [T])
-    func addFromFireBase<T: CoreDataProtocol>(entity: T)
     func saveInCoredataIfNotSaved<T: CoreDataProtocol>(entity: T)
     func removeAll<T: CoreDataProtocol>(type: T.Type)
     func mySave()
@@ -42,6 +43,7 @@ protocol DataStoreManagerInput {
     ) -> NSFetchedResultsController<T>
 }
 
+//MARK: - CoreDataProtocol
 protocol CoreDataProtocol where Self: NSManagedObject & Hashable & Identifiable & Decodable {
         
     var identifier: String { get }
@@ -73,23 +75,23 @@ final class DataStoreManager {
                 fatalError("Unresolved error \(error), \(error.userInfo)")
             }
         })
-        
+       
         return container
     }()
+    
+    
+    lazy var backgroundViewContext = persistentContainer.newBackgroundContext()
+    
+    func test() {
+        backgroundViewContext.undoManager = UndoManager()
+    }
 }
 
 extension DataStoreManager: DataStoreManagerInput {
     
-    typealias Object = NSManagedObject
-
-    func addFromFireBase<T: CoreDataProtocol>(entity: T) {
-        getFromCoreDataIfNoSavedNew(entity: entity)
-    }
-    
     func mySave() {
-        
         viewContext.performAndWait {
-            
+        
             if viewContext.hasChanges {
                 
                 let deletedObjects = initAbstractObjects(for: viewContext.deletedObjects)

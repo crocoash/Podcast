@@ -8,22 +8,23 @@
 import UIKit
 import Network
 
-protocol NetworkMonitiorDelegate: AnyObject {
-    func internetConnectionDidRestore(_ networkMonitior: NetworkMonitor)
+protocol NetworkMonitorDelegate: AnyObject {
+    func internetConnectionDidRestore(_ networkMonitior: NetworkMonitor, isConnection: Bool)
 }
 
 class NetworkMonitor {
     
-    weak var delegate: NetworkMonitiorDelegate?
+    weak var delegate: NetworkMonitorDelegate?
     
     private let queue = DispatchQueue.global()
     private let monitor: NWPathMonitor
     
     private(set) var isConnection: Bool = false {
         didSet {
-            DispatchQueue.main.async {
-                if oldValue != self.isConnection {
-                    self.delegate?.internetConnectionDidRestore(self)
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                if oldValue != isConnection {
+                    delegate?.internetConnectionDidRestore(self, isConnection: isConnection)
                 }
             }
         }
@@ -47,7 +48,6 @@ class NetworkMonitor {
         monitor.pathUpdateHandler = { [weak self] path in
             
             DispatchQueue.main.async { [weak self] in
-                
                 guard let self = self else { return }
 
                 isConnection = path.status == .satisfied

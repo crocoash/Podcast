@@ -8,17 +8,19 @@
 import UIKit
 import CoreData
 
+//MARK: - InputDownloadProtocol
 protocol InputDownloadProtocol {
     var downloadEntity: DownloadProtocol { get }
 }
 
+//MARK: - DownloadProtocol
 protocol DownloadProtocol {
     var downloadUrl: String? { get }
     var downloadEntityIdentifier: String { get }
 }
 
+//MARK: - DownloadServiceType
 struct DownloadServiceType: PodcastCellDownloadProtocol {
-    
     
     var downloadIdentifier: String
     var inputDownloadProtocol: InputDownloadProtocol
@@ -39,26 +41,35 @@ struct DownloadServiceType: PodcastCellDownloadProtocol {
     }
 }
 
+//MARK: - DownloadEventNotifications
 protocol DownloadEventNotifications where Self: AnyObject {
         
-    func updateDownloadInformation (_ downloadService: DownloadService, entity: DownloadServiceType)
-    func didEndDownloading         (_ downloadService: DownloadService, entity: DownloadServiceType)
-    func didPauseDownload          (_ downloadService: DownloadService, entity: DownloadServiceType)
-    func didContinueDownload       (_ downloadService: DownloadService, entity: DownloadServiceType)
-    func didStartDownload          (_ downloadService: DownloadService, entity: DownloadServiceType)
-    func didRemoveEntity           (_ downloadService: DownloadService, entity: DownloadServiceType)
+    func updateDownloadInformation (_ downloadService: DownloadServiceInput, entity: DownloadServiceType)
+    func didEndDownloading         (_ downloadService: DownloadServiceInput, entity: DownloadServiceType)
+    func didPauseDownload          (_ downloadService: DownloadServiceInput, entity: DownloadServiceType)
+    func didContinueDownload       (_ downloadService: DownloadServiceInput, entity: DownloadServiceType)
+    func didStartDownload          (_ downloadService: DownloadServiceInput, entity: DownloadServiceType)
+    func didRemoveEntity           (_ downloadService: DownloadServiceInput, entity: DownloadServiceType)
 }
 
-class DownloadService: NSObject {
+//MARK: - DownloadServiceInput
+protocol DownloadServiceInput: AnyObject {
+    func addObserverDownloadEventNotifications(for object: DownloadEventNotifications)
+    func isDownloaded(entity: InputDownloadProtocol) -> Bool
+    func conform(entity: InputDownloadProtocol)
+    func cancelDownload(_ entity: InputDownloadProtocol)
+}
+
+class DownloadService: NSObject, DownloadServiceInput {
     
     typealias DownloadsSession = [URL: DownloadServiceType]
     
     private let dataStoreManagerInput: DataStoreManagerInput
     private let networkMonitor: NetworkMonitor
     
-    init(dataStoreManagerInput: DataStoreManagerInput, networkMonitor: NetworkMonitor) {
+    init(dataStoreManager: DataStoreManagerInput, networkMonitor: NetworkMonitor) {
         self.networkMonitor = networkMonitor
-        self.dataStoreManagerInput = dataStoreManagerInput
+        self.dataStoreManagerInput = dataStoreManager
     }
     
     private(set) var delegates: [WeakObject] = []

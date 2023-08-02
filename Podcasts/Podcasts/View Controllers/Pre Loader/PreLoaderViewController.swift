@@ -10,11 +10,11 @@ import UIKit
 class PreLoaderViewController: UIViewController {
     
     private let userViewModel: UserViewModel
-    private let addToLikeManager: AddToLikeManager
+    private let likeManager: InputLikeManager
     private let addToFavoriteManager: FavoriteManager
     private let firestorageDatabase: FirestorageDatabase
-    private let player: Player
-    private let downloadService: DownloadService
+    private let player: InputPlayer
+    private let downloadService: DownloadServiceInput
     private let firebaseDataBase: FirebaseDatabase
     private let apiService: ApiService
     private let dataStoreManagerInput: DataStoreManagerInput
@@ -26,9 +26,6 @@ class PreLoaderViewController: UIViewController {
     
     lazy private var topAnchorConst = view.frame.height / 2 - logoImageView.frame.height / 2
     
-    
-    
-    
     lazy private var tabBarVC: TabBarViewController = TabBarViewController.create { [weak self] coder in
         
         guard let self = self else { fatalError() }
@@ -39,7 +36,7 @@ class PreLoaderViewController: UIViewController {
                                                         player: player,
                                                         downloadService: downloadService,
                                                         addToFavoriteManager: addToFavoriteManager,
-                                                        addToLikeManager: addToLikeManager,
+                                                        likeManager: likeManager,
                                                         firebaseDataBase: firebaseDataBase,
                                                         apiService: apiService,
                                                         dataStoreManagerInput: dataStoreManagerInput)
@@ -55,10 +52,10 @@ class PreLoaderViewController: UIViewController {
         guard let self = self else { fatalError() }
         
         let registrationVC = RegistrationViewController(coder: coder,
-                                                        userViewModel: self.userViewModel,
-                                                        addToFavoriteManager: self.addToFavoriteManager,
-                                                        addToLikeManager: addToLikeManager,
-                                                        player: self.player,
+                                                        userViewModel: userViewModel,
+                                                        addToFavoriteManager: addToFavoriteManager,
+                                                        likeManager: likeManager,
+                                                        player: player,
                                                         firebaseDataBase: firebaseDataBase,
                                                         apiService: apiService,
                                                         downloadService: downloadService,
@@ -73,17 +70,17 @@ class PreLoaderViewController: UIViewController {
         
     init?(coder: NSCoder,
           userViewModel: UserViewModel,
-          addToLikeManager: AddToLikeManager,
+          likeManager: InputLikeManager,
           addToFavoriteManager: FavoriteManager,
           firestorageDatabase: FirestorageDatabase,
-          player: Player,
-          downloadService: DownloadService,
+          player: InputPlayer,
+          downloadService: DownloadServiceInput,
           firebaseDataBase: FirebaseDatabase,
           apiService: ApiService,
           dataStoreManagerInput: DataStoreManagerInput) {
         
         self.addToFavoriteManager = addToFavoriteManager
-        self.addToLikeManager = addToLikeManager
+        self.likeManager = likeManager
         self.userViewModel = userViewModel
         self.player = player
         self.downloadService = downloadService

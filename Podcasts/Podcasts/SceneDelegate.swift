@@ -19,27 +19,36 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     private let userViewModel = UserViewModel()
     private let firestorageDatabase = FirestorageDatabase()
-    private let netWorkMonitor = NetworkMonitor()
+    
+    lazy private var netWorkMonitor: NetworkMonitor = {
+        $0.delegate = self
+        return $0
+    }(NetworkMonitor())
     
     lazy private var firebaseDatabase: FirebaseDatabase = {
         $0.delegate = self
         return $0
     }(FirebaseDatabase())
     
-    private let player = Player()
+    private let player: InputPlayer = Player()
     
-    lazy private var dataStoreManagerInput: DataStoreManagerInput = {
+    lazy private var dataStoreManager: DataStoreManagerInput = {
         $0.delegate = self
         return $0
     }(DataStoreManager())
     
-    lazy private var listeningManager = ListeningManager(dataStoreManagerInput: dataStoreManagerInput)
-    lazy private var addToLikeManager = AddToLikeManager(dataStoreManagerInput: dataStoreManagerInput)
-    lazy private var downloadService = DownloadService(dataStoreManagerInput: dataStoreManagerInput, networkMonitor: netWorkMonitor)
-    lazy private var apiService = ApiService(viewContext: dataStoreManagerInput.viewContext)
+    lazy private var listeningManager = ListeningManager(dataStoreManagerInput: dataStoreManager)
+    lazy private var likeManager: InputLikeManager = {
+        let likeManager = LikeManager(dataStoreManagerInput: dataStoreManager)
+        likeManager.delegate = self
+        return likeManager
+    }()
+    
+    lazy private var downloadService: DownloadServiceInput = DownloadService(dataStoreManager: dataStoreManager, networkMonitor: netWorkMonitor)
+    lazy private var apiService = ApiService(viewContext: dataStoreManager.viewContext)
     
     lazy private var favoriteManager: FavoriteManager = {
-        let manager = FavoriteManager(dataStoreManagerInput: dataStoreManagerInput)
+        let manager = FavoriteManager(dataStoreManagerInput: dataStoreManager)
         manager.delegate = self
         return manager
     }()
@@ -50,7 +59,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         self.window?.rootViewController = preLoaderViewController()
         self.window?.makeKeyAndVisible()
         
-        player.addObserverPlayerEventNotification(for: self)
         updateFromFireBase()
     }
     
@@ -76,82 +84,94 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             return PreLoaderViewController(
                 coder: coder,
                 userViewModel: userViewModel,
-                addToLikeManager: addToLikeManager,
+                likeManager: likeManager,
                 addToFavoriteManager: favoriteManager,
                 firestorageDatabase: firestorageDatabase,
                 player: player,
                 downloadService: downloadService,
                 firebaseDataBase: firebaseDatabase,
                 apiService: apiService,
-                dataStoreManagerInput: dataStoreManagerInput)
+                dataStoreManagerInput: dataStoreManager)
         }
     }
     
     private func updateFromFireBase() {
-        let viewContext = dataStoreManagerInput.viewContext
+        let viewContext = dataStoreManager.backgroundViewContext
         
-        //FavoritePodcast
+        // FavoritePodcast
         firebaseDatabase.observe(
             
             viewContext: viewContext, add: { [weak self] (result: Result<FavoritePodcast>) in
+                guard let self = self else { return }
+
                 switch result {
                 case .success(result: let favoritePodcast) :
-                    self?.dataStoreManagerInput.saveInCoredataIfNotSaved(entity: favoritePodcast)
+                    dataStoreManager.saveInCoredataIfNotSaved(entity: favoritePodcast)
                 case .failure(error: let error):
-                    if let vc = self?.window?.rootViewController {
+                    if let vc = window?.rootViewController {
                         error.showAlert(vc: vc)
                     }
                 }
             },
             
             remove: { [weak self] (result: Result<FavoritePodcast>) in
+                guard let self = self else { return }
+                
                 switch result {
                 case .success(result: let favoritePodcast):
-                    self?.dataStoreManagerInput.removeFromCoreData(entity: favoritePodcast)
+                    dataStoreManager.removeFromCoreData(entity: favoritePodcast)
                 case .failure(error: let error):
-                    if let vc = self?.window?.rootViewController {
+                    if let vc = window?.rootViewController {
                         error.showAlert(vc: vc)
                     }
                 }
             })
         
-        ///LikedMoment
+        // LikedMoment
         firebaseDatabase.observe(
             viewContext: viewContext, add: { [weak self] (result: Result<LikedMoment>) in
+                guard let self = self else { return }
+
                 switch result {
                 case .success(result: let likedMoment) :
-                    self?.dataStoreManagerInput.saveInCoredataIfNotSaved(entity: likedMoment)
+                    dataStoreManager.saveInCoredataIfNotSaved(entity: likedMoment)
                 case .failure(error: let error):
-                    if let vc = self?.window?.rootViewController {
+                    if let vc = window?.rootViewController {
                         error.showAlert(vc: vc)
                     }                }
             }, remove: { [weak self] (result: Result<LikedMoment>) in
+                guard let self = self else { return }
+
                 switch result {
                 case .success(result: let likedMoment):
-                    self?.dataStoreManagerInput.removeFromCoreData(entity: likedMoment)
+                    dataStoreManager.removeFromCoreData(entity: likedMoment)
                 case .failure(error: let error):
-                    if let vc = self?.window?.rootViewController {
+                    if let vc = window?.rootViewController {
                         error.showAlert(vc: vc)
                     }
                 }
             })
         
-        ///ListeningPodcast
+        // ListeningPodcast
         firebaseDatabase.observe(
             viewContext: viewContext, add: { [weak self] (result: Result<ListeningPodcast>) in
+                guard let self = self else { return }
+
                 switch result {
                 case .success(result: let listeningPodcast) :
-                    self?.dataStoreManagerInput.saveInCoredataIfNotSaved(entity: listeningPodcast)
+                    dataStoreManager.saveInCoredataIfNotSaved(entity: listeningPodcast)
                 case .failure(error: let error):
-                    if let vc = self?.window?.rootViewController {
+                    if let vc = window?.rootViewController {
                         error.showAlert(vc: vc)
                     }                }
             }, remove: { [weak self] (result: Result<ListeningPodcast>) in
+                guard let self = self else { return }
+
                 switch result {
                 case .success(result: let listeningPodcast):
-                    self?.dataStoreManagerInput.removeFromCoreData(entity: listeningPodcast)
+                    dataStoreManager.removeFromCoreData(entity: listeningPodcast)
                 case .failure(error: let error):
-                    if let vc = self?.window?.rootViewController {
+                    if let vc = window?.rootViewController {
                         error.showAlert(vc: vc)
                     }
                 }
@@ -168,7 +188,7 @@ extension SceneDelegate: PlayerEventNotification {
     
     func playerUpdatePlayingInformation(with track: OutputPlayerProtocol) {
         let entity = track.inputType
-        let progress = track.listeningProgress ?? 0
+        let progress = track.listeningProgress 
         guard let inputListeningManager = entity as? (any InputListeningManager) else { fatalError() }
         listeningManager.saveListeningProgress(for: inputListeningManager, progress: progress)
     }
@@ -180,15 +200,15 @@ extension SceneDelegate: PlayerEventNotification {
 extension SceneDelegate: FirebaseDatabaseDelegate {
     
     func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didGetEmptyData type: any FirebaseProtocol.Type) {
-        dataStoreManagerInput.removeAll(type: type)
+        dataStoreManager.removeAll(type: type)
     }
     
     func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didRemove entity: (any  FirebaseProtocol)) {
-        dataStoreManagerInput.removeFromCoreData(entity: entity)
+        dataStoreManager.removeFromCoreData(entity: entity)
     }
     
     func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didAdd entity: (any FirebaseProtocol)) {
-        dataStoreManagerInput.addFromFireBase(entity: entity)
+        dataStoreManager.getFromCoreDataIfNoSavedNew(entity: entity)
     }
     
     func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didGet entities: [(any FirebaseProtocol)]) {
@@ -196,7 +216,7 @@ extension SceneDelegate: FirebaseDatabaseDelegate {
     }
     
     func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didUpdate entity: (any FirebaseProtocol)) {
-        dataStoreManagerInput.updateCoreData(entity: entity)
+        dataStoreManager.updateCoreData(entity: entity)
     }
 }
 
@@ -227,5 +247,25 @@ extension SceneDelegate: DataStoreManagerDelegate {
         entities.compactMap { $0 as? (any FirebaseProtocol) }.forEach  {
             firebaseDatabase.add(entity: $0)
         }
+    }
+}
+
+//MARK: - LikeManagerDelegate
+extension SceneDelegate: LikeManagerDelegate {
+    
+    func likeManager(_ LikeManager: LikeManager, didAdd likedMoment: LikedMoment) {
+        firebaseDatabase.add(entity: likedMoment)
+    }
+    
+    func likeManager(_ LikeManager: LikeManager, didRemove likedMoment: LikedMoment) {
+        firebaseDatabase.remove(entity: likedMoment)
+    }
+}
+
+//MARK: - NetworkMonitorDelegate
+extension SceneDelegate: NetworkMonitorDelegate {
+    
+    func internetConnectionDidRestore(_ networkMonitior: NetworkMonitor, isConnection: Bool) {
+        print("print connection is \(isConnection)")
     }
 }

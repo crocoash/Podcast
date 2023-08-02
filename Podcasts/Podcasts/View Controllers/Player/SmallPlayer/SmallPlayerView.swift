@@ -69,24 +69,24 @@ class SmallPlayerView: UIView {
         }
     }
     
-    private var player: Player!
+    private var player: InputPlayer!
     
     // MARK: - Init
-    init<T: SmallPlayerViewControllerDelegate>(vc: T, frame: CGRect = .zero, model: SmallPlayerViewModel, player: Player) {
+    init<T: SmallPlayerViewControllerDelegate>(vc: T, frame: CGRect = .zero, model: SmallPlayerViewModel, player: InputPlayer) {
         self.model = model
         self.player = player
         self.delegate = vc
         
         super.init(frame: frame)
         
-        loadFromXib()
+        
         initial()
         
         updateView()
         addObserverPlayerEventNotification()
     }
     
-    func configure(with model: SmallPlayerPlayableProtocol, player: Player) {
+    func configure(with model: SmallPlayerPlayableProtocol, player: InputPlayer) {
         let model = SmallPlayerViewModel(model)
         self.model = model
         self.player = player
@@ -94,19 +94,13 @@ class SmallPlayerView: UIView {
         addObserverPlayerEventNotification()
     }
     
-//    func configure<T: SmallPlayerViewControllerDelegate>(vc: T, with model: SmallPlayerViewModel) {
-//        self.model = model
-//        self.delegate = vc
-//        addObserverPlayerEventNotification()
-//    }
-    
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        loadFromXib()
         initial()
     }
     
     private func initial() {
+        loadFromXib()
         configureView()
         configureGesture()
     }
@@ -138,7 +132,7 @@ extension SmallPlayerView {
         if model.listeningProgress == 0 {
             progressView.progress = 1
         } else {
-            progressView.progress = Float(model.listeningProgress ?? 0)
+            progressView.progress = Float(model.listeningProgress)
         }
         
         if model.isGoingPlaying {

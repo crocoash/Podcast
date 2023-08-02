@@ -47,7 +47,6 @@ class EpisodeTableView: UITableView {
             beginUpdates()
             endUpdates()
          
-            let offset = rectForRow(at: indexPath).height
             let isLastCell = isLastSectionAndRow(indexPath: indexPath)
             let height = rect(forSection: 0).height
             myDataSource?.episodeTableViewDidChangeHeightTableView(self, height: height, with: isLastCell)

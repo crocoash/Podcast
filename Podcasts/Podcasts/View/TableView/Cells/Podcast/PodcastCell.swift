@@ -254,7 +254,7 @@ extension PodcastCell {
         playStopButton.image = model.isPlaying ? pauseImage : playImage
         playStopButton.isHidden = model.isGoingPlaying
         
-        listeningProgressView.progress = Float(model.listeningProgress ?? 0)
+        listeningProgressView.progress = Float(model.listeningProgress)
         listeningProgressView.isHidden = model.listeningProgress == 0
         
         if model.isGoingPlaying {
