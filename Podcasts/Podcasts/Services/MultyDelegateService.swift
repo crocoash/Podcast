@@ -33,7 +33,7 @@ class MultyDelegateService<T>: NSObject, MultyDelegateServiceInput {
         } else {
             fatalError("delegate must be like \(T.self)")
         }
-}
+    }
     
     func delegates(_ delegate: (T) -> ()) {
         delegates.allObjects.reversed().forEach {
