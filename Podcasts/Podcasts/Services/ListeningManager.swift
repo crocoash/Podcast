@@ -15,16 +15,16 @@ protocol ListeningManagerDelegate: AnyObject {
 }
 
 //MARK: - Type
-protocol ListeningManagerProtocol {
-    var trackId: String { get }
-    var listeningProgress: Double? { get }
-    var currentTime: Float? { get }
-    var duration: Double? { get }
-}
+//protocol ListeningManagerProtocol {
+//    var trackId: String { get }
+//    var listeningProgress: Double? { get }
+//    var currentTime: Float? { get }
+//    var duration: Double? { get }
+//}
 
 //MARK: - Input
 protocol ListeningManagerInput: MultyDelegateServiceInput {
-    func saveListeningProgress(by entity: (any ListeningManagerProtocol))
+    func saveListeningProgress(by entity: Track)
     func removeListeningPodcast(_ entity: ListeningPodcast)
     func saveListeningPodcast(_ entity: ListeningPodcast)
 }
@@ -43,27 +43,31 @@ class ListeningManager: MultyDelegateService<ListeningManagerDelegate>, Listenin
         firebaseDatabaseInput.delegate = self
     }
     
-    func saveListeningProgress(by entity: (any ListeningManagerProtocol)) {
+    func saveListeningProgress(by entity: Track) {
         
-        let predicate = NSPredicate(format: "podcast.id == %@", entity.trackId)
-        let listeningPodcast = dataStoreManager.fetchObject(entity: ListeningPodcast.self, predicates: [predicate])
-        
-        if let listeningPodcast = listeningPodcast {
-            listeningPodcast.currentTime = entity.currentTime ?? 0
-            listeningPodcast.progress = entity.listeningProgress ?? 0
-            listeningPodcast.duration = entity.duration ?? 0
-            dataStoreManager.save()
+        if let podcast = entity.inputType as? Podcast {
             
-            firebaseDatabase.update(entity: listeningPodcast)
+            let predicate = NSPredicate(format: "podcast.id == %@", podcast.id)
+            let listeningPodcast = dataStoreManager.fetchObject(entity: ListeningPodcast.self, predicates: [predicate])
             
-            delegates {
-                $0.listeningManager(self, didUpdate: listeningPodcast)
-            }
-            
-        } else {
-            let predicate1 = NSPredicate(format: "id == %@", entity.trackId)
-            if let podcast = dataStoreManager.fetchObject(entity: Podcast.self, predicates: [predicate1]) {
+            if let listeningPodcast = listeningPodcast {
+                listeningPodcast.currentTime = entity.currentTime ?? 0
+                listeningPodcast.progress = entity.listeningProgress ?? 0
+                listeningPodcast.duration = entity.duration ?? 0
+                dataStoreManager.save()
+                
+                firebaseDatabase.update(entity: listeningPodcast)
+                
+                delegates {
+                    $0.listeningManager(self, didUpdate: listeningPodcast)
+                }
+                
+            } else {
+                
+                let podcast = dataStoreManager.getFromCoreDataIfNoSavedNew(entity: podcast)
                 let listenigPodcast = ListeningPodcast.init(podcast, viewContext: dataStoreManager.viewContext, dataStoreManagerInput: dataStoreManager)
+                
+                firebaseDatabase.add(entity: listenigPodcast)
                 
                 delegates {
                     $0.listeningManager(self, didSave: listenigPodcast)
@@ -150,7 +154,7 @@ extension ListeningManager: PlayerDelegate {
     func playerDidEndLoading(with track: OutputPlayerProtocol) {}
     
     func playerUpdatePlayingInformation(with track: OutputPlayerProtocol) {
-        saveListeningProgress(by: track)
+        saveListeningProgress(by: track as! Track)
     }
     
     func playerStateDidChanged(with track: OutputPlayerProtocol) {}

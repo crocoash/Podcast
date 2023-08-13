@@ -84,10 +84,10 @@ class ListViewModel {
         }
     }
     
-    func appendItem(_ object: Any) {
+    func appendItem(_ object: Any, at index: Int) {
         if let object = object as? NSManagedObject {
-            if let index = getIndexOfSection(forAny: object) {
-                sections[index].rows.append(object)
+            if let indexSection = getIndexOfSection(forAny: object) {
+                sections[indexSection].rows.insert(object, at: index)
             } else {
                 let section = Section(entities: [object])
                 sections.append(section)

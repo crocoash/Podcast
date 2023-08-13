@@ -351,7 +351,7 @@ extension ListViewController: NSFetchedResultsControllerDelegate {
             
             guard var newIndexPath = newIndexPath else { return }
             
-            model.appendItem(anObject)
+            model.appendItem(anObject, at: newIndexPath.row)
             
             guard let section = model.getIndexOfSection(forAny: anObject) else { return }
             
