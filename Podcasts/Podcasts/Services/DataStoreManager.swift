@@ -7,35 +7,34 @@
 
 import CoreData
 
-//MARK: - DataStoreManagerDelegate
-protocol DataStoreManagerDelegate: AnyObject {
-    func dataStoreManager(_ dataStoreManagerInput: DataStoreManagerInput, didRemoveEntity entities: [NSManagedObject])
-    func dataStoreManager(_ dataStoreManagerInput: DataStoreManagerInput, didUpdateEntity entities: [NSManagedObject])
-    func dataStoreManager(_ dataStoreManagerInput: DataStoreManagerInput, didAdd entities: [NSManagedObject])
-}
 
-//MARK: - DataStoreManagerInput
+//MARK: - Input
 protocol DataStoreManagerInput {
     var viewContext: NSManagedObjectContext { get }
     var backgroundViewContext: NSManagedObjectContext { get }
     
-    func getFromCoreData<T: CoreDataProtocol>(entity: T) -> T?
+//    func getFromCoreData<T: CoreDataProtocol>(entity: T) -> T?
     
-    @discardableResult func getFromCoreDataIfNoSavedNew<T: CoreDataProtocol>(entity: T) -> T
+//    @discardableResult
+    func getFromCoreDataIfNoSavedNew<T: CoreDataProtocol>(entity: T) -> T
     
     func removeFromCoreData<T: CoreDataProtocol>(entity: T)
     func allObjectsFromCoreData<T: NSManagedObject>(type: T.Type) -> Set<T>
     func fetchObject<T: CoreDataProtocol>(entity: T, predicates: [NSPredicate]?) -> T?
     func fetchObject<T: CoreDataProtocol>(entity: T.Type, predicates: [NSPredicate]?) -> T?
     
-    func updateCoreData<T: CoreDataProtocol>(entity: T)
-    func updateCoreData<T: CoreDataProtocol>(set: [T])
-    func saveInCoredataIfNotSaved<T: CoreDataProtocol>(entity: T)
-    func removeAll<T: CoreDataProtocol>(type: T.Type)
-    func mySave()
-    func conFigureFRC<T: NSManagedObject>(for entity: T.Type, with sortDescription: [NSSortDescriptor]) -> NSFetchedResultsController<T>
+    func initAbstractObjects<T: NSManagedObject>(for objects: Set<T>) -> [T]
+    func initAbstractObject<T: NSManagedObject>(for objects: T) -> T
     
-    func fetchResultController<T: NSManagedObject>(
+//    func updateCoreData<T: CoreDataProtocol>(entity: T)
+    
+    func updateCoreData(set: [(any CoreDataProtocol)])
+        
+    func save()
+    
+    func conFigureFRC<T: CoreDataProtocol>(for entity: T.Type, with sortDescription: [NSSortDescriptor]?) -> NSFetchedResultsController<T>
+    
+    func fetchResultController<T: CoreDataProtocol>(
         sortDescription: [NSSortDescriptor]?,
         predicates: [NSPredicate]?,
         sectionNameKeyPath: String?,
@@ -43,20 +42,35 @@ protocol DataStoreManagerInput {
     ) -> NSFetchedResultsController<T>
 }
 
-//MARK: - CoreDataProtocol
-protocol CoreDataProtocol where Self: NSManagedObject & Hashable & Identifiable & Decodable {
-        
-    var identifier: String { get }
-   
-    @discardableResult
-    init(_ entity: Self, viewContext: NSManagedObjectContext?, dataStoreManagerInput: DataStoreManagerInput?)
+//MARK: - Type
+protocol CoreDataProtocol where Self: NSManagedObject & Hashable & Identifiable & Codable {
+    var id: String { get }
+    static var defaultSortDescription: [NSSortDescriptor] { get }
+    
+    init(_ entity: Self, viewContext: NSManagedObjectContext, dataStoreManagerInput: DataStoreManagerInput)
 }
 
-
-extension CoreDataProtocol where Self: NSManagedObject {
+extension CoreDataProtocol {
     
     var defaultPredicate: NSPredicate {
-        return NSPredicate(format: "identifier == %@", "\(identifier)")
+        return NSPredicate(format: "id == %@", "\(id)")
+    }
+    
+    init(_ entity: Self, viewContext: NSManagedObjectContext, dataStoreManagerInput: DataStoreManagerInput) {
+        
+        self.init(entity: entity.entity, insertInto: viewContext)
+        
+        for initProp in self.entity.propertiesByName {
+            let value = entity.value(forKey: initProp.key)
+            if let value = value {
+                if let object = value as? (any CoreDataProtocol) {
+                    let object = dataStoreManagerInput.getFromCoreDataIfNoSavedNew(entity: object)
+                    self.setValue(object, forKey: initProp.key)
+                } else {
+                    self.setValue(value, forKey: initProp.key)
+                }
+            }
+        }
     }
 }
 
@@ -64,8 +78,6 @@ final class DataStoreManager {
     
     lazy var viewContext = persistentContainer.viewContext
     lazy var backgroundContext = persistentContainer.newBackgroundContext()
-    
-    weak var delegate: DataStoreManagerDelegate?
     
     private(set) var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "CoreData")
@@ -78,8 +90,7 @@ final class DataStoreManager {
        
         return container
     }()
-    
-    
+ 
     lazy var backgroundViewContext = persistentContainer.newBackgroundContext()
     
     func test() {
@@ -88,42 +99,26 @@ final class DataStoreManager {
 }
 
 extension DataStoreManager: DataStoreManagerInput {
-    
-    func mySave() {
+  
+    func save() {
         viewContext.performAndWait {
         
             if viewContext.hasChanges {
-                
-                let deletedObjects = initAbstractObjects(for: viewContext.deletedObjects)
-                let insertedObjects = Array(viewContext.insertedObjects)
-                let updatedObjects = Array(viewContext.updatedObjects)
                 
                 do {
                     try viewContext.save()
                 } catch {
                     print("\(error.localizedDescription)")
                 }
-                
-                if insertedObjects.count != 0 {
-                    delegate?.dataStoreManager(self, didAdd: insertedObjects)
-                }
-                
-                if updatedObjects.count != 0 {
-                    delegate?.dataStoreManager(self, didUpdateEntity: updatedObjects)
-                }
-                
-                if deletedObjects.count != 0 {
-                    delegate?.dataStoreManager(self, didRemoveEntity: deletedObjects)
-                }
             }
         }
     }
     
-    func conFigureFRC<T: NSManagedObject>(for entity: T.Type, with sortDescription: [NSSortDescriptor]) -> NSFetchedResultsController<T> {
+    func conFigureFRC<T: CoreDataProtocol>(for entity: T.Type, with sortDescription: [NSSortDescriptor]?) -> NSFetchedResultsController<T> {
         return fetchResultController(sortDescription: sortDescription, predicates: nil, sectionNameKeyPath: nil, fetchLimit: nil)
     }
     
-    func fetchResultController<T: NSManagedObject>(
+    func fetchResultController<T: CoreDataProtocol>(
         sortDescription: [NSSortDescriptor]?,
         predicates: [NSPredicate]? = nil,
         sectionNameKeyPath: String? = nil,
@@ -131,22 +126,20 @@ extension DataStoreManager: DataStoreManagerInput {
     ) -> NSFetchedResultsController<T> {
         
         let fetchRequest: NSFetchRequest<T> = T.fetchRequest() as! NSFetchRequest<T>
-        
+                
         if let predicates = predicates {
-            for predicate in predicates {
-                fetchRequest.predicate = predicate
-            }
+            fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
         }
         
         fetchRequest.fetchLimit = fetchLimit ?? Int.max
-        fetchRequest.sortDescriptors = sortDescription
+        fetchRequest.sortDescriptors = sortDescription ?? T.defaultSortDescription
         let fetchResultController = NSFetchedResultsController(
             fetchRequest: fetchRequest,
             managedObjectContext: viewContext,
             sectionNameKeyPath: sectionNameKeyPath,
             cacheName: nil
         )
-        
+                
         do {
             try fetchResultController.performFetch()
         } catch {
@@ -158,13 +151,6 @@ extension DataStoreManager: DataStoreManagerInput {
     
     func allObjectsFromCoreData<T: NSManagedObject>(type: T.Type) -> Set<T> {
         viewContext.fetchObjects(T.self)
-    }
-    
-    func removeAll<T: CoreDataProtocol>(type: T.Type) {
-        let objects = allObjectsFromCoreData(type: type)
-        objects.forEach {
-            removeFromCoreData(entity: $0)
-        }
     }
     
     func fetchObject<T: CoreDataProtocol>(entity: T.Type, predicates: [NSPredicate]? = nil) -> T? {
@@ -195,14 +181,8 @@ extension DataStoreManager: DataStoreManagerInput {
     
     func saveInCoredataIfNotSaved<T: CoreDataProtocol>(entity: T) {
         if getFromCoreData(entity: entity) == nil {
-            T.init(entity, viewContext: viewContext, dataStoreManagerInput: self)
-            mySave()
+            let _ = T.init(entity, viewContext: viewContext, dataStoreManagerInput: self)
         }
-    }
-    
-    @discardableResult
-    func getFromCoreDataIfNoSavedNew<T: CoreDataProtocol>(entity: T) -> T {
-        return getFromCoreData(entity: entity) ?? T.init(entity, viewContext: viewContext, dataStoreManagerInput: self)
     }
     
     func fetchObjects<T: CoreDataProtocol>(predicates: [NSPredicate]) -> [T]? {
@@ -214,29 +194,26 @@ extension DataStoreManager: DataStoreManagerInput {
         return try? viewContext.fetch(fetchRequest)
     }
     
-    func fetchObject<T: CoreDataProtocol>(predicates: [NSPredicate]) -> T? {
-        
-        let fetchRequest: NSFetchRequest<T> = T.fetchRequest() as! NSFetchRequest<T>
-       
-        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: predicates )
-        
-        fetchRequest.fetchLimit = 1
-        let result = try? viewContext.fetch(fetchRequest)
-        return result?.first
+    @discardableResult
+    func getFromCoreDataIfNoSavedNew<T: CoreDataProtocol>(entity: T) -> T {
+        return getFromCoreData(entity: entity) ?? T.init(entity, viewContext: viewContext, dataStoreManagerInput: self)
     }
     
-    func updateCoreData<T: CoreDataProtocol>(set: [T]) {
+    func updateCoreData(set: [(any CoreDataProtocol)]) {
         
-        let allObjectsFromCoreData = allObjectsFromCoreData(type: T.self)
+        guard let allObjectsFromCoreData = self.viewContext.fetchObjects(set.first!.entityName) as? [(any CoreDataProtocol)] else { return
+        }
         
         let newObjects = set.filter { fetchObject(entity: $0) == nil }
         
         ///create new
         newObjects.forEach {
-            let _ = T.init($0, viewContext: viewContext, dataStoreManagerInput: self)
+            getFromCoreDataIfNoSavedNew(entity: $0)
         }
         
-        let removedObjects = allObjectsFromCoreData.filter { object in set.filter { $0 != object }.first == nil }
+        let removedObjects = allObjectsFromCoreData.filter { object in
+            set.filter { $0.id == object.id }.first == nil
+        }
         
         /// remove
         removedObjects.forEach {
@@ -266,18 +243,22 @@ extension DataStoreManager: DataStoreManagerInput {
         }
         
         viewContext.delete(object)
-        mySave()
+        save()
     }
 }
 
 //MARK: - Private Methods
 extension DataStoreManager {
     
-    private func initAbstractObjects(for objects: Set<NSManagedObject>) -> [NSManagedObject] {
-        return objects.map { entity in
-            let object = NSManagedObject.init(entity)
-            return object
+    func initAbstractObjects<T: NSManagedObject>(for objects: Set<T>) -> [T] {
+        return objects.map { initAbstractObject(for: $0) }
+    }
+    
+    func initAbstractObject<T: NSManagedObject>(for object: T) -> T {
+        if let object = NSManagedObject.init(object) as? T {
+           return object
         }
+        fatalError()
     }
     
     private func checkSubItem<T: NSManagedObject>(item: NSManagedObject, with checkItem: T) {
@@ -298,11 +279,11 @@ extension DataStoreManager {
                 
                 if item.value(forKey: key) is T {
                     item.setNilValueForKey(key)
-                    mySave()
+                    save()
                 } else if let set = item.value(forKey: key) as? Set<T> {
                     let set = set.filter { $0.objectID != checkItem.objectID }
                     item.setValue(set, forKey: key)
-                    mySave()
+                    save()
                 }
             }
             
@@ -334,12 +315,12 @@ extension DataStoreManager {
                         }
                     }
                     item.setNilValueForKey(key)
-                    mySave()
+                    save()
                 }
             }
             
             viewContext.delete(item)
-            mySave()
+            save()
         }
     }
 }

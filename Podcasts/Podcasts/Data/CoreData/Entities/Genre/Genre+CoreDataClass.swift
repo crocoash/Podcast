@@ -12,7 +12,7 @@ import CoreData
 @objc(Genre)
 public class Genre: NSManagedObject, Codable {
     private enum CodingKeys: String, CodingKey {
-        case identifier, name
+        case id, name
     }
     
     //MARK: decoder
@@ -22,7 +22,7 @@ public class Genre: NSManagedObject, Codable {
         
         let container = try decoder.container(keyedBy: CodingKeys.self)
         
-        identifier = try container.decodeIfPresent(String.self, forKey: .identifier) ?? UUID().uuidString
+        id = try container.decodeIfPresent(String.self, forKey: .id) ?? UUID().uuidString
         name = try container.decodeIfPresent(String.self, forKey: .name)
         
     }
@@ -32,32 +32,26 @@ public class Genre: NSManagedObject, Codable {
         
         var container = encoder.container(keyedBy: CodingKeys.self)
         
-        try container.encode(identifier, forKey: .identifier)
-        try container.encode(name,forKey: .name)
+        try container.encodeIfPresent(id, forKey: .id)
+        try container.encodeIfPresent(name,       forKey: .name)
     }
     
     //MARK: init
-    convenience init(identifier: String, name: String?, viewContext: NSManagedObjectContext?, dataStoreManagerInput: DataStoreManagerInput? = nil) {
+    convenience init(id: String, name: String?, viewContext: NSManagedObjectContext? = nil, dataStoreManagerInput: DataStoreManagerInput? = nil) {
         
         self.init(entity: Self.entity(), insertInto: viewContext)
         
-        self.identifier = identifier
+        self.id = id
         self.name = name
         
-        dataStoreManagerInput?.mySave()
-    }
-    
-    //TODO: <---
-    required convenience init(_ entity: Genre, viewContext: NSManagedObjectContext?, dataStoreManagerInput: DataStoreManagerInput?) {
-        
-        self.init(entity: Self.entity(), insertInto: viewContext)
-        self.identifier = entity.identifier
-        
-        self.name = entity.name
-        self.podcasts = entity.podcasts /// <-------
+        dataStoreManagerInput?.save()
     }
 }
 
 //MARK: - CoreDataProtocol
-extension Genre: CoreDataProtocol { }
+extension Genre: CoreDataProtocol {
+    static var defaultSortDescription: [NSSortDescriptor] {
+        return [NSSortDescriptor(key: #keyPath(Genre.name), ascending: true)]
+    }
+}
 

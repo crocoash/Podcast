@@ -9,7 +9,12 @@ import Foundation
 import UIKit
 import CoreData
 
-class ApiService {
+//MARK: - Input
+protocol ApiServiceInput {
+    func getData<T: Decodable>(for request: String, completion: @escaping (Result<T>) -> Void)
+}
+
+class ApiService: ApiServiceInput {
    
     private var viewContext: NSManagedObjectContext
     

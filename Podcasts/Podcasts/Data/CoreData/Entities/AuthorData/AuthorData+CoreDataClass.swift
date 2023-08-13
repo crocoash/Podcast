@@ -10,7 +10,8 @@ import Foundation
 import CoreData
 
 
-public class AuthorData: NSManagedObject, Decodable {
+public class
+AuthorData: NSManagedObject, Decodable {
 
     private enum CodingKeys: String, CodingKey {
         case resultCount, results

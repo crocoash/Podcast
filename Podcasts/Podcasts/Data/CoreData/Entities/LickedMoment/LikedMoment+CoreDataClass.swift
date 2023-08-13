@@ -15,7 +15,7 @@ public class LikedMoment: NSManagedObject, Codable {
     private enum CodingKeys: String, CodingKey {
         case moment
         case podcast
-        case identifier
+        case id
     }
     
     //MARK: decoder
@@ -26,48 +26,41 @@ public class LikedMoment: NSManagedObject, Codable {
         
         moment =     try values.decode(Double .self, forKey: .moment)
         podcast =    try values.decode(Podcast.self, forKey: .podcast)
-        identifier = try values.decode(String.self , forKey: .identifier)
+        id = try values.decode(String.self , forKey: .id)
     }
     
     //MARK: encode
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         
-        try container.encode(moment,     forKey: .moment)
-        try container.encode(podcast,    forKey: .podcast)
-        try container.encode(identifier, forKey: .identifier)
+        try container.encodeIfPresent(moment,     forKey: .moment)
+        try container.encodeIfPresent(podcast,    forKey: .podcast)
+        try container.encodeIfPresent(id, forKey: .id)
     }
     
     //MARK: init
     
     @discardableResult
-    convenience init(podcast: Podcast, moment: Double, viewContext: NSManagedObjectContext?, dataStoreManagerInput: DataStoreManagerInput?) {
+    convenience init(podcast: Podcast, moment: Double, viewContext: NSManagedObjectContext?, dataStoreManagerInput: DataStoreManagerInput) {
         
         self.init(entity: Self.entity(), insertInto: viewContext)
         
         self.moment     = moment
-        self.podcast    = dataStoreManagerInput?.getFromCoreDataIfNoSavedNew(entity: podcast) ?? podcast
-        self.identifier = UUID().uuidString
+        self.podcast    = dataStoreManagerInput.getFromCoreDataIfNoSavedNew(entity: podcast)
+        self.id = UUID().uuidString
         
-        dataStoreManagerInput?.mySave()
-    }
-    
-    @discardableResult
-    required convenience init(_ likedMoment: LikedMoment, viewContext: NSManagedObjectContext?, dataStoreManagerInput: DataStoreManagerInput?) {
-        
-        self.init(entity: Self.entity(), insertInto: viewContext)
-        
-        self.moment     = likedMoment.moment
-        self.podcast    = likedMoment.podcast
-        self.identifier = likedMoment.identifier
-        
-        dataStoreManagerInput?.mySave()
+        dataStoreManagerInput.save()
     }
 }
 
 
 //MARK: - CoreDataProtocol
-extension LikedMoment: CoreDataProtocol { }
+extension LikedMoment: CoreDataProtocol {
+    
+    static var defaultSortDescription: [NSSortDescriptor] {
+        return [NSSortDescriptor(key: #keyPath(LikedMoment.moment), ascending: true)]
+    }
+}
 
 //MARK: - FirebaseProtocol
 extension LikedMoment: FirebaseProtocol { }

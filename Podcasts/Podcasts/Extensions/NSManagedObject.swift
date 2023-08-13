@@ -42,17 +42,30 @@ extension NSManagedObject {
 
 extension NSManagedObject {
     
-    convenience init(_ entity: NSManagedObject) {
+    convenience init(_ entity: NSManagedObject, withRelationShip: Bool = true) {
         
         self.init(entity: entity.entity, insertInto: nil)
         
         for initProp in self.entity.propertiesByName {
-            let value = entity.value(forKey: initProp.key)
-            if let value = value, !(value is NSManagedObject) {
-                self.setValue(value, forKey: initProp.key)
+            if let value = entity.value(forKey: initProp.key) {
+                if let object = value as? NSManagedObject {
+                    if withRelationShip {
+                        let abstructObject = NSManagedObject.init(object, withRelationShip: false)
+                        self.setValue(abstructObject, forKey: initProp.key)
+                    }
+                } else if let objects = value as? Set<NSManagedObject> {
+                    if withRelationShip, !objects.isEmpty {
+                        let abstructObjects = objects.map { NSManagedObject.init($0, withRelationShip: false)}
+                        self.setValue(abstructObjects, forKey: initProp.key)
+                    }
+                } else {
+                    self.setValue(value, forKey: initProp.key)
+                }
             }
         }
     }
+    
+    
     
     func updateObject(by entity: NSManagedObject) {
         for initProp in self.entity.propertiesByName {

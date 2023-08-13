@@ -18,7 +18,7 @@ protocol SearchViewControllerDelegate: AnyObject {
 
 class SearchViewController : UIViewController {
     
-    private let apiService: ApiService
+    private let apiService: ApiServiceInput
     
     @IBOutlet private weak var searchBar: UISearchBar!
     @IBOutlet private weak var searchCollectionView: SearchCollectionView!
@@ -60,7 +60,7 @@ class SearchViewController : UIViewController {
     //MARK: init
     init?<T: SearchViewControllerDelegate>(coder: NSCoder,
                                            _ vc : T,
-                                           apiService: ApiService) {
+                                           apiService: ApiServiceInput) {
         self.delegate = vc
         self.apiService = apiService
         
@@ -201,10 +201,9 @@ extension SearchViewController {
     private func getData() {
         searchCollectionView.setContentOffset(.zero, animated: true)
         guard let request = searchBar.text?.conform, !request.isEmpty else { showEmptyImage(); return }
-//        activityIndicator.startAnimating()
         view.showActivityIndicator()
         if searchSegmentalControl.selectedSegmentIndex == 0 {
-            getPodcasts(request: DynamicLinkManager.podcastEpisode(request).url)
+            getPodcasts(request: DynamicLinkManager.podcastSearch(request).url)
         } else {
             getAuthors(request: DynamicLinkManager.authors(request).url)
         }
@@ -222,7 +221,6 @@ extension SearchViewController {
             case .failure(error: let error) :
                 error.showAlert(vc: self)
             }
-//            self?.activityIndicator.stopAnimating()
             self?.view.hideActivityIndicator()
         }
     }
@@ -231,7 +229,7 @@ extension SearchViewController {
         apiService.getData(for: request) { [weak self] (result: Result<AuthorData>) in
             switch result {
             case .success(result: let authorData) :
-                let authors = authorData.results.allObjects as? [Author]
+                let authors = authorData.results?.allObjects as? [Author]
                 self?.processResults(result: authors) {
                     self?.authors = $0
                 }

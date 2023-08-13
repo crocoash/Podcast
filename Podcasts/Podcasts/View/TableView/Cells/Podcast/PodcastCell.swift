@@ -19,13 +19,13 @@ protocol PodcastCellDelegate: AnyObject {
 protocol PodcastCellPlayableProtocol {
     var isPlaying: Bool { get }
     var isGoingPlaying: Bool { get }
-    var listeningProgress: Double { get }
-    var duration: Double { get }
-    var trackIdentifier: String { get }
+    var listeningProgress: Double? { get }
+    var duration: Double? { get }
+    var trackId: String { get }
 }
 
 protocol PodcastCellDownloadProtocol {
-    var downloadIdentifier: String { get }
+    var downloadId: String { get }
     var isDownloading: Bool { get }
     var isDownloaded: Bool { get }
     var isGoingDownload: Bool { get }
@@ -42,55 +42,57 @@ protocol InputPodcastCell {
 }
 
 protocol PodcastCellProtocol {
-    var identifier: String { get }
+    var id: String { get }
     var trackDuration: String? { get }
     var dateDuration: String { get }
     var descriptionMy: String? { get }
     var trackName: String? { get }
     var imageForPodcastCell: String? { get }
+    var listeningProgress: Double? { get }
 }
 
 protocol UpdatingTypes: PodcastCellDownloadProtocol, PodcastCellPlayableProtocol & PodcastCellFavoriteProtocol {}
 
 struct PodcastCellModel: PodcastCellProtocol, UpdatingTypes {
     
-    var identifier: String
+    var id: String
     var isFavorite: Bool
     var trackDuration: String?
     var dateDuration: String
     var descriptionMy: String?
     var trackName: String?
     var imageForPodcastCell: String?
+    var listeningProgress: Double?
     
     ///DownloadServiceInformation
-    var downloadIdentifier: String
+    var downloadId: String
     var downloadingProgress: Float = 0
 
     var isDownloading: Bool
     var isGoingDownload: Bool
     var downloadTotalSize : String = ""
     var isDownloaded: Bool
-
     
     ///Player
     var isPlaying: Bool = false
     var isGoingPlaying: Bool = false
-    var listeningProgress: Double = 0
-    var duration: Double = 0
-    var trackIdentifier: String
+    
+    var duration: Double?
+    var trackId: String
     
     init(_ inputPodcastCell: any InputPodcastCell, isFavorite: Bool, isDownloaded: Bool) {
         
         let inputType = inputPodcastCell.inputPodcastCell
         
-        self.identifier = inputType.identifier
+        self.id = inputType.id
         self.trackDuration = inputType.trackDuration
         self.dateDuration = inputType.dateDuration
         self.descriptionMy = inputType.descriptionMy
         self.trackName = inputType.trackName
         self.imageForPodcastCell = inputType.imageForPodcastCell
-        self.trackIdentifier = inputType.identifier
-        self.downloadIdentifier = inputType.identifier
+        self.trackId = inputType.id
+        self.downloadId = inputType.id
+        self.listeningProgress = inputType.listeningProgress
         
         self.isFavorite =  isFavorite  //inputType.isFavorite
         self.isDownloaded = isDownloaded ///
@@ -99,23 +101,21 @@ struct PodcastCellModel: PodcastCellProtocol, UpdatingTypes {
         self.isGoingDownload = false
     }
     
-    mutating func updatePlayableInformation(_ input: Any) {
+    mutating func updateModel(_ input: Any) {
         
         if let player = input as? PodcastCellPlayableProtocol {
             
-            if player.trackIdentifier == trackIdentifier {
+            if player.trackId == trackId {
                 self.isPlaying = player.isPlaying
                 self.isGoingPlaying = player.isGoingPlaying
                 self.listeningProgress = player.listeningProgress
                 self.duration = player.duration
-                self.duration = player.duration
-                self.trackIdentifier = player.trackIdentifier
             }
         }
         
         if let download = input as? PodcastCellDownloadProtocol {
             
-            if download.downloadIdentifier == downloadIdentifier {
+            if download.downloadId == downloadId {
                 self.isDownloaded = download.isDownloaded
                 self.isDownloading  = download.isDownloading
                 self.isGoingDownload = download.isGoingDownload
@@ -180,6 +180,8 @@ class PodcastCell: UITableViewCell {
     func configureCell(_ delegate: PodcastCellDelegate?, with inputPodcastCell: InputPodcastCell,  isFavorite: Bool, isDownloaded: Bool) {
         self.delegate = delegate
         self.model = PodcastCellModel(inputPodcastCell, isFavorite: isFavorite, isDownloaded: isDownloaded)
+        self.heightOfImageView.constant = (frame.height - dateLabel.frame.height) - 10
+        
         configureGestures()
         updateCell()
         
@@ -190,11 +192,14 @@ class PodcastCell: UITableViewCell {
     }
     
     func update(with input: Any) {
-        model.updatePlayableInformation(input)
+        if let input = input as? PodcastCellModel {
+            self.model = input
+        } else {
+            model.updateModel(input)
+        }
     }
     
     func updateCell() {
-        heightOfImageView.constant = bounds.height * 0.8
         dateLabel.text = model.dateDuration
         trackDuration.text = model.trackDuration
         podcastDescription.text = model.descriptionMy
@@ -254,7 +259,7 @@ extension PodcastCell {
         playStopButton.image = model.isPlaying ? pauseImage : playImage
         playStopButton.isHidden = model.isGoingPlaying
         
-        listeningProgressView.progress = Float(model.listeningProgress)
+        listeningProgressView.progress = Float(model.listeningProgress ?? 0)
         listeningProgressView.isHidden = model.listeningProgress == 0
         
         if model.isGoingPlaying {

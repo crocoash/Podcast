@@ -8,7 +8,15 @@
 import Foundation
 import FirebaseAuth
 
-class AuthService {
+//MARK: - Input
+protocol AuthServiceInput {
+    func signInWithEmail (email: String, password: String, completion: @escaping (Bool, String) -> Void)
+    func signUpWithEmail (email: String, password: String, completion: @escaping (Bool, String) -> Void)
+    func forgotPassword(with email: String, completion: @escaping (Error?) -> Void)
+}
+
+
+class AuthService: AuthServiceInput {
     
     func signInWithEmail (email: String, password: String, completion: @escaping (Bool, String) -> Void) {
         Auth.auth().signIn(withEmail: email, password: password) { (result, err) in
@@ -36,7 +44,6 @@ class AuthService {
     
     func forgotPassword(with email: String, completion: @escaping (Error?) -> Void) {
         Auth.auth().sendPasswordReset(withEmail: email) { error in
-            
             completion(error)
         }
     }

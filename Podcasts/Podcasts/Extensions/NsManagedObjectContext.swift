@@ -19,6 +19,16 @@ extension NSManagedObjectContext {
         return []
     }
     
+    func fetchObjects(_ entityName: String) -> [NSManagedObject] {
+        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: entityName)
+        do {
+             return try self.fetch(fetchRequest)
+        } catch {
+            print(error.localizedDescription)
+        }
+        return []
+    }
+    
     func fetchObjectsArray<T: NSManagedObject>(_ type: T.Type) -> [T] {
         let fetchRequest = NSFetchRequest<T>(entityName: T.entityName)
         do {

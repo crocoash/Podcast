@@ -22,13 +22,14 @@ class RegistrationViewController: UIViewController {
     @IBOutlet private weak var backGroundView: UIView!
     
     private let userViewModel: UserViewModel
-    private let addToFavoriteManager: FavoriteManager
-    private let likeManager: InputLikeManager
-    private let firebaseDataBase: FirebaseDatabase
+    private let favoriteManager: FavoriteManagerInput
+    private let likeManager: LikeManagerInput
+    private let firebaseDataBase: FirebaseDatabaseInput
     private let player: InputPlayer
-    private let apiService: ApiService
+    private let apiService: ApiServiceInput
     private let downloadService: DownloadServiceInput
-    private let dataStoreManagerInput: DataStoreManagerInput
+    private let dataStoreManager: DataStoreManagerInput
+    private let listeningManager: ListeningManagerInput
     
     lazy private var tabBarVc = TabBarViewController.create { [weak self] coder in
         guard let self = self else { fatalError() }
@@ -38,11 +39,12 @@ class RegistrationViewController: UIViewController {
                                           firestorageDatabase: FirestorageDatabase(),
                                           player: player,
                                           downloadService: downloadService,
-                                          addToFavoriteManager: addToFavoriteManager,
+                                          favoriteManager: favoriteManager,
                                           likeManager: likeManager,
                                           firebaseDataBase: firebaseDataBase,
                                           apiService: apiService,
-                                          dataStoreManagerInput: dataStoreManagerInput)
+                                          dataStoreManager: dataStoreManager,
+                                          listeningManager: listeningManager)
         
         guard let tabBar = tabBar else { fatalError() }
         
@@ -54,22 +56,24 @@ class RegistrationViewController: UIViewController {
     
     init?(coder: NSCoder,
           userViewModel: UserViewModel,
-          addToFavoriteManager: FavoriteManager,
-          likeManager: InputLikeManager,
+          favoriteManager: FavoriteManagerInput,
+          likeManager: LikeManagerInput,
           player: InputPlayer,
-          firebaseDataBase: FirebaseDatabase,
-          apiService: ApiService,
+          firebaseDataBase: FirebaseDatabaseInput,
+          apiService: ApiServiceInput,
           downloadService: DownloadServiceInput,
-          dataStoreManagerInput: DataStoreManagerInput) {
+          dataStoreManager: DataStoreManagerInput,
+          listeningManager: ListeningManagerInput) {
         
         self.userViewModel = userViewModel
-        self.addToFavoriteManager = addToFavoriteManager
+        self.favoriteManager = favoriteManager
         self.likeManager = likeManager
         self.player = player
         self.firebaseDataBase = firebaseDataBase
         self.apiService = apiService
         self.downloadService = downloadService
-        self.dataStoreManagerInput = dataStoreManagerInput
+        self.dataStoreManager = dataStoreManager
+        self.listeningManager = listeningManager
         
         super.init(coder: coder)
     }
@@ -96,7 +100,7 @@ class RegistrationViewController: UIViewController {
     private let alert = Alert()
     
     //MARK: - Settings
-    lazy private var email: String = userViewModel.userDocument.user.userName ?? "crocoash@gmail.com"
+    lazy private var email: String = userViewModel.userLogin ?? "crocoash@gmail.com"
     private var password: String = "123456"
     
     private let colorFails = #colorLiteral(red: 0.5807225108, green: 0.066734083, blue: 0, alpha: 1)

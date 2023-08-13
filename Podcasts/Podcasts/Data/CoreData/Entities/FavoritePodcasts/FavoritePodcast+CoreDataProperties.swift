@@ -2,7 +2,7 @@
 //  FavoritePodcast+CoreDataProperties.swift
 //  Podcasts
 //
-//  Created by Anton on 11.06.2023.
+//  Created by Anton on 08.08.2023.
 //
 //
 
@@ -17,7 +17,7 @@ extension FavoritePodcast {
     }
 
     @NSManaged public var date: Date?
-    @NSManaged public var identifier: String
+    @NSManaged public var id: String
     @NSManaged public var podcast: Podcast
 
 }

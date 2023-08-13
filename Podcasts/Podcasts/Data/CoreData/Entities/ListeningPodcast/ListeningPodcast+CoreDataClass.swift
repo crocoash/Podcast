@@ -17,7 +17,7 @@ public class ListeningPodcast: NSManagedObject, Codable {
         case duration
         case progress
         case podcast
-        case identifier
+        case id
     }
     
     ///decoder
@@ -31,7 +31,7 @@ public class ListeningPodcast: NSManagedObject, Codable {
         duration    = try container.decode(Double.self, forKey: .duration)
         progress    = try container.decode(Double.self, forKey: .progress)
         podcast     = try container.decode(Podcast.self, forKey: .podcast)
-        identifier  = try container.decode(String.self, forKey: .identifier)
+        id  = try container.decode(String.self, forKey: .id)
     }
     
     ///encode
@@ -39,11 +39,11 @@ public class ListeningPodcast: NSManagedObject, Codable {
         
         var container = encoder.container(keyedBy: CodingKeys.self)
         
-        try container.encode(currentTime, forKey: .currentTime)
-        try container.encode(duration,    forKey: .duration)
-        try container.encode(progress,    forKey: .progress)
-        try container.encode(podcast,     forKey: .podcast)
-        try container.encode(identifier,  forKey: .identifier)
+        try container.encodeIfPresent(currentTime, forKey: .currentTime)
+        try container.encodeIfPresent(duration,    forKey: .duration)
+        try container.encodeIfPresent(progress,    forKey: .progress)
+        try container.encodeIfPresent(podcast,     forKey: .podcast)
+        try container.encodeIfPresent(id,  forKey: .id)
     }
     
     ///init
@@ -52,29 +52,20 @@ public class ListeningPodcast: NSManagedObject, Codable {
         
         self.init(entity: Self.entity(), insertInto: viewContext)
         
-        self.podcast    = dataStoreManagerInput.getFromCoreDataIfNoSavedNew(entity: podcast)
-        self.identifier = UUID().uuidString
+        self.podcast = dataStoreManagerInput.getFromCoreDataIfNoSavedNew(entity: podcast)
+        self.id = UUID().uuidString
         
-        dataStoreManagerInput.mySave()
-    }
-    
-    @discardableResult
-    required convenience init(_ entity: ListeningPodcast, viewContext: NSManagedObjectContext?, dataStoreManagerInput: DataStoreManagerInput?) {
-        
-        self.init(entity: Self.entity(), insertInto: viewContext)
-        
-        self.currentTime = entity.currentTime
-        self.duration    = entity.duration
-        self.progress    = entity.progress
-        self.podcast     = dataStoreManagerInput?.getFromCoreDataIfNoSavedNew(entity: entity.podcast) ?? entity.podcast
-        self.identifier  = entity.identifier
-        
-        dataStoreManagerInput?.mySave()
+        dataStoreManagerInput.save()
     }
 }
 
 //MARK: - CoreDataProtocol
-extension ListeningPodcast: CoreDataProtocol { }
+extension ListeningPodcast: CoreDataProtocol {
+    
+    static var defaultSortDescription: [NSSortDescriptor] {
+        return [NSSortDescriptor(key: #keyPath(ListeningPodcast.progress),ascending: true)]
+    }
+}
 
 //MARK: - FirebaseProtocol
 extension ListeningPodcast: FirebaseProtocol { }

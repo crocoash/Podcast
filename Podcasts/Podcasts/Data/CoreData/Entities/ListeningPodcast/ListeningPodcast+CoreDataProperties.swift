@@ -19,7 +19,7 @@ extension ListeningPodcast {
     @NSManaged public var currentTime: Float
     @NSManaged public var duration: Double
     @NSManaged public var progress: Double
-    @NSManaged public var identifier: String
+    @NSManaged public var id: String
     @NSManaged public var podcast: Podcast
 
 }

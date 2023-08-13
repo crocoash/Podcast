@@ -19,22 +19,29 @@ class TabBarViewController: UITabBarController {
     private var smallPlayer: SmallPlayerView?
     
     private let userViewModel: UserViewModel
-    private let firestorageDatabase: FirestorageDatabase
-    private let player: InputPlayer
+    private let firestorageDatabase: FirestorageDatabaseInput
+    private var player: InputPlayer
     private let downloadService: DownloadServiceInput
-    private let addToFavoriteManager: FavoriteManager
-    private let likeManager: InputLikeManager
-    private let firebaseDataBase: FirebaseDatabase
-    private let apiService: ApiService
-    private let dataStoreManagerInput: DataStoreManagerInput
+    private let favoriteManager: FavoriteManagerInput
+    private let likeManager: LikeManagerInput
+    private let firebaseDataBase: FirebaseDatabaseInput
+    private let apiService: ApiServiceInput
+    private let dataStoreManager: DataStoreManagerInput
+    private let listeningManager: ListeningManagerInput
     
-    lazy private var favoritePodcastVC: FavoriteViewController = {
-        let favoritePodcastTableViewController = FavoriteViewController(downloadService: downloadService, player: player, addToFavoriteManager: addToFavoriteManager, firebaseDataBase: firebaseDataBase, dataStoreManagerInput: dataStoreManagerInput)
+    lazy private var ListVC: ListViewController = {
+        let vc = ListViewController(self,
+                                                                        downloadService: downloadService,
+                                                                        player: player,
+                                                                        favoriteManager: favoriteManager,
+                                                                        firebaseDataBase: firebaseDataBase,
+                                                                        dataStoreManager: dataStoreManager,
+                                                                        listeningManager: listeningManager)
         
-        favoritePodcastTableViewController.transitioningDelegate = self
-        modalPresentationStyle = .custom
+        vc.transitioningDelegate = self
+        vc.modalPresentationStyle = .custom
         
-        return createTabBar(favoritePodcastTableViewController, title: "Playlist", imageName: "folder.fill")
+        return createTabBar(vc, title: "Playlist", imageName: "folder.fill")
     }()
     
     lazy private var searchVC: SearchViewController = SearchViewController.create { [weak self] coder in
@@ -59,58 +66,29 @@ class TabBarViewController: UITabBarController {
         return createTabBar(vc, title: "Settings", imageName: "gear")
     }
     
-    private var detailViewController: DetailViewController?
-    
-    lazy private var bigPlayerVc: BigPlayerViewController = {
-        $0.delegate = self
-        $0.modalPresentationStyle = .fullScreen
-        return $0
-    }(BigPlayerViewController.loadFromXib)
-    
-    private func configureDetailViewController(podcast: Podcast, playList: [Podcast]) -> DetailViewController {
-        
-        let detailViewController: DetailViewController = DetailViewController.create { [weak self] coder in
-
-            guard let self = self else { fatalError() }
-
-            let detailViewController = DetailViewController.init(
-                coder: coder,
-                self,
-                podcast: podcast,
-                playlist: playList,
-                player: player,
-                downloadService: downloadService,
-                likeManager: self.likeManager,
-                addToFavoritePodcast: addToFavoriteManager)
-            
-            return detailViewController
-        }
-        
-        self.detailViewController = detailViewController
-        return detailViewController
-    }
-    
     //MARK: init
     init?(coder: NSCoder,
                                userViewModel: UserViewModel,
-                               firestorageDatabase: FirestorageDatabase,
+                               firestorageDatabase: FirestorageDatabaseInput,
                                player: InputPlayer,
                                downloadService: DownloadServiceInput,
-                               addToFavoriteManager: FavoriteManager,
-                               likeManager: InputLikeManager,
-                               firebaseDataBase: FirebaseDatabase,
-                               apiService: ApiService,
-                               dataStoreManagerInput: DataStoreManagerInput) {
+                               favoriteManager: FavoriteManagerInput,
+                               likeManager: LikeManagerInput,
+                               firebaseDataBase: FirebaseDatabaseInput,
+                               apiService: ApiServiceInput,
+                               dataStoreManager: DataStoreManagerInput,
+                               listeningManager: ListeningManagerInput) {
         
         self.userViewModel = userViewModel
         self.firestorageDatabase = firestorageDatabase
         self.player = player
         self.downloadService = downloadService
-        self.addToFavoriteManager = addToFavoriteManager
+        self.favoriteManager = favoriteManager
         self.likeManager = likeManager
         self.firebaseDataBase = firebaseDataBase
         self.apiService = apiService
-        self.dataStoreManagerInput = dataStoreManagerInput
+        self.dataStoreManager = dataStoreManager
+        self.listeningManager = listeningManager
         
         super.init(coder: coder)
     }
@@ -123,7 +101,8 @@ class TabBarViewController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureView()
-        player.addObserverPlayerEventNotification(for: self)
+        
+        self.player.delegate = self
     }
 }
 
@@ -142,34 +121,53 @@ extension TabBarViewController {
         smallPlayer.heightAnchor.constraint(equalToConstant: 50).isActive = true
         smallPlayer.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
         
-        favoritePodcastVC.updateConstraintForTableView(playerIsPresent: true)
+        ListVC.updateConstraintForTableView(playerIsPresent: true)
         searchVC.updateConstraintForTableView(playerIsPresent: true)
     }
     
-    private func presentDetailViewController(podcast: Podcast, completion: (() -> Void)? = nil) {
+    private func configureDetailViewController(podcast: Podcast, playList: [Podcast]) -> DetailViewController {
         
-        /// don't present new detail vc if it already present ( big player vc )
-        guard presentedViewController as? DetailViewController == nil else {
-            completion?()
-            return
+        let detailViewController: DetailViewController = DetailViewController.create { [weak self] coder in
+
+            guard let self = self else { fatalError() }
+
+            return DetailViewController.init(
+                coder: coder,
+                podcast: podcast,
+                playlist: playList,
+                player: player,
+                downloadService: downloadService,
+                likeManager: self.likeManager,
+                favoriteManager: favoriteManager)
         }
         
-        if let detailViewController = detailViewController, detailViewController.podcast == podcast {
-            self.present(detailViewController, animated: true, completion: completion)
+        detailViewController.modalPresentationStyle = .custom
+        detailViewController.transitioningDelegate = self
+        
+        return detailViewController
+    }
+    
+    private func presentDetailViewController(podcast: Podcast, completion: ((DetailViewController) -> Void)? = nil) {
+        /// don't present new detail vc if it already present ( big player vc )
+        
+        if let detailViewController = presentedViewController as? DetailViewController, detailViewController.podcast == podcast {
+            self.present(detailViewController, animated: true)
+            completion?(detailViewController)
         } else {
-            let id = podcast.downloadEntityIdentifier //guard else { return }
+            guard let id = podcast.collectionId?.stringValue else { return }
             self.view.showActivityIndicator()
             
-            apiService.getData(for: DynamicLinkManager.podcastById(id).url) { [weak self] (result : Result<PodcastData>) in
+            apiService.getData(for: DynamicLinkManager.podcastEpisodeById(id).url) { [weak self] (result : Result<PodcastData>) in
                 guard let self = self else { return }
-                self.view.hideActivityIndicator()
+                view.hideActivityIndicator()
                 switch result {
                 case .failure(let error):
                     error.showAlert(vc: self)
                 case .success(result: let podcastData) :
                     let podcasts = podcastData.podcasts.filter { $0.wrapperType == "podcastEpisode"}
                     let detailViewController = configureDetailViewController(podcast: podcast, playList: podcasts)
-                    self.present(detailViewController, animated: true, completion: completion)
+                    self.present(detailViewController, animated: true)
+                    completion?(detailViewController)
                 }
             }
         }
@@ -177,7 +175,7 @@ extension TabBarViewController {
     
     //MARK: configureView
     private func configureTabBar() {
-        let navigationController = UINavigationController(rootViewController: favoritePodcastVC)
+        let navigationController = UINavigationController(rootViewController: ListVC)
         self.viewControllers = [navigationController, searchVC, settingsVC]
     }
     
@@ -230,7 +228,7 @@ extension TabBarViewController: SettingsTableViewControllerDelegate {
 extension TabBarViewController: SmallPlayerViewControllerDelegate {
     
     func smallPlayerViewControllerSwipeOrTouch(_ smallPlayerViewController: SmallPlayerView) {
-        guard let track = player.currentTrack?.track  else { return }
+        guard let track = player.currentTrack?.track else { return }
         let bigPlayerViewController = BigPlayerViewController(self, player: player, track: track, likeManager: likeManager)
         bigPlayerViewController.modalPresentationStyle = .fullScreen
         self.present(bigPlayerViewController, animated: true)
@@ -242,15 +240,12 @@ extension TabBarViewController: BigPlayerViewControllerDelegate {
     
     func bigPlayerViewControllerDidTouchPodcastNameLabel(_ bigPlayerViewController: BigPlayerViewController, entity: NSManagedObject) {
         guard let podcast = entity as? Podcast else { return }
-        bigPlayerViewController.dismiss(animated: true)
-        presentDetailViewController(podcast: podcast) { [weak self] in
-            self?.detailViewController?.scrollToCell(podcast: podcast)
+        presentedViewController?.dismiss(animated: true)
+        presentDetailViewController(podcast: podcast) { detail in
+            detail.scrollToCell(podcast: podcast)
         }
     }
 }
-
-// MARK: - DetailViewControllerDelegate
-extension TabBarViewController : DetailViewControllerDelegate {}
 
 //MARK: - UIViewControllerTransitioningDelegate
 extension TabBarViewController: UIViewControllerTransitioningDelegate {
@@ -265,7 +260,7 @@ extension TabBarViewController: UIViewControllerTransitioningDelegate {
 }
 
 //MARK: - PlayerEventNotification
-extension TabBarViewController: PlayerEventNotification {
+extension TabBarViewController: PlayerDelegate {
     
     func playerDidEndPlay(with track: OutputPlayerProtocol) {}
     
@@ -275,8 +270,17 @@ extension TabBarViewController: PlayerEventNotification {
     
     func playerDidEndLoading(with track: OutputPlayerProtocol) {}
     
-    func playerUpdatePlayingInformation(with track: OutputPlayerProtocol) {}
+    func playerUpdatePlayingInformation(with track: OutputPlayerProtocol) {
+        
+    }
     
     func playerStateDidChanged(with track: OutputPlayerProtocol) {}
+}
+
+//MARK: -
+extension TabBarViewController: ListViewControllerDelegate {
     
+    func listViewController(_ listViewController: ListViewController, didSelect podcast: Podcast) {
+        presentDetailViewController(podcast: podcast)
+    }
 }

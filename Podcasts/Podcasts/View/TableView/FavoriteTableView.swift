@@ -151,13 +151,6 @@ class FavoriteTableView: UITableView {
         reloadTableView()
     }
     
-    func reloadCell(_ cell: UITableViewCell) {
-        guard let indexPath = indexPath(for: cell),
-              let identifier = diffableDataSource.itemIdentifier(for: indexPath) else { return }
-        
-        mySnapShot.reloadItems([identifier])
-    }
-    
     func updateTableView(with type: Any) {
         visibleCells.forEach {
             if let podcastCell = $0 as? PodcastCell {

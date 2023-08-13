@@ -11,15 +11,14 @@ import CoreData
 protocol EpisodeTableViewMyDataSource: AnyObject {
     
     func episodeTableViewDidChangeHeightTableView(_ episodeTableView: EpisodeTableView, height: CGFloat, with lastCell: Bool)
-//    func episodeTableView(_ episodeTableView: EpisodeTableView, playButtonDidTouchFor indexPath: IndexPath)
-//    
-//    func episodeTableView(_ episodeTableView: EpisodeTableView, playButtonDidTouchFor indexPath: IndexPath)
-//    func episodeTableView(_ episodeTableView: EpisodeTableView, playButtonDidTouchFor indexPath: IndexPath)
-//    func episodeTableView(_ episodeTableView: EpisodeTableView, playButtonDidTouchFor indexPath: IndexPath)
-//    func episodeTableView(_ episodeTableView: EpisodeTableView, playButtonDidTouchFor indexPath: IndexPath)
-//    func episodeTableView(_ episodeTableView: EpisodeTableView, playButtonDidTouchFor indexPath: IndexPath)
-//    func episodeTableView(_ episodeTableView: EpisodeTableView, playButtonDidTouchFor indexPath: IndexPath)
+}
 
+protocol EpisodeTableViewMyDelegate: AnyObject {
+    
+    func episodeTableView(_ episodeTableView: EpisodeTableView, didSelectStar indexPath: IndexPath)
+    func episodeTableView(_ episodeTableView: EpisodeTableView, didSelectDownLoadImage indexPath: IndexPath)
+    func episodeTableView(_ episodeTableView: EpisodeTableView, didTouchPlayButton indexPath: IndexPath)
+    func episodeTableView(_ episodeTableView: EpisodeTableView, didTouchStopButton indexPath: IndexPath)
 }
 
 class EpisodeTableView: UITableView {
@@ -29,20 +28,25 @@ class EpisodeTableView: UITableView {
     private var paddingBetweenSections = CGFloat(20)
     
     weak var myDataSource: EpisodeTableViewMyDataSource?
+    weak var myDelegate: EpisodeTableViewMyDelegate?
+
     
     //MARK: - PublicMethods
-    func configureEpisodeTableView<T: EpisodeTableViewMyDataSource & UITableViewDelegate & UITableViewDataSource>(_ vc: T) {
+    func configureEpisodeTableView<T: EpisodeTableViewMyDataSource & EpisodeTableViewMyDelegate & UITableViewDelegate & UITableViewDataSource>(_ vc: T) {
         self.myDataSource = vc
+        self.myDelegate = vc
         self.delegate = vc
         self.dataSource = vc
         
         reloadData()
     }
     
-    func openCell(_ cell: UITableViewCell) {
+    func openCell(at indexPath: IndexPath) {
         UIView.animate(withDuration: 0.4) { [weak self] in
             guard let self = self,
-                  let indexPath = indexPath(for: cell) else { return }
+                  let cell = cellForRow(at: indexPath) else { return }
+            
+            cell.isSelected = !cell.isSelected
             
             beginUpdates()
             endUpdates()
@@ -57,6 +61,8 @@ class EpisodeTableView: UITableView {
         visibleCells.forEach {
             if let podcastCell = $0 as? PodcastCell {
                 podcastCell.update(with: entity)
+            } else if let listCell = $0 as? ListeningPodcastCell {
+                listCell.update(with: entity)
             }
         }
     }
@@ -80,14 +86,26 @@ class EpisodeTableView: UITableView {
     }
 }
 
-//MARK: - Private Methods
-extension EpisodeTableView {
+//MARK: - PodcastCellDelegate
+extension EpisodeTableView: PodcastCellDelegate {
     
-    private var countOfAllCellsInTableView: Int {
-        return (0..<numberOfSections).reduce(into: 0) { $0 += numberOfRows(inSection: $1) }
+    func podcastCellDidSelectStar(_ podcastCell: PodcastCell) {
+        guard let indexPath = indexPath(for: podcastCell) else { return }
+        myDelegate?.episodeTableView(self, didSelectStar: indexPath)
     }
     
-    private func setHeightOfEpisodeTableView() -> CGFloat {
-        return countOfAllCellsInTableView.cgFloat * defaultRowHeight + sumOfHeightsOfAllHeaders
+    func podcastCellDidSelectDownLoadImage(_ podcastCell: PodcastCell) {
+        guard let indexPath = indexPath(for: podcastCell) else { return }
+        myDelegate?.episodeTableView(self, didSelectDownLoadImage: indexPath)
+    }
+    
+    func podcastCellDidTouchPlayButton(_ podcastCell: PodcastCell) {
+        guard let indexPath = indexPath(for: podcastCell) else { return }
+        myDelegate?.episodeTableView(self, didTouchPlayButton: indexPath)
+    }
+    
+    func podcastCellDidTouchStopButton(_ podcastCell: PodcastCell) {
+        guard let indexPath = indexPath(for: podcastCell) else { return }
+        myDelegate?.episodeTableView(self, didTouchStopButton: indexPath)
     }
 }

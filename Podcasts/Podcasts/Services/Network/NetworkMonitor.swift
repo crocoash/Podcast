@@ -8,6 +8,7 @@
 import UIKit
 import Network
 
+//MARK: - Delegate
 protocol NetworkMonitorDelegate: AnyObject {
     func internetConnectionDidRestore(_ networkMonitior: NetworkMonitor, isConnection: Bool)
 }

@@ -9,14 +9,26 @@ import Foundation
 
 class UserViewModel {
     
-    private(set) var userDocument: UserDocument {
+    var userLogin: String? {
+        return userDocument.user.userName
+    }
+    
+    var userIsLogin: Bool {
+        return userDocument.user.isAuthorization
+    }
+    
+    var userInterfaceStyleIsDark: Bool {
+        return userDocument.user.userInterfaceStyleIsDark
+    }
+    
+    private(set) var userDocument: UserModel {
         didSet {
             UserDefaults.standard.setValue(userDocument.json, forKey: String(describing: Self.self))
         }
     }
     
     init() {
-       userDocument = UserDocument(json: UserDefaults.standard.data(forKey: String(describing: Self.self))) ?? UserDocument()
+       userDocument = UserModel(json: UserDefaults.standard.data(forKey: String(describing: Self.self))) ?? UserModel()
     }
     
     func changeUserName(newName: String) {

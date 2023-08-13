@@ -5,6 +5,7 @@
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21679"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -18,29 +19,34 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="lzn-Q0-gO7">
-                        <rect key="frame" x="0.0" y="0.0" width="665" height="189"/>
+                        <rect key="frame" x="415" y="0.0" width="250" height="250"/>
+                        <color key="backgroundColor" systemColor="systemCyanColor"/>
+                        <constraints>
+                            <constraint firstAttribute="width" secondItem="lzn-Q0-gO7" secondAttribute="height" multiplier="1:1" id="geb-gU-Uir"/>
+                        </constraints>
                     </imageView>
                     <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" progress="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="QO8-I5-u9B">
                         <rect key="frame" x="2" y="246" width="663" height="4"/>
+                        <color key="tintColor" systemColor="systemPinkColor"/>
                     </progressView>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="klK-77-UiC" userLabel="name">
-                        <rect key="frame" x="20" y="208" width="625" height="21"/>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="center" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="klK-77-UiC" userLabel="name">
+                        <rect key="frame" x="20" y="20" width="385" height="218"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="lzn-Q0-gO7" firstAttribute="bottom" secondItem="klK-77-UiC" secondAttribute="top" constant="-19" id="7qY-fb-NjO"/>
-                    <constraint firstItem="QO8-I5-u9B" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="2" id="BgD-hm-Tpp"/>
-                    <constraint firstItem="lzn-Q0-gO7" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="HCz-g2-NGH"/>
-                    <constraint firstAttribute="bottom" secondItem="klK-77-UiC" secondAttribute="bottom" constant="21" id="JVR-Ud-AKH"/>
-                    <constraint firstAttribute="bottom" secondItem="QO8-I5-u9B" secondAttribute="bottom" id="KCv-Vm-gZK"/>
-                    <constraint firstAttribute="trailing" secondItem="lzn-Q0-gO7" secondAttribute="trailing" id="LSK-Oc-pB7"/>
-                    <constraint firstItem="lzn-Q0-gO7" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="QIO-b8-eYw"/>
-                    <constraint firstAttribute="trailing" secondItem="QO8-I5-u9B" secondAttribute="trailing" id="Szu-An-1Vi"/>
-                    <constraint firstAttribute="trailing" secondItem="klK-77-UiC" secondAttribute="trailing" constant="20" symbolic="YES" id="hwx-Hn-4VU"/>
-                    <constraint firstItem="klK-77-UiC" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="20" symbolic="YES" id="xhT-cz-h44"/>
+                    <constraint firstAttribute="bottom" secondItem="QO8-I5-u9B" secondAttribute="bottom" id="0RT-Or-yMB"/>
+                    <constraint firstItem="klK-77-UiC" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="20" symbolic="YES" id="5iY-Do-ExZ"/>
+                    <constraint firstAttribute="trailing" secondItem="QO8-I5-u9B" secondAttribute="trailing" id="EQ0-GB-lIm"/>
+                    <constraint firstAttribute="bottom" secondItem="lzn-Q0-gO7" secondAttribute="bottom" id="UdS-yP-bEV"/>
+                    <constraint firstAttribute="trailing" secondItem="lzn-Q0-gO7" secondAttribute="trailing" id="Vug-zs-HWl"/>
+                    <constraint firstItem="lzn-Q0-gO7" firstAttribute="leading" secondItem="klK-77-UiC" secondAttribute="trailing" constant="10" id="ZYp-sr-O95"/>
+                    <constraint firstItem="lzn-Q0-gO7" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="fE8-Ty-0TZ"/>
+                    <constraint firstItem="QO8-I5-u9B" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="2" id="jW1-x8-yoP"/>
+                    <constraint firstAttribute="bottom" secondItem="klK-77-UiC" secondAttribute="bottom" constant="12" id="ogc-Yy-MWl"/>
+                    <constraint firstItem="klK-77-UiC" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="20" symbolic="YES" id="zph-8j-pdI"/>
                 </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
@@ -52,4 +58,12 @@
             <point key="canvasLocation" x="51.145038167938928" y="42.253521126760567"/>
         </tableViewCell>
     </objects>
+    <resources>
+        <systemColor name="systemCyanColor">
+            <color red="0.19607843137254902" green="0.67843137254901964" blue="0.90196078431372551" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="systemPinkColor">
+            <color red="1" green="0.17647058823529413" blue="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
 </document>

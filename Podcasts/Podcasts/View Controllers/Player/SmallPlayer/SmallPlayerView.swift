@@ -14,25 +14,25 @@ import UIKit
 protocol SmallPlayerPlayableProtocol {
     var imageForSmallPlayer: String? { get }
     var trackName: String? { get }
-    var listeningProgress: Double { get }
+    var listeningProgress: Double? { get }
     var isPlaying: Bool { get }
     var isGoingPlaying: Bool { get }
-    var trackIdentifier: String { get }
+    var trackId: String { get }
 }
 
 struct SmallPlayerViewModel: SmallPlayerPlayableProtocol {
     var isGoingPlaying: Bool = true
     var imageForSmallPlayer: String?
     var trackName: String?
-    var listeningProgress: Double 
+    var listeningProgress: Double?
     var isPlaying: Bool = false
-    var trackIdentifier: String
+    var trackId: String
     
     init(_ entity: SmallPlayerPlayableProtocol) {
         self.imageForSmallPlayer = entity.imageForSmallPlayer
         self.trackName = entity.trackName
         self.listeningProgress = entity.listeningProgress
-        self.trackIdentifier = entity.trackIdentifier
+        self.trackId = entity.trackId
         self.imageForSmallPlayer = entity.imageForSmallPlayer
     }
     
@@ -42,7 +42,6 @@ struct SmallPlayerViewModel: SmallPlayerPlayableProtocol {
             self.imageForSmallPlayer = player.imageForSmallPlayer
             self.trackName = player.trackName
             self.listeningProgress = player.listeningProgress
-            self.trackIdentifier = player.trackIdentifier
             self.isPlaying = player.isPlaying
             self.isGoingPlaying = player.isGoingPlaying
         }
@@ -79,25 +78,26 @@ class SmallPlayerView: UIView {
         
         super.init(frame: frame)
         
-        
         initial()
-        
+        self.player.delegate = self
         updateView()
-        addObserverPlayerEventNotification()
     }
     
     func configure(with model: SmallPlayerPlayableProtocol, player: InputPlayer) {
         let model = SmallPlayerViewModel(model)
         self.model = model
         self.player = player
+        
+        self.player.delegate = self
         updateView()
-        addObserverPlayerEventNotification()
+       
     }
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         initial()
     }
+   
     
     private func initial() {
         loadFromXib()
@@ -132,7 +132,7 @@ extension SmallPlayerView {
         if model.listeningProgress == 0 {
             progressView.progress = 1
         } else {
-            progressView.progress = Float(model.listeningProgress)
+            progressView.progress = Float(model.listeningProgress ?? 0)
         }
         
         if model.isGoingPlaying {
@@ -157,7 +157,7 @@ extension SmallPlayerView {
 }
 
 //MARK: - PlayerEventNotification
-extension SmallPlayerView: PlayerEventNotification {
+extension SmallPlayerView: PlayerDelegate {
    
     func playerDidEndPlay(with track: OutputPlayerProtocol) {
         model.updatePlayableInformation(track)
@@ -182,11 +182,5 @@ extension SmallPlayerView: PlayerEventNotification {
     
     func playerStateDidChanged(with track: OutputPlayerProtocol) {
         model.updatePlayableInformation(track)
-    }
-    
-    func addObserverPlayerEventNotification() {
-        if model != nil {
-            player.addObserverPlayerEventNotification(for: self)
-        }
     }
 }

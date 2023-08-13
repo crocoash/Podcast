@@ -10,14 +10,15 @@ import UIKit
 class PreLoaderViewController: UIViewController {
     
     private let userViewModel: UserViewModel
-    private let likeManager: InputLikeManager
-    private let addToFavoriteManager: FavoriteManager
-    private let firestorageDatabase: FirestorageDatabase
+    private let likeManager: LikeManagerInput
+    private let favoriteManager: FavoriteManagerInput
+    private let firestorageDatabase: FirestorageDatabaseInput
     private let player: InputPlayer
     private let downloadService: DownloadServiceInput
-    private let firebaseDataBase: FirebaseDatabase
-    private let apiService: ApiService
-    private let dataStoreManagerInput: DataStoreManagerInput
+    private let firebaseDataBase: FirebaseDatabaseInput
+    private let apiService: ApiServiceInput
+    private let dataStoreManager: DataStoreManagerInput
+    private let listeningManager: ListeningManagerInput
     
     @IBOutlet private weak var logoImageView: UIImageView!
     @IBOutlet private weak var horizontalCenterConstraint: NSLayoutConstraint!
@@ -35,11 +36,12 @@ class PreLoaderViewController: UIViewController {
                                                         firestorageDatabase: firestorageDatabase,
                                                         player: player,
                                                         downloadService: downloadService,
-                                                        addToFavoriteManager: addToFavoriteManager,
+                                                        favoriteManager: favoriteManager,
                                                         likeManager: likeManager,
                                                         firebaseDataBase: firebaseDataBase,
                                                         apiService: apiService,
-                                                        dataStoreManagerInput: dataStoreManagerInput)
+                                                        dataStoreManager: dataStoreManager,
+                                                        listeningManager: listeningManager)
         
         guard let tabBarViewController = tabBarViewController else { fatalError() }
         tabBarViewController.modalPresentationStyle = .custom
@@ -53,13 +55,14 @@ class PreLoaderViewController: UIViewController {
         
         let registrationVC = RegistrationViewController(coder: coder,
                                                         userViewModel: userViewModel,
-                                                        addToFavoriteManager: addToFavoriteManager,
+                                                        favoriteManager: favoriteManager,
                                                         likeManager: likeManager,
                                                         player: player,
                                                         firebaseDataBase: firebaseDataBase,
                                                         apiService: apiService,
                                                         downloadService: downloadService,
-                                                        dataStoreManagerInput: dataStoreManagerInput)
+                                                        dataStoreManager: dataStoreManager,
+                                                        listeningManager: listeningManager)
         
         guard let registrationVC = registrationVC else { fatalError() }
         
@@ -70,16 +73,17 @@ class PreLoaderViewController: UIViewController {
         
     init?(coder: NSCoder,
           userViewModel: UserViewModel,
-          likeManager: InputLikeManager,
-          addToFavoriteManager: FavoriteManager,
-          firestorageDatabase: FirestorageDatabase,
+          likeManager: LikeManagerInput,
+          favoriteManager: FavoriteManagerInput,
+          firestorageDatabase: FirestorageDatabaseInput,
           player: InputPlayer,
           downloadService: DownloadServiceInput,
-          firebaseDataBase: FirebaseDatabase,
-          apiService: ApiService,
-          dataStoreManagerInput: DataStoreManagerInput) {
+          firebaseDataBase: FirebaseDatabaseInput,
+          apiService: ApiServiceInput,
+          dataStoreManager: DataStoreManagerInput,
+          listeningManager: ListeningManagerInput) {
         
-        self.addToFavoriteManager = addToFavoriteManager
+        self.favoriteManager = favoriteManager
         self.likeManager = likeManager
         self.userViewModel = userViewModel
         self.player = player
@@ -87,21 +91,14 @@ class PreLoaderViewController: UIViewController {
         self.firestorageDatabase = firestorageDatabase
         self.firebaseDataBase = firebaseDataBase
         self.apiService = apiService
-        self.dataStoreManagerInput = dataStoreManagerInput
+        self.dataStoreManager = dataStoreManager
+        self.listeningManager = listeningManager
         
         super.init(coder: coder)
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    //MARK: - ViewMethods
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        if let window = UIApplication.shared.windows.first {
-            window.overrideUserInterfaceStyle = userViewModel.userDocument.user.userInterfaceStyleIsDark ? .dark : .light
-        }
     }
     
     override func viewDidLoad() {
@@ -114,7 +111,7 @@ class PreLoaderViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        if userViewModel.userDocument.user.isAuthorization {
+        if userViewModel.userIsLogin {
             Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { _ in
                 self.present(self.tabBarVC, animated: true)
                 self.view.isHidden = true

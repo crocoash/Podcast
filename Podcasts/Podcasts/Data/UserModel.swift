@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct UserDocument: Codable {
+struct UserModel: Codable {
     
     var user = User()
     
@@ -16,7 +16,7 @@ struct UserDocument: Codable {
     init() {}
     init? (json: Data?) {
         guard let json = json,
-              let userDocument = try? JSONDecoder().decode(UserDocument.self, from: json) else { return nil }
+              let userDocument = try? JSONDecoder().decode(UserModel.self, from: json) else { return nil }
         
         self = userDocument
     }

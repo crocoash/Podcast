@@ -9,28 +9,37 @@ import Foundation
 import FirebaseStorage
 import FirebaseAuth
 
-class FirestorageDatabase {
+//MARK: - Input
+protocol FirestorageDatabaseInput {
+    func saveLogo(logo: UIImage)
+    func getLogo(comletion: @escaping (UIImage) -> Void)
+}
+ 
+class FirestorageDatabase: FirestorageDatabaseInput {
     
     let storage = Storage.storage()
-    let userID = Auth.auth().currentUser!.uid
+    lazy var userID = Auth.auth().currentUser?.uid
     lazy var storageRef = storage.reference()
-    lazy var logoImage = storageRef.child("LogoImage").child(userID)
    
     func getLogo(comletion: @escaping (UIImage) -> Void) {
         let imageView = UIImage(systemName: "photo")!
         
-        logoImage.getData(maxSize: Int64.max) { data, erorr in
-            guard erorr == nil,
-                  let data = data else { comletion(imageView); return }
-            
-            if let logo = UIImage(data: data) {
-                comletion(logo)
+        if let userID = userID {
+            storageRef.child("LogoImage").child(userID).getData(maxSize: Int64.max) { data, erorr in
+                guard erorr == nil,
+                      let data = data else { comletion(imageView); return }
+                
+                if let logo = UIImage(data: data) {
+                    comletion(logo)
+                }
             }
         }
     }
-    
+        
     func saveLogo(logo: UIImage) {
-        guard let imageData = logo.jpegData(compressionQuality: 0.01) else { return }
-        logoImage.putData(imageData, metadata: nil)
+        guard let imageData = logo.jpegData(compressionQuality: 0.01),
+              let userID = userID else { return }
+        
+        storageRef.child("LogoImage").child(userID).putData(imageData, metadata: nil)
     }
 }

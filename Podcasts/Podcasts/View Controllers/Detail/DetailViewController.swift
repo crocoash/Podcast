@@ -8,9 +8,6 @@
 import UIKit
 import CoreData
 
-protocol DetailViewControllerDelegate: AnyObject {
-}
-
 class DetailViewController: UIViewController {
     
     @IBOutlet private weak var scrollView: UIScrollView!
@@ -45,10 +42,8 @@ class DetailViewController: UIViewController {
     private var player: InputPlayer
     private var downloadService: DownloadServiceInput
     private var bigPlayerViewController: BigPlayerViewController?
-    private var likeManager: InputLikeManager
-    private var favoritePodcast: FavoriteManager
-    
-    weak var delegate: DetailViewControllerDelegate?
+    private var likeManager: LikeManagerInput
+    private var favoriteManager: FavoriteManagerInput
     
     enum TypeSortOfTableView {
         case byNewest
@@ -57,43 +52,39 @@ class DetailViewController: UIViewController {
     }
     
     lazy private var typeOfSort: TypeSortOfTableView = .byGenre
-
     
     //MARK: View Methods
     override func viewDidLoad() {
         super.viewDidLoad()
         configureGestures()
         setupView()
-        addObserverPlayerEventNotification()
-        addDownloadEventNotifications()
+        downloadService.delegate = self
+        favoriteManager.delegate = self
+        
+        player.delegate = self
         let height = getHeightOfTableView()
         reloadTableViewHeightConstraint(newHeight: height)
     }
     
     //MARK: Public Methods
-    init?<T: DetailViewControllerDelegate & UIViewControllerTransitioningDelegate>(
+    init?(
         coder: NSCoder,
-        _ vc : T,
         podcast: Podcast,
         playlist: [Podcast],
         player: InputPlayer,
         downloadService: DownloadServiceInput,
-        likeManager: InputLikeManager,
-        addToFavoritePodcast: FavoriteManager
+        likeManager: LikeManagerInput,
+                        favoriteManager: FavoriteManagerInput
     ) {
       
         self.podcast = podcast
         self.podcasts = playlist
-        self.delegate = vc
         self.player = player
         self.downloadService = downloadService
         self.likeManager = likeManager
-        self.favoritePodcast = addToFavoritePodcast
+        self.favoriteManager = favoriteManager
         
         super.init(coder: coder)
-        
-        modalPresentationStyle = .custom
-        self.transitioningDelegate = vc
     }
     
     required init?(coder: NSCoder) {
@@ -102,17 +93,24 @@ class DetailViewController: UIViewController {
     
     //MARK: Public Methods
     func scrollToCell(podcast: Podcast) {
+        
         guard let index = podcasts.firstIndex(matching: podcast) else { fatalError() }
-        let positionOfCell = episodeTableView.getYPositionYFor(indexPath: IndexPath(row: index, section: 1))
+        let indexPath = IndexPath(row: index, section: 0)
+        let positionOfCell = episodeTableView.getYPositionYFor(indexPath: indexPath)
         let positionOfTableView = episodeTableView.frame.origin.y
         let position = positionOfTableView + positionOfCell
-        scrollView.setContentOffset(CGPoint(x: .zero, y: position), animated: true)
+        UIView.animate(withDuration: 12, animations: { [weak self] in
+            guard let self = self else { return }
+            scrollView.setContentOffset(CGPoint(x: .zero, y: position), animated: true)
+        }) { [weak self] _ in
+            guard let self = self else { return }
+            episodeTableView.openCell(at: indexPath)
+        }
     }
     
     //MARK: - Actions
     @IBAction private func backAction(_ sender: UITapGestureRecognizer) {
         dismiss(animated: true)
-        view.endEditing(true)
     }
     
     @IBAction private func refreshByGenre(_ sender: UICommand) {
@@ -131,14 +129,13 @@ class DetailViewController: UIViewController {
         presentActivityViewController()
     }
     
-    //MARK: Actions
     @objc func tapCell(sender: UITapGestureRecognizer) {
         guard let cell = sender.view as? PodcastCell,
-              cell.moreThanThreeLines
+              cell.moreThanThreeLines,
+                let indexPath = episodeTableView.indexPath(for: cell)
         else { return }
         
-        cell.isSelected = !cell.isSelected
-        episodeTableView.openCell(cell)
+        episodeTableView.openCell(at: indexPath)
     }
 }
 
@@ -198,7 +195,7 @@ extension DetailViewController {
         episodeName        .text = podcast.trackName
         artistName         .text = podcast.artistName ?? "Artist Name"
         genresLabel        .text = podcast.genresString
-        descriptionTextView.text = podcast.description
+        descriptionTextView.text = podcast.descriptionMy
         countryLabel       .text = podcast.country
         advisoryRatingLabel.text = podcast.contentAdvisoryRating
         dateLabel          .text = podcast.releaseDateInformation.formattedDate(dateFormat: "d MMM YYY")
@@ -258,9 +255,9 @@ extension DetailViewController: UITableViewDataSource {
 //        cell.isSelected = episodeTableView.selectedCellAndHisHeight[indexPath] != nil
         cell.addMyGestureRecognizer(self, type: .tap(), #selector(tapCell))
         
-        let isFavorite = favoritePodcast.isFavorite(podcast)
+        let isFavorite = favoriteManager.isFavorite(podcast)
         let isDownloaded = downloadService.isDownloaded(entity: podcast)
-        cell.configureCell(self, with: podcast, isFavorite: isFavorite, isDownloaded: isDownloaded)
+        cell.configureCell(episodeTableView, with: podcast, isFavorite: isFavorite, isDownloaded: isDownloaded)
         
         return cell
     }
@@ -277,11 +274,7 @@ extension DetailViewController: SmallPlayerViewControllerDelegate {
 }
 
 //MARK: - DownloadServiceDelegate
-extension DetailViewController: DownloadEventNotifications {
-    
-    func addDownloadEventNotifications() {
-        downloadService.addObserverDownloadEventNotifications(for: self)
-    }
+extension DetailViewController: DownloadServiceDelegate {
     
     func updateDownloadInformation(_ downloadService: DownloadServiceInput, entity: DownloadServiceType) {
         episodeTableView.update(with: entity)
@@ -313,18 +306,16 @@ extension DetailViewController: BigPlayerViewControllerDelegate {
     
     func bigPlayerViewControllerDidTouchPodcastNameLabel(_ bigPlayerViewController: BigPlayerViewController, entity: NSManagedObject) {
         bigPlayerViewController.dismiss(animated: true, completion: { [weak self] in
-            guard let self = self else { return }
+            guard let self = self,
+                  let podcast = entity as? Podcast else { return }
             
+            scrollToCell(podcast: podcast)
         })
     }
 }
 
 //MARK: - PlayerEventNotification
-extension DetailViewController: PlayerEventNotification {
-    
-    func addObserverPlayerEventNotification() {
-        player.addObserverPlayerEventNotification(for: self)
-    }
+extension DetailViewController: PlayerDelegate {
     
     func playerDidEndPlay(with track: OutputPlayerProtocol) {
         episodeTableView.update(with: track)
@@ -350,29 +341,25 @@ extension DetailViewController: PlayerEventNotification {
 }
 
 
-//MARK: - PodcastCellDelegate
-extension DetailViewController: PodcastCellDelegate {
-
-    func podcastCellDidSelectStar(_ podcastCell: PodcastCell) {
-        guard let indexPath = episodeTableView.indexPath(for: podcastCell) else { return }
+//MARK: - EpisodeTableViewMyDelegate
+extension DetailViewController: EpisodeTableViewMyDelegate {
+    
+    func episodeTableView(_ episodeTableView: EpisodeTableView, didSelectStar indexPath: IndexPath) {
         let podcast = getPodcast(for: indexPath)
-        favoritePodcast.addOrRemoveFavoritePodcast(entity: podcast)
-        episodeTableView.reloadRows(at: [indexPath], with: .automatic)
+        favoriteManager.addOrRemoveFavoritePodcast(entity: podcast)
     }
     
-    func podcastCellDidSelectDownLoadImage(_ podcastCell: PodcastCell) {
-        guard let indexPath = episodeTableView.indexPath(for: podcastCell) else { return }
+    func episodeTableView(_ episodeTableView: EpisodeTableView, didSelectDownLoadImage indexPath: IndexPath) {
         let podcast = getPodcast(for: indexPath)
         downloadService.conform(entity: podcast)
     }
     
-    func podcastCellDidTouchPlayButton(_ podcastCell: PodcastCell) {
-        guard let indexPath = episodeTableView.indexPath(for: podcastCell) else { return }
+    func episodeTableView(_ episodeTableView: EpisodeTableView, didTouchPlayButton indexPath: IndexPath) {
         let podcast = getPodcast(for: indexPath)
-        player.conform(entity: podcast, entities: podcasts)
+        player.conform(track: podcast, trackList: podcasts)
     }
     
-    func podcastCellDidTouchStopButton(_ podcastCell: PodcastCell) {
+    func episodeTableView(_ episodeTableView: EpisodeTableView, didTouchStopButton indexPath: IndexPath) {
         player.playOrPause()
     }
 }
@@ -389,5 +376,27 @@ extension DetailViewController: UITableViewDelegate {
         }
         
         return episodeTableView.defaultRowHeight
+    }
+    
+    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 100
+    }
+}
+
+//MARK: - FavoriteManagerDelegate
+extension DetailViewController: FavoriteManagerDelegate {
+    
+    func favoriteManager(_ favoriteManager: FavoriteManagerInput, didRemove favorite: FavoritePodcast) {
+        if let index = podcasts.firstIndex(matching: favorite.podcast) {
+            episodeTableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+            view.addToast(title: favorite.podcast.isFavorite ? "Add" : "Remove" + " to favorite" , smallPlayerView.isHidden ? .bottom : .bottomWithPlayer)
+        }
+    }
+    
+    func favoriteManager(_ favoriteManager: FavoriteManagerInput, didAdd favorite: FavoritePodcast) {
+        if let index = podcasts.firstIndex(matching: favorite.podcast) {
+            episodeTableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+            view.addToast(title: favorite.podcast.isFavorite ? "Add" : "Remove" + " to favorite" , smallPlayerView.isHidden ? .bottom : .bottomWithPlayer)
+        }
     }
 }

@@ -8,12 +8,24 @@
 import UIKit
 
 protocol ListeningPodcastCellProtocol {
+    var id: String { get }
     var progressForCell: Float { get }
     var imageForCell: String? { get }
     var podcastName: String? { get }
 }
 
-struct ListeningPodcastCellModel: ListeningPodcastCellProtocol {
+//MARK: - PlayableProtocol
+protocol ListeningPodcastCellPlayableProtocol {
+    var trackId: String { get }
+    var listeningProgress: Double? { get }
+    var duration: Double? { get }
+}
+
+struct ListeningPodcastCellModel: ListeningPodcastCellProtocol, ListeningPodcastCellPlayableProtocol {
+    var id: String
+    var listeningProgress: Double?
+    var duration: Double?
+    var trackId: String
     var podcastName: String?
     var imageForCell: String?
     var progressForCell: Float
@@ -22,6 +34,19 @@ struct ListeningPodcastCellModel: ListeningPodcastCellProtocol {
         self.progressForCell = input.progressForCell
         self.imageForCell = input.imageForCell
         self.podcastName = input.podcastName
+        self.trackId = input.id
+        self.id = input.id
+    }
+    
+    mutating func updateModel(_ input: Any) {
+        
+        if let player = input as? ListeningPodcastCellPlayableProtocol {
+            
+            if player.trackId == trackId {
+                self.listeningProgress = player.listeningProgress
+                self.duration = player.duration
+            }
+        }
     }
 }
 
@@ -35,7 +60,7 @@ class ListeningPodcastCell: UITableViewCell {
         super.awakeFromNib()
     }
     
-    
+    private(set) var model: ListeningPodcastCellModel!
     
     func configure(with model: ListeningPodcastCellProtocol ) {
         self.progressView.progress = model.progressForCell
@@ -43,5 +68,9 @@ class ListeningPodcastCell: UITableViewCell {
         DataProvider.shared.downloadImage(string: model.imageForCell) {
             self.listeningImageView.image = $0
         }
+    }
+    
+    func update(with entity: Any) {
+        model.updateModel(entity)
     }
 }

@@ -102,7 +102,6 @@ enum MyError {
     
     enum FirebaseDatabase {
         case error(Error)
-        case NSNull
         case snapShotIsNil
         
         func showAlert(vc: UIViewController?, completion: (() -> Void)? = nil) {
@@ -110,12 +109,7 @@ enum MyError {
             guard let vc = vc else { return }
             
             switch self {
-            case .NSNull:
-                Alert().create(for: vc, title: "FirebaseDatabase error", message: "NSNull") { _ in
-                    [UIAlertAction(title: "Ok", style: .cancel) { _ in
-                        completion?()
-                    }]
-                }
+        
             case .snapShotIsNil:
                 Alert().create(for: vc, title: "FirebaseDatabase error", message:"snapShotIsNil") { _ in
                     [UIAlertAction(title: "Ok", style: .cancel) { _ in

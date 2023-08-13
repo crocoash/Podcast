@@ -16,8 +16,8 @@ protocol SettingsTableViewControllerDelegate: AnyObject {
 class SettingsTableViewController: UITableViewController {
     
     private var userViewModel: UserViewModel
-    private let firestorageDatabase: FirestorageDatabase
-    private let apiService: ApiService
+    private let firestorageDatabase: FirestorageDatabaseInput
+    private let apiService: ApiServiceInput
 
     private var user: User { userViewModel.userDocument.user }
     weak var delegate: SettingsTableViewControllerDelegate?
@@ -47,8 +47,8 @@ class SettingsTableViewController: UITableViewController {
     //MARK: init
     init?(coder: NSCoder,
           _ userViewModel: UserViewModel,
-          firestorageDatabase: FirestorageDatabase,
-          apiService: ApiService) {
+          firestorageDatabase: FirestorageDatabaseInput,
+          apiService: ApiServiceInput) {
         
         self.userViewModel = userViewModel
         self.firestorageDatabase = firestorageDatabase

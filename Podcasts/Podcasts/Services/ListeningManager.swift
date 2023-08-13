@@ -7,29 +7,151 @@
 
 import Foundation
 
-
-protocol InputListeningManager {
-    var podcast: Podcast { get }
+//MARK: - Delegate
+protocol ListeningManagerDelegate: AnyObject {
+    func listeningManager(_ listeningManager: ListeningManager, didSave listeningPodcast : ListeningPodcast)
+    func listeningManager(_ listeningManager: ListeningManager, didRemove listeningPodcast: ListeningPodcast)
+    func listeningManager(_ listeningManager: ListeningManager, didUpdate listeningPodcast: ListeningPodcast)
 }
 
-class ListeningManager {
+//MARK: - Type
+protocol ListeningManagerProtocol {
+    var trackId: String { get }
+    var listeningProgress: Double? { get }
+    var currentTime: Float? { get }
+    var duration: Double? { get }
+}
+
+//MARK: - Input
+protocol ListeningManagerInput: MultyDelegateServiceInput {
+    func saveListeningProgress(by entity: (any ListeningManagerProtocol))
+    func removeListeningPodcast(_ entity: ListeningPodcast)
+    func saveListeningPodcast(_ entity: ListeningPodcast)
+}
+
+class ListeningManager: MultyDelegateService<ListeningManagerDelegate>, ListeningManagerInput {
     
-    private var dataStoreManagerInput: DataStoreManagerInput
+    private let dataStoreManager: DataStoreManagerInput
+    private let firebaseDatabase: FirebaseDatabaseInput
     
-    init(dataStoreManagerInput: DataStoreManagerInput) {
-        self.dataStoreManagerInput = dataStoreManagerInput
+    init(dataStoreManager: DataStoreManagerInput, firebaseDatabaseInput: FirebaseDatabaseInput) {
+        self.dataStoreManager = dataStoreManager
+        self.firebaseDatabase = firebaseDatabaseInput
+        
+        super.init()
+        
+        firebaseDatabaseInput.delegate = self
     }
     
-    func saveListeningProgress(for entity: (any InputListeningManager), progress: Double) {
+    func saveListeningProgress(by entity: (any ListeningManagerProtocol)) {
         
-        let listeningPodcasts = dataStoreManagerInput.allObjectsFromCoreData(type: ListeningPodcast.self)
-        let listeningPodcast = listeningPodcasts.filter { $0.podcast.identifier == entity.podcast.identifier }.first
+        let predicate = NSPredicate(format: "podcast.id == %@", entity.trackId)
+        let listeningPodcast = dataStoreManager.fetchObject(entity: ListeningPodcast.self, predicates: [predicate])
         
         if let listeningPodcast = listeningPodcast {
-            listeningPodcast.progress = progress
+            listeningPodcast.currentTime = entity.currentTime ?? 0
+            listeningPodcast.progress = entity.listeningProgress ?? 0
+            listeningPodcast.duration = entity.duration ?? 0
+            dataStoreManager.save()
+            
+            firebaseDatabase.update(entity: listeningPodcast)
+            
+            delegates {
+                $0.listeningManager(self, didUpdate: listeningPodcast)
+            }
+            
         } else {
-            _ = ListeningPodcast.init(entity.podcast, viewContext: dataStoreManagerInput.viewContext, dataStoreManagerInput: dataStoreManagerInput)
+            let predicate1 = NSPredicate(format: "id == %@", entity.trackId)
+            if let podcast = dataStoreManager.fetchObject(entity: Podcast.self, predicates: [predicate1]) {
+                let listenigPodcast = ListeningPodcast.init(podcast, viewContext: dataStoreManager.viewContext, dataStoreManagerInput: dataStoreManager)
+                
+                delegates {
+                    $0.listeningManager(self, didSave: listenigPodcast)
+                }
+            }
         }
-        dataStoreManagerInput.mySave()
     }
+    
+    func saveListeningPodcast(_ entity: ListeningPodcast) {
+        if dataStoreManager.fetchObject(entity: entity, predicates: nil) == nil {
+            let listeningPodcast = ListeningPodcast(entity, viewContext: dataStoreManager.viewContext, dataStoreManagerInput: dataStoreManager)
+            
+            firebaseDatabase.add(entity: listeningPodcast)
+            
+            delegates {
+                $0.listeningManager(self, didSave: listeningPodcast)
+            }
+        }
+    }
+    
+    func removeListeningPodcast(_ entity: ListeningPodcast) {
+        let abstructListeningPodcast = dataStoreManager.initAbstractObject(for: entity)
+        dataStoreManager.removeFromCoreData(entity: entity)
+        
+        firebaseDatabase.remove(entity: abstructListeningPodcast)
+        
+        delegates {
+            $0.listeningManager(self, didRemove: abstructListeningPodcast)
+        }
+    }
+    
+    func removeAll() {
+        dataStoreManager.allObjectsFromCoreData(type: ListeningPodcast.self).forEach {
+            removeListeningPodcast($0)
+        }
+    }
+}
+
+//MARK: - FirebaseDatabaseDelegate
+extension ListeningManager: FirebaseDatabaseDelegate {
+    
+    func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didGetEmptyData type: any FirebaseProtocol.Type) {
+        if type is ListeningPodcast.Type {
+            removeAll()
+        }
+    }
+    
+    func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didAdd entity: (any FirebaseProtocol)) {
+        if let listeningPodcast = entity as? ListeningPodcast {
+            saveListeningPodcast(listeningPodcast)
+        }
+    }
+    
+    func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didRemove entity: (any FirebaseProtocol)) {
+        if let listeningPodcast = entity as? ListeningPodcast {
+            removeListeningPodcast(listeningPodcast)
+        }
+    }
+    
+    func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didAdd entities: [any FirebaseProtocol]) {
+        if let likedMoments = entities as? [ListeningPodcast] {
+            likedMoments.forEach {
+                saveListeningPodcast($0)
+            }
+        }
+    }
+    
+    func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didUpdate entity: (any FirebaseProtocol)) {
+        if let listeningPodcast = entity as? ListeningPodcast {
+            let entity = dataStoreManager.getFromCoreDataIfNoSavedNew(entity: listeningPodcast)
+            entity.updateObject(by: listeningPodcast)
+            dataStoreManager.save()
+        }
+    }
+}
+
+//MARK: - PlayerDelegate
+extension ListeningManager: PlayerDelegate {
+    
+    func playerDidEndPlay(with track: OutputPlayerProtocol) {}
+    
+    func playerStartLoading(with track: OutputPlayerProtocol) {}
+    
+    func playerDidEndLoading(with track: OutputPlayerProtocol) {}
+    
+    func playerUpdatePlayingInformation(with track: OutputPlayerProtocol) {
+        saveListeningProgress(by: track)
+    }
+    
+    func playerStateDidChanged(with track: OutputPlayerProtocol) {}
 }
