@@ -24,7 +24,7 @@ class SearchCollectionViewCell: UICollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        podcastImageView.image = nil    
+        podcastImageView.image = nil
     }
     
     required init?(coder: NSCoder) {

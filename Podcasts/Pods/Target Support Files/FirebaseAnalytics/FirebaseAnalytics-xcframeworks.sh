@@ -17,17 +17,11 @@ RSYNC_PROTECT_TMP_FILES=(--filter "P .*.??????")
 variant_for_slice()
 {
   case "$1" in
-  "FirebaseAnalytics.xcframework/macos-arm64_x86_64")
-    echo ""
-    ;;
-  "FirebaseAnalytics.xcframework/ios-arm64_i386_x86_64-simulator")
+  "FirebaseAnalytics.xcframework/ios-arm64_x86_64-simulator")
     echo "simulator"
     ;;
-  "FirebaseAnalytics.xcframework/ios-arm64_armv7")
+  "FirebaseAnalytics.xcframework/ios-arm64")
     echo ""
-    ;;
-  "FirebaseAnalytics.xcframework/tvos-arm64_x86_64-simulator")
-    echo "simulator"
     ;;
   "FirebaseAnalytics.xcframework/ios-arm64_x86_64-maccatalyst")
     echo "maccatalyst"
@@ -35,29 +29,35 @@ variant_for_slice()
   "FirebaseAnalytics.xcframework/tvos-arm64")
     echo ""
     ;;
+  "FirebaseAnalytics.xcframework/macos-arm64_x86_64")
+    echo ""
+    ;;
+  "FirebaseAnalytics.xcframework/tvos-arm64_x86_64-simulator")
+    echo "simulator"
+    ;;
   esac
 }
 
 archs_for_slice()
 {
   case "$1" in
-  "FirebaseAnalytics.xcframework/macos-arm64_x86_64")
+  "FirebaseAnalytics.xcframework/ios-arm64_x86_64-simulator")
     echo "arm64 x86_64"
     ;;
-  "FirebaseAnalytics.xcframework/ios-arm64_i386_x86_64-simulator")
-    echo "arm64 i386 x86_64"
-    ;;
-  "FirebaseAnalytics.xcframework/ios-arm64_armv7")
-    echo "arm64 armv7"
-    ;;
-  "FirebaseAnalytics.xcframework/tvos-arm64_x86_64-simulator")
-    echo "arm64 x86_64"
+  "FirebaseAnalytics.xcframework/ios-arm64")
+    echo "arm64"
     ;;
   "FirebaseAnalytics.xcframework/ios-arm64_x86_64-maccatalyst")
     echo "arm64 x86_64"
     ;;
   "FirebaseAnalytics.xcframework/tvos-arm64")
     echo "arm64"
+    ;;
+  "FirebaseAnalytics.xcframework/macos-arm64_x86_64")
+    echo "arm64 x86_64"
+    ;;
+  "FirebaseAnalytics.xcframework/tvos-arm64_x86_64-simulator")
+    echo "arm64 x86_64"
     ;;
   esac
 }
@@ -141,5 +141,5 @@ install_xcframework() {
   echo "Copied $source to $destination"
 }
 
-install_xcframework "${PODS_ROOT}/FirebaseAnalytics/Frameworks/FirebaseAnalytics.xcframework" "FirebaseAnalytics/AdIdSupport" "framework" "ios-arm64_i386_x86_64-simulator" "ios-arm64_armv7" "ios-arm64_x86_64-maccatalyst"
+install_xcframework "${PODS_ROOT}/FirebaseAnalytics/Frameworks/FirebaseAnalytics.xcframework" "FirebaseAnalytics/AdIdSupport" "framework" "ios-arm64_x86_64-simulator" "ios-arm64" "ios-arm64_x86_64-maccatalyst"
 

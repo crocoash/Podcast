@@ -10,13 +10,15 @@ import CoreData
 import SwiftUI
 
 protocol SearchViewControllerDelegate: AnyObject {
-    func searchViewController                      (_ searchViewController: SearchViewController,_ playlist: [InputPlayerProtocol], track: InputPlayerProtocol)
-    func searchViewControllerDidSelectDownLoadImage(_ searchViewController: SearchViewController, entity: DownloadServiceProtocol, completion: @escaping () -> Void)
-    func searchViewControllerDidSelectFavoriteStar (_ searchViewController: SearchViewController, podcast: Podcast)
+//    func searchViewController                      (_ searchViewController: SearchViewController,_ playlist: [TrackProtocol], track: TrackProtocol)
+//    func searchViewControllerDidSelectDownLoadImage(_ searchViewController: SearchViewController, entity: DownloadInputType, completion: @escaping () -> Void)
+//    func searchViewControllerDidSelectFavoriteStar (_ searchViewController: SearchViewController, podcast: Podcast)
     func searchViewControllerDidSelectCell (_ searchViewController: SearchViewController, podcast: Podcast)
 }
 
 class SearchViewController : UIViewController {
+    
+    private let apiService: ApiServiceInput
     
     @IBOutlet private weak var searchBar: UISearchBar!
     @IBOutlet private weak var searchCollectionView: SearchCollectionView!
@@ -53,22 +55,21 @@ class SearchViewController : UIViewController {
         playerIsSHidden = !value
     }
     
-    func updateDownloadInformation(progress: Float, totalSize: String, podcast: Podcast) {
-//        guard let index = podcasts.firstIndex(matching: podcast) else { return }
-//
-//        if let podcastCell = self.tableView?.cellForRow(at: IndexPath(row: index, section: 0)) as? PodcastCell {
-//            podcastCell.updateDownloadInformation(progress: progress, totalSize: totalSize)
-//        }
-    }
-    
-    func endDownloading(podcast: Podcast) {
-//        guard let index = podcasts.firstIndex(matching: podcast) else { return }
-//        if let cell = tableView.cellForRow(at: IndexPath(row: index, section: 0)) as? PodcastCell {
-//            cell.endDownloading()
-//        }
-    }
-    
     private var isPodcast: Bool { searchSegmentalControl.selectedSegmentIndex == 0 }
+    
+    //MARK: init
+    init?<T: SearchViewControllerDelegate>(coder: NSCoder,
+                                           _ vc : T,
+                                           apiService: ApiServiceInput) {
+        self.delegate = vc
+        self.apiService = apiService
+        
+        super.init(coder: coder)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     // MARK: - View Methods
     override func viewWillAppear(_ animated: Bool) {
@@ -200,17 +201,16 @@ extension SearchViewController {
     private func getData() {
         searchCollectionView.setContentOffset(.zero, animated: true)
         guard let request = searchBar.text?.conform, !request.isEmpty else { showEmptyImage(); return }
-//        activityIndicator.startAnimating()
         view.showActivityIndicator()
         if searchSegmentalControl.selectedSegmentIndex == 0 {
-            getPodcasts(request: DynamicLinkManager.podcastEpisode(request).url)
+            getPodcasts(request: DynamicLinkManager.podcastSearch(request).url)
         } else {
             getAuthors(request: DynamicLinkManager.authors(request).url)
         }
     }
     
     private func getPodcasts(request: String) {
-        ApiService.getData(for: request) { [weak self] (result: Result<PodcastData>) in
+        apiService.getData(for: request) { [weak self] (result: Result<PodcastData>) in
             switch result {
             case .success(result: let podcastData) :
                 guard let podcasts = podcastData.results.allObjects as? [Podcast] else { return }
@@ -221,16 +221,15 @@ extension SearchViewController {
             case .failure(error: let error) :
                 error.showAlert(vc: self)
             }
-//            self?.activityIndicator.stopAnimating()
             self?.view.hideActivityIndicator()
         }
     }
     
     private func getAuthors(request: String) {
-        ApiService.getData(for: request) { [weak self] (result: Result<AuthorData>) in
+        apiService.getData(for: request) { [weak self] (result: Result<AuthorData>) in
             switch result {
             case .success(result: let authorData) :
-                let authors = authorData.results.allObjects as? [Author]
+                let authors = authorData.results?.allObjects as? [Author]
                 self?.processResults(result: authors) {
                     self?.authors = $0
                 }

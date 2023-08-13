@@ -21,18 +21,65 @@ class RegistrationViewController: UIViewController {
     @IBOutlet private weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet private weak var backGroundView: UIView!
     
-    private(set) var userViewModel: UserViewModel!
+    private let userViewModel: UserViewModel
+    private let favoriteManager: FavoriteManagerInput
+    private let likeManager: LikeManagerInput
+    private let firebaseDataBase: FirebaseDatabaseInput
+    private let player: InputPlayer
+    private let apiService: ApiServiceInput
+    private let downloadService: DownloadServiceInput
+    private let dataStoreManager: DataStoreManagerInput
+    private let listeningManager: ListeningManagerInput
     
-    lazy private var tabBarVC: TabBarViewController = {
-        let vc = TabBarViewController.loadFromStoryboard
-        vc.modalPresentationStyle = .custom
-        vc.setUserViewModel(userViewModel)
-        vc.transitioningDelegate = self
-        return vc
-    }()
+    lazy private var tabBarVc = TabBarViewController.create { [weak self] coder in
+        guard let self = self else { fatalError() }
+        
+        let tabBar = TabBarViewController(coder: coder,
+                                          userViewModel: userViewModel,
+                                          firestorageDatabase: FirestorageDatabase(),
+                                          player: player,
+                                          downloadService: downloadService,
+                                          favoriteManager: favoriteManager,
+                                          likeManager: likeManager,
+                                          firebaseDataBase: firebaseDataBase,
+                                          apiService: apiService,
+                                          dataStoreManager: dataStoreManager,
+                                          listeningManager: listeningManager)
+        
+        guard let tabBar = tabBar else { fatalError() }
+        
+        tabBar.transitioningDelegate = self
+        tabBar.modalPresentationStyle = .custom
+        
+        return tabBar
+    }
     
-    func configure(userViewModel: UserViewModel) {
+    init?(coder: NSCoder,
+          userViewModel: UserViewModel,
+          favoriteManager: FavoriteManagerInput,
+          likeManager: LikeManagerInput,
+          player: InputPlayer,
+          firebaseDataBase: FirebaseDatabaseInput,
+          apiService: ApiServiceInput,
+          downloadService: DownloadServiceInput,
+          dataStoreManager: DataStoreManagerInput,
+          listeningManager: ListeningManagerInput) {
+        
         self.userViewModel = userViewModel
+        self.favoriteManager = favoriteManager
+        self.likeManager = likeManager
+        self.player = player
+        self.firebaseDataBase = firebaseDataBase
+        self.apiService = apiService
+        self.downloadService = downloadService
+        self.dataStoreManager = dataStoreManager
+        self.listeningManager = listeningManager
+        
+        super.init(coder: coder)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     // MARK: - View Methods
@@ -40,6 +87,9 @@ class RegistrationViewController: UIViewController {
         super.viewDidLoad()
         configureGestures()
         configureView()
+        
+        self.modalPresentationStyle = .custom
+        self.transitioningDelegate = self
     }
     
     //MARK: - Varibels
@@ -50,8 +100,8 @@ class RegistrationViewController: UIViewController {
     private let alert = Alert()
     
     //MARK: - Settings
-    lazy private var email: String = userViewModel.userDocument.user.userName ?? ""
-    private var password: String = ""
+    lazy private var email: String = userViewModel.userLogin ?? "crocoash@gmail.com"
+    private var password: String = "123456"
     
     private let colorFails = #colorLiteral(red: 0.5807225108, green: 0.066734083, blue: 0, alpha: 1)
     private let colorOk = #colorLiteral(red: 0.6000000238, green: 0.6000000238, blue: 0.6000000238, alpha: 1)
@@ -206,7 +256,7 @@ extension RegistrationViewController {
             }
         } else {
             userViewModel.changeUserName(newName: email)
-            present(tabBarVC, animated: true)
+            present(tabBarVc, animated: true)
         }
     }
     
@@ -306,11 +356,11 @@ extension RegistrationViewController: AlertDelegate {
 
 // MARK: - UIViewControllerTransitioningDelegate
 extension RegistrationViewController: UIViewControllerTransitioningDelegate {
-    
+
     func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         return PresentTransition()
     }
-    
+
     func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         return DismissTransition()
     }

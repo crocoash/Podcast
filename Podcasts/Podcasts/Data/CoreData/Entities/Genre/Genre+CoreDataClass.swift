@@ -22,7 +22,7 @@ public class Genre: NSManagedObject, Codable {
         
         let container = try decoder.container(keyedBy: CodingKeys.self)
         
-        id = try container.decodeIfPresent(String.self, forKey: .id)
+        id = try container.decodeIfPresent(String.self, forKey: .id) ?? UUID().uuidString
         name = try container.decodeIfPresent(String.self, forKey: .name)
         
     }
@@ -32,81 +32,26 @@ public class Genre: NSManagedObject, Codable {
         
         var container = encoder.container(keyedBy: CodingKeys.self)
         
-        try container.encode(id, forKey: .id)
-        try container.encode(name,forKey: .name)
+        try container.encodeIfPresent(id, forKey: .id)
+        try container.encodeIfPresent(name,       forKey: .name)
     }
     
     //MARK: init
-    /// to nil
-    convenience init(id: String?, name: String?) {
+    convenience init(id: String, name: String?, viewContext: NSManagedObjectContext? = nil, dataStoreManagerInput: DataStoreManagerInput? = nil) {
         
-        self.init(entity: Self.entity(), insertInto: nil)
+        self.init(entity: Self.entity(), insertInto: viewContext)
         
         self.id = id
         self.name = name
-    }
-    
-    /// to viewContext
-    convenience init(genre: Genre) {
         
-        self.init(entity: Self.entity(), insertInto: Self.viewContext)
-        
-        self.id = genre.id
-        self.name = genre.name
-        self.podcasts = genre.podcasts
-        
-        saveInit()
+        dataStoreManagerInput?.save()
     }
 }
 
+//MARK: - CoreDataProtocol
 extension Genre: CoreDataProtocol {
-    
-    typealias T = Genre
-    
-    static var allObjectsFromCoreData: [Genre] { viewContext.fetchObjects(Genre.self) }
-    
-    static func removeAll() {
-        allObjectsFromCoreData.forEach {
-            $0.remove()
-        }
-    }
-
-    func removeFromCoreDataWithOwnEntityRule() {
-        if let genre = getFromCoreData {
-            genre.myValidateDelete()
-        }
-    }
-    
-    func saveInCoredataIfNotSaved() {
-        if let _ = getFromCoreData  { _ = Genre(genre: self) }
-    }
-   
-    var getFromCoreData: Genre? {
-        return Self.allObjectsFromCoreData.first(matching: self)
-    }
-    
-    var getFromCoreDataIfNoSavedNew: Genre {
-        return Self.allObjectsFromCoreData.first(matching: self) ?? Genre(genre: self)
+    static var defaultSortDescription: [NSSortDescriptor] {
+        return [NSSortDescriptor(key: #keyPath(Genre.name), ascending: true)]
     }
 }
 
-//MARK: - Common
-extension Genre {
-    
-    func removePodcast(podcast: Podcast) {
-        if let podcasts = self.podcasts?.allObjects as? [Podcast] {
-            let podcasts = podcasts.filter { $0 != podcast }
-            self.podcasts = NSSet(array: podcasts)
-        }
-    }
-}
-
-extension Collection where Element: Genre {
-    
-    func remove(podcast: Podcast) {
-        self.forEach {
-            $0.removePodcast(podcast: podcast)
-            $0.remove()
-        }
-    }
-}

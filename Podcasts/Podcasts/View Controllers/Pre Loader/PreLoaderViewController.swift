@@ -9,35 +9,96 @@ import UIKit
 
 class PreLoaderViewController: UIViewController {
     
+    private let userViewModel: UserViewModel
+    private let likeManager: LikeManagerInput
+    private let favoriteManager: FavoriteManagerInput
+    private let firestorageDatabase: FirestorageDatabaseInput
+    private let player: InputPlayer
+    private let downloadService: DownloadServiceInput
+    private let firebaseDataBase: FirebaseDatabaseInput
+    private let apiService: ApiServiceInput
+    private let dataStoreManager: DataStoreManagerInput
+    private let listeningManager: ListeningManagerInput
+    
     @IBOutlet private weak var logoImageView: UIImageView!
     @IBOutlet private weak var horizontalCenterConstraint: NSLayoutConstraint!
     
     private var heightConstraint: NSLayoutConstraint?
-    private var userViewModel = UserViewModel()
     
     lazy private var topAnchorConst = view.frame.height / 2 - logoImageView.frame.height / 2
     
-    lazy private var tabBarVC: TabBarViewController = {
-        $0.modalPresentationStyle = .custom
-        $0.transitioningDelegate = self
-        $0.setUserViewModel(userViewModel)
-        return $0
-    }(TabBarViewController.loadFromStoryboard)
+    lazy private var tabBarVC: TabBarViewController = TabBarViewController.create { [weak self] coder in
+        
+        guard let self = self else { fatalError() }
+        
+        let tabBarViewController = TabBarViewController(coder: coder,
+                                                        userViewModel: userViewModel,
+                                                        firestorageDatabase: firestorageDatabase,
+                                                        player: player,
+                                                        downloadService: downloadService,
+                                                        favoriteManager: favoriteManager,
+                                                        likeManager: likeManager,
+                                                        firebaseDataBase: firebaseDataBase,
+                                                        apiService: apiService,
+                                                        dataStoreManager: dataStoreManager,
+                                                        listeningManager: listeningManager)
+        
+        guard let tabBarViewController = tabBarViewController else { fatalError() }
+        tabBarViewController.modalPresentationStyle = .custom
+        tabBarViewController.transitioningDelegate = self
+        return tabBarViewController
+        
+    }
     
-    lazy private var registrationVC: RegistrationViewController =  {
-        $0.configure(userViewModel: self.userViewModel)
-        $0.modalPresentationStyle = .custom
-        $0.transitioningDelegate = self
-        return $0
-    }(RegistrationViewController.loadFromStoryboard)
+    lazy private var registrationVC = RegistrationViewController.storyboard.instantiateViewController(identifier: RegistrationViewController.identifier) { [weak self] coder in
+        guard let self = self else { fatalError() }
+        
+        let registrationVC = RegistrationViewController(coder: coder,
+                                                        userViewModel: userViewModel,
+                                                        favoriteManager: favoriteManager,
+                                                        likeManager: likeManager,
+                                                        player: player,
+                                                        firebaseDataBase: firebaseDataBase,
+                                                        apiService: apiService,
+                                                        downloadService: downloadService,
+                                                        dataStoreManager: dataStoreManager,
+                                                        listeningManager: listeningManager)
+        
+        guard let registrationVC = registrationVC else { fatalError() }
+        
+        registrationVC.modalPresentationStyle = .custom
+        registrationVC.transitioningDelegate = self
+        return registrationVC
+    }
+        
+    init?(coder: NSCoder,
+          userViewModel: UserViewModel,
+          likeManager: LikeManagerInput,
+          favoriteManager: FavoriteManagerInput,
+          firestorageDatabase: FirestorageDatabaseInput,
+          player: InputPlayer,
+          downloadService: DownloadServiceInput,
+          firebaseDataBase: FirebaseDatabaseInput,
+          apiService: ApiServiceInput,
+          dataStoreManager: DataStoreManagerInput,
+          listeningManager: ListeningManagerInput) {
+        
+        self.favoriteManager = favoriteManager
+        self.likeManager = likeManager
+        self.userViewModel = userViewModel
+        self.player = player
+        self.downloadService = downloadService
+        self.firestorageDatabase = firestorageDatabase
+        self.firebaseDataBase = firebaseDataBase
+        self.apiService = apiService
+        self.dataStoreManager = dataStoreManager
+        self.listeningManager = listeningManager
+        
+        super.init(coder: coder)
+    }
     
-    //MARK: - ViewMethods
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        if let window = UIApplication.shared.windows.first {
-            window.overrideUserInterfaceStyle = userViewModel.userDocument.user.userInterfaceStyleIsDark ? .dark : .light
-        }
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     override func viewDidLoad() {
@@ -50,9 +111,10 @@ class PreLoaderViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        if userViewModel.userDocument.user.isAuthorization {
+        if userViewModel.userIsLogin {
             Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { _ in
                 self.present(self.tabBarVC, animated: true)
+                self.view.isHidden = true
             }
             
         } else {
@@ -60,9 +122,9 @@ class PreLoaderViewController: UIViewController {
             UIView.animate(withDuration: 0.5, animations: { self.view.layoutIfNeeded() }) { [weak self] _ in
                 guard let self = self else { return }
                 self.present(self.registrationVC, animated: false)
+                self.view.isHidden = true
             }
         }
-        NetworkMonitor.shared.starMonitor()
     }
 }
 
