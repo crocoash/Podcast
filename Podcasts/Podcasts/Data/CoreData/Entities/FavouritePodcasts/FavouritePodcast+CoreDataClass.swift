@@ -1,5 +1,5 @@
 //
-//  FavoritePodcast+CoreDataClass.swift
+//  FavouritePodcast+CoreDataClass.swift
 //  Podcasts
 //
 //  Created by Anton on 03.05.2022.
@@ -9,7 +9,7 @@
 import UIKit
 import CoreData
 
-public class FavoritePodcast: NSManagedObject, Codable {
+public class FavouritePodcast: NSManagedObject, Codable {
     
     private enum CodingKeys: String, CodingKey {
         case podcast
@@ -50,18 +50,18 @@ public class FavoritePodcast: NSManagedObject, Codable {
 }
 
 //MARK: - CoreDataProtocol
-extension FavoritePodcast: CoreDataProtocol {
+extension FavouritePodcast: CoreDataProtocol {
    
     static var defaultSortDescription: [NSSortDescriptor] {
-        return [NSSortDescriptor(key: #keyPath(FavoritePodcast.date), ascending: true)]
+        return [NSSortDescriptor(key: #keyPath(FavouritePodcast.date), ascending: true)]
     }
 }
 
 //MARK: - FirebaseProtocol
-extension FavoritePodcast: FirebaseProtocol { }
+extension FavouritePodcast: FirebaseProtocol { }
 
 //MARK: - InputPodcastCell
-extension FavoritePodcast: InputPodcastCell {
+extension FavouritePodcast: InputPodcastCell {
     
     var inputPodcastCell: PodcastCellProtocol {
         return podcast
@@ -69,7 +69,7 @@ extension FavoritePodcast: InputPodcastCell {
 }
 
 //MARK: - InputDownloadProtocol
-extension FavoritePodcast: InputDownloadProtocol {
+extension FavouritePodcast: InputDownloadProtocol {
     
     var downloadEntity: DownloadProtocol {
         return podcast
