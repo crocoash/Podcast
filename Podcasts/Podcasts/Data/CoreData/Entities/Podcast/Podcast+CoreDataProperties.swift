@@ -43,7 +43,7 @@ extension Podcast {
     @NSManaged public var trackViewUrl: String?
     @NSManaged public var wrapperType: String?
     @NSManaged public var artistId: NSNumber?
-    @NSManaged public var favoritePodcast: FavoritePodcast?
+    @NSManaged public var favouritePodcast: FavouritePodcast?
     @NSManaged public var genres: NSSet?
     @NSManaged public var likedMoment: NSSet?
     @NSManaged public var listeningPodcast: ListeningPodcast?

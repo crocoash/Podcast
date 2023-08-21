@@ -90,7 +90,6 @@ class SmallPlayerView: UIView {
         
         self.player.delegate = self
         updateView()
-       
     }
     
     required init?(coder: NSCoder) {
@@ -98,7 +97,6 @@ class SmallPlayerView: UIView {
         initial()
     }
    
-    
     private func initial() {
         loadFromXib()
         configureView()

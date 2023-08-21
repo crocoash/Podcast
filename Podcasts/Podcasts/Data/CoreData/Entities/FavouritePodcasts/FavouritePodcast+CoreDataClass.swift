@@ -13,7 +13,7 @@ public class FavouritePodcast: NSManagedObject, Codable {
     
     private enum CodingKeys: String, CodingKey {
         case podcast
-        case date
+        case dateAdd
         case id
     }
     
@@ -25,7 +25,7 @@ public class FavouritePodcast: NSManagedObject, Codable {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         
         self.podcast = try values.decode(Podcast.self, forKey: .podcast)
-        self.date = try values.decode(Date.self, forKey: .date)
+        self.dateAdd = try values.decode(Date.self, forKey: .dateAdd)
         self.id = try values.decode(String.self, forKey: .id)
     }
     
@@ -34,7 +34,7 @@ public class FavouritePodcast: NSManagedObject, Codable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         
         try container.encodeIfPresent(podcast, forKey: .podcast)
-        try container.encodeIfPresent(date, forKey: .date)
+        try container.encodeIfPresent(dateAdd, forKey: .dateAdd)
         try container.encodeIfPresent(id, forKey: .id)
     }
     
@@ -43,7 +43,7 @@ public class FavouritePodcast: NSManagedObject, Codable {
             
        self.init(entity: Self.entity(), insertInto: viewContext)
         
-        self.date = Date()
+        self.dateAdd = Date()
         self.podcast = dataStoreManager.getFromCoreDataIfNoSavedNew(entity: entity)
         self.id = UUID().uuidString
     }
@@ -53,7 +53,7 @@ public class FavouritePodcast: NSManagedObject, Codable {
 extension FavouritePodcast: CoreDataProtocol {
    
     static var defaultSortDescription: [NSSortDescriptor] {
-        return [NSSortDescriptor(key: #keyPath(FavouritePodcast.date), ascending: true)]
+        return [NSSortDescriptor(key: #keyPath(FavouritePodcast.dateAdd), ascending: true)]
     }
 }
 

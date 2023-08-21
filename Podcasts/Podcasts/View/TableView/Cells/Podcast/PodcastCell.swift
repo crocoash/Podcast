@@ -33,8 +33,8 @@ protocol PodcastCellDownloadProtocol {
     var downloadTotalSize : String  { get }
 }
 
-protocol PodcastCellFavoriteProtocol {
-    var isFavorite: Bool { get }
+protocol PodcastCellFavouriteProtocol {
+    var isFavourite: Bool { get }
 }
 
 protocol InputPodcastCell {
@@ -51,12 +51,12 @@ protocol PodcastCellProtocol {
     var listeningProgress: Double? { get }
 }
 
-protocol UpdatingTypes: PodcastCellDownloadProtocol, PodcastCellPlayableProtocol & PodcastCellFavoriteProtocol {}
+protocol UpdatingTypes: PodcastCellDownloadProtocol, PodcastCellPlayableProtocol & PodcastCellFavouriteProtocol {}
 
 struct PodcastCellModel: PodcastCellProtocol, UpdatingTypes {
     
     var id: String
-    var isFavorite: Bool
+    var isFavourite: Bool
     var trackDuration: String?
     var dateDuration: String
     var descriptionMy: String?
@@ -80,7 +80,7 @@ struct PodcastCellModel: PodcastCellProtocol, UpdatingTypes {
     var duration: Double?
     var trackId: String
     
-    init(_ inputPodcastCell: any InputPodcastCell, isFavorite: Bool, isDownloaded: Bool) {
+    init(_ inputPodcastCell: any InputPodcastCell, isFavourite: Bool, isDownloaded: Bool) {
         
         let inputType = inputPodcastCell.inputPodcastCell
         
@@ -94,7 +94,7 @@ struct PodcastCellModel: PodcastCellProtocol, UpdatingTypes {
         self.downloadId = inputType.id
         self.listeningProgress = inputType.listeningProgress
         
-        self.isFavorite =  isFavorite  //inputType.isFavorite
+        self.isFavourite =  isFavourite  //inputType.isFavourite
         self.isDownloaded = isDownloaded ///
         
         self.isDownloading = false
@@ -130,7 +130,7 @@ struct PodcastCellModel: PodcastCellProtocol, UpdatingTypes {
 class PodcastCell: UITableViewCell {
     
     @IBOutlet private weak var podcastImage:             UIImageView!
-    @IBOutlet private weak var favoriteStarImageView:    UIImageView!
+    @IBOutlet private weak var favouriteStarImageView:    UIImageView!
     @IBOutlet private weak var downLoadImageView:        UIImageView!
     @IBOutlet private weak var playStopButton:           UIImageView!
     @IBOutlet private weak var openDescriptionImageView: UIImageView!
@@ -154,8 +154,8 @@ class PodcastCell: UITableViewCell {
     private let downImage = UIImage(systemName: "chevron.down")!
     private let upImage = UIImage(systemName: "chevron.up")!
     
-    private let isFavoriteImage = UIImage(named: "star5")!
-    private let isNotFavoriteImage = UIImage(named: "star1")!
+    private let isFavouriteImage = UIImage(named: "star5")!
+    private let isNotFavouriteImage = UIImage(named: "star1")!
     
     private(set) var model: PodcastCellModel! {
         didSet {
@@ -177,9 +177,9 @@ class PodcastCell: UITableViewCell {
         }
     }
     
-    func configureCell(_ delegate: PodcastCellDelegate?, with inputPodcastCell: InputPodcastCell,  isFavorite: Bool, isDownloaded: Bool) {
+    func configureCell(_ delegate: PodcastCellDelegate?, with inputPodcastCell: InputPodcastCell,  isFavourite: Bool, isDownloaded: Bool) {
         self.delegate = delegate
-        self.model = PodcastCellModel(inputPodcastCell, isFavorite: isFavorite, isDownloaded: isDownloaded)
+        self.model = PodcastCellModel(inputPodcastCell, isFavourite: isFavourite, isDownloaded: isDownloaded)
         self.heightOfImageView.constant = (frame.height - dateLabel.frame.height) - 10
         
         configureGestures()
@@ -208,13 +208,13 @@ class PodcastCell: UITableViewCell {
         updateOpenDescriptionInfo()
         updateSelectState()
         updatePlayerUI()
-        updateFavoriteStar()
+        updateFavouriteStar()
         updateDownloadUI()
     }
 
     
     //MARK: Actions
-    @objc func handlerTapFavoriteStar(_ sender: UITapGestureRecognizer) {
+    @objc func handlerTapFavouriteStar(_ sender: UITapGestureRecognizer) {
         delegate?.podcastCellDidSelectStar(self)
     }
     
@@ -245,14 +245,14 @@ extension PodcastCell {
         openDescriptionImageView.image = isSelected ? downImage : upImage
     }
     
-    func updateFavoriteStar() {
-        favoriteStarImageView.image = model.isFavorite ? isFavoriteImage : isNotFavoriteImage
+    func updateFavouriteStar() {
+        favouriteStarImageView.image = model.isFavourite ? isFavouriteImage : isNotFavouriteImage
         updateDownloadUI()
     }
     
-    func updateFavoriteStar(with value: Bool) {
-        self.model.isFavorite = value
-        updateFavoriteStar()
+    func updateFavouriteStar(with value: Bool) {
+        self.model.isFavourite = value
+        updateFavouriteStar()
     }
     
     func updatePlayerUI() {
@@ -273,13 +273,13 @@ extension PodcastCell {
     
     func updateDownloadUI() {
         
-        let isFavorite = model.isFavorite
+        let isFavourite = model.isFavourite
         
         let isDownloaded = model.isDownloaded
         let isGoingDownload = model.isGoingDownload
         let isDownloading  = model.isDownloading
         
-        if isFavorite {
+        if isFavourite {
             downloadProgressView.isHidden = !model.isDownloading  ///+++
             downloadActivityIndicator.isHidden = !model.isGoingDownload ///+++
             downLoadImageView.isHidden = isGoingDownload
@@ -312,6 +312,6 @@ extension PodcastCell {
     private func configureGestures() {
         downLoadImageView.addMyGestureRecognizer(self, type: .tap(), #selector(handlerTapDownloadImage))
         playStopButton.addMyGestureRecognizer(self, type: .tap(), #selector(tapPlayPauseButton))
-        favoriteStarImageView.addMyGestureRecognizer(self, type: .tap(), #selector(handlerTapFavoriteStar))
+        favouriteStarImageView.addMyGestureRecognizer(self, type: .tap(), #selector(handlerTapFavouriteStar))
     }
 }

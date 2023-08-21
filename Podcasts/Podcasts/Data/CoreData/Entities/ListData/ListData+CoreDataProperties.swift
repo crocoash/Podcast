@@ -16,8 +16,8 @@ extension ListData {
         return NSFetchRequest<ListData>(entityName: "ListData")
     }
 
-    @NSManaged public var id: String?
-    @NSManaged public var listSection: NSSet?
+    @NSManaged public var id: String
+    @NSManaged public var listSection: NSSet
 
 }
 

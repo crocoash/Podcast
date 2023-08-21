@@ -22,7 +22,7 @@ class TabBarViewController: UITabBarController {
     private let firestorageDatabase: FirestorageDatabaseInput
     private var player: InputPlayer
     private let downloadService: DownloadServiceInput
-    private let favoriteManager: FavoriteManagerInput
+    private let favouriteManager: FavouriteManagerInput
     private let likeManager: LikeManagerInput
     private let firebaseDataBase: FirebaseDatabaseInput
     private let apiService: ApiServiceInput
@@ -30,17 +30,27 @@ class TabBarViewController: UITabBarController {
     private let listeningManager: ListeningManagerInput
     
     lazy private var ListVC: ListViewController = {
-        let vc = ListViewController(self,
-                                                                        downloadService: downloadService,
-                                                                        player: player,
-                                                                        favoriteManager: favoriteManager,
-                                                                        firebaseDataBase: firebaseDataBase,
-                                                                        dataStoreManager: dataStoreManager,
-                                                                        listeningManager: listeningManager)
         
-        vc.transitioningDelegate = self
-        vc.modalPresentationStyle = .custom
-        
+        let vc = ListViewController.create(creator: { [weak self] coder in
+            guard let self = self else { fatalError() }
+            
+            let vc = ListViewController(coder: coder, self,
+                                        downloadService: downloadService,
+                                        player: player,
+                                        favouriteManager: favouriteManager,
+                                        firebaseDataBase: firebaseDataBase,
+                                        dataStoreManager: dataStoreManager,
+                                        listeningManager: listeningManager)
+            
+            guard let vc = vc else { fatalError() }
+            
+            vc.transitioningDelegate = self
+            vc.modalPresentationStyle = .custom
+            
+            return vc
+            
+        })
+            
         return createTabBar(vc, title: "Playlist", imageName: "folder.fill")
     }()
     
@@ -72,7 +82,7 @@ class TabBarViewController: UITabBarController {
                                firestorageDatabase: FirestorageDatabaseInput,
                                player: InputPlayer,
                                downloadService: DownloadServiceInput,
-                               favoriteManager: FavoriteManagerInput,
+                               favouriteManager: FavouriteManagerInput,
                                likeManager: LikeManagerInput,
                                firebaseDataBase: FirebaseDatabaseInput,
                                apiService: ApiServiceInput,
@@ -83,7 +93,7 @@ class TabBarViewController: UITabBarController {
         self.firestorageDatabase = firestorageDatabase
         self.player = player
         self.downloadService = downloadService
-        self.favoriteManager = favoriteManager
+        self.favouriteManager = favouriteManager
         self.likeManager = likeManager
         self.firebaseDataBase = firebaseDataBase
         self.apiService = apiService
@@ -138,7 +148,7 @@ extension TabBarViewController {
                 player: player,
                 downloadService: downloadService,
                 likeManager: self.likeManager,
-                favoriteManager: favoriteManager)
+                favouriteManager: favouriteManager)
         }
         
         detailViewController.modalPresentationStyle = .custom

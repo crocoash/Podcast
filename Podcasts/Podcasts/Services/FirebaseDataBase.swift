@@ -96,6 +96,7 @@ class FirebaseDatabase: MultyDelegateService<FirebaseDatabaseDelegate>, Firebase
             delegates {
                $0.firebaseDatabase(self, didGetEmptyData: T.self)
             }
+            completion(.failure(.firebaseDatabase(.snapShotIsNil)))
             return
          }
          

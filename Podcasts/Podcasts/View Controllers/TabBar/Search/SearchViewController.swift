@@ -12,7 +12,7 @@ import SwiftUI
 protocol SearchViewControllerDelegate: AnyObject {
 //    func searchViewController                      (_ searchViewController: SearchViewController,_ playlist: [TrackProtocol], track: TrackProtocol)
 //    func searchViewControllerDidSelectDownLoadImage(_ searchViewController: SearchViewController, entity: DownloadInputType, completion: @escaping () -> Void)
-//    func searchViewControllerDidSelectFavoriteStar (_ searchViewController: SearchViewController, podcast: Podcast)
+//    func searchViewControllerDidSelectFavouriteStar (_ searchViewController: SearchViewController, podcast: Podcast)
     func searchViewControllerDidSelectCell (_ searchViewController: SearchViewController, podcast: Podcast)
 }
 

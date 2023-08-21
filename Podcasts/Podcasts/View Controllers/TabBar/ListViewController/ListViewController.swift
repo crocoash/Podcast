@@ -8,94 +8,66 @@
 import UIKit
 import CoreData
 
+//MARK: - Delegate
 protocol ListViewControllerDelegate: AnyObject {
     func listViewController(_ listViewController: ListViewController, didSelect podcast: Podcast)
 }
 
-class ListViewController: UIViewController {
+class ListViewController: UIViewController, AlertSortListViewDataSource {
     
-    private var downloadService: DownloadServiceInput
-    private var player: InputPlayer
+    //MARK: services
+    private var downloadService:  DownloadServiceInput
+    private var player:           InputPlayer
     private let firebaseDataBase: FirebaseDatabaseInput
-    private let favoriteManager: FavoriteManagerInput
+    private let favouriteManager: FavouriteManagerInput
     private let dataStoreManager: DataStoreManagerInput
     private let listeningManager: ListeningManagerInput
+    
     weak var delegate: ListViewControllerDelegate?
     
     private let refreshControl = UIRefreshControl()
     private var bottomTableViewConstraint: NSLayoutConstraint?
-    private var searchSection: String? = nil
+    private var alertTopConstraint: NSLayoutConstraint?
     
-    lazy private var favoriteTableView: FavoriteTableView = {
-        let tableView = FavoriteTableView(self)
-        tableView.translatesAutoresizingMaskIntoConstraints = false
-        refreshControl.addTarget(self, action: #selector(refreshTableView), for: .valueChanged)
-        tableView.refreshControl = refreshControl
-        return tableView
-    }()
+    private var searchSection: String? = nil {
+        didSet {  }
+    }
     
-    lazy var favoriteFRC = dataStoreManager.conFigureFRC(for: FavoritePodcast.self, with: nil)
-    lazy var likeMomentFRC = dataStoreManager.conFigureFRC(for: LikedMoment.self, with: nil)
-    lazy var listeningFRC = dataStoreManager.conFigureFRC(for: ListeningPodcast.self, with: nil)
+    private var playerIsSHidden: Bool = true
     
-    private var model: ListViewModel!
+    lazy private var heightTabBarItem = tabBarController?.tabBar.frame.height ?? 0
+    
+    //MARK: Outlets
+    @IBOutlet private weak var favouriteTableView: FavouriteTableView!
+    private var alertSortListView: AlertSortListView?
+    
+    lazy private var model = ListViewModel(vc: self, dataStoreManager: dataStoreManager)
+    
+    var searchText: String? { didSet { model.performSearch(text: searchText) } }
     
     //MARK: init
-    init<T: ListViewControllerDelegate>(_ vc: T,
-                                            downloadService: DownloadServiceInput,
-                                            player: InputPlayer,
-                                            favoriteManager: FavoriteManagerInput,
-                                            firebaseDataBase: FirebaseDatabaseInput,
-                                            dataStoreManager: DataStoreManagerInput,
-                                        listeningManager: ListeningManagerInput) {
+    init?<T: ListViewControllerDelegate>(coder: NSCoder,
+                                         _ vc: T,
+                                         downloadService: DownloadServiceInput,
+                                         player: InputPlayer,
+                                         favouriteManager: FavouriteManagerInput,
+                                         firebaseDataBase: FirebaseDatabaseInput,
+                                         dataStoreManager: DataStoreManagerInput,
+                                         listeningManager: ListeningManagerInput) {
         
         self.downloadService = downloadService
         self.player = player
-        self.favoriteManager = favoriteManager
+        self.favouriteManager = favouriteManager
         self.firebaseDataBase = firebaseDataBase
         self.dataStoreManager = dataStoreManager
         self.delegate = vc
         self.listeningManager = listeningManager
         
-        super.init(nibName: nil, bundle: nil)
-        
-        favoriteFRC.delegate = self
-        likeMomentFRC.delegate = self
-        listeningFRC.delegate = self
-            
-        let sections: [[NSManagedObject]] = [favoriteFRC.fetchedObjects ?? [],
-                                          listeningFRC.fetchedObjects ?? [],
-                                          likeMomentFRC.fetchedObjects ?? []].filter( { !$0.isEmpty })
-        
-//        (favoriteFRC.fetchedObjects ?? []).forEach {
-//            if let podcast = $0.podcast.listeningPodcast?.podcast {
-//                podcast.observeValue(forKeyPath: #keyPath(Podcast.listeningPodcast), of: nil, change: nil, context: nil)
-//            }
-//        }
-//       
-        self.model = ListViewModel(entities: sections)
+        super.init(coder: coder)
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    var searchText: String? {
-        didSet {
-            if let searchText = searchText, searchText != "" {
-                let predicate = NSPredicate(format: "podcast.trackName CONTAINS [c] %@", "\(searchText)")
-                self.favoriteFRC.fetchRequest.predicate = predicate
-                self.likeMomentFRC.fetchRequest.predicate = predicate
-                self.listeningFRC.fetchRequest.predicate = predicate
-            } else {
-                self.favoriteFRC.fetchRequest.predicate = nil
-                self.likeMomentFRC.fetchRequest.predicate = nil
-                self.listeningFRC.fetchRequest.predicate = nil
-            }
-            try? favoriteFRC.performFetch()
-            try? likeMomentFRC.performFetch()
-            try? listeningFRC.performFetch()
-        }
     }
     
     //MARK: Variables
@@ -113,124 +85,99 @@ class ListViewController: UIViewController {
     }(UISearchController(searchResultsController: nil))
     
     lazy private var removeAllButton: UIBarButtonItem = {
-        let button =  UIBarButtonItem(title: "Remova All", primaryAction: UIAction {_ in
-            self.removeAllAction()
+        let button =  UIBarButtonItem(title: "Remova All", primaryAction: UIAction { [weak self] _ in
+            guard let self = self else { return }
+            removeAllAction()
         })
         return button
     }()
     
     lazy private var editButton: UIBarButtonItem = {
-        let button = UIBarButtonItem(systemItem: .edit, primaryAction: UIAction {_ in
-            self.toggleEditing()
+        let button = UIBarButtonItem(systemItem: .edit, primaryAction: UIAction { [weak self] _ in
+            guard let self = self else { return }
+            editButtonDidTouch()
         })
         return button
     }()
     
     //MARK: Public Methods
     func updateConstraintForTableView(playerIsPresent value: Bool) {
+        bottomTableViewConstraint?.constant = heightTabBarItem + (playerIsSHidden ? 0 : 50)
         playerIsSHidden = !value
-    }
-    
-    func toggleEditing() {
-        favoriteTableView.setEditing(!favoriteTableView.isEditing, animated: true)
     }
     
     //MARK: View Methods
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        navigationItem.searchController = searchController
-        navigationItem.rightBarButtonItem = removeAllButton
-        navigationItem.leftBarButtonItem = editButton
-        navigationItem.title = "Favorite List"
-        
         player.delegate = self
         downloadService.delegate = self
         
-        view.addSubview(favoriteTableView)
-        
-        self.bottomTableViewConstraint = view.bottomAnchor.constraint(equalTo: favoriteTableView.bottomAnchor, constant: heightTabBarItem)
-        self.bottomTableViewConstraint?.isActive = true
-        
-        favoriteTableView.leadingAnchor .constraint(equalTo: view.leadingAnchor).isActive = true
-        favoriteTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        favoriteTableView.topAnchor     .constraint(equalTo: view.topAnchor).isActive = true
+        configureNavigationItem()
+        configureAlertSortListView()
     }
-    
-    private var playerIsSHidden: Bool = true {
-        didSet {
-            bottomTableViewConstraint?.constant = heightTabBarItem + (playerIsSHidden ? 0 : 50)
-        }
-    }
-    
-    lazy private var heightTabBarItem = tabBarController?.tabBar.frame.height ?? 0
-    
+
     //MARK: Actions
-    @objc func tapFavoritePodcastCell(sender: UITapGestureRecognizer) {
+    @objc private func tapFavouritePodcastCell(sender: UITapGestureRecognizer) {
         
         guard let cell = sender.view as? UITableViewCell,
-              let indexPath = favoriteTableView.indexPath(for: cell),
-              let favoritePodcast = model.getObject(for: indexPath) as? FavoritePodcast else { return }
+              let indexPath = favouriteTableView.indexPath(for: cell),
+              let favouritePodcast = model.getObject(for: indexPath) as? FavouritePodcast else { return }
         
-        
-        delegate?.listViewController(self, didSelect: favoritePodcast.podcast)
+        delegate?.listViewController(self, didSelect: favouritePodcast.podcast)
     }
     
-    @objc func removeListeningPodcast(sender: UILongPressGestureRecognizer) {
+    @objc private func removeListeningPodcast(sender: UILongPressGestureRecognizer) {
         guard let cell = sender.view as? UITableViewCell,
-              let indexPath = favoriteTableView.indexPath(for: cell),
+              let indexPath = favouriteTableView.indexPath(for: cell),
               let listeningPodcast = model.getObject(for: indexPath) as? ListeningPodcast else { return }
         
         listeningManager.removeListeningPodcast(listeningPodcast)
     }
     
-    @objc func refreshTableView() {
-        let viewContext = dataStoreManager.viewContext
-        
-        firebaseDataBase.update(viewContext: viewContext) { [weak self] (result: FavoritePodcast.ResultType) in
-            switch result {
-            case .failure(error: let error) :
-                error.showAlert(vc: self)
-            default: break
-            }
-        }
-        
-        firebaseDataBase.update(viewContext: viewContext) { [weak self] (result: ListeningPodcast.ResultType) in
-            
-            guard let self = self else { return }
-            
-            switch result {
-            case .failure(error: let error) :
-                error.showAlert(vc: self) {
-                }
-            default: break
-            }
-            
-            refreshControl.endRefreshing()
-            refreshControl.isHidden = true
-        }
+    
+    private func editButtonDidTouch() {
+        guard let alertSortListView = alertSortListView else { fatalError() }
+        alertSortListView.showOrHideAlertListView()
+    }
+    
+    private func removeAllAction() {
+        favouriteManager.removeAll()
     }
 }
 
 //MARK: - Private methods
 extension ListViewController {
     
-    private func removeAllAction() {
-        favoriteManager.removeAll()
+    private func configureNavigationItem() {
+        navigationItem.searchController = searchController
+        navigationItem.rightBarButtonItem = removeAllButton
+        navigationItem.leftBarButtonItem = editButton
+        navigationItem.title = "Favourite List"
+        navigationItem.hidesSearchBarWhenScrolling = false
+    }
+    
+    private func configureAlertSortListView() {
+        guard let tabBarController = tabBarController else { fatalError() }
+        
+        let vc = AlertSortListView(vc: self)
+        tabBarController.view.addSubview(vc)
+        
+        alertSortListView = vc
     }
     
     private func configureCell(for tableView: UITableView, at indexPath: IndexPath) -> UITableViewCell {
         
         let item = model.getObject(for: indexPath)
         
-        if let item = item as? FavoritePodcast {
+        if let item = item as? FavouritePodcast {
             let cell = tableView.getCell(cell: PodcastCell.self, indexPath: indexPath)
             
-            let isFavorite = true
+            let isFavourite = true
             let isDownloaded = downloadService.isDownloaded(entity: item)
             
-            cell.configureCell(self, with: item, isFavorite: isFavorite, isDownloaded: isDownloaded)
-            cell.addMyGestureRecognizer(self, type: .tap(), #selector(tapFavoritePodcastCell(sender:)))
+            cell.configureCell(self, with: item, isFavourite: isFavourite, isDownloaded: isDownloaded)
+            cell.addMyGestureRecognizer(self, type: .tap(), #selector(tapFavouritePodcastCell(sender:)))
             return cell
         } else if let item = item as? LikedMoment {
             let cell = tableView.getCell(cell: LikedPodcastTableViewCell.self, indexPath: indexPath)
@@ -244,6 +191,34 @@ extension ListViewController {
         }
         fatalError()
     }
+    
+    private func refreshTableView(completion: @escaping () -> ()) {
+        let viewContext = dataStoreManager.viewContext
+        
+        firebaseDataBase.update(viewContext: viewContext) { [weak self] (result: FavouritePodcast.ResultType) in
+            guard let self = self else { return }
+            
+            switch result {
+            case .failure(error: let error) :
+                error.showAlert(vc: self)
+            default: break
+            }
+            
+            firebaseDataBase.update(viewContext: viewContext) { [weak self] (result: ListeningPodcast.ResultType) in
+                
+                guard let self = self else { return }
+                
+                switch result {
+                case .failure(error: let error) :
+                    error.showAlert(vc: self) {
+                    }
+                default: break
+                }
+                
+                completion()
+            }
+        }
+    }
 }
 
 
@@ -256,7 +231,7 @@ extension ListViewController: UISearchResultsUpdating {
         //            Section.searchText = searchText
         //        }
         //
-        favoriteTableView.reloadData()
+        favouriteTableView.reloadData()
     }
 }
 
@@ -265,7 +240,7 @@ extension ListViewController: UISearchBarDelegate {
     
     func searchBar(_ searchBar: UISearchBar, selectedScopeButtonIndexDidChange selectedScope: Int) {
         //        self.searchSection = Section[selectedScope]
-        self.favoriteTableView.reloadData()
+        self.favouriteTableView.reloadData()
     }
 }
 
@@ -273,23 +248,23 @@ extension ListViewController: UISearchBarDelegate {
 extension ListViewController: PlayerDelegate {
     
     func playerDidEndPlay(with track: OutputPlayerProtocol) {
-        favoriteTableView.updateTableView(with: track)
+        favouriteTableView.updateTableView(with: track)
     }
     
     func playerStartLoading(with track: OutputPlayerProtocol) {
-        favoriteTableView.updateTableView(with: track)
+        favouriteTableView.updateTableView(with: track)
     }
     
     func playerDidEndLoading(with track: OutputPlayerProtocol) {
-        favoriteTableView.updateTableView(with: track)
+        favouriteTableView.updateTableView(with: track)
     }
     
     func playerUpdatePlayingInformation(with track: OutputPlayerProtocol) {
-        favoriteTableView.updateTableView(with: track)
+        favouriteTableView.updateTableView(with: track)
     }
     
     func playerStateDidChanged(with track: OutputPlayerProtocol) {
-        favoriteTableView.updateTableView(with: track)
+        favouriteTableView.updateTableView(with: track)
     }
 }
 
@@ -297,27 +272,27 @@ extension ListViewController: PlayerDelegate {
 extension ListViewController: DownloadServiceDelegate {
     
     func updateDownloadInformation(_ downloadService: DownloadServiceInput, entity: DownloadServiceType) {
-        favoriteTableView.updateTableView(with: entity)
+        favouriteTableView.updateTableView(with: entity)
     }
     
     func didEndDownloading(_ downloadService: DownloadServiceInput, entity: DownloadServiceType) {
-        favoriteTableView.updateTableView(with: entity)
+        favouriteTableView.updateTableView(with: entity)
     }
     
     func didPauseDownload(_ downloadService: DownloadServiceInput, entity: DownloadServiceType) {
-        favoriteTableView.updateTableView(with: entity)
+        favouriteTableView.updateTableView(with: entity)
     }
     
     func didContinueDownload(_ downloadService: DownloadServiceInput, entity: DownloadServiceType) {
-        favoriteTableView.updateTableView(with: entity)
+        favouriteTableView.updateTableView(with: entity)
     }
     
     func didStartDownload(_ downloadService: DownloadServiceInput, entity: DownloadServiceType) {
-        favoriteTableView.updateTableView(with: entity)
+        favouriteTableView.updateTableView(with: entity)
     }
     
     func didRemoveEntity(_ downloadService: DownloadServiceInput, entity: DownloadServiceType) {
-        favoriteTableView.updateTableView(with: entity)
+        favouriteTableView.updateTableView(with: entity)
     }
 }
 
@@ -325,7 +300,7 @@ extension ListViewController: DownloadServiceDelegate {
 extension ListViewController: NSFetchedResultsControllerDelegate {
     
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        favoriteTableView.beginUpdates()
+        favouriteTableView.beginUpdates()
     }
     
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
@@ -335,18 +310,18 @@ extension ListViewController: NSFetchedResultsControllerDelegate {
         case .delete:
             guard var indexPath = indexPath,
                   let section = model.getIndexOfSection(forAny: anObject) else { return }
-           
+            
             indexPath.section = section
             
             model.remove(anObject)
-            favoriteTableView.deleteItem(at: indexPath)
+            favouriteTableView.deleteItem(at: indexPath)
             
-            if let favoritePodcast = anObject as? FavoritePodcast {
-                let name = favoritePodcast.podcast.trackName ?? ""
+            if let favouritePodcast = anObject as? FavouritePodcast {
+                let name = favouritePodcast.podcast.trackName ?? ""
                 let title = "\(name) podcast is added to playlist"
                 addToast(title: title, (playerIsSHidden ? .bottom : .bottomWithPlayer))
             }
-           
+            
         case .insert:
             
             guard var newIndexPath = newIndexPath else { return }
@@ -371,39 +346,49 @@ extension ListViewController: NSFetchedResultsControllerDelegate {
                 }
             }
             
-            favoriteTableView.insertCell(isLast: isLastSection, insertSection: insertSection, at: newIndexPath, before: indexPath)
+            favouriteTableView.insertCell(isLast: isLastSection, insertSection: insertSection, at: newIndexPath, before: indexPath)
             
-            if let favoritePodcast = anObject as? FavoritePodcast {
-                let name = favoritePodcast.podcast.trackName ?? ""
+            if let favouritePodcast = anObject as? FavouritePodcast {
+                let name = favouritePodcast.podcast.trackName ?? ""
                 let title = "\(name) podcast is added to playlist"
                 addToast(title: title, (playerIsSHidden ? .bottom : .bottomWithPlayer))
             }
-           
+            
         default : break
         }
     }
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        favoriteTableView.endUpdates()
+        favouriteTableView.endUpdates()
     }
 }
 
-//MARK: - FavoriteTableDataSource
-extension ListViewController: FavoriteTableDataSource {
+//MARK: - FavouriteTableViewDelegate
+extension ListViewController: FavouriteTableViewDelegate {
     
-    func favoriteTableView(_ favoriteTableView: FavoriteTableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        return configureCell(for: favoriteTableView, at: indexPath)
+    func favouriteTableView(_ favouriteTableView: FavouriteTableView, didRefreshed refreshControl: UIRefreshControl) {
+        refreshTableView {
+            refreshControl.endRefreshing()
+        }
+    }
+}
+
+//MARK: - FavouriteTableDataSource
+extension ListViewController: FavouriteTableDataSource {
+    
+    func favouriteTableView(_ favouriteTableView: FavouriteTableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        return configureCell(for: favouriteTableView, at: indexPath)
     }
     
-    func favoriteTableViewCountOfSections(_ favoriteTableView: FavoriteTableView) -> Int {
+    func favouriteTableViewCountOfSections(_ favouriteTableView: FavouriteTableView) -> Int {
         return model.countOfSections
     }
     
-    func favoriteTableView(_ favoriteTableView: FavoriteTableView, countOfRowsInSection index: Int) -> Int {
+    func favouriteTableView(_ favouriteTableView: FavouriteTableView, countOfRowsInSection index: Int) -> Int {
         return model.getCountOfRowsInSection(section: index)
     }
     
-    func favoriteTableView(_ favoriteTableView: FavoriteTableView, nameOfSectionFor index: Int) -> String {
+    func favouriteTableView(_ favouriteTableView: FavouriteTableView, nameOfSectionFor index: Int) -> String {
         return model.getNameOfSection(for: index) ?? "dwdweqd"
     }
 }
@@ -412,27 +397,33 @@ extension ListViewController: FavoriteTableDataSource {
 extension ListViewController: PodcastCellDelegate {
     
     func podcastCellDidSelectStar(_ podcastCell: PodcastCell) {
-        guard let indexPath = favoriteTableView.indexPath(for: podcastCell),
-              let favoritePodcast = model.getObject(for: indexPath) as? FavoritePodcast else { return }
+        guard let indexPath = favouriteTableView.indexPath(for: podcastCell),
+              let favouritePodcast = model.getObject(for: indexPath) as? FavouritePodcast else { return }
         
-        favoriteManager.addOrRemoveFavoritePodcast(entity: favoritePodcast.podcast)
+        favouriteManager.addOrRemoveFavouritePodcast(entity: favouritePodcast.podcast)
     }
     
     func podcastCellDidSelectDownLoadImage(_ podcastCell: PodcastCell) {
-        guard let indexPath = favoriteTableView.indexPath(for: podcastCell) else { return }
+        guard let indexPath = favouriteTableView.indexPath(for: podcastCell) else { return }
         guard let entity = model.getObject(for: indexPath) as? InputDownloadProtocol else { return }
         downloadService.conform(entity: entity)
     }
     
     func podcastCellDidTouchPlayButton(_ podcastCell: PodcastCell) {
-        guard let indexPath = favoriteTableView.indexPath(for: podcastCell),
-              let favoritePodcast = model.getObject(for: indexPath) as? FavoritePodcast,
-              let favoritePodcasts = model.getObjects(for: indexPath) as? [FavoritePodcast] else { fatalError() }
+        guard let indexPath = favouriteTableView.indexPath(for: podcastCell),
+              let favouritePodcast = model.getObject(for: indexPath) as? FavouritePodcast,
+              let favouritePodcasts = model.getObjects(for: indexPath) as? [FavouritePodcast] else { fatalError() }
         
-        player.conform(track: favoritePodcast.podcast, trackList: favoritePodcasts.map { $0.podcast })
+        player.conform(track: favouritePodcast.podcast, trackList: favouritePodcasts.map { $0.podcast })
     }
     
     func podcastCellDidTouchStopButton(_ podcastCell: PodcastCell) {
         player.playOrPause()
     }
 }
+
+//MARK: - AlertSortListViewMyDelegate
+extension ListViewController: AlertSortListViewDelegate {
+    
+}
+

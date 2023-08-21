@@ -147,7 +147,7 @@
                 <outlet property="downloadActivityIndicator" destination="niz-vo-xOt" id="G3u-bI-41U"/>
                 <outlet property="downloadProgressLabel" destination="Rlk-QC-Yls" id="mtz-uy-Hdq"/>
                 <outlet property="downloadProgressView" destination="jFc-Bc-tCa" id="7M3-tS-8NP"/>
-                <outlet property="favoriteStarImageView" destination="cSq-aK-NQM" id="p23-69-bjt"/>
+                <outlet property="favouriteStarImageView" destination="cSq-aK-NQM" id="p23-69-bjt"/>
                 <outlet property="heightOfImageView" destination="ZER-Wg-N5A" id="Plj-K4-Wga"/>
                 <outlet property="listeningProgressView" destination="gS0-gt-2Sl" id="0EA-r5-4db"/>
                 <outlet property="openDescriptionImageView" destination="UxH-8v-OCt" id="Srk-gG-nx0"/>

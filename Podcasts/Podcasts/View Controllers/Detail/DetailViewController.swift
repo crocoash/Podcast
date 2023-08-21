@@ -43,7 +43,7 @@ class DetailViewController: UIViewController {
     private var downloadService: DownloadServiceInput
     private var bigPlayerViewController: BigPlayerViewController?
     private var likeManager: LikeManagerInput
-    private var favoriteManager: FavoriteManagerInput
+    private var favouriteManager: FavouriteManagerInput
     
     enum TypeSortOfTableView {
         case byNewest
@@ -59,7 +59,7 @@ class DetailViewController: UIViewController {
         configureGestures()
         setupView()
         downloadService.delegate = self
-        favoriteManager.delegate = self
+        favouriteManager.delegate = self
         
         player.delegate = self
         let height = getHeightOfTableView()
@@ -74,7 +74,7 @@ class DetailViewController: UIViewController {
         player: InputPlayer,
         downloadService: DownloadServiceInput,
         likeManager: LikeManagerInput,
-                        favoriteManager: FavoriteManagerInput
+                        favouriteManager: FavouriteManagerInput
     ) {
       
         self.podcast = podcast
@@ -82,7 +82,7 @@ class DetailViewController: UIViewController {
         self.player = player
         self.downloadService = downloadService
         self.likeManager = likeManager
-        self.favoriteManager = favoriteManager
+        self.favouriteManager = favouriteManager
         
         super.init(coder: coder)
     }
@@ -255,9 +255,9 @@ extension DetailViewController: UITableViewDataSource {
 //        cell.isSelected = episodeTableView.selectedCellAndHisHeight[indexPath] != nil
         cell.addMyGestureRecognizer(self, type: .tap(), #selector(tapCell))
         
-        let isFavorite = favoriteManager.isFavorite(podcast)
+        let isFavourite = favouriteManager.isFavourite(podcast)
         let isDownloaded = downloadService.isDownloaded(entity: podcast)
-        cell.configureCell(episodeTableView, with: podcast, isFavorite: isFavorite, isDownloaded: isDownloaded)
+        cell.configureCell(episodeTableView, with: podcast, isFavourite: isFavourite, isDownloaded: isDownloaded)
         
         return cell
     }
@@ -346,7 +346,7 @@ extension DetailViewController: EpisodeTableViewMyDelegate {
     
     func episodeTableView(_ episodeTableView: EpisodeTableView, didSelectStar indexPath: IndexPath) {
         let podcast = getPodcast(for: indexPath)
-        favoriteManager.addOrRemoveFavoritePodcast(entity: podcast)
+        favouriteManager.addOrRemoveFavouritePodcast(entity: podcast)
     }
     
     func episodeTableView(_ episodeTableView: EpisodeTableView, didSelectDownLoadImage indexPath: IndexPath) {
@@ -383,20 +383,20 @@ extension DetailViewController: UITableViewDelegate {
     }
 }
 
-//MARK: - FavoriteManagerDelegate
-extension DetailViewController: FavoriteManagerDelegate {
+//MARK: - FavouriteManagerDelegate
+extension DetailViewController: FavouriteManagerDelegate {
     
-    func favoriteManager(_ favoriteManager: FavoriteManagerInput, didRemove favorite: FavoritePodcast) {
-        if let index = podcasts.firstIndex(matching: favorite.podcast) {
+    func favouriteManager(_ favouriteManager: FavouriteManagerInput, didRemove favourite: FavouritePodcast) {
+        if let index = podcasts.firstIndex(matching: favourite.podcast) {
             episodeTableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
-            view.addToast(title: favorite.podcast.isFavorite ? "Add" : "Remove" + " to favorite" , smallPlayerView.isHidden ? .bottom : .bottomWithPlayer)
+            view.addToast(title: favourite.podcast.isFavourite ? "Add" : "Remove" + " to favourite" , smallPlayerView.isHidden ? .bottom : .bottomWithPlayer)
         }
     }
     
-    func favoriteManager(_ favoriteManager: FavoriteManagerInput, didAdd favorite: FavoritePodcast) {
-        if let index = podcasts.firstIndex(matching: favorite.podcast) {
+    func favouriteManager(_ favouriteManager: FavouriteManagerInput, didAdd favourite: FavouritePodcast) {
+        if let index = podcasts.firstIndex(matching: favourite.podcast) {
             episodeTableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
-            view.addToast(title: favorite.podcast.isFavorite ? "Add" : "Remove" + " to favorite" , smallPlayerView.isHidden ? .bottom : .bottomWithPlayer)
+            view.addToast(title: favourite.podcast.isFavourite ? "Add" : "Remove" + " to favourite" , smallPlayerView.isHidden ? .bottom : .bottomWithPlayer)
         }
     }
 }
