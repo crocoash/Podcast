@@ -24,7 +24,7 @@ public class ListData: NSManagedObject {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         
         self.id =            try container.decode(String.self, forKey: .id)
-        self.listSection =   try container.decode(ListSection.self, forKey: .listSection)
+        self.listSection =   try container.decode(Set<ListSection>.self, forKey: .listSection) as NSSet
     }
     
     //MARK: encode
@@ -32,23 +32,14 @@ public class ListData: NSManagedObject {
         
         var container = encoder.container(keyedBy: CodingKeys.self)
         
-        try container.encode(id,           forKey: .id)
-        try container.encode(listSection,  forKey: .listSection)
-    }
-        
-        
-    required convenience init(_ entity: ListData, viewContext: NSManagedObjectContext, dataStoreManagerInput: DataStoreManagerInput) {
-        self.init(entity: Self.entity(), insertInto: viewContext)
-        
-        self.id = entity.id
-        self.listSection = dataStoreManagerInput.getFromCoreDataIfNoSavedNew(entity: entity.listSection)
-        
+        try container.encode(id,                               forKey: .id)
+        try container.encode(listSection as? Set<ListSection>, forKey: .listSection)
     }
 }
 
 //MARK: - CoreDataProtocol
 extension ListData: CoreDataProtocol {
-    
+
     static var defaultSortDescription: [NSSortDescriptor] {
         return [NSSortDescriptor(key: #keyPath(ListData.listSection), ascending: true)]
     }

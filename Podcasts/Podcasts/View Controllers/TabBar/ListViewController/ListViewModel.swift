@@ -19,11 +19,45 @@ class ListViewModel {
             self.rows = entities
         }
     }
+    private let dataStoreManager: DataStoreManagerInput
     
-    private var sections: [Section]
+    lazy private var favouriteFRC = dataStoreManager.conFigureFRC(for: FavouritePodcast.self, with: nil)
+    lazy private var likeMomentFRC = dataStoreManager.conFigureFRC(for: LikedMoment.self, with: nil)
+    lazy private var listeningFRC = dataStoreManager.conFigureFRC(for: ListeningPodcast.self, with: nil)
     
-    init(entities: [[NSManagedObject]]) {
-        self.sections = entities.map { Section(entities: $0 )}
+    private var sections: [Section] = []
+    
+    init(vc: NSFetchedResultsControllerDelegate, dataStoreManager: DataStoreManagerInput) {
+        
+        self.dataStoreManager = dataStoreManager
+        
+        let sections: [[NSManagedObject]] = [favouriteFRC.fetchedObjects ?? [],
+                                             listeningFRC.fetchedObjects ?? [],
+                                             likeMomentFRC.fetchedObjects ?? []].filter( { !$0.isEmpty })
+                
+        self.sections = sections.map { Section(entities: $0 )}
+        
+        self.favouriteFRC.delegate = vc
+        self.likeMomentFRC.delegate = vc
+        self.listeningFRC.delegate = vc
+    }
+    
+    func performSearch(text: String?) {
+        if let searchText = text, searchText != "" {
+            let predicate = NSPredicate(format: "podcast.trackName CONTAINS [c] %@", "\(searchText)")
+            favouriteFRC.fetchRequest.predicate = predicate
+            likeMomentFRC.fetchRequest.predicate = predicate
+            listeningFRC.fetchRequest.predicate = predicate
+        } else {
+            favouriteFRC.fetchRequest.predicate = nil
+            likeMomentFRC.fetchRequest.predicate = nil
+            listeningFRC.fetchRequest.predicate = nil
+        }
+        try? favouriteFRC.performFetch()
+        try? likeMomentFRC.performFetch()
+        try? listeningFRC.performFetch()
+        
+        
     }
     
     func isFirstElementInSection(at indexPath: IndexPath) -> Bool {
@@ -52,7 +86,7 @@ class ListViewModel {
     
     func getIndexPath(forAny object: Any) -> IndexPath? {
         
-        if let object = object as? FavoritePodcast {
+        if let object = object as? FavouritePodcast {
             return getIndexPath(forEntity: object)
         } else if let object = object as? ListeningPodcast {
             return getIndexPath(forEntity: object)
@@ -111,3 +145,4 @@ class ListViewModel {
         return sections[index].rows.count
     }
 }
+

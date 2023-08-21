@@ -43,7 +43,7 @@ public class Podcast: NSManagedObject, Codable {
         case artistName
         case trackCount
         case genreIds
-        case favoritePodcast
+        case favouritePodcast
         case likedMoment
         case listeningPodcast
     }
@@ -334,10 +334,10 @@ extension Podcast: SearchCollectionViewCellType {
     }
 }
 
-//MARK: - FavoritePodcastTableViewCellType
+//MARK: - FavouritePodcastTableViewCellType
 extension Podcast: LikedPodcastTableViewCellType {
     
-    var mainImageForFavoritePodcastTableViewCellType: String? {
+    var mainImageForFavouritePodcastTableViewCellType: String? {
         return artworkUrl600
     }
     
@@ -353,8 +353,8 @@ extension Podcast: PodcastCellProtocol, InputPodcastCell {
         return self
     }
     
-    var isFavorite: Bool {
-        return favoritePodcast != nil
+    var isFavourite: Bool {
+        return favouritePodcast != nil
     }
     
     var trackDuration: String? { return trackTimeMillis?.minute }
@@ -366,10 +366,10 @@ extension Podcast: PodcastCellProtocol, InputPodcastCell {
     var imageForPodcastCell: String? { return image600 }
 }
 
-//MARK: - InputFavoriteType
-extension Podcast: InputFavoriteType {
+//MARK: - InputFavouriteType
+extension Podcast: InputFavouriteType {
     
-    var favoriteInputTypeid: String {
+    var favouriteInputTypeid: String {
         return id
     }
 }

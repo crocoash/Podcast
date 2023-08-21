@@ -16,9 +16,9 @@ extension FavouritePodcast {
         return NSFetchRequest<FavouritePodcast>(entityName: "FavouritePodcast")
     }
 
-    @NSManaged public var dateAdd: Date?
-    @NSManaged public var id: String?
-    @NSManaged public var podcast: Podcast?
+    @NSManaged public var dateAdd: Date
+    @NSManaged public var id: String
+    @NSManaged public var podcast: Podcast
 
 }
 

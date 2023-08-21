@@ -1,5 +1,5 @@
 //
-//  AddFavoriteManeger.swift
+//  AddFavouriteManeger.swift
 //  Podcasts
 //
 //  Created by Anton on 22.07.2023.
@@ -9,24 +9,24 @@ import UIKit
 import CoreData
  
 //MARK: - Delegate
-protocol FavoriteManagerDelegate: AnyObject {
-    func favoriteManager(_ favoriteManager: FavoriteManagerInput, didRemove favorite: FavoritePodcast)
-    func favoriteManager(_ favoriteManager: FavoriteManagerInput, didAdd favorite: FavoritePodcast)
+protocol FavouriteManagerDelegate: AnyObject {
+    func favouriteManager(_ favouriteManager: FavouriteManagerInput, didRemove favourite: FavouritePodcast)
+    func favouriteManager(_ favouriteManager: FavouriteManagerInput, didAdd favourite: FavouritePodcast)
 }
 
 //MARK: - Type
-protocol InputFavoriteType: CoreDataProtocol {
-    var favoriteInputTypeid: String { get }
+protocol InputFavouriteType: CoreDataProtocol {
+    var favouriteInputTypeid: String { get }
 }
 
 //MARK: - Input
-protocol FavoriteManagerInput: MultyDelegateServiceInput {
-    func addOrRemoveFavoritePodcast(entity: (any InputFavoriteType))
-    func isFavorite(_ entity: any InputFavoriteType) -> Bool
+protocol FavouriteManagerInput: MultyDelegateServiceInput {
+    func addOrRemoveFavouritePodcast(entity: (any InputFavouriteType))
+    func isFavourite(_ entity: any InputFavouriteType) -> Bool
     func removeAll()
 }
 
-class FavoriteManager: MultyDelegateService<FavoriteManagerDelegate>, FavoriteManagerInput {
+class FavouriteManager: MultyDelegateService<FavouriteManagerDelegate>, FavouriteManagerInput {
     
     private let dataStoreManager: DataStoreManagerInput
     private let firebaseDatabase: FirebaseDatabaseInput
@@ -42,54 +42,54 @@ class FavoriteManager: MultyDelegateService<FavoriteManagerDelegate>, FavoriteMa
     }
     
     var isEmpty: Bool {
-        dataStoreManager.allObjectsFromCoreData(type: FavoritePodcast.self).count == 0
+        dataStoreManager.allObjectsFromCoreData(type: FavouritePodcast.self).count == 0
     }
     
-    func addOrRemoveFavoritePodcast(entity: (any InputFavoriteType)) {
-        if let favoritePodcast = getFavorite(for: entity) {
-            removeFavoritePodcast(favoritePodcast)
+    func addOrRemoveFavouritePodcast(entity: (any InputFavouriteType)) {
+        if let favouritePodcast = getFavourite(for: entity) {
+            removeFavouritePodcast(favouritePodcast)
         } else {
-            addFavoritePodcast(entity: entity)
+            addFavouritePodcast(entity: entity)
         }
     }
     
-    private func removeFavoritePodcast(_ favoritePodcast: FavoritePodcast) {
-        if let favoritePodcast = getFavorite(for: favoritePodcast.podcast) {
-            let abstructFavorite = dataStoreManager.initAbstractObject(for: favoritePodcast)
+    private func removeFavouritePodcast(_ favouritePodcast: FavouritePodcast) {
+        if let favouritePodcast = getFavourite(for: favouritePodcast.podcast) {
+            let abstructFavourite = dataStoreManager.initAbstractObject(for: favouritePodcast)
             
-            dataStoreManager.removeFromCoreData(entity: favoritePodcast)
-            firebaseDatabase.remove(entity: abstructFavorite)
+            dataStoreManager.removeFromCoreData(entity: favouritePodcast)
+            firebaseDatabase.remove(entity: abstructFavourite)
             
             delegates {
-                $0.favoriteManager(self, didRemove: abstructFavorite)
+                $0.favouriteManager(self, didRemove: abstructFavourite)
             }
             feedbackGenerator()
         }
     }
     
-    func isFavorite(_ entity: any InputFavoriteType) -> Bool {
-        return getFavorite(for: entity) != nil
+    func isFavourite(_ entity: any InputFavouriteType) -> Bool {
+        return getFavourite(for: entity) != nil
     }
     
     func removeAll() {
-        dataStoreManager.allObjectsFromCoreData(type: FavoritePodcast.self).forEach {
-            removeFavoritePodcast($0)
+        dataStoreManager.allObjectsFromCoreData(type: FavouritePodcast.self).forEach {
+            removeFavouritePodcast($0)
         }
     }
 }
 
 //MARK: - Private Methods
-extension FavoriteManager {
+extension FavouriteManager {
     
-    private func addFavoritePodcast(entity: (any InputFavoriteType)) {
-        if getFavorite(for: entity) == nil {
+    private func addFavouritePodcast(entity: (any InputFavouriteType)) {
+        if getFavourite(for: entity) == nil {
             
             if let podcast = entity as? Podcast {
-                let favoritePodcast = FavoritePodcast(podcast, viewContext: viewContext, dataStoreManager: dataStoreManager)
+                let favouritePodcast = FavouritePodcast(podcast, viewContext: viewContext, dataStoreManager: dataStoreManager)
                 dataStoreManager.save()
-                firebaseDatabase.add(entity: favoritePodcast)
+                firebaseDatabase.add(entity: favouritePodcast)
                 delegates {
-                    $0.favoriteManager(self, didAdd: favoritePodcast)
+                    $0.favouriteManager(self, didAdd: favouritePodcast)
                 }
             } else {
                 //TODO: -
@@ -100,10 +100,10 @@ extension FavoriteManager {
         }
     }
     
-    private func getFavorite(for entity: any InputFavoriteType) -> FavoritePodcast? {
-        let predicate = NSPredicate(format: "podcast.id == %@", "\(entity.favoriteInputTypeid)")
-        let favoritePodcast = dataStoreManager.fetchObject(entity: FavoritePodcast.self, predicates: [predicate])
-        return favoritePodcast
+    private func getFavourite(for entity: any InputFavouriteType) -> FavouritePodcast? {
+        let predicate = NSPredicate(format: "podcast.id == %@", "\(entity.favouriteInputTypeid)")
+        let favouritePodcast = dataStoreManager.fetchObject(entity: FavouritePodcast.self, predicates: [predicate])
+        return favouritePodcast
     }
     
     private func feedbackGenerator() {
@@ -114,39 +114,39 @@ extension FavoriteManager {
 }
 
 //MARK: - FirebaseDatabaseDelegate
-extension FavoriteManager: FirebaseDatabaseDelegate {
+extension FavouriteManager: FirebaseDatabaseDelegate {
     
     func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didGetEmptyData type: any FirebaseProtocol.Type) {
-        if type is FavoritePodcast.Type {
+        if type is FavouritePodcast.Type {
             removeAll()
         }
     }
     
     func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didAdd entity: (any FirebaseProtocol)) {
-        if let favoritePodcast = entity as? FavoritePodcast {
-            if dataStoreManager.fetchObject(entity: favoritePodcast, predicates: nil) == nil {
-                let fav = FavoritePodcast(favoritePodcast, viewContext: viewContext, dataStoreManagerInput: dataStoreManager)
+        if let favouritePodcast = entity as? FavouritePodcast {
+            if dataStoreManager.fetchObject(entity: favouritePodcast, predicates: nil) == nil {
+                let fav = FavouritePodcast(favouritePodcast, viewContext: viewContext, dataStoreManagerInput: dataStoreManager)
                 delegates {
-                    $0.favoriteManager(self, didAdd: fav)
+                    $0.favouriteManager(self, didAdd: fav)
                 }
             }
         }
     }
     
     func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didRemove entity: (any FirebaseProtocol)) {
-        if let favoritePodcast = entity as? FavoritePodcast {
-            removeFavoritePodcast(favoritePodcast)
+        if let favouritePodcast = entity as? FavouritePodcast {
+            removeFavouritePodcast(favouritePodcast)
         }
     }
     
     func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didAdd entities: [any FirebaseProtocol]) {
-        if entities is [FavoritePodcast] {
+        if entities is [FavouritePodcast] {
             dataStoreManager.updateCoreData(set: entities)
         }
     }
     
     func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didUpdate entity: (any FirebaseProtocol)) {
-        if let favoritePodcast = entity as? FavoritePodcast? {
+        if let favouritePodcast = entity as? FavouritePodcast? {
             
         }
     }

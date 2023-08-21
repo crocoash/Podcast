@@ -44,6 +44,7 @@ enum TypeOfGestureRecognizer {
     case swipe(directions: [UISwipeGestureRecognizer.Direction] = Direction.round)
     case longPressGesture(minimumPressDuration: TimeInterval = 0.5)
     case screenEdgePanGestureRecognizer(directions: [UIRectEdge])
+    case panGestureRecognizer
     
     func createGestures(for target: Any?, selector: Selector?) -> [UIGestureRecognizer] {
         
@@ -80,8 +81,11 @@ enum TypeOfGestureRecognizer {
                 gestures.append(screenEdgePan)
             }
             return gestures
+           
+        // panGestureRecognizer
+        case .panGestureRecognizer:
+            return [UIPanGestureRecognizer(target: target, action: selector)]
         }
-        
     }
 }
 

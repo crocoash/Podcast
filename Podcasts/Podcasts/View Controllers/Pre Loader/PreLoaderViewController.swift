@@ -11,7 +11,7 @@ class PreLoaderViewController: UIViewController {
     
     private let userViewModel: UserViewModel
     private let likeManager: LikeManagerInput
-    private let favoriteManager: FavoriteManagerInput
+    private let favouriteManager: FavouriteManagerInput
     private let firestorageDatabase: FirestorageDatabaseInput
     private let player: InputPlayer
     private let downloadService: DownloadServiceInput
@@ -36,7 +36,7 @@ class PreLoaderViewController: UIViewController {
                                                         firestorageDatabase: firestorageDatabase,
                                                         player: player,
                                                         downloadService: downloadService,
-                                                        favoriteManager: favoriteManager,
+                                                        favouriteManager: favouriteManager,
                                                         likeManager: likeManager,
                                                         firebaseDataBase: firebaseDataBase,
                                                         apiService: apiService,
@@ -55,7 +55,7 @@ class PreLoaderViewController: UIViewController {
         
         let registrationVC = RegistrationViewController(coder: coder,
                                                         userViewModel: userViewModel,
-                                                        favoriteManager: favoriteManager,
+                                                        favouriteManager: favouriteManager,
                                                         likeManager: likeManager,
                                                         player: player,
                                                         firebaseDataBase: firebaseDataBase,
@@ -74,7 +74,7 @@ class PreLoaderViewController: UIViewController {
     init?(coder: NSCoder,
           userViewModel: UserViewModel,
           likeManager: LikeManagerInput,
-          favoriteManager: FavoriteManagerInput,
+          favouriteManager: FavouriteManagerInput,
           firestorageDatabase: FirestorageDatabaseInput,
           player: InputPlayer,
           downloadService: DownloadServiceInput,
@@ -83,7 +83,7 @@ class PreLoaderViewController: UIViewController {
           dataStoreManager: DataStoreManagerInput,
           listeningManager: ListeningManagerInput) {
         
-        self.favoriteManager = favoriteManager
+        self.favouriteManager = favouriteManager
         self.likeManager = likeManager
         self.userViewModel = userViewModel
         self.player = player

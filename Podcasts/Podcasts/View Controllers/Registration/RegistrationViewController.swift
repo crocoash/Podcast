@@ -22,7 +22,7 @@ class RegistrationViewController: UIViewController {
     @IBOutlet private weak var backGroundView: UIView!
     
     private let userViewModel: UserViewModel
-    private let favoriteManager: FavoriteManagerInput
+    private let favouriteManager: FavouriteManagerInput
     private let likeManager: LikeManagerInput
     private let firebaseDataBase: FirebaseDatabaseInput
     private let player: InputPlayer
@@ -39,7 +39,7 @@ class RegistrationViewController: UIViewController {
                                           firestorageDatabase: FirestorageDatabase(),
                                           player: player,
                                           downloadService: downloadService,
-                                          favoriteManager: favoriteManager,
+                                          favouriteManager: favouriteManager,
                                           likeManager: likeManager,
                                           firebaseDataBase: firebaseDataBase,
                                           apiService: apiService,
@@ -56,7 +56,7 @@ class RegistrationViewController: UIViewController {
     
     init?(coder: NSCoder,
           userViewModel: UserViewModel,
-          favoriteManager: FavoriteManagerInput,
+          favouriteManager: FavouriteManagerInput,
           likeManager: LikeManagerInput,
           player: InputPlayer,
           firebaseDataBase: FirebaseDatabaseInput,
@@ -66,7 +66,7 @@ class RegistrationViewController: UIViewController {
           listeningManager: ListeningManagerInput) {
         
         self.userViewModel = userViewModel
-        self.favoriteManager = favoriteManager
+        self.favouriteManager = favouriteManager
         self.likeManager = likeManager
         self.player = player
         self.firebaseDataBase = firebaseDataBase

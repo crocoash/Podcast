@@ -30,7 +30,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     lazy private var player: InputPlayer = Player()
         
-    lazy private var favoriteManager: FavoriteManagerInput = FavoriteManager(dataStoreManager: dataStoreManager, firebaseDatabase: firebaseDatabase)
+    lazy private var favouriteManager: FavouriteManagerInput = FavouriteManager(dataStoreManager: dataStoreManager, firebaseDatabase: firebaseDatabase)
     
     lazy private var listeningManager: ListeningManagerInput = {
         let manager = ListeningManager(dataStoreManager: dataStoreManager, firebaseDatabaseInput: firebaseDatabase)
@@ -42,7 +42,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     lazy private var downloadService: DownloadServiceInput = {
         let service = DownloadService(dataStoreManager: dataStoreManager, networkMonitor: netWorkMonitor)
-        favoriteManager.delegate = service
+        favouriteManager.delegate = service
         return service
     }()
     
@@ -83,7 +83,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 coder: coder,
                 userViewModel: userViewModel,
                 likeManager: likeManager,
-                favoriteManager: favoriteManager,
+                favouriteManager: favouriteManager,
                 firestorageDatabase: firestorageDatabase,
                 player: player,
                 downloadService: downloadService,
@@ -100,7 +100,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         firebaseDatabase.update(viewContext: dataStoreManager.viewContext) { (result: Result<[LikedMoment]>) in }
         
-        firebaseDatabase.update(viewContext: dataStoreManager.viewContext) { (result: Result<[FavoritePodcast]>) in }
+        firebaseDatabase.update(viewContext: dataStoreManager.viewContext) { (result: Result<[FavouritePodcast]>) in }
     }
     
     private func showError(_ error: MyError) {
@@ -112,11 +112,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     private func addFirebaseObserve() {
         let viewContext = dataStoreManager.backgroundViewContext
         
-        // FavoritePodcast
+        // FavouritePodcast
         firebaseDatabase.observe(
             viewContext: viewContext,
                 
-            add: { [weak self] (result: Result<FavoritePodcast>) in
+            add: { [weak self] (result: Result<FavouritePodcast>) in
                 
             guard let self = self else { return }
 
@@ -127,7 +127,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 }
             },
             
-            remove: { [weak self] (result: Result<FavoritePodcast>) in
+            remove: { [weak self] (result: Result<FavouritePodcast>) in
                 guard let self = self else { return }
                 
                 switch result {

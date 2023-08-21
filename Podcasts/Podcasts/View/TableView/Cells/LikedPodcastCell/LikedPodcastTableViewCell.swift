@@ -8,7 +8,7 @@
 import UIKit
 
 protocol LikedPodcastTableViewCellType {
-    var mainImageForFavoritePodcastTableViewCellType: String? { get }
+    var mainImageForFavouritePodcastTableViewCellType: String? { get }
     var nameLabel: String? { get }
 }
 
@@ -17,11 +17,11 @@ class LikedPodcastTableViewCell: UITableViewCell {
     @IBOutlet private weak var collectionImageView: UIImageView!
     @IBOutlet private weak var nameLabel: UILabel!
     
-    private(set) var favoritePodcastTableViewCellType: LikedPodcastTableViewCellType!
+    private(set) var favouritePodcastTableViewCellType: LikedPodcastTableViewCellType!
     
     func configureCell(with entity: LikedPodcastTableViewCellType) {
-        self.favoritePodcastTableViewCellType = entity
-        DataProvider.shared.downloadImage(string: entity.mainImageForFavoritePodcastTableViewCellType) {
+        self.favouritePodcastTableViewCellType = entity
+        DataProvider.shared.downloadImage(string: entity.mainImageForFavouritePodcastTableViewCellType) {
             self.collectionImageView.image = $0
         }
         self.nameLabel.text = entity.nameLabel

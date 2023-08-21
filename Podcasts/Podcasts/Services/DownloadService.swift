@@ -276,12 +276,12 @@ extension DownloadService: URLSessionDelegate, URLSessionDownloadDelegate {
     }
 }
 
-//MARK: - FavoriteManagerDelegate
-extension DownloadService: FavoriteManagerDelegate {
+//MARK: - FavouriteManagerDelegate
+extension DownloadService: FavouriteManagerDelegate {
     
-    func favoriteManager(_ favoriteManager: FavoriteManagerInput, didRemove favorite: FavoritePodcast) {
-       cancelDownload(favorite)
+    func favouriteManager(_ favouriteManager: FavouriteManagerInput, didRemove favourite: FavouritePodcast) {
+       cancelDownload(favourite)
     }
     
-    func favoriteManager(_ favoriteManager: FavoriteManagerInput, didAdd favorite: FavoritePodcast) {}
+    func favouriteManager(_ favouriteManager: FavouriteManagerInput, didAdd favourite: FavouritePodcast) {}
 }
