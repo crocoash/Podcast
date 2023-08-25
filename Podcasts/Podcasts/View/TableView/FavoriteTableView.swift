@@ -106,6 +106,7 @@ class FavouriteTableView: UITableView {
             let beforeSection = mySnapShot.sectionIdentifiers[newIndex]
             mySnapShot.moveSection(section, beforeSection: beforeSection)
         }
+        
         diffableDataSource.apply(mySnapShot)
     }
     
@@ -167,7 +168,6 @@ class FavouriteTableView: UITableView {
             }
         }
         
-        configureDataSource()
         diffableDataSource.apply(mySnapShot)
         showEmptyImage()
     }
@@ -219,8 +219,7 @@ extension FavouriteTableView {
             mySnapShot.appendSections([section])
             mySnapShot.appendItems(cells)
         }
-        
-        self.diffableDataSource.apply(mySnapShot, animatingDifferences: true)
+        diffableDataSource.apply(mySnapShot)
         showEmptyImage()
     }
     
