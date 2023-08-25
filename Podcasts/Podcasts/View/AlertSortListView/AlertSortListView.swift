@@ -191,9 +191,7 @@ extension AlertSortListView {
 }
 
 //MARK: - UITableViewDelegate
-extension AlertSortListView: UITableViewDelegate {
-    
-}
+extension AlertSortListView: UITableViewDelegate {}
 
 //MARK: - UITableViewDataSource
 extension AlertSortListView: UITableViewDataSource {
