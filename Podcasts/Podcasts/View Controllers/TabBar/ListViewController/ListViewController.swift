@@ -364,18 +364,19 @@ extension ListViewController: NSFetchedResultsControllerDelegate {
                         
             if let listSection = anObject as? ListSection {
                 
-                guard let section = model.getSection(by: listSection.nameOfSection) else { fatalError() }
-                guard let modeIndex = model.getIndexOfActiveSection(for: section) else { return }
-                
-                model.moveSection(from: index, to: newIndex)
-                
-                guard let modeNewIndex = model.getIndexOfActiveSection(for: section) else { return }
-                
+                let section = model.sections[index]
+                let newSection = model.sections[newIndex]
                 let isActiveSection = model.sectionIsEmpty(section)
                 
-                if modeIndex != modeNewIndex, isActiveSection {
-                    favouriteTableView.moveSection(from: modeIndex, to: modeNewIndex)
+                if let modeIndex = model.getIndexOfActiveSection(for: section),
+                   let modeNewIndex = model.getIndexOfActiveSection(for: newSection) {
+                    
+                    if modeIndex != modeNewIndex, isActiveSection {
+                        favouriteTableView.moveSection(from: modeIndex, to: modeNewIndex)
+                    }
                 }
+                
+                model.moveSection(from: index, to: newIndex)
             }
         default:
             break
