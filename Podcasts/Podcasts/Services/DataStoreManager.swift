@@ -10,28 +10,24 @@ import CoreData
 
 //MARK: - Input
 protocol DataStoreManagerInput {
+    
     var viewContext: NSManagedObjectContext { get }
     var backgroundViewContext: NSManagedObjectContext { get }
     
-//    func getFromCoreData<T: CoreDataProtocol>(entity: T) -> T?
-    
-//    @discardableResult
     func getFromCoreDataIfNoSavedNew<T: CoreDataProtocol>(entity: T) -> T
-    
     func removeFromCoreData<T: CoreDataProtocol>(entity: T)
     func allObjectsFromCoreData<T: NSManagedObject>(type: T.Type) -> Set<T>
     func fetchObject<T: CoreDataProtocol>(entity: T, predicates: [NSPredicate]?) -> T?
     func fetchObject<T: CoreDataProtocol>(entity: T.Type, predicates: [NSPredicate]?) -> T?
+
+    func updateCoreData(set: [(any CoreDataProtocol)])
+    func save()
     
+    /// inits
     func initAbstractObjects<T: NSManagedObject>(for objects: Set<T>) -> [T]
     func initAbstractObject<T: NSManagedObject>(for objects: T) -> T
     
-//    func updateCoreData<T: CoreDataProtocol>(entity: T)
-    
-    func updateCoreData(set: [(any CoreDataProtocol)])
-        
-    func save()
-    
+    ///frc
     func conFigureFRC<T: CoreDataProtocol>(for entity: T.Type) -> NSFetchedResultsController<T>
     func conFigureFRC<T: CoreDataProtocol>(for entity: T.Type, with sortDescription: [NSSortDescriptor]) -> NSFetchedResultsController<T>
     func conFigureFRC<T: CoreDataProtocol>(for entity: T.Type, with sortDescription: [NSSortDescriptor], predicates: [NSPredicate]) -> NSFetchedResultsController<T>
