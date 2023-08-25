@@ -89,7 +89,6 @@ final class DataStoreManager {
                 fatalError("Unresolved error \(error), \(error.userInfo)")
             }
         })
-       
         return container
     }()
  
