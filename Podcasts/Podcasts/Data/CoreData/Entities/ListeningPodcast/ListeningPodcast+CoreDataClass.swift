@@ -71,7 +71,6 @@ extension ListeningPodcast: CoreDataProtocol {
 extension ListeningPodcast: FirebaseProtocol {}
 
 //extension ListeningPodcast: ListeningPodcastCellProtocol {
-//    
 //    var podcastName: String? {
 //        podcast.trackName
 //    }
