@@ -74,6 +74,5 @@ extension ListeningPodcast: FirebaseProtocol {}
 //    var podcastName: String? {
 //        podcast.trackName
 //    }
-//    
 //    var imageForCell: String? { return podcast.image600 }
 //}
