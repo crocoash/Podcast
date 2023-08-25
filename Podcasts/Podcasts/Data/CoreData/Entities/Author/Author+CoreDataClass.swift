@@ -31,7 +31,4 @@ public class Author: NSManagedObject, Decodable {
 }
 
 //MARK: - static methods
-extension Author {
-    
-    static var searchAuthors: [Author] { viewContext.fetchObjects(self) }
-}
+extension Author { }

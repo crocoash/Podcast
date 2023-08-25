@@ -3,7 +3,7 @@
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21678"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21679"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -18,7 +18,7 @@
             </connections>
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" restorationIdentifier="SmallPlayerView" id="i5M-Pr-FkT">
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="i5M-Pr-FkT">
             <rect key="frame" x="0.0" y="0.0" width="414" height="108"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
@@ -28,23 +28,24 @@
                         <constraint firstAttribute="height" constant="101" id="GL8-Jj-Tdv"/>
                         <constraint firstAttribute="width" constant="50" id="Lxl-hl-KTp"/>
                     </constraints>
+                    <color key="tintColor" systemColor="secondaryLabelColor"/>
                     <state key="normal" image="pause.fill" catalog="system"/>
                     <connections>
                         <action selector="playOrPause" destination="-1" eventType="touchUpInside" id="dtv-1r-7Sy"/>
                     </connections>
                 </button>
                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" adjustsImageSizeForAccessibilityContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3vw-cZ-C9n">
-                    <rect key="frame" x="0.0" y="6.5" width="107.5" height="95"/>
+                    <rect key="frame" x="0.0" y="0.0" width="108" height="108"/>
                     <constraints>
-                        <constraint firstAttribute="width" secondItem="3vw-cZ-C9n" secondAttribute="height" multiplier="1:1" constant="12" id="Nz5-q6-RUT"/>
+                        <constraint firstAttribute="width" secondItem="3vw-cZ-C9n" secondAttribute="height" multiplier="1:1" id="Nz5-q6-RUT"/>
                     </constraints>
                 </imageView>
                 <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" progressViewStyle="bar" translatesAutoresizingMaskIntoConstraints="NO" id="UkG-9Q-AK5">
-                    <rect key="frame" x="107.5" y="106.5" width="306.5" height="2.5"/>
+                    <rect key="frame" x="108" y="106.5" width="306" height="2.5"/>
                     <color key="tintColor" red="0.99516242740000005" green="0.1948511004" blue="0.37298858169999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                 </progressView>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Podcast Name" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="A1c-4Y-GlG">
-                    <rect key="frame" x="115.5" y="47" width="212.5" height="14.5"/>
+                    <rect key="frame" x="116" y="47" width="212" height="14.5"/>
                     <fontDescription key="fontDescription" type="boldSystem" pointSize="12"/>
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
@@ -54,30 +55,33 @@
                     <color key="tintColor" red="0.9992973208" green="0.13010036950000001" blue="0.29632696510000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                 </activityIndicatorView>
             </subviews>
-            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+            <color key="backgroundColor" systemColor="placeholderTextColor"/>
             <constraints>
                 <constraint firstItem="23u-4B-sHm" firstAttribute="leading" secondItem="A1c-4Y-GlG" secondAttribute="trailing" constant="19" id="1ue-St-HQx"/>
                 <constraint firstAttribute="trailing" secondItem="UkG-9Q-AK5" secondAttribute="trailing" constant="0.11478882384039935" id="3r8-g7-x0u"/>
                 <constraint firstItem="3vw-cZ-C9n" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="EyS-FX-sXt"/>
                 <constraint firstAttribute="bottom" secondItem="UkG-9Q-AK5" secondAttribute="bottom" id="FHR-0o-8Ms"/>
+                <constraint firstAttribute="bottom" secondItem="3vw-cZ-C9n" secondAttribute="bottom" id="Ig0-Lp-kmJ"/>
                 <constraint firstAttribute="trailing" secondItem="WGq-qB-fKe" secondAttribute="trailing" id="Q5A-lQ-UH1"/>
+                <constraint firstItem="3vw-cZ-C9n" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="Uk3-wj-ux6"/>
                 <constraint firstItem="A1c-4Y-GlG" firstAttribute="centerY" secondItem="i5M-Pr-FkT" secondAttribute="centerY" id="Whz-IT-0ky"/>
                 <constraint firstItem="WGq-qB-fKe" firstAttribute="leading" secondItem="23u-4B-sHm" secondAttribute="trailing" constant="-3" id="XBS-3Z-thG"/>
-                <constraint firstItem="3vw-cZ-C9n" firstAttribute="height" secondItem="i5M-Pr-FkT" secondAttribute="height" multiplier="0.8" constant="9" id="ZH6-1O-nb2"/>
                 <constraint firstItem="23u-4B-sHm" firstAttribute="centerY" secondItem="WGq-qB-fKe" secondAttribute="centerY" id="cKh-Lz-xJd"/>
                 <constraint firstItem="WGq-qB-fKe" firstAttribute="centerY" secondItem="i5M-Pr-FkT" secondAttribute="centerY" id="imy-Tm-rUh"/>
                 <constraint firstItem="UkG-9Q-AK5" firstAttribute="leading" secondItem="3vw-cZ-C9n" secondAttribute="trailing" id="jnv-dW-tJ7"/>
                 <constraint firstItem="A1c-4Y-GlG" firstAttribute="leading" secondItem="3vw-cZ-C9n" secondAttribute="trailing" constant="8" symbolic="YES" id="pdh-uQ-DTG"/>
-                <constraint firstItem="3vw-cZ-C9n" firstAttribute="centerY" secondItem="i5M-Pr-FkT" secondAttribute="centerY" id="pjA-UH-JeE"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
-            <point key="canvasLocation" x="196" y="-163"/>
+            <point key="canvasLocation" x="195.6521739130435" y="-163.39285714285714"/>
         </view>
     </objects>
     <resources>
         <image name="pause.fill" catalog="system" width="117" height="128"/>
-        <systemColor name="systemBackgroundColor">
-            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        <systemColor name="placeholderTextColor">
+            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.29803921568627451" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="secondaryLabelColor">
+            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

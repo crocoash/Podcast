@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21679"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="AlertSortListView" customModule="Podcasts" customModuleProvider="target">
+            <connections>
+                <outlet property="closeImageView" destination="lJo-Qm-RVt" id="j5R-tV-kXR"/>
+                <outlet property="tableView" destination="FUd-3o-sgh" id="zUP-cu-L2c"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="2RB-m9-Pzk">
+            <rect key="frame" x="0.0" y="0.0" width="393" height="603"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <subviews>
+                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="chevron.compact.down" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="lJo-Qm-RVt">
+                    <rect key="frame" x="76" y="7" width="227" height="14"/>
+                    <color key="tintColor" systemColor="systemGreenColor"/>
+                </imageView>
+                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="FUd-3o-sgh">
+                    <rect key="frame" x="10" y="38" width="373" height="555"/>
+                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    <connections>
+                        <outlet property="dataSource" destination="-1" id="8wD-FJ-50O"/>
+                        <outlet property="delegate" destination="-1" id="8mL-au-o3J"/>
+                    </connections>
+                </tableView>
+            </subviews>
+            <color key="backgroundColor" systemColor="systemTealColor"/>
+            <constraints>
+                <constraint firstItem="lJo-Qm-RVt" firstAttribute="leading" secondItem="2RB-m9-Pzk" secondAttribute="leading" constant="76" id="7xl-zj-dXK"/>
+                <constraint firstAttribute="bottom" secondItem="FUd-3o-sgh" secondAttribute="bottom" constant="10" id="Cac-7B-vtL"/>
+                <constraint firstAttribute="trailing" secondItem="FUd-3o-sgh" secondAttribute="trailing" constant="10" id="CjX-PW-D9h"/>
+                <constraint firstItem="FUd-3o-sgh" firstAttribute="leading" secondItem="2RB-m9-Pzk" secondAttribute="leading" constant="10" id="CuY-Uc-7HA"/>
+                <constraint firstItem="lJo-Qm-RVt" firstAttribute="top" secondItem="2RB-m9-Pzk" secondAttribute="top" id="Fv6-md-PKP"/>
+                <constraint firstItem="lJo-Qm-RVt" firstAttribute="height" secondItem="2RB-m9-Pzk" secondAttribute="height" multiplier="0.0630182" constant="-10" id="LDS-gG-sVP"/>
+                <constraint firstItem="FUd-3o-sgh" firstAttribute="top" secondItem="lJo-Qm-RVt" secondAttribute="bottom" constant="10" id="SsJ-IN-w77"/>
+                <constraint firstAttribute="trailing" secondItem="lJo-Qm-RVt" secondAttribute="trailing" constant="90" id="bKs-Th-3kN"/>
+                <constraint firstItem="FUd-3o-sgh" firstAttribute="leading" secondItem="2RB-m9-Pzk" secondAttribute="leading" constant="10" id="gql-Wc-Skb"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <userDefinedRuntimeAttributes>
+                <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                    <integer key="value" value="10"/>
+                </userDefinedRuntimeAttribute>
+            </userDefinedRuntimeAttributes>
+            <point key="canvasLocation" x="151.90839694656489" y="-83.450704225352112"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="chevron.compact.down" catalog="system" width="128" height="42"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemGreenColor">
+            <color red="0.20392156862745098" green="0.7803921568627451" blue="0.34901960784313724" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="systemTealColor">
+            <color red="0.18823529411764706" green="0.69019607843137254" blue="0.7803921568627451" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
+</document>

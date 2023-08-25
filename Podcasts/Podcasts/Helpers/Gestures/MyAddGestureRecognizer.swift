@@ -13,6 +13,15 @@ extension UIView {
         // get array of GestureRecognizer then add him to the View
         gesture.createGestures(for: target, selector: selector).forEach { addGestureRecognizer($0) }
     }
+    
+    func addMyGestureRecognizer(_ target: Any?, type gestures: [TypeOfGestureRecognizer],_ selector: Selector) {
+        self.isUserInteractionEnabled = true
+        // get array of GestureRecognizer then add him to the View
+        gestures.forEach {
+            $0.createGestures(for: target, selector: selector).forEach { addGestureRecognizer($0) }
+
+        }
+    }
 }
 
 extension Collection where Element: UIView {
@@ -35,6 +44,7 @@ enum TypeOfGestureRecognizer {
     case swipe(directions: [UISwipeGestureRecognizer.Direction] = Direction.round)
     case longPressGesture(minimumPressDuration: TimeInterval = 0.5)
     case screenEdgePanGestureRecognizer(directions: [UIRectEdge])
+    case panGestureRecognizer
     
     func createGestures(for target: Any?, selector: Selector?) -> [UIGestureRecognizer] {
         
@@ -71,8 +81,11 @@ enum TypeOfGestureRecognizer {
                 gestures.append(screenEdgePan)
             }
             return gestures
+           
+        // panGestureRecognizer
+        case .panGestureRecognizer:
+            return [UIPanGestureRecognizer(target: target, action: selector)]
         }
-        
     }
 }
 

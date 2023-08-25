@@ -9,26 +9,48 @@ import Foundation
 import UIKit
 import CoreData
 
-class ApiService {
+//MARK: - Input
+protocol ApiServiceInput {
+    func getData<T: Decodable>(for request: String, completion: @escaping (Result<T>) -> Void)
+}
+
+class ApiService: ApiServiceInput {
+   
+    private var viewContext: NSManagedObjectContext
     
-    static func getData<T: Decodable>(for request: String, completion: @escaping (Result<T>) -> Void) {
+    init(viewContext: NSManagedObjectContext) {
+        self.viewContext = viewContext
+    }
+    
+    func getData<T: Decodable>(for request: String, completion: @escaping (Result<T>) -> Void) {
         
         guard let url = URL(string: request.encodeUrl) else { fatalError() }
-        
-        let viewContext = DataStoreManager.shared.viewContext
-        
-        URLSession.shared.dataTask(with: url) { data, response, error in
+                
+        URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
+            
+            guard let self = self else { return }
             
             var result: Result<T>
-            
+
             defer {
                 DispatchQueue.main.async {
                     completion(result)
                 }
             }
             
-            guard let data = data, response != nil, error == nil else {
-                result = .failure(error: .error(error?.localizedDescription ?? "No Data" ))
+            if let error = error {
+                result = .failure(.apiService(.error(error.localizedDescription)))
+                return
+            }
+            
+            if let response = response as? HTTPURLResponse {
+                if response.statusCode != 200 {
+                    result = .failure(.apiService(.error("\(response.statusCode)")))
+                }
+            }
+            
+            guard let data = data else {
+                result = .failure(.apiService(.noData))
                 return
             }
             
@@ -39,10 +61,8 @@ class ApiService {
                 
             } catch let error {
                 print(error)
-                result = .failure(error: .error(error.localizedDescription.debugDescription))
+                result = .failure(.apiService(.error(error.localizedDescription.debugDescription)))
             }
         }.resume()
     }
 }
-
-

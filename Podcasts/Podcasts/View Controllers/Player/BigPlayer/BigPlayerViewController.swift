@@ -7,27 +7,67 @@
 
 import UIKit
 import AVFoundation
+import CoreData
 
 protocol BigPlayerViewControllerDelegate: AnyObject {
-    func bigPlayerViewControllerDidSelectPlayStopButton (_ bigPlayerViewController: BigPlayerViewController)
-    func bigPlayerViewControllerDidSelectNextTrackButton (_ bigPlayerViewController: BigPlayerViewController)
-    func bigPlayerViewControllerDidSelectPreviewsTrackButton (_ bigPlayerViewController: BigPlayerViewController)
-    func bigPlayerViewController(_ bigPlayerViewController: BigPlayerViewController, didChangeCurrentTime  value: Double)
-    func bigPlayerViewController(_ bigPlayerViewController: BigPlayerViewController, didRewindCurrentTime value: Double)
-    func bigPlayerViewController(_ bigPlayerViewController: BigPlayerViewController, didLikeThis moment: Double)
-    func bigPlayerViewControllerDidTouchPodcastNameLabel(_ bigPlayerViewController: BigPlayerViewController, track: InputPlayerProtocol?)
+    func bigPlayerViewControllerDidTouchPodcastNameLabel(_ bigPlayerViewController: BigPlayerViewController, entity: NSManagedObject)
 }
 
 protocol BigPlayerPlayableProtocol {
-    var playerIsLoading: Bool { get }
+    
+    var isGoingPlaying: Bool { get }
     var isLast: Bool { get }
     var isFirst: Bool { get }
     var isPlaying: Bool { get }
     var trackName: String? { get }
-    var trackImage: String? { get }
+    var imageForBigPlayer: String? { get }
     var currentTime: Float? { get }
     var duration: Double? { get }
-    var track: InputPlayerProtocol? { get }
+    var listeningProgress: Double? { get }
+    var inputType: TrackProtocol { get }
+}
+
+struct BigPlayerModel: BigPlayerPlayableProtocol {
+    
+    var inputType: TrackProtocol
+    
+    var isGoingPlaying: Bool
+    var isLast: Bool
+    var isFirst: Bool
+    var isPlaying: Bool
+    var trackName: String?
+    var imageForBigPlayer: String?
+    var currentTime: Float?
+    var duration: Double?
+    var listeningProgress: Double?
+    
+    init(model: BigPlayerPlayableProtocol) {
+        self.isGoingPlaying = model.isGoingPlaying
+        self.isLast = model.isLast
+        self.isFirst = model.isFirst
+        self.isPlaying = model.isPlaying
+        self.trackName = model.trackName
+        self.imageForBigPlayer = model.imageForBigPlayer
+        self.currentTime = model.currentTime
+        self.duration = model.duration
+        self.inputType = model.inputType
+        self.listeningProgress = model.listeningProgress
+    }
+    
+    mutating func update(_ input: Any) {
+        if let player = input as? BigPlayerPlayableProtocol {
+            self.isGoingPlaying = player.isGoingPlaying
+            self.isLast = player.isLast
+            self.isFirst = player.isFirst
+            self.isPlaying = player.isPlaying
+            self.trackName = player.trackName
+            self.imageForBigPlayer = player.imageForBigPlayer
+            self.currentTime = player.currentTime
+            self.inputType = player.inputType
+            self.listeningProgress = player.listeningProgress
+            self.duration = player.duration
+        }
+    }
 }
 
 class BigPlayerViewController: UIViewController {
@@ -49,77 +89,118 @@ class BigPlayerViewController: UIViewController {
     
     weak var delegate: BigPlayerViewControllerDelegate?
     
+    private(set) var model: BigPlayerModel {
+        didSet {
+            configure()
+        }
+    }
+    
+    private var player: InputPlayer
+    private var likeManager: LikeManagerInput
+    
     private let defaultTime = "0:00"
     private var pauseImage = UIImage(systemName: "pause.fill")!
     private var playImage = UIImage(systemName: "play.fill")!
     private var bigPlayerPlayableProtocol: BigPlayerPlayableProtocol!
     
+    //MARK: init
+    init<T: BigPlayerViewControllerDelegate>(_ vc: T,
+                                             player: InputPlayer,
+                                             track: BigPlayerPlayableProtocol,
+                                             likeManager: LikeManagerInput) {
+        self.player = player
+        self.model = BigPlayerModel(model: track)
+        self.delegate = vc
+        self.likeManager = likeManager
+        
+        super.init(nibName: Self.identifier, bundle: nil)
+    }
+    
+    deinit {
+        
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     //MARK: - PublicMethods
-    func setUpUI(with player: BigPlayerPlayableProtocol) {
-        self.bigPlayerPlayableProtocol = player
+    
+    private func configure() {
+        progressSlider.maximumValue = Float(model.duration ?? 0)
+        progressSlider.value = Float(model.currentTime ?? 0)
         
-        progressSlider.maximumValue = Float(player.duration ?? 0)
-        progressSlider.value = player.currentTime ?? 0
+        currentTimeLabel  .text = model.currentTime?.formatted
+        durationTrackLabel.text = model.duration?.formatted
+        podcastNameLabel  .text = model.trackName
         
-        currentTimeLabel  .text = player.currentTime?.formatted ?? defaultTime
-        durationTrackLabel.text = player.duration?.formatted ?? defaultTime
-        podcastNameLabel  .text = player.trackName
+        activityIndicator.isHidden = !model.isGoingPlaying
         
-        activityIndicator.isHidden = !player.playerIsLoading
-        
-        DataProvider.shared.downloadImage(string: player.trackImage) { [weak self] image in
+        DataProvider.shared.downloadImage(string: model.imageForBigPlayer) { [weak self] image in
             self?.podcastImageView.image = image
         }
         
-        likedButton          .isEnabled = !player.playerIsLoading
-        previousPodcastButton.isEnabled = !player.isFirst
-        nextPodcastButton    .isEnabled = !player.isLast
+        likedButton          .isEnabled = !model.isGoingPlaying
+        previousPodcastButton.isEnabled = !model.isFirst
+        nextPodcastButton    .isEnabled = !model.isLast
         
-        setupPlayPauseButton(player: player)
+        playPauseButton.setImage(model.isPlaying || model.isGoingPlaying ? pauseImage : playImage, for: .normal)
     }
     
     //MARK: View Methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        addObserverPlayerEventNotification()
+        player.delegate = self
         configureGestures()
-    }
-    
-    deinit {
-        removeObserverEventNotification()
+        progressSlider.addTarget(self, action: #selector(sliderValueChangedBegin), for: .editingDidBegin)
+        progressSlider.addTarget(self, action: #selector(progressSliderValueChanged(slider:event:)), for: .valueChanged)
+        configure()
     }
     
     //MARK:  Actions
     @objc func dismissBigPlayer() {
-        dismiss(animated: true)
+        presentingViewController?.dismiss(animated: true)
+    }
+    
+    @objc func sliderValueChangedBegin() {
+        player.pause()
     }
     
     @objc func tapPodcastNameLabel(sender: UITapGestureRecognizer) {
-        delegate?.bigPlayerViewControllerDidTouchPodcastNameLabel(self, track: bigPlayerPlayableProtocol.track )
+        delegate?.bigPlayerViewControllerDidTouchPodcastNameLabel(self, entity: model.inputType )
     }
     
-    @IBAction func progressSliderValueChanged(_ sender: UISlider) {
-        delegate?.bigPlayerViewController(self, didChangeCurrentTime:  Double(sender.value))
+    @objc func progressSliderValueChanged(slider: UISlider, event: UIEvent) {
+        switch event.allTouches?.first?.phase {
+        case .began:
+            player.pause()
+        case .ended:
+            progressSlider.value = slider.value
+            player.playerSeek(to: Double(slider.value))
+        case .moved:
+            currentTimeLabel.text = Double(slider.value).formatted
+        default: break
+        }
     }
     
     @IBAction func playPauseTouchUpInside(_ sender: UIButton) {
-        delegate?.bigPlayerViewControllerDidSelectPlayStopButton(self)
+        player.playOrPause()
     }
     
     @IBAction func nextPodcastTouchUpInside(_ sender: UIButton) {
-        delegate?.bigPlayerViewControllerDidSelectNextTrackButton(self)
+        player.playNextPodcast()
     }
     
     @IBAction func previousPodcastTouchUpInside(_ sender: UIButton) {
-        delegate?.bigPlayerViewControllerDidSelectPreviewsTrackButton(self)
+        player.playPreviewsTrack()
     }
     
     @IBAction func tenSecondBackTouchUpInside(_ sender: UIButton) {
-        delegate?.bigPlayerViewController(self, didRewindCurrentTime: -60)
+        player.playerRewindSeek(to: -60)
     }
     
     @IBAction func tenSecondForwardTouchUpInside(_ sender: UIButton) {
-        delegate?.bigPlayerViewController(self, didRewindCurrentTime: 60)
+        player.playerRewindSeek(to: 60)
     }
     
     @objc func respondToSwipe(gesture: Any) {
@@ -127,7 +208,8 @@ class BigPlayerViewController: UIViewController {
     }
     
     @IBAction func likedButton(_ sender: UIButton) {
-        delegate?.bigPlayerViewController(self, didLikeThis: Double(progressSlider.value))
+        let moment = Double(progressSlider.value)
+        likeManager.addToLikedMoments(entity: model.inputType, moment: moment)
     }
     
     @IBAction func dissmisButtonTouchUpInside(_ sender: UIButton) {
@@ -143,59 +225,43 @@ extension BigPlayerViewController {
         podcastNameLabel.addMyGestureRecognizer(self, type: .tap(), #selector(tapPodcastNameLabel))
     }
     
-    private func updateProgressSlider(player: BigPlayerPlayableProtocol) {
-        progressSlider.value = player.currentTime ?? 0
-        progressSlider.maximumValue = Float(player.duration ?? 0)
-        currentTimeLabel.text = player.currentTime?.formatted ?? defaultTime
-        durationTrackLabel.text = player.duration?.formatted ?? defaultTime
-        if !likedButton.isEnabled { likedButton.isEnabled = true }
-    }
-    
-    private func playerEndPlay(player: BigPlayerPlayableProtocol) {
-        progressSlider.value = 0
-        progressSlider.maximumValue = 0
-        currentTimeLabel.text = defaultTime
-        durationTrackLabel.text = defaultTime
-        likedButton.isEnabled = false
-    }
-    
-    private func setupPlayPauseButton(player: BigPlayerPlayableProtocol) {
-        playPauseButton.setImage(player.isPlaying ? pauseImage : playImage, for: .normal)
-    }
+//    private func updateProgressSlider(player: BigPlayerPlayableProtocol) {
+//        progressSlider.value = player.currentTime ?? 0
+//        progressSlider.maximumValue = Float(player.playingDuration ?? 0)
+//        currentTimeLabel.text = player.currentTime?.formatted ?? defaultTime
+//        durationTrackLabel.text = player.playingDuration?.formatted ?? defaultTime
+//        if !likedButton.isEnabled { likedButton.isEnabled = true }
+//    }
+//
+//    private func playerEndPlay(player: BigPlayerPlayableProtocol) {
+//        progressSlider.value = 0
+//        progressSlider.maximumValue = 0
+//        currentTimeLabel.text = defaultTime
+//        durationTrackLabel.text = defaultTime
+//        likedButton.isEnabled = false
+//    }
 }
  
 //MARK: - PlayerEventNotification
-extension BigPlayerViewController: PlayerEventNotification {
-   
-    func addObserverPlayerEventNotification() {
-        Player.addObserverPlayerPlayerEventNotification(for: self)
+extension BigPlayerViewController: PlayerDelegate {
+    
+    func playerDidEndPlay(with track: OutputPlayerProtocol) {
+        model.update(track)
     }
     
-    func removeObserverEventNotification() {
-        Player.removeObserverEventNotification(for: self)
+    func playerStartLoading(with track: OutputPlayerProtocol) {
+        model.update(track)
     }
     
-    func playerDidEndPlay(notification: NSNotification) {
-        guard let player = notification.object as? BigPlayerPlayableProtocol else { return }
-        playerEndPlay(player: player)
+    func playerDidEndLoading(with track: OutputPlayerProtocol) {
+        model.update(track)
     }
     
-    func playerStartLoading(notification: NSNotification) {
-        activityIndicator.stopAnimating()
+    func playerUpdatePlayingInformation(with track: OutputPlayerProtocol) {
+        model.update(track)
     }
     
-    func playerDidEndLoading(notification: NSNotification) {
-        guard let player = notification.object as? BigPlayerPlayableProtocol else { return }
-        setUpUI(with: player)
-    }
-    
-    func playerUpdatePlayingInformation(notification: NSNotification) {
-        guard let player = notification.object as? BigPlayerPlayableProtocol else { return }
-        updateProgressSlider(player: player)
-    }
-    
-    func playerStateDidChanged(notification: NSNotification) {
-        guard let player = notification.object as? BigPlayerPlayableProtocol else { return }
-        setupPlayPauseButton(player: player)
+    func playerStateDidChanged(with track: OutputPlayerProtocol) {
+        model.update(track)
     }
 }

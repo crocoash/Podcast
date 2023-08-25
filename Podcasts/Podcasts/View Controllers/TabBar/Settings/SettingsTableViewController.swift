@@ -15,14 +15,12 @@ protocol SettingsTableViewControllerDelegate: AnyObject {
 
 class SettingsTableViewController: UITableViewController {
     
-    private var userViewModel: UserViewModel!
+    private var userViewModel: UserViewModel
+    private let firestorageDatabase: FirestorageDatabaseInput
+    private let apiService: ApiServiceInput
+
     private var user: User { userViewModel.userDocument.user }
-    private let firestorageDatabase = FirestorageDatabase()
     weak var delegate: SettingsTableViewControllerDelegate?
-    
-    func setUser(_ userViewModel: UserViewModel) {
-        self.userViewModel = userViewModel
-    }
     
     @IBOutlet private weak var userNameLabel: UILabel!
     @IBOutlet private weak var locationLabel: UILabel!
@@ -46,13 +44,31 @@ class SettingsTableViewController: UITableViewController {
         return $0
     }(UIImagePickerController())
     
+    //MARK: init
+    init?(coder: NSCoder,
+          _ userViewModel: UserViewModel,
+          firestorageDatabase: FirestorageDatabaseInput,
+          apiService: ApiServiceInput) {
+        
+        self.userViewModel = userViewModel
+        self.firestorageDatabase = firestorageDatabase
+        self.apiService = apiService
+        
+        super.init(coder: coder)
+    }
+    
+    required init(coder: NSCoder) {
+        fatalError()
+    }
+    
     //MARK: - View Methods
     override func loadView() {
         super.loadView()
-        ApiService.getData(for: URLS.api.rawValue) { [weak self] (result: Result<IpModel>) in
+        apiService.getData(for: URLS.api.rawValue) { [weak self] (result: Result<IpModel>) in
             switch result {
                 
-            case .failure(error: let error):
+            case .failure(let error):
+                
                 error.showAlert(vc: self)
                 
             case .success(result: let result) :

@@ -14,6 +14,19 @@ extension UIViewController {
     }
     
     static var loadFromXib: Self {
-        return Self(nibName: "\(Self.self)", bundle: nil)
+        return Self(nibName: Self.identifier, bundle: nil)
+    }
+    
+    static var storyboard: UIStoryboard {
+        UIStoryboard.init(name: Self.identifier, bundle: nil)
+    }
+    
+    static func create(creator: @escaping ((NSCoder) -> UIViewController?)) -> Self {
+        let vc = Self.storyboard.instantiateViewController(identifier: Self.identifier) { coder in
+            return creator(coder)
+        }
+        guard let vc = vc as? Self else { fatalError() }
+        
+        return vc
     }
 }
