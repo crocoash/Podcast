@@ -63,19 +63,18 @@ public class ListeningPodcast: NSManagedObject, Codable {
 extension ListeningPodcast: CoreDataProtocol {
     
     static var defaultSortDescription: [NSSortDescriptor] {
-        return [NSSortDescriptor(key: #keyPath(ListeningPodcast.progress),ascending: true)]
+        return [NSSortDescriptor(key: #keyPath(ListeningPodcast.currentTime),ascending: true)]
     }
 }
 
 //MARK: - FirebaseProtocol
-extension ListeningPodcast: FirebaseProtocol { }
+extension ListeningPodcast: FirebaseProtocol {}
 
-extension ListeningPodcast: ListeningPodcastCellProtocol {
-    
-    var podcastName: String? {
-        podcast.trackName
-    }
-    
-    var progressForCell: Float { return Float(progress) }
-    var imageForCell: String? { return podcast.image600 }
-}
+//extension ListeningPodcast: ListeningPodcastCellProtocol {
+//    
+//    var podcastName: String? {
+//        podcast.trackName
+//    }
+//    
+//    var imageForCell: String? { return podcast.image600 }
+//}

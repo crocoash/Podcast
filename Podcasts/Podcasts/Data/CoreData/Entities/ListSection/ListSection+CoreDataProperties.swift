@@ -22,7 +22,6 @@ extension ListSection {
     @NSManaged public var id: String
     @NSManaged public var sequenceNumber: NSNumber
     @NSManaged public var listData: ListData
-
 }
 
 extension ListSection : Identifiable {

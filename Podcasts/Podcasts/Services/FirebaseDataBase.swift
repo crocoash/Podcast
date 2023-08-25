@@ -37,6 +37,7 @@ protocol FirebaseDatabaseInput: MultyDelegateServiceInput {
  
 //MARK: - Delegate
 protocol FirebaseDatabaseDelegate: AnyObject {
+   
    func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didGetEmptyData type: any FirebaseProtocol.Type)
    func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didAdd entity: (any FirebaseProtocol))
    func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didRemove entity: (any FirebaseProtocol))

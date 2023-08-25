@@ -32,7 +32,9 @@ protocol DataStoreManagerInput {
         
     func save()
     
-    func conFigureFRC<T: CoreDataProtocol>(for entity: T.Type, with sortDescription: [NSSortDescriptor]?) -> NSFetchedResultsController<T>
+    func conFigureFRC<T: CoreDataProtocol>(for entity: T.Type) -> NSFetchedResultsController<T>
+    func conFigureFRC<T: CoreDataProtocol>(for entity: T.Type, with sortDescription: [NSSortDescriptor]) -> NSFetchedResultsController<T>
+    func conFigureFRC<T: CoreDataProtocol>(for entity: T.Type, with sortDescription: [NSSortDescriptor], predicates: [NSPredicate]) -> NSFetchedResultsController<T>
     
     func fetchResultController<T: CoreDataProtocol>(
         sortDescription: [NSSortDescriptor]?,
@@ -99,12 +101,10 @@ final class DataStoreManager {
 }
 
 extension DataStoreManager: DataStoreManagerInput {
-  
+    
     func save() {
         viewContext.performAndWait {
-        
             if viewContext.hasChanges {
-                
                 do {
                     try viewContext.save()
                 } catch {
@@ -114,8 +114,16 @@ extension DataStoreManager: DataStoreManagerInput {
         }
     }
     
-    func conFigureFRC<T: CoreDataProtocol>(for entity: T.Type, with sortDescription: [NSSortDescriptor]?) -> NSFetchedResultsController<T> {
+    func conFigureFRC<T: CoreDataProtocol>(for entity: T.Type) -> NSFetchedResultsController<T> {
+        return fetchResultController(sortDescription: nil, predicates: nil, sectionNameKeyPath: nil, fetchLimit: nil)
+    }
+    
+    func conFigureFRC<T: CoreDataProtocol>(for entity: T.Type, with sortDescription: [NSSortDescriptor]) -> NSFetchedResultsController<T> {
         return fetchResultController(sortDescription: sortDescription, predicates: nil, sectionNameKeyPath: nil, fetchLimit: nil)
+    }
+    
+    func conFigureFRC<T: CoreDataProtocol>(for entity: T.Type, with sortDescription: [NSSortDescriptor], predicates: [NSPredicate]) -> NSFetchedResultsController<T> {
+        fetchResultController(sortDescription: sortDescription, predicates: predicates, sectionNameKeyPath: nil, fetchLimit: nil)
     }
     
     func fetchResultController<T: CoreDataProtocol>(

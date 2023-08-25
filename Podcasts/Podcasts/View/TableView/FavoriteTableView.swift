@@ -66,11 +66,43 @@ class FavouriteTableView: UITableView {
     }
     
     func updateTableView(with type: Any) {
-        visibleCells.forEach {
-            if let podcastCell = $0 as? PodcastCell {
-                podcastCell.update(with: type)
+        if !isTracking {
+            visibleCells.forEach {
+                if let podcastCell = $0 as? PodcastCell {
+                    podcastCell.update(with: type)
+                }
+                
+                if let listeningPodcast = $0 as? ListeningPodcastCell {
+                    listeningPodcast.update(with: type)
+                }
+                
+//                if let likedPodcastTableViewCell = $0 as? LikedPodcastTableViewCell {
+//                    likedPodcastTableViewCell.update(with: type)
+//                }
             }
         }
+    }
+    
+    func deleteSection(at index: Int) {
+        guard let identifier = myDataSource?.favouriteTableView(self, nameOfSectionFor: index) else { return }
+        mySnapShot.deleteSections([identifier])
+        diffableDataSource.apply(mySnapShot)
+    }
+    
+    func moveSection(from oldIndex: Int, to newIndex: Int) {
+        
+        let isFirstSection = newIndex == 0
+        
+        guard let sectionIdentifier = myDataSource?.favouriteTableView(self, nameOfSectionFor: newIndex) else { return }
+        
+        if isFirstSection {
+            let firstSection = mySnapShot.sectionIdentifiers[0]
+            mySnapShot.moveSection(sectionIdentifier, beforeSection: firstSection)
+        } else {
+            let section = mySnapShot.sectionIdentifiers[newIndex]
+            mySnapShot.moveSection(sectionIdentifier, afterSection: section)
+        }
+        diffableDataSource.apply(mySnapShot)
     }
     
     func deleteItem(at indexPath: IndexPath) {
@@ -86,13 +118,11 @@ class FavouriteTableView: UITableView {
         diffableDataSource.apply(mySnapShot)
     }
     
-    func insertCell(isLast: Bool, insertSection: String, at indexPath: IndexPath, before oldIndexPath: IndexPath?) {
+    func insertCell(isLastSection: Bool, insertSection: String, at indexPath: IndexPath, before oldIndexPath: IndexPath?) {
                 
         guard let section = myDataSource?.favouriteTableView(self, nameOfSectionFor: indexPath.section),
               let cell = myDataSource?.favouriteTableView(self, cellForRowAt: indexPath)
         else { return }
-        
-        
         
         if let oldIndexPath = oldIndexPath, let item = diffableDataSource.itemIdentifier(for: oldIndexPath) {
             mySnapShot.insertItems([cell], beforeItem: item)
@@ -123,7 +153,7 @@ class FavouriteTableView: UITableView {
                 }
                 
                 if !alreadyAdd {
-                    if isLast {
+                    if isLastSection {
                         mySnapShot.insertSections([section], afterSection: insertSection)
                     } else {
                         mySnapShot.insertSections([section], beforeSection: insertSection)
@@ -162,6 +192,7 @@ extension FavouriteTableView {
     }
     
     private func reloadTableView() {
+        
         guard let myDataSource = myDataSource else { return }
         
         let countOfSections = myDataSource.favouriteTableViewCountOfSections(self)

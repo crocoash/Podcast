@@ -55,9 +55,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         self.window?.makeKeyAndVisible()
         
         window?.overrideUserInterfaceStyle = userViewModel.userInterfaceStyleIsDark ? .dark : .light
-        
-        addFirebaseObserve()
-        updateFromFirebase()
     }
     
     func sceneDidEnterBackground(_ scene: UIScene) {
@@ -93,94 +90,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 listeningManager: listeningManager)
         }
     }
-    
-    private func updateFromFirebase() {
-        
-        firebaseDatabase.update(viewContext: dataStoreManager.viewContext) { (result: Result<[ListeningPodcast]>) in }
-        
-        firebaseDatabase.update(viewContext: dataStoreManager.viewContext) { (result: Result<[LikedMoment]>) in }
-        
-        firebaseDatabase.update(viewContext: dataStoreManager.viewContext) { (result: Result<[FavouritePodcast]>) in }
-    }
-    
-    private func showError(_ error: MyError) {
-        if let vc = window?.rootViewController {
-            error.showAlert(vc: vc)
-        }
-    }
-    
-    private func addFirebaseObserve() {
-        let viewContext = dataStoreManager.backgroundViewContext
-        
-        // FavouritePodcast
-        firebaseDatabase.observe(
-            viewContext: viewContext,
-                
-            add: { [weak self] (result: Result<FavouritePodcast>) in
-                
-            guard let self = self else { return }
-
-                switch result {
-                case .failure(error: let error):
-                    showError(error)
-                default: break
-                }
-            },
-            
-            remove: { [weak self] (result: Result<FavouritePodcast>) in
-                guard let self = self else { return }
-                
-                switch result {
-                case .failure(error: let error):
-                    showError(error)
-                default: break
-                }
-            })
-        
-        // LikedMoment
-        firebaseDatabase.observe(viewContext: viewContext,
-                                 add: { [weak self] (result: Result<LikedMoment>) in
-            guard let self = self else { return }
-            
-            switch result {
-           
-            case .failure(error: let error):
-                showError(error)
-            default: break
-            }
-        }, remove: { [weak self] (result: Result<LikedMoment>) in
-            guard let self = self else { return }
-            
-            switch result {
-            case .failure(error: let error):
-                showError(error)
-            default: break
-            }
-        })
-        
-        // ListeningPodcast
-        firebaseDatabase.observe( viewContext: viewContext,
-                                  add: { [weak self] (result: Result<ListeningPodcast>) in
-                guard let self = self else { return }
-
-                switch result {
-                case .failure(error: let error):
-                    showError(error)
-                default: break
-                }
-            }, remove: { [weak self] (result: Result<ListeningPodcast>) in
-                guard let self = self else { return }
-
-                switch result {
-                case .failure(error: let error):
-                    showError(error)
-                default: break
-                }
-            })
-    }
 }
-
-
 
 //MARK: - NetworkMonitorDelegate
 extension SceneDelegate: NetworkMonitorDelegate {

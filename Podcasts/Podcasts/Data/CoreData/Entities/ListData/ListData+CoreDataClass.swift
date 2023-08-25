@@ -13,7 +13,7 @@ import CoreData
 public class ListData: NSManagedObject {
 
     private enum CodingKeys: String, CodingKey {
-            case id, listSection
+            case id, listSections
     }
     
     //MARK: decoder
@@ -24,7 +24,7 @@ public class ListData: NSManagedObject {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         
         self.id =            try container.decode(String.self, forKey: .id)
-        self.listSection =   try container.decode(Set<ListSection>.self, forKey: .listSection) as NSSet
+        self.listSections =   try container.decode(Set<ListSection>.self, forKey: .listSections) as NSSet
     }
     
     //MARK: encode
@@ -33,7 +33,16 @@ public class ListData: NSManagedObject {
         var container = encoder.container(keyedBy: CodingKeys.self)
         
         try container.encode(id,                               forKey: .id)
-        try container.encode(listSection as? Set<ListSection>, forKey: .listSection)
+        try container.encode(listSections as? Set<ListSection>, forKey: .listSections)
+    }
+    
+    //MARK: init
+    convenience init(_ listSections: [ListSection], viewContext: NSManagedObjectContext) {
+            
+       self.init(entity: Self.entity(), insertInto: viewContext)
+        
+        self.id = UUID().uuidString
+        self.listSections = Set(listSections) as NSSet
     }
 }
 
@@ -41,6 +50,9 @@ public class ListData: NSManagedObject {
 extension ListData: CoreDataProtocol {
 
     static var defaultSortDescription: [NSSortDescriptor] {
-        return [NSSortDescriptor(key: #keyPath(ListData.listSection), ascending: true)]
+        return [NSSortDescriptor(key: #keyPath(ListData.listSections), ascending: true)]
     }
 }
+
+//MARK: - FirebaseProtocol
+extension ListData: FirebaseProtocol {}

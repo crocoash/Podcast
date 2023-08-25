@@ -2,7 +2,7 @@
 //  ListeningPodcast+CoreDataProperties.swift
 //  Podcasts
 //
-//  Created by Anton on 11.06.2023.
+//  Created by Anton on 25.08.2023.
 //
 //
 
@@ -18,8 +18,8 @@ extension ListeningPodcast {
 
     @NSManaged public var currentTime: Float
     @NSManaged public var duration: Double
-    @NSManaged public var progress: Double
     @NSManaged public var id: String
+    @NSManaged public var progress: Double
     @NSManaged public var podcast: Podcast
 
 }

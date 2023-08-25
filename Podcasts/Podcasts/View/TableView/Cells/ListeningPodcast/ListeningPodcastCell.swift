@@ -7,12 +7,14 @@
 
 import UIKit
 
-protocol ListeningPodcastCellProtocol {
-    var id: String { get }
-    var progressForCell: Float { get }
-    var imageForCell: String? { get }
-    var podcastName: String? { get }
-}
+//MARK: - Input protocol
+//protocol ListeningPodcastCellProtocol {
+//    var id: String { get }
+//    var duration: Double? { get }
+//    var listeningProgress: Double? { get }
+//    var imageForCell: String? { get }
+//    var podcastName: String? { get }
+//}
 
 //MARK: - PlayableProtocol
 protocol ListeningPodcastCellPlayableProtocol {
@@ -21,20 +23,23 @@ protocol ListeningPodcastCellPlayableProtocol {
     var duration: Double? { get }
 }
 
-struct ListeningPodcastCellModel: ListeningPodcastCellProtocol, ListeningPodcastCellPlayableProtocol {
+struct ListeningPodcastCellModel: ListeningPodcastCellPlayableProtocol {
+    
     var id: String
     var listeningProgress: Double?
     var duration: Double?
     var trackId: String
     var podcastName: String?
-    var imageForCell: String?
-    var progressForCell: Float
+    var image: String?
     
-    init(_ input: ListeningPodcastCellProtocol) {
-        self.progressForCell = input.progressForCell
-        self.imageForCell = input.imageForCell
-        self.podcastName = input.podcastName
-        self.trackId = input.id
+    init(_ input: ListeningPodcast) {
+        
+        self.image = input.podcast.image600
+        self.podcastName = input.podcast.trackName
+        self.duration = input.duration
+        self.listeningProgress = input.progress
+        self.trackId = input.podcast.trackId
+       
         self.id = input.id
     }
     
@@ -60,17 +65,34 @@ class ListeningPodcastCell: UITableViewCell {
         super.awakeFromNib()
     }
     
-    private(set) var model: ListeningPodcastCellModel!
-    
-    func configure(with model: ListeningPodcastCellProtocol ) {
-        self.progressView.progress = model.progressForCell
-        self.name.text = model.podcastName
-        DataProvider.shared.downloadImage(string: model.imageForCell) {
-            self.listeningImageView.image = $0
+    private(set) var model: ListeningPodcastCellModel! {
+        didSet {
+            updateCell()
         }
     }
     
+    func configure(with model: ListeningPodcastCellModel ) {
+        self.model = model
+    }
+    
     func update(with entity: Any) {
-        model.updateModel(entity)
+        
+        if let input = entity as? ListeningPodcastCellModel {
+            self.model = input
+        } else {
+            model.updateModel(entity)
+        }
+    }
+}
+
+//MARK: - Private Methods
+extension ListeningPodcastCell {
+    
+    private func updateCell() {
+        self.progressView.progress = Float(model.listeningProgress ?? 0)
+        self.name.text = model.podcastName
+        DataProvider.shared.downloadImage(string: model.image) {
+            self.listeningImageView.image = $0
+        }
     }
 }

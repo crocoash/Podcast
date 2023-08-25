@@ -29,8 +29,10 @@ extension NSManagedObjectContext {
         return []
     }
     
-    func fetchObjectsArray<T: NSManagedObject>(_ type: T.Type) -> [T] {
+    func fetchObjectsArray<T: NSManagedObject>(_ type: T.Type, sortDescriptors: [NSSortDescriptor]? = nil, predicates: [NSPredicate]? = nil) -> [T] {
         let fetchRequest = NSFetchRequest<T>(entityName: T.entityName)
+        fetchRequest.sortDescriptors = sortDescriptors
+        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: predicates ?? [])
         do {
              return try self.fetch(fetchRequest)
         } catch {

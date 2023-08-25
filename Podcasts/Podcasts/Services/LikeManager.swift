@@ -16,8 +16,8 @@ protocol LikeManagerDelegate {
 //MARK: -
 protocol LikeManagerInput: MultyDelegateServiceInput {
     func addToLikedMoments(entity: Any, moment: Double)
-    func saveLikedMoments(entity: LikedMoment)
-    func removeFromLikedMoments(entity: LikedMoment)
+//    func saveLikedMoments(entity: LikedMoment)
+//    func removeFromLikedMoments(entity: LikedMoment)
 }
 
 class LikeManager: MultyDelegateService<LikeManagerDelegate>, LikeManagerInput {
@@ -34,18 +34,25 @@ class LikeManager: MultyDelegateService<LikeManagerDelegate>, LikeManagerInput {
         super.init()
         
         firebaseDatabase.delegate = self
+        
+        firebaseDatabase.update(viewContext: dataStoreManager.viewContext) { (result: Result<[LikedMoment]>) in }
+        firebaseDatabase.observe(viewContext: viewContext,
+                                 add: { (result: Result<LikedMoment>) in },
+                                 remove: { (result: Result<LikedMoment>) in })
     }
     
     func addToLikedMoments(entity: Any, moment: Double) {
         if let podcast = entity as? Podcast {
             let moment = LikedMoment(podcast: podcast, moment: moment, viewContext: viewContext, dataStoreManagerInput: dataStoreManager)
+            firebaseDatabase.add(entity: moment)
             delegates {
                $0.likeManager(self, didAdd: moment)
             }
         }
     }
     
-    func saveLikedMoments(entity: LikedMoment) {
+    ///from FireBase
+    private func saveLikedMoments(entity: LikedMoment) {
         if dataStoreManager.fetchObject(entity: entity, predicates: nil) == nil {
             let moment = LikedMoment(entity, viewContext: viewContext, dataStoreManagerInput: dataStoreManager)
             delegates {
@@ -54,14 +61,16 @@ class LikeManager: MultyDelegateService<LikeManagerDelegate>, LikeManagerInput {
         }
     }
     
-    func removeFromLikedMoments(entity: LikedMoment) {
+    ///from FireBase
+    private func removeFromLikedMoments(entity: LikedMoment) {
         dataStoreManager.removeFromCoreData(entity: entity)
         delegates {
             $0.likeManager(self, didRemove: entity)
         }
     }
     
-    func removeAll() {
+    ///from FireBase
+    private func removeAll() {
         dataStoreManager.allObjectsFromCoreData(type: LikedMoment.self).forEach {
             removeFromLikedMoments(entity: $0)
         }

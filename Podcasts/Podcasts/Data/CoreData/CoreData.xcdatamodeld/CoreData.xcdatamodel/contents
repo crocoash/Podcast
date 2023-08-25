@@ -28,13 +28,13 @@
     </entity>
     <entity name="ListData" representedClassName="ListData" syncable="YES">
         <attribute name="id" attributeType="String"/>
-        <relationship name="listSection" maxCount="1" deletionRule="Deny" destinationEntity="ListSection" inverseName="listData" inverseEntity="ListSection"/>
+        <relationship name="listSections" toMany="YES" deletionRule="Deny" destinationEntity="ListSection" inverseName="listData" inverseEntity="ListSection"/>
     </entity>
     <entity name="ListeningPodcast" representedClassName="ListeningPodcast" syncable="YES">
         <attribute name="currentTime" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES"/>
-        <attribute name="duration" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="duration" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="id" attributeType="String"/>
-        <attribute name="progress" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="progress" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <relationship name="podcast" maxCount="1" deletionRule="Nullify" destinationEntity="Podcast" inverseName="listeningPodcast" inverseEntity="Podcast"/>
     </entity>
     <entity name="ListSection" representedClassName="ListSection" syncable="YES">
@@ -43,7 +43,7 @@
         <attribute name="nameOfEntity" attributeType="String"/>
         <attribute name="nameOfSection" attributeType="String"/>
         <attribute name="sequenceNumber" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
-        <relationship name="listData" maxCount="1" deletionRule="Nullify" destinationEntity="ListData" inverseName="listSection" inverseEntity="ListData"/>
+        <relationship name="listData" maxCount="1" deletionRule="Nullify" destinationEntity="ListData" inverseName="listSections" inverseEntity="ListData"/>
     </entity>
     <entity name="Podcast" representedClassName=".Podcast" syncable="YES">
         <attribute name="artistId" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>

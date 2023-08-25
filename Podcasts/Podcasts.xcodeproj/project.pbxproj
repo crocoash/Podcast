@@ -77,7 +77,7 @@
 		3A41942A29881A0300D59AA4 /* MyError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A41942929881A0300D59AA4 /* MyError.swift */; };
 		3A4A3757280164DC000C80E4 /* PodcastData+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4A3755280164DC000C80E4 /* PodcastData+CoreDataClass.swift */; };
 		3A4A3758280164DC000C80E4 /* PodcastData+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4A3756280164DC000C80E4 /* PodcastData+CoreDataProperties.swift */; };
-		3A5022532A6BD7CE00600422 /* FavoriteManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A5022522A6BD7CE00600422 /* FavoriteManager.swift */; };
+		3A5022532A6BD7CE00600422 /* FavouriteManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A5022522A6BD7CE00600422 /* FavouriteManager.swift */; };
 		3A5022552A6BD90C00600422 /* LikeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A5022542A6BD90C00600422 /* LikeManager.swift */; };
 		3A5022592A6C294D00600422 /* ListeningPodcastCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A5022572A6C294D00600422 /* ListeningPodcastCell.swift */; };
 		3A50225A2A6C294D00600422 /* ListeningPodcastCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3A5022582A6C294D00600422 /* ListeningPodcastCell.xib */; };
@@ -101,6 +101,7 @@
 		3A73D0B02A8D1CD100947893 /* ListViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3A73D0AF2A8D1CD100947893 /* ListViewController.storyboard */; };
 		3A73D0B82A8D224200947893 /* AlertSortListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A73D0B62A8D224200947893 /* AlertSortListView.swift */; };
 		3A73D0B92A8D224200947893 /* AlertSortListView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3A73D0B72A8D224200947893 /* AlertSortListView.xib */; };
+		3A73D0BB2A973B9300947893 /* ListDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A73D0BA2A973B9300947893 /* ListDataManager.swift */; };
 		3AA59DC528142C0D00FF2D19 /* FirebaseDataBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA59DC428142C0D00FF2D19 /* FirebaseDataBase.swift */; };
 		3AA82D1E29EAB5CC00557A94 /* NsNumber + minute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA82D1D29EAB5CC00557A94 /* NsNumber + minute.swift */; };
 		3AA82D2029EAB9E500557A94 /* Dictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA82D1F29EAB9E500557A94 /* Dictionary.swift */; };
@@ -196,7 +197,7 @@
 		3A41942929881A0300D59AA4 /* MyError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyError.swift; sourceTree = "<group>"; };
 		3A4A3755280164DC000C80E4 /* PodcastData+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PodcastData+CoreDataClass.swift"; sourceTree = "<group>"; };
 		3A4A3756280164DC000C80E4 /* PodcastData+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PodcastData+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		3A5022522A6BD7CE00600422 /* FavoriteManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteManager.swift; sourceTree = "<group>"; };
+		3A5022522A6BD7CE00600422 /* FavouriteManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavouriteManager.swift; sourceTree = "<group>"; };
 		3A5022542A6BD90C00600422 /* LikeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LikeManager.swift; sourceTree = "<group>"; };
 		3A5022572A6C294D00600422 /* ListeningPodcastCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListeningPodcastCell.swift; sourceTree = "<group>"; };
 		3A5022582A6C294D00600422 /* ListeningPodcastCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ListeningPodcastCell.xib; sourceTree = "<group>"; };
@@ -220,6 +221,7 @@
 		3A73D0AF2A8D1CD100947893 /* ListViewController.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = ListViewController.storyboard; sourceTree = "<group>"; };
 		3A73D0B62A8D224200947893 /* AlertSortListView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AlertSortListView.swift; path = Podcasts/View/AlertSortListView/AlertSortListView.swift; sourceTree = SOURCE_ROOT; };
 		3A73D0B72A8D224200947893 /* AlertSortListView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = AlertSortListView.xib; path = Podcasts/View/AlertSortListView/AlertSortListView.xib; sourceTree = SOURCE_ROOT; };
+		3A73D0BA2A973B9300947893 /* ListDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListDataManager.swift; sourceTree = "<group>"; };
 		3AA59DC428142C0D00FF2D19 /* FirebaseDataBase.swift */ = {isa = PBXFileReference; indentWidth = 3; lastKnownFileType = sourcecode.swift; path = FirebaseDataBase.swift; sourceTree = "<group>"; tabWidth = 4; };
 		3AA82D1D29EAB5CC00557A94 /* NsNumber + minute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NsNumber + minute.swift"; sourceTree = "<group>"; };
 		3AA82D1F29EAB9E500557A94 /* Dictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dictionary.swift; sourceTree = "<group>"; };
@@ -281,6 +283,7 @@
 				049D47DD2726E05B00B6DA3C /* SceneDelegate.swift */,
 				184CE19027271D9D0088044C /* Resourses */,
 				184CE19127271DAE0088044C /* Helpers */,
+				3A73D0BC2A9776F100947893 /* Storage */,
 				18D13DDA273C400C00495C97 /* Services */,
 				184CE18E27271D7B0088044C /* Data */,
 				189C1FB0272D84B100A8480E /* View Model */,
@@ -538,16 +541,14 @@
 				3A69EA0228B255C000241414 /* Network */,
 				3AC5839C299141B30042DDC5 /* Player.swift */,
 				184CE18827270C8D0088044C /* ApiService.swift */,
-				3AC4B2A528132337001BA710 /* FirestorageDatabase.swift */,
 				3A3BD8692A84244400674042 /* MultyDelegateService.swift */,
-				3AA59DC428142C0D00FF2D19 /* FirebaseDataBase.swift */,
 				1831DED02730560D00EC09E2 /* DownloadService.swift */,
 				3A50225D2A6E6CE200600422 /* ListeningManager.swift */,
 				1828F9BA2738798F00761CD5 /* DataProvider.swift */,
 				1855934627380C270012BA91 /* AuthService.swift */,
-				181F5BC327E6718A00AC27EB /* DataStoreManager.swift */,
-				3A5022522A6BD7CE00600422 /* FavoriteManager.swift */,
+				3A5022522A6BD7CE00600422 /* FavouriteManager.swift */,
 				3A5022542A6BD90C00600422 /* LikeManager.swift */,
+				3A73D0BA2A973B9300947893 /* ListDataManager.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -730,6 +731,17 @@
 			);
 			name = AlertSortListView;
 			path = TableView/AlertSortListView;
+			sourceTree = "<group>";
+		};
+		3A73D0BC2A9776F100947893 /* Storage */ = {
+			isa = PBXGroup;
+			children = (
+				3AC4B2A528132337001BA710 /* FirestorageDatabase.swift */,
+				3AA59DC428142C0D00FF2D19 /* FirebaseDataBase.swift */,
+				181F5BC327E6718A00AC27EB /* DataStoreManager.swift */,
+			);
+			name = Storage;
+			path = Services;
 			sourceTree = "<group>";
 		};
 		3AA82D2829EAC74B00557A94 /* Headers */ = {
@@ -922,7 +934,7 @@
 				3A4A3758280164DC000C80E4 /* PodcastData+CoreDataProperties.swift in Sources */,
 				3AA59DC528142C0D00FF2D19 /* FirebaseDataBase.swift in Sources */,
 				3A5644542A812AC4007B24ED /* ListSection+CoreDataClass.swift in Sources */,
-				3A5022532A6BD7CE00600422 /* FavoriteManager.swift in Sources */,
+				3A5022532A6BD7CE00600422 /* FavouriteManager.swift in Sources */,
 				049D480327286D5900B6DA3C /* DetailViewController.swift in Sources */,
 				3A25DB112A0CE2330000CAE0 /* SearchCollectionHeaderReusableView.swift in Sources */,
 				3A632653281DAF6A005FFB08 /* formated.swift in Sources */,
@@ -943,6 +955,7 @@
 				184CE18927270C8D0088044C /* ApiService.swift in Sources */,
 				3A5644552A812AC4007B24ED /* ListSection+CoreDataProperties.swift in Sources */,
 				1828F9BB2738798F00761CD5 /* DataProvider.swift in Sources */,
+				3A73D0BB2A973B9300947893 /* ListDataManager.swift in Sources */,
 				3A50225C2A6E474200600422 /* FavoriteTableView.swift in Sources */,
 				181F5BD627E6850500AC27EB /* Author+CoreDataProperties.swift in Sources */,
 				3A123CD62A1CF17600A237AE /* CustomActivityIndicator.swift in Sources */,
