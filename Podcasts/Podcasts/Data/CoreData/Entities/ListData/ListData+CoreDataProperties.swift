@@ -2,7 +2,7 @@
 //  ListData+CoreDataProperties.swift
 //  Podcasts
 //
-//  Created by Anton on 14.08.2023.
+//  Created by Anton on 22.08.2023.
 //
 //
 
@@ -17,24 +17,23 @@ extension ListData {
     }
 
     @NSManaged public var id: String
-    @NSManaged public var listSection: NSSet
-
+    @NSManaged public var listSections: NSSet
 }
 
-// MARK: Generated accessors for listSection
+// MARK: Generated accessors for listSections
 extension ListData {
 
-    @objc(addListSectionObject:)
-    @NSManaged public func addToListSection(_ value: ListSection)
+    @objc(addListSectionsObject:)
+    @NSManaged public func addToListSections(_ value: ListSection)
 
-    @objc(removeListSectionObject:)
-    @NSManaged public func removeFromListSection(_ value: ListSection)
+    @objc(removeListSectionsObject:)
+    @NSManaged public func removeFromListSections(_ value: ListSection)
 
-    @objc(addListSection:)
-    @NSManaged public func addToListSection(_ values: NSSet)
+    @objc(addListSections:)
+    @NSManaged public func addToListSections(_ values: NSSet)
 
-    @objc(removeListSection:)
-    @NSManaged public func removeFromListSection(_ values: NSSet)
+    @objc(removeListSections:)
+    @NSManaged public func removeFromListSections(_ values: NSSet)
 
 }
 

@@ -32,11 +32,17 @@ class FavouriteManager: MultyDelegateService<FavouriteManagerDelegate>, Favourit
     private let firebaseDatabase: FirebaseDatabaseInput
     lazy private var viewContext = dataStoreManager.viewContext
     
+    //MARK: init
     init(dataStoreManager: DataStoreManagerInput, firebaseDatabase: FirebaseDatabaseInput) {
         self.firebaseDatabase = firebaseDatabase
         self.dataStoreManager = dataStoreManager
         
         super.init()
+        
+        firebaseDatabase.update(viewContext: dataStoreManager.viewContext) { (result: Result<[FavouritePodcast]>) in }
+        firebaseDatabase.observe(viewContext: viewContext,
+                                 add: { (result: Result<FavouritePodcast>) in },
+                                 remove: {  (result: Result<FavouritePodcast>) in })
         
         firebaseDatabase.delegate = self
     }
@@ -50,20 +56,6 @@ class FavouriteManager: MultyDelegateService<FavouriteManagerDelegate>, Favourit
             removeFavouritePodcast(favouritePodcast)
         } else {
             addFavouritePodcast(entity: entity)
-        }
-    }
-    
-    private func removeFavouritePodcast(_ favouritePodcast: FavouritePodcast) {
-        if let favouritePodcast = getFavourite(for: favouritePodcast.podcast) {
-            let abstructFavourite = dataStoreManager.initAbstractObject(for: favouritePodcast)
-            
-            dataStoreManager.removeFromCoreData(entity: favouritePodcast)
-            firebaseDatabase.remove(entity: abstructFavourite)
-            
-            delegates {
-                $0.favouriteManager(self, didRemove: abstructFavourite)
-            }
-            feedbackGenerator()
         }
     }
     
@@ -110,6 +102,20 @@ extension FavouriteManager {
         let feedbackGenerator = UIImpactFeedbackGenerator()
         feedbackGenerator.prepare()
         feedbackGenerator.impactOccurred()
+    }
+    
+    private func removeFavouritePodcast(_ favouritePodcast: FavouritePodcast) {
+        if let favouritePodcast = getFavourite(for: favouritePodcast.podcast) {
+            
+            let abstructFavourite = dataStoreManager.initAbstractObject(for: favouritePodcast)
+            dataStoreManager.removeFromCoreData(entity: favouritePodcast)
+            firebaseDatabase.remove(entity: abstructFavourite)
+            
+            delegates {
+                $0.favouriteManager(self, didRemove: abstructFavourite)
+            }
+            feedbackGenerator()
+        }
     }
 }
 

@@ -9,17 +9,45 @@ import UIKit
 
 //MARK: - MyDataSource
 @objc protocol AlertSortListViewDataSource: AnyObject {
-    
+    @objc optional func test()
 }
 
 @objc protocol AlertSortListViewDelegate: AnyObject {
     
 }
 
+class AlertSortListViewModel {
+    
+    private let dataStoreManager: DataStoreManagerInput
+    private let listDataManager: ListDataManagerInput
+    
+    init(dataStoreManager: DataStoreManagerInput, listDataManager: ListDataManagerInput) {
+        self.dataStoreManager = dataStoreManager
+        self.listDataManager = listDataManager
+    }
+    
+   var listSections: [ListSection]  {
+        return dataStoreManager.viewContext.fetchObjectsArray(ListSection.self,
+                                                              sortDescriptors: [NSSortDescriptor(key: #keyPath(ListSection.sequenceNumber), ascending: true)])
+    }
+    
+    var countOfRows: Int {
+        return listSections.count
+    }
+    
+    func moveItem(from oldIndex: Int, to newIndex: Int) {
+        let object = listSections[oldIndex]
+        listDataManager.change(for: object, sequenceNumber: newIndex)
+    }
+}
+
 class AlertSortListView: UIView {
     
+    //MARK: Services
+    private let dataStoreManager: DataStoreManagerInput
+    
     @IBOutlet private weak var closeImageView: UIImageView!
-    @IBOutlet private weak var collectionView: UICollectionView!
+    @IBOutlet private weak var tableView: UITableView!
     
     weak var dataSource: AlertSortListViewDataSource?
     weak var delegate: AlertSortListViewDelegate?
@@ -27,24 +55,30 @@ class AlertSortListView: UIView {
     
     //MARK: Variables
     private var alertSortListViewIsShowing = false
-    
+    private var model: AlertSortListViewModel
     private var gestureView: UIView?
     private var panGestureAnchorY: CGFloat?
     private var height: Double = 300
+    lazy private var width = vc.view.frame.width * 0.8
+    
     private var y: Double {
         get { frame.origin.y }
         set { frame.origin.y = newValue }
     }
-        
+      
+    /// Positions
     lazy private var hidePositionY = vc.view.frame.height
-    lazy private var showPositionY = vc.view.frame.height - height
-    lazy private var positionForClosedY = showPositionY + height * 0.3
-
+    lazy private var showPositionY = vc.view.frame.height - height - margin
+    lazy private var margin = (vc.view.frame.width - width) / 2
+    lazy private var positionYForClosed = showPositionY + height * 0.3
       
     typealias InputType = AlertSortListViewDelegate & AlertSortListViewDataSource & UIViewController
     
     //MARK: init
-    init(vc: InputType) {
+    init(vc: InputType, dataStoreManager: DataStoreManagerInput, listDataManager: ListDataManagerInput) {
+
+        self.dataStoreManager = dataStoreManager
+        self.model = AlertSortListViewModel(dataStoreManager: dataStoreManager, listDataManager: listDataManager)
         
         super.init(frame: .zero)
         
@@ -53,12 +87,17 @@ class AlertSortListView: UIView {
         self.dataSource = vc
         
         configureView()
+        loadFromXib()
+        
+        closeImageView.addMyGestureRecognizer(self, type: .panGestureRecognizer, #selector(panGesture(sender:)))
+
+        tableView.isEditing = true
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-        
+    
     //MARK: Actions
     @objc func showOrHideAlertListView() {
         if alertSortListViewIsShowing {
@@ -84,7 +123,7 @@ class AlertSortListView: UIView {
                 y -= -changes
             }
             
-            if newPositionY > positionForClosedY {
+            if newPositionY > positionYForClosed {
                 hide()
             }
 
@@ -92,7 +131,7 @@ class AlertSortListView: UIView {
             
         case .cancelled, .ended:
             
-            if y < positionForClosedY {
+            if y < positionYForClosed {
                 show()
             }
             
@@ -116,15 +155,12 @@ extension AlertSortListView {
         vc.tabBarController?.view.insertSubview(gestureView, belowSubview: self)
         self.gestureView = gestureView
     }
-    
+  
     private func configureView() {
-        frame.size.width = vc.view.frame.width + 0.1
+        frame.size.width = width
         frame.size.height = height
         frame.origin.y = vc.view.frame.height
-        layer.cornerRadius = frame.width * 0.1
-        
-        backgroundColor = .yellow
-        addMyGestureRecognizer(self, type: .panGestureRecognizer, #selector(panGesture(sender:)))
+        frame.origin.x = margin
     }
 
     private func show() {
@@ -150,5 +186,41 @@ extension AlertSortListView {
         }
         
         gestureView?.removeFromSuperview()
+        gestureView = nil
+    }
+}
+
+//MARK: - UITableViewDelegate
+extension AlertSortListView: UITableViewDelegate {
+    
+}
+
+//MARK: - UITableViewDataSource
+extension AlertSortListView: UITableViewDataSource {
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return model.countOfRows
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let item = model.listSections[indexPath.row]
+        let cell = UITableViewCell()
+        var content = cell.defaultContentConfiguration()
+        content.text = item.nameOfEntity
+        cell.contentConfiguration = content
+        return cell
+    }
+    
+    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+        return .none
+    }
+    
+    func tableView(_ tableView: UITableView, shouldIndentWhileEditingRowAt indexPath: IndexPath) -> Bool {
+        return false
+    }
+    
+    func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        guard sourceIndexPath != destinationIndexPath else { return }
+        model.moveItem(from: sourceIndexPath.row, to: destinationIndexPath.row)
     }
 }

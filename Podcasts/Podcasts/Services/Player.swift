@@ -83,7 +83,7 @@ struct Track: Equatable, OutputPlayerProtocol {
     }
 }
 
-protocol OutputPlayerProtocol: PodcastCellPlayableProtocol, BigPlayerPlayableProtocol, SmallPlayerPlayableProtocol {}
+protocol OutputPlayerProtocol: PodcastCellPlayableProtocol, BigPlayerPlayableProtocol, SmallPlayerPlayableProtocol, ListeningPodcastCellPlayableProtocol {}
 
 protocol PlayerDelegate {
     

@@ -123,13 +123,13 @@ extension TabBarViewController {
         guard smallPlayer == nil else { return }
         let model = SmallPlayerViewModel(track)
         let smallPlayer = SmallPlayerView(vc: self, model: model, player: player)
-        view.addSubview(smallPlayer)
+        tabBar.addSubview(smallPlayer)
         smallPlayer.isHidden = false
         self.smallPlayer = smallPlayer
         
         smallPlayer.bottomAnchor.constraint(equalTo: tabBar.topAnchor).isActive = true
         smallPlayer.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        smallPlayer.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
+        smallPlayer.widthAnchor.constraint(equalTo: tabBar.widthAnchor).isActive = true
         
         ListVC.updateConstraintForTableView(playerIsPresent: true)
         searchVC.updateConstraintForTableView(playerIsPresent: true)

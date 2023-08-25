@@ -41,6 +41,12 @@ class ListeningManager: MultyDelegateService<ListeningManagerDelegate>, Listenin
         super.init()
         
         firebaseDatabaseInput.delegate = self
+        
+        firebaseDatabase.update(viewContext: dataStoreManager.viewContext) { (result: Result<[ListeningPodcast]>) in }
+        
+        firebaseDatabase.observe(viewContext: dataStoreManager.viewContext,
+                                  add: { (result: Result<ListeningPodcast>) in },
+                                  remove: { (result: Result<ListeningPodcast>) in })
     }
     
     func saveListeningProgress(by entity: Track) {

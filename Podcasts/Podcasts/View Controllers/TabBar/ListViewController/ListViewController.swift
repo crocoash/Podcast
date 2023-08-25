@@ -13,7 +13,7 @@ protocol ListViewControllerDelegate: AnyObject {
     func listViewController(_ listViewController: ListViewController, didSelect podcast: Podcast)
 }
 
-class ListViewController: UIViewController, AlertSortListViewDataSource {
+class ListViewController: UIViewController {
     
     //MARK: services
     private var downloadService:  DownloadServiceInput
@@ -23,10 +23,11 @@ class ListViewController: UIViewController, AlertSortListViewDataSource {
     private let dataStoreManager: DataStoreManagerInput
     private let listeningManager: ListeningManagerInput
     
+    lazy private var listDataManager: ListDataManagerInput = ListDataManager(dataStoreManager: dataStoreManager, firebaseDatabase: firebaseDataBase)
+    
     weak var delegate: ListViewControllerDelegate?
     
     private let refreshControl = UIRefreshControl()
-    private var bottomTableViewConstraint: NSLayoutConstraint?
     private var alertTopConstraint: NSLayoutConstraint?
     
     private var searchSection: String? = nil {
@@ -39,9 +40,11 @@ class ListViewController: UIViewController, AlertSortListViewDataSource {
     
     //MARK: Outlets
     @IBOutlet private weak var favouriteTableView: FavouriteTableView!
+    @IBOutlet private weak var bottomTableViewConstraint: NSLayoutConstraint!
+    
     private var alertSortListView: AlertSortListView?
     
-    lazy private var model = ListViewModel(vc: self, dataStoreManager: dataStoreManager)
+    lazy private var model = ListViewModel(vc: self, dataStoreManager: dataStoreManager, listDataManager: listDataManager)
     
     var searchText: String? { didSet { model.performSearch(text: searchText) } }
     
@@ -102,8 +105,8 @@ class ListViewController: UIViewController, AlertSortListViewDataSource {
     
     //MARK: Public Methods
     func updateConstraintForTableView(playerIsPresent value: Bool) {
-        bottomTableViewConstraint?.constant = heightTabBarItem + (playerIsSHidden ? 0 : 50)
         playerIsSHidden = !value
+        bottomTableViewConstraint?.constant = playerIsSHidden ? 0 : 50
     }
     
     //MARK: View Methods
@@ -122,7 +125,7 @@ class ListViewController: UIViewController, AlertSortListViewDataSource {
         
         guard let cell = sender.view as? UITableViewCell,
               let indexPath = favouriteTableView.indexPath(for: cell),
-              let favouritePodcast = model.getObject(for: indexPath) as? FavouritePodcast else { return }
+              let favouritePodcast = model.getObjectInActiveSection(for: indexPath) as? FavouritePodcast else { return }
         
         delegate?.listViewController(self, didSelect: favouritePodcast.podcast)
     }
@@ -130,11 +133,10 @@ class ListViewController: UIViewController, AlertSortListViewDataSource {
     @objc private func removeListeningPodcast(sender: UILongPressGestureRecognizer) {
         guard let cell = sender.view as? UITableViewCell,
               let indexPath = favouriteTableView.indexPath(for: cell),
-              let listeningPodcast = model.getObject(for: indexPath) as? ListeningPodcast else { return }
+              let listeningPodcast = model.getObjectInActiveSection(for: indexPath) as? ListeningPodcast else { return }
         
         listeningManager.removeListeningPodcast(listeningPodcast)
     }
-    
     
     private func editButtonDidTouch() {
         guard let alertSortListView = alertSortListView else { fatalError() }
@@ -160,7 +162,7 @@ extension ListViewController {
     private func configureAlertSortListView() {
         guard let tabBarController = tabBarController else { fatalError() }
         
-        let vc = AlertSortListView(vc: self)
+        let vc = AlertSortListView(vc: self, dataStoreManager: dataStoreManager, listDataManager: listDataManager)
         tabBarController.view.addSubview(vc)
         
         alertSortListView = vc
@@ -168,7 +170,7 @@ extension ListViewController {
     
     private func configureCell(for tableView: UITableView, at indexPath: IndexPath) -> UITableViewCell {
         
-        let item = model.getObject(for: indexPath)
+        let item = model.getObjectInActiveSection(for: indexPath)
         
         if let item = item as? FavouritePodcast {
             let cell = tableView.getCell(cell: PodcastCell.self, indexPath: indexPath)
@@ -186,7 +188,8 @@ extension ListViewController {
         } else if let item = item as? ListeningPodcast {
             let cell = tableView.getCell(cell: ListeningPodcastCell.self, indexPath: indexPath)
             cell.addMyGestureRecognizer(self, type: .longPressGesture(minimumPressDuration: 1), #selector(removeListeningPodcast(sender:)))
-            cell.configure(with: item)
+            let model = ListeningPodcastCellModel(item)
+            cell.configure(with: model)
             return cell
         }
         fatalError()
@@ -308,10 +311,11 @@ extension ListViewController: NSFetchedResultsControllerDelegate {
         switch type {
             
         case .delete:
-            guard var indexPath = indexPath,
-                  let section = model.getIndexOfSection(forAny: anObject) else { return }
             
-            indexPath.section = section
+            guard var indexPath = indexPath,
+                  let indexSection = model.getIndexOfActiveSection(forAny: anObject)  else { return }
+            
+            indexPath.section = indexSection
             
             model.remove(anObject)
             favouriteTableView.deleteItem(at: indexPath)
@@ -327,26 +331,26 @@ extension ListViewController: NSFetchedResultsControllerDelegate {
             guard var newIndexPath = newIndexPath else { return }
             
             model.appendItem(anObject, at: newIndexPath.row)
+
+            guard let indexSection = model.getIndexOfActiveSection(forAny: anObject) else { return }
             
-            guard let section = model.getIndexOfSection(forAny: anObject) else { return }
+            newIndexPath.section = indexSection
             
-            newIndexPath.section = section
-            
-            let isFirstElementInSection = model.isFirstElementInSection(at: newIndexPath)
-            let isLastSection = model.isLastSection(at: newIndexPath)
+            let isFirstElementInSection = model.isFirstElementInSection(at: newIndexPath.section)
+            let isLastSection = model.isLastSection(at: newIndexPath.section)
             let isOnlyOneSection = model.isOnlyOneSection
             
             var insertSection = ""
             
             if isFirstElementInSection, !isOnlyOneSection {
                 if isLastSection {
-                    insertSection = model.getNameOfSection(for: newIndexPath.section - 1) ?? ""
+                    insertSection = model.getNameOfActiveSection(for: newIndexPath.section - 1) 
                 } else {
-                    insertSection = model.getNameOfSection(for: newIndexPath.section + 1) ?? ""
+                    insertSection = model.getNameOfActiveSection(for: newIndexPath.section + 1)
                 }
             }
             
-            favouriteTableView.insertCell(isLast: isLastSection, insertSection: insertSection, at: newIndexPath, before: indexPath)
+            favouriteTableView.insertCell(isLastSection: isLastSection, insertSection: insertSection, at: newIndexPath, before: indexPath)
             
             if let favouritePodcast = anObject as? FavouritePodcast {
                 let name = favouritePodcast.podcast.trackName ?? ""
@@ -354,7 +358,27 @@ extension ListViewController: NSFetchedResultsControllerDelegate {
                 addToast(title: title, (playerIsSHidden ? .bottom : .bottomWithPlayer))
             }
             
-        default : break
+        case .move:
+            guard let index = indexPath?.row,
+                  let newIndex = newIndexPath?.row  else { return }
+                        
+            if let listSection = anObject as? ListSection {
+                
+                guard let section = model.getSection(by: listSection.nameOfSection) else { fatalError() }
+                guard let modeIndex = model.getIndexOfActiveSection(for: section) else { return }
+                
+                model.moveSection(from: index, to: newIndex)
+                
+                guard let modeNewIndex = model.getIndexOfActiveSection(for: section) else { return }
+                
+                let isActiveSection = model.sectionIsEmpty(section)
+                
+                if modeIndex != modeNewIndex, isActiveSection {
+                    favouriteTableView.moveSection(from: modeIndex, to: modeNewIndex)
+                }
+            }
+        default:
+            break
         }
     }
     
@@ -381,7 +405,7 @@ extension ListViewController: FavouriteTableDataSource {
     }
     
     func favouriteTableViewCountOfSections(_ favouriteTableView: FavouriteTableView) -> Int {
-        return model.countOfSections
+        return model.countOfActiveSections
     }
     
     func favouriteTableView(_ favouriteTableView: FavouriteTableView, countOfRowsInSection index: Int) -> Int {
@@ -389,7 +413,7 @@ extension ListViewController: FavouriteTableDataSource {
     }
     
     func favouriteTableView(_ favouriteTableView: FavouriteTableView, nameOfSectionFor index: Int) -> String {
-        return model.getNameOfSection(for: index) ?? "dwdweqd"
+        return model.getNameOfActiveSection(for: index)
     }
 }
 
@@ -398,21 +422,21 @@ extension ListViewController: PodcastCellDelegate {
     
     func podcastCellDidSelectStar(_ podcastCell: PodcastCell) {
         guard let indexPath = favouriteTableView.indexPath(for: podcastCell),
-              let favouritePodcast = model.getObject(for: indexPath) as? FavouritePodcast else { return }
+              let favouritePodcast = model.getObjectInActiveSection(for: indexPath) as? FavouritePodcast else { return }
         
         favouriteManager.addOrRemoveFavouritePodcast(entity: favouritePodcast.podcast)
     }
     
     func podcastCellDidSelectDownLoadImage(_ podcastCell: PodcastCell) {
         guard let indexPath = favouriteTableView.indexPath(for: podcastCell) else { return }
-        guard let entity = model.getObject(for: indexPath) as? InputDownloadProtocol else { return }
+        guard let entity = model.getObjectInActiveSection(for: indexPath) as? InputDownloadProtocol else { return }
         downloadService.conform(entity: entity)
     }
     
     func podcastCellDidTouchPlayButton(_ podcastCell: PodcastCell) {
         guard let indexPath = favouriteTableView.indexPath(for: podcastCell),
-              let favouritePodcast = model.getObject(for: indexPath) as? FavouritePodcast,
-              let favouritePodcasts = model.getObjects(for: indexPath) as? [FavouritePodcast] else { fatalError() }
+              let favouritePodcast = model.getObjectInActiveSection(for: indexPath) as? FavouritePodcast,
+              let favouritePodcasts = model.getObjectsInActiveSections(for: indexPath) as? [FavouritePodcast] else { fatalError() }
         
         player.conform(track: favouritePodcast.podcast, trackList: favouritePodcasts.map { $0.podcast })
     }
@@ -424,6 +448,11 @@ extension ListViewController: PodcastCellDelegate {
 
 //MARK: - AlertSortListViewMyDelegate
 extension ListViewController: AlertSortListViewDelegate {
+    
+}
+
+//MARK: - AlertSortListViewDataSource
+extension ListViewController: AlertSortListViewDataSource {
     
 }
 

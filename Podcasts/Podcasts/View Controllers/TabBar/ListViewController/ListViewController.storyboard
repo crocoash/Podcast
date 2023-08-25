@@ -36,6 +36,7 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="bottomTableViewConstraint" destination="sTV-2l-Ibh" id="naW-57-4Vt"/>
                         <outlet property="favouriteTableView" destination="Hpg-QP-mbV" id="TZl-fn-8ew"/>
                     </connections>
                 </viewController>

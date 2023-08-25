@@ -56,7 +56,7 @@ extension NSManagedObject {
                 } else if let objects = value as? Set<NSManagedObject> {
                     if withRelationShip, !objects.isEmpty {
                         let abstructObjects = objects.map { NSManagedObject.init($0, withRelationShip: false)}
-                        self.setValue(abstructObjects, forKey: initProp.key)
+                        self.setValue(Set(abstructObjects), forKey: initProp.key)
                     }
                 } else {
                     self.setValue(value, forKey: initProp.key)
