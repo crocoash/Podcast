@@ -194,7 +194,7 @@ extension Podcast: CoreDataProtocol {
     }
 }
 
-//MARK: - InputPlayerProtocol
+//MARK: - PlayerInputProtocol
 extension Podcast: TrackProtocol {
     
     var duration: Double? {
