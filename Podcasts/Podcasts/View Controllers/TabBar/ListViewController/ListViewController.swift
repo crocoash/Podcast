@@ -372,11 +372,13 @@ extension ListViewController: NSFetchedResultsControllerDelegate {
                    let modeNewIndex = model.getIndexOfActiveSection(for: newSection) {
                     
                     if modeIndex != modeNewIndex, isActiveSection {
+                        model.moveSection(from: index, to: newIndex)
                         favouriteTableView.moveSection(from: modeIndex, to: modeNewIndex)
+                        return
                     }
                 }
-                
                 model.moveSection(from: index, to: newIndex)
+               
             }
         default:
             break
