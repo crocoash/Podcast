@@ -232,7 +232,7 @@ extension FavouriteTableView {
    }
    
    private func showEmptyImage() {
-      backgroundView?.isHidden = numberOfSections == 0
+      backgroundView?.isHidden = numberOfSections != 0
    }
    
    private func configureTableView() {
