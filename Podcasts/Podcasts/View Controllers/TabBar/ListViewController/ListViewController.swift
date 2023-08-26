@@ -119,7 +119,7 @@ class ListViewController: UIViewController {
         configureNavigationItem()
         configureAlertSortListView()
     }
-
+    
     //MARK: Actions
     @objc private func tapFavouritePodcastCell(sender: UITapGestureRecognizer) {
         
@@ -331,7 +331,7 @@ extension ListViewController: NSFetchedResultsControllerDelegate {
             guard var newIndexPath = newIndexPath else { return }
             
             model.appendItem(anObject, at: newIndexPath.row)
-
+            
             guard let indexSection = model.getIndexOfActiveSection(forAny: anObject) else { return }
             
             newIndexPath.section = indexSection
@@ -344,7 +344,7 @@ extension ListViewController: NSFetchedResultsControllerDelegate {
             
             if isFirstElementInSection, !isOnlyOneSection {
                 if isLastSection {
-                    insertSection = model.getNameOfActiveSection(for: newIndexPath.section - 1) 
+                    insertSection = model.getNameOfActiveSection(for: newIndexPath.section - 1)
                 } else {
                     insertSection = model.getNameOfActiveSection(for: newIndexPath.section + 1)
                 }
@@ -361,21 +361,23 @@ extension ListViewController: NSFetchedResultsControllerDelegate {
         case .move:
             guard let index = indexPath?.row,
                   let newIndex = newIndexPath?.row  else { return }
-                        
-            if let listSection = anObject as? ListSection {
+            
+            if anObject is ListSection {
                 
-                guard let section = model.getSection(by: listSection.nameOfSection) else { fatalError() }
-                guard let modeIndex = model.getIndexOfActiveSection(for: section) else { return }
-                
-                model.moveSection(from: index, to: newIndex)
-                
-                guard let modeNewIndex = model.getIndexOfActiveSection(for: section) else { return }
-                
+                let section = model.sections[index]
+                let newSection = model.sections[newIndex]
                 let isActiveSection = model.sectionIsEmpty(section)
                 
-                if modeIndex != modeNewIndex, isActiveSection {
-                    favouriteTableView.moveSection(from: modeIndex, to: modeNewIndex)
+                if let modeIndex = model.getIndexOfActiveSection(for: section),
+                   let modeNewIndex = model.getIndexOfActiveSection(for: newSection) {
+                    
+                    if modeIndex != modeNewIndex, isActiveSection {
+                        model.moveSection(from: index, to: newIndex)
+                        favouriteTableView.moveSection(from: modeIndex, to: modeNewIndex)
+                        return
+                    }
                 }
+                model.moveSection(from: index, to: newIndex)
             }
         default:
             break

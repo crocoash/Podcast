@@ -88,20 +88,25 @@ class FavouriteTableView: UITableView {
         mySnapShot.deleteSections([identifier])
         diffableDataSource.apply(mySnapShot)
     }
-    
+
     func moveSection(from oldIndex: Int, to newIndex: Int) {
-        
+        let countOfSections = mySnapShot.sectionIdentifiers.count - 1
         let isFirstSection = newIndex == 0
+        let isLastSection = newIndex == countOfSections
         
-        guard let sectionIdentifier = myDataSource?.favouriteTableView(self, nameOfSectionFor: newIndex) else { return }
+        let section = mySnapShot.sectionIdentifiers[oldIndex]
         
         if isFirstSection {
             let firstSection = mySnapShot.sectionIdentifiers[0]
-            mySnapShot.moveSection(sectionIdentifier, beforeSection: firstSection)
+            mySnapShot.moveSection(section, beforeSection: firstSection)
+        } else if isLastSection {
+            let lastSection = mySnapShot.sectionIdentifiers[countOfSections]
+            mySnapShot.moveSection(section, afterSection: lastSection)
         } else {
-            let section = mySnapShot.sectionIdentifiers[newIndex]
-            mySnapShot.moveSection(sectionIdentifier, afterSection: section)
+            let beforeSection = mySnapShot.sectionIdentifiers[newIndex]
+            mySnapShot.moveSection(section, beforeSection: beforeSection)
         }
+        
         diffableDataSource.apply(mySnapShot)
     }
     
@@ -252,4 +257,3 @@ extension FavouriteTableView {
         }
     }
 }
-
