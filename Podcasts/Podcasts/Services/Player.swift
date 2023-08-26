@@ -9,7 +9,7 @@ import Foundation
 import MediaPlayer
 import CoreData
 
-protocol InputPlayer: MultyDelegateServiceInput {
+protocol PlayerInput: MultyDelegateServiceInput {
     
     var currentTrack: (track: Track, index: Int)? { get }
     
@@ -138,7 +138,7 @@ class Player: MultyDelegateService<PlayerDelegate> {
     }
 }
 
-extension Player: InputPlayer {
+extension Player: PlayerInput {
    
     //MARK: - public Methods
     //MARK: Actions
@@ -188,7 +188,7 @@ extension Player: InputPlayer {
     }
     
     @objc func playNextPodcast() {
-        guard !playlist.isEmpty, let currentItem = currentTrack, !isLast else { playOrPause(); return }
+       guard !playlist.isEmpty, let currentItem = currentTrack, !isLast else { return } // play or pause
         let index = currentItem.index + 1
         let track = playlist[index]
         startPlay(track: track, indexInPlaylist: index)

@@ -20,7 +20,7 @@ class TabBarViewController: UITabBarController {
     
     private let userViewModel: UserViewModel
     private let firestorageDatabase: FirestorageDatabaseInput
-    private var player: InputPlayer
+    private var player: PlayerInput
     private let downloadService: DownloadServiceInput
     private let favouriteManager: FavouriteManagerInput
     private let likeManager: LikeManagerInput
@@ -80,7 +80,7 @@ class TabBarViewController: UITabBarController {
     init?(coder: NSCoder,
                                userViewModel: UserViewModel,
                                firestorageDatabase: FirestorageDatabaseInput,
-                               player: InputPlayer,
+                               player: PlayerInput,
                                downloadService: DownloadServiceInput,
                                favouriteManager: FavouriteManagerInput,
                                likeManager: LikeManagerInput,

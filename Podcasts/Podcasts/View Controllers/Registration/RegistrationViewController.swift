@@ -25,7 +25,7 @@ class RegistrationViewController: UIViewController {
     private let favouriteManager: FavouriteManagerInput
     private let likeManager: LikeManagerInput
     private let firebaseDataBase: FirebaseDatabaseInput
-    private let player: InputPlayer
+    private let player: PlayerInput
     private let apiService: ApiServiceInput
     private let downloadService: DownloadServiceInput
     private let dataStoreManager: DataStoreManagerInput
@@ -58,7 +58,7 @@ class RegistrationViewController: UIViewController {
           userViewModel: UserViewModel,
           favouriteManager: FavouriteManagerInput,
           likeManager: LikeManagerInput,
-          player: InputPlayer,
+          player: PlayerInput,
           firebaseDataBase: FirebaseDatabaseInput,
           apiService: ApiServiceInput,
           downloadService: DownloadServiceInput,

@@ -95,7 +95,7 @@ class BigPlayerViewController: UIViewController {
         }
     }
     
-    private var player: InputPlayer
+    private var player: PlayerInput
     private var likeManager: LikeManagerInput
     
     private let defaultTime = "0:00"
@@ -105,7 +105,7 @@ class BigPlayerViewController: UIViewController {
     
     //MARK: init
     init<T: BigPlayerViewControllerDelegate>(_ vc: T,
-                                             player: InputPlayer,
+                                             player: PlayerInput,
                                              track: BigPlayerPlayableProtocol,
                                              likeManager: LikeManagerInput) {
         self.player = player

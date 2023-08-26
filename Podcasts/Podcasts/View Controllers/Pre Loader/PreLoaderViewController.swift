@@ -13,7 +13,7 @@ class PreLoaderViewController: UIViewController {
     private let likeManager: LikeManagerInput
     private let favouriteManager: FavouriteManagerInput
     private let firestorageDatabase: FirestorageDatabaseInput
-    private let player: InputPlayer
+    private let player: PlayerInput
     private let downloadService: DownloadServiceInput
     private let firebaseDataBase: FirebaseDatabaseInput
     private let apiService: ApiServiceInput
@@ -76,7 +76,7 @@ class PreLoaderViewController: UIViewController {
           likeManager: LikeManagerInput,
           favouriteManager: FavouriteManagerInput,
           firestorageDatabase: FirestorageDatabaseInput,
-          player: InputPlayer,
+          player: PlayerInput,
           downloadService: DownloadServiceInput,
           firebaseDataBase: FirebaseDatabaseInput,
           apiService: ApiServiceInput,

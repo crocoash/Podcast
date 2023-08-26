@@ -28,7 +28,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     private let firebaseDatabase: FirebaseDatabaseInput = FirebaseDatabase()
     private let dataStoreManager: DataStoreManagerInput = (DataStoreManager())
 
-    lazy private var player: InputPlayer = Player()
+    lazy private var player: PlayerInput = Player()
         
     lazy private var favouriteManager: FavouriteManagerInput = FavouriteManager(dataStoreManager: dataStoreManager, firebaseDatabase: firebaseDatabase)
     

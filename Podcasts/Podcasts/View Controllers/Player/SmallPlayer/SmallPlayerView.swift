@@ -68,10 +68,10 @@ class SmallPlayerView: UIView {
         }
     }
     
-    private var player: InputPlayer!
+    private var player: PlayerInput!
     
     // MARK: - Init
-    init<T: SmallPlayerViewControllerDelegate>(vc: T, frame: CGRect = .zero, model: SmallPlayerViewModel, player: InputPlayer) {
+    init<T: SmallPlayerViewControllerDelegate>(vc: T, frame: CGRect = .zero, model: SmallPlayerViewModel, player: PlayerInput) {
         self.model = model
         self.player = player
         self.delegate = vc
@@ -83,7 +83,7 @@ class SmallPlayerView: UIView {
         updateView()
     }
     
-    func configure(with model: SmallPlayerPlayableProtocol, player: InputPlayer) {
+    func configure(with model: SmallPlayerPlayableProtocol, player: PlayerInput) {
         let model = SmallPlayerViewModel(model)
         self.model = model
         self.player = player
