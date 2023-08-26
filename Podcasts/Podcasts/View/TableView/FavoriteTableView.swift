@@ -48,7 +48,6 @@ class FavouriteTableView: UITableView {
    private var diffableDataSource: DataSource!
    
    private func setScrollEnabled() {
-      
       let heightOfCells = (0..<numberOfSections).reduce(into: 0) { $0 += rect(forSection: $1).height }
       isScrollEnabled = heightOfCells > frame.height
    }
@@ -73,6 +72,7 @@ class FavouriteTableView: UITableView {
             if let podcastCell = $0 as? PodcastCell {
                podcastCell.update(with: type)
             }
+
             
             if let listeningPodcast = $0 as? ListeningPodcastCell {
                listeningPodcast.update(with: type)
@@ -88,22 +88,6 @@ class FavouriteTableView: UITableView {
    func deleteSection(at index: Int) {
       guard let identifier = myDataSource?.favouriteTableView(self, nameOfSectionFor: index) else { return }
       mySnapShot.deleteSections([identifier])
-      diffableDataSource.apply(mySnapShot)
-   }
-   
-   func moveSection(from oldIndex: Int, to newIndex: Int) {
-      
-      let isFirstSection = newIndex == 0
-      
-      guard let sectionIdentifier = myDataSource?.favouriteTableView(self, nameOfSectionFor: newIndex) else { return }
-      
-      if isFirstSection {
-         let firstSection = mySnapShot.sectionIdentifiers[0]
-         mySnapShot.moveSection(sectionIdentifier, beforeSection: firstSection)
-      } else {
-         let section = mySnapShot.sectionIdentifiers[newIndex]
-         mySnapShot.moveSection(sectionIdentifier, afterSection: section)
-      }
       diffableDataSource.apply(mySnapShot)
    }
    
@@ -172,6 +156,27 @@ class FavouriteTableView: UITableView {
       setScrollEnabled()
       showEmptyImage()
    }
+    
+    func moveSection(from oldIndex: Int, to newIndex: Int) {
+        let countOfSections = mySnapShot.sectionIdentifiers.count - 1
+        let isFirstSection = newIndex == 0
+        let isLastSection = newIndex == countOfSections
+        
+        let section = mySnapShot.sectionIdentifiers[oldIndex]
+        
+        if isFirstSection {
+            let firstSection = mySnapShot.sectionIdentifiers[0]
+            mySnapShot.moveSection(section, beforeSection: firstSection)
+        } else if isLastSection {
+            let lastSection = mySnapShot.sectionIdentifiers[countOfSections]
+            mySnapShot.moveSection(section, afterSection: lastSection)
+        } else {
+            let beforeSection = mySnapShot.sectionIdentifiers[newIndex]
+            mySnapShot.moveSection(section, beforeSection: beforeSection)
+        }
+        
+        diffableDataSource.apply(mySnapShot)
+    }
 }
 
 //MARK: - Private Methods
@@ -227,9 +232,7 @@ extension FavouriteTableView {
    }
    
    private func showEmptyImage() {
-      let favouritePodcastsIsEmpty = mySnapShot.itemIdentifiers.count == 0
-      
-      backgroundView?.isHidden = !favouritePodcastsIsEmpty
+      backgroundView?.isHidden = numberOfSections == 0
    }
    
    private func configureTableView() {
@@ -259,4 +262,3 @@ extension FavouriteTableView {
       }
    }
 }
-

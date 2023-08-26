@@ -92,6 +92,7 @@ class AlertSortListView: UIView {
         closeImageView.addMyGestureRecognizer(self, type: .panGestureRecognizer, #selector(panGesture(sender:)))
 
         tableView.isEditing = true
+        tableView.isScrollEnabled = false
     }
     
     required init?(coder: NSCoder) {
