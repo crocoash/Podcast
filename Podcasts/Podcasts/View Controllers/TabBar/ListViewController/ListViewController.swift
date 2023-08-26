@@ -357,7 +357,7 @@ extension ListViewController: NSFetchedResultsControllerDelegate {
                 let title = "\(name) podcast is added to playlist"
                 addToast(title: title, (playerIsSHidden ? .bottom : .bottomWithPlayer))
             }
-            
+        
         case .move:
             guard let index = indexPath?.row,
                   let newIndex = newIndexPath?.row  else { return }
@@ -365,19 +365,16 @@ extension ListViewController: NSFetchedResultsControllerDelegate {
             if anObject is ListSection {
                 
                 let section = model.sections[index]
-                let newSection = model.sections[newIndex]
                 let isActiveSection = model.sectionIsEmpty(section)
                 
-                if let modeIndex = model.getIndexOfActiveSection(for: section),
-                   let modeNewIndex = model.getIndexOfActiveSection(for: newSection) {
-                    
-                    if modeIndex != modeNewIndex, isActiveSection {
-                        model.moveSection(from: index, to: newIndex)
-                        favouriteTableView.moveSection(from: modeIndex, to: modeNewIndex)
-                        return
-                    }
-                }
+                let modeIndex = model.getIndexOfActiveSection(for: index)
+                let modeNewIndex = model.getIndexOfActiveSection(for: newIndex)
+                
                 model.moveSection(from: index, to: newIndex)
+                
+                if modeIndex != modeNewIndex, isActiveSection {
+                    favouriteTableView.moveSection(from: modeIndex, to: modeNewIndex)
+                }
             }
         default:
             break

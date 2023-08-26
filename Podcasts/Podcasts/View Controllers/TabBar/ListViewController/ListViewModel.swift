@@ -102,8 +102,14 @@ class ListViewModel: NSObject {
       return activeSections.firstIndex(where: { $0.nameOfEntity == object.entityName })
    }
    
-   func getIndexOfActiveSection(for section: Section) -> Int? {
-      return activeSections.firstIndex(where: { $0.sectionName == section.sectionName })
+   func getIndexOfActiveSection(for index: Int) -> Int {
+      var count = 0
+      for i in (0...index) {
+         if sectionIsEmpty(sections[i]) {
+            count += 1
+         }
+      }
+      return count == 0 ? 0 : (count - 1)
    }
    
    func moveSection(from index: Int, to newIndex: Int) {

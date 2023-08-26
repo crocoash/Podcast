@@ -12,10 +12,10 @@ import CoreData
 @objc protocol FavouriteTableViewDelegate: AnyObject {
     
     func favouriteTableView(_ favouriteTableView: FavouriteTableView, didRefreshed refreshControl: UIRefreshControl)
-//    func favouriteTableView(_ favouriteTableView: FavouriteTableView, didSelectCellAt indexPath: IndexPath)
-//    func favouriteTableView(_ favouriteTableView: FavouriteTableView, didSelectPlayButtonAt indexPath: IndexPath)
-//    func favouriteTableView(_ favouriteTableView: FavouriteTableView, didSelectDownloadButtonAt indexPath: IndexPath)
-//    func favouriteTableView(_ favouriteTableView: FavouriteTableView, didSelectFavouriteButtonAt indexPath: IndexPath)
+    //    func favouriteTableView(_ favouriteTableView: FavouriteTableView, didSelectCellAt indexPath: IndexPath)
+    //    func favouriteTableView(_ favouriteTableView: FavouriteTableView, didSelectPlayButtonAt indexPath: IndexPath)
+    //    func favouriteTableView(_ favouriteTableView: FavouriteTableView, didSelectDownloadButtonAt indexPath: IndexPath)
+    //    func favouriteTableView(_ favouriteTableView: FavouriteTableView, didSelectFavouriteButtonAt indexPath: IndexPath)
 }
 
 //MARK: - DataSource
@@ -48,7 +48,7 @@ class FavouriteTableView: UITableView {
     private var diffableDataSource: DataSource!
     private var mySnapShot: SnapShot! = nil
     
-    //MARK: init 
+    //MARK: init
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         configureTableView()
@@ -77,9 +77,9 @@ class FavouriteTableView: UITableView {
                     listeningPodcast.update(with: type)
                 }
                 
-//                if let likedPodcastTableViewCell = $0 as? LikedPodcastTableViewCell {
-//                    likedPodcastTableViewCell.update(with: type)
-//                }
+                //                if let likedPodcastTableViewCell = $0 as? LikedPodcastTableViewCell {
+                //                    likedPodcastTableViewCell.update(with: type)
+                //                }
             }
         }
     }
@@ -88,8 +88,10 @@ class FavouriteTableView: UITableView {
         guard let identifier = myDataSource?.favouriteTableView(self, nameOfSectionFor: index) else { return }
         mySnapShot.deleteSections([identifier])
         diffableDataSource.apply(mySnapShot)
+        showEmptyImage()
+        setScrollEnabled()
     }
-
+    
     func moveSection(from oldIndex: Int, to newIndex: Int) {
         let countOfSections = mySnapShot.sectionIdentifiers.count - 1
         let isFirstSection = newIndex == 0
@@ -113,7 +115,7 @@ class FavouriteTableView: UITableView {
     
     func deleteItem(at indexPath: IndexPath) {
         guard let item = diffableDataSource.itemIdentifier(for: indexPath) else { return }
-
+        
         let section = mySnapShot.sectionIdentifiers[indexPath.section]
         
         mySnapShot.deleteItems([item])
@@ -121,11 +123,12 @@ class FavouriteTableView: UITableView {
             mySnapShot.deleteSections([section])
         }
         showEmptyImage()
+        setScrollEnabled()
         diffableDataSource.apply(mySnapShot)
     }
     
     func insertCell(isLastSection: Bool, insertSection: String, at indexPath: IndexPath, before oldIndexPath: IndexPath?) {
-                
+        
         guard let section = myDataSource?.favouriteTableView(self, nameOfSectionFor: indexPath.section),
               let cell = myDataSource?.favouriteTableView(self, cellForRowAt: indexPath)
         else { return }
@@ -170,8 +173,9 @@ class FavouriteTableView: UITableView {
         }
         
         configureDataSource()
-        diffableDataSource.apply(mySnapShot)
         showEmptyImage()
+        setScrollEnabled()
+        diffableDataSource.apply(mySnapShot)
     }
 }
 
@@ -224,6 +228,7 @@ extension FavouriteTableView {
         
         self.diffableDataSource.apply(mySnapShot, animatingDifferences: true)
         showEmptyImage()
+        setScrollEnabled()
     }
     
     private func showEmptyImage() {
@@ -238,6 +243,11 @@ extension FavouriteTableView {
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: #selector(refreshed), for: .valueChanged)
         self.refreshControl = refreshControl
+    }
+    
+    private func setScrollEnabled() {
+        let heightOfCells = (0..<numberOfSections).reduce(into: 0) { $0 += rect(forSection: $1).height }
+        isScrollEnabled = heightOfCells > frame.height
     }
 }
 
