@@ -108,7 +108,7 @@ class ListViewController: UIViewController {
         playerIsSHidden = !value
         bottomTableViewConstraint?.constant = playerIsSHidden ? 0 : 50
     }
-    
+        
     //MARK: View Methods
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -357,23 +357,21 @@ extension ListViewController: NSFetchedResultsControllerDelegate {
                 let title = "\(name) podcast is added to playlist"
                 addToast(title: title, (playerIsSHidden ? .bottom : .bottomWithPlayer))
             }
-        
+            
         case .move:
             guard let index = indexPath?.row,
                   let newIndex = newIndexPath?.row  else { return }
             
             if anObject is ListSection {
-                
                 let section = model.sections[index]
-                let isActiveSection = model.sectionIsEmpty(section)
-                
-                let modeIndex = model.getIndexOfActiveSection(for: index)
-                let modeNewIndex = model.getIndexOfActiveSection(for: newIndex)
+                let indexMode = model.activeSections.firstIndex { $0.sectionName == section.sectionName }
                 
                 model.moveSection(from: index, to: newIndex)
                 
-                if modeIndex != modeNewIndex, isActiveSection {
-                    favouriteTableView.moveSection(from: modeIndex, to: modeNewIndex)
+                let newIndexPath = model.activeSections.firstIndex { $0.sectionName == section.sectionName }
+                
+                if !section.rows.isEmpty, let newIndexPath = newIndexPath, let indexMode = indexMode, indexMode != newIndexPath {
+                    favouriteTableView.moveSection(from: indexMode, to: newIndexPath)
                 }
             }
         default:
