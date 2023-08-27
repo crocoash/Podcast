@@ -122,9 +122,9 @@ class FavouriteTableView: UITableView {
         if mySnapShot.numberOfItems(inSection: section) == 0 {
             mySnapShot.deleteSections([section])
         }
+        diffableDataSource.apply(mySnapShot)
         showEmptyImage()
         setScrollEnabled()
-        diffableDataSource.apply(mySnapShot)
     }
     
     func insertCell(isLastSection: Bool, insertSection: String, at indexPath: IndexPath, before oldIndexPath: IndexPath?) {
@@ -173,9 +173,9 @@ class FavouriteTableView: UITableView {
         }
         
         configureDataSource()
+        diffableDataSource.apply(mySnapShot)
         showEmptyImage()
         setScrollEnabled()
-        diffableDataSource.apply(mySnapShot)
     }
 }
 
@@ -246,7 +246,7 @@ extension FavouriteTableView {
     }
     
     private func setScrollEnabled() {
-        let heightOfCells = (0..<numberOfSections).reduce(into: 0) { $0 += rect(forSection: $1).height }
+        let heightOfCells = (0..<numberOfSections).reduce(into: 0) { $0 += rect(forSection: $1).height + 50 }
         isScrollEnabled = heightOfCells > frame.height
     }
 }
