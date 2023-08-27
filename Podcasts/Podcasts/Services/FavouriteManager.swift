@@ -153,7 +153,6 @@ extension FavouriteManager: FirebaseDatabaseDelegate {
     
     func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didUpdate entity: (any FirebaseProtocol)) {
         if let favouritePodcast = entity as? FavouritePodcast? {
-            
         }
     }
 }
