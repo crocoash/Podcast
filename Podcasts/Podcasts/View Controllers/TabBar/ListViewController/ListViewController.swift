@@ -152,7 +152,7 @@ extension ListViewController {
     }
     
     private func configureScopeBar() {
-        searchController.searchBar.scopeButtonTitles = model.nameOfActiveSections
+        searchController.searchBar.scopeButtonTitles = model.nameForScopeBar
         searchController.searchBar.scopeButtonTitles?.insert("All", at: .zero)
     }
     
@@ -262,9 +262,11 @@ extension ListViewController {
     private func move(_ anObject: Any, indexPath: IndexPath?, newIndexPath: IndexPath?) {
         guard let index = indexPath?.row,
               let newIndex = newIndexPath?.row  else { return }
+        
         model.moveSection(anObject, from: index, to: newIndex) { [weak self] index, newIndex in
             guard let self = self else { return }
             favouriteTableView.moveSection(from: index, to: newIndex)
+            configureScopeBar()
         }
     }
 }

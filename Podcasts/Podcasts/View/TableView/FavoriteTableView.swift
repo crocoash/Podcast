@@ -49,7 +49,9 @@ class FavouriteTableView: UITableView {
     private var mySnapShot: SnapShot! = nil
     
     override func reloadData() {
-        <#code#>
+        super.reloadData()
+        showEmptyImage()
+        setScrollEnabled()
     }
     
     //MARK: init
@@ -92,8 +94,6 @@ class FavouriteTableView: UITableView {
         let section = mySnapShot.sectionIdentifiers[index]
         mySnapShot.deleteSections([section])
         diffableDataSource.apply(mySnapShot)
-        showEmptyImage()
-        setScrollEnabled()
     }
     
     func moveSection(from oldIndex: Int, to newIndex: Int) {
@@ -119,13 +119,8 @@ class FavouriteTableView: UITableView {
     
     func deleteItem(at indexPath: IndexPath) {
         guard let item = diffableDataSource.itemIdentifier(for: indexPath) else { return }
-        
-        let section = mySnapShot.sectionIdentifiers[indexPath.section]
-        
         mySnapShot.deleteItems([item])
         diffableDataSource.apply(mySnapShot)
-        showEmptyImage()
-        setScrollEnabled()
     }
 
     func insertCell(at indexPath: IndexPath) {
@@ -142,8 +137,6 @@ class FavouriteTableView: UITableView {
         }
         
         diffableDataSource.apply(mySnapShot)
-        showEmptyImage()
-        setScrollEnabled()
     }
     
     func insertSection(at index: Int) {
@@ -159,60 +152,7 @@ class FavouriteTableView: UITableView {
         }
         configureDataSource()
         diffableDataSource.apply(mySnapShot)
-        showEmptyImage()
-        setScrollEnabled()
     }
-    
-//    func insertCell(isLastSection: Bool, insertSection: String, at indexPath: IndexPath, before oldIndexPath: IndexPath?) {
-//
-//        guard let section = myDataSource?.favouriteTableView(self, nameOfSectionFor: indexPath.section),
-//              let cell = myDataSource?.favouriteTableView(self, cellForRowAt: indexPath)
-//        else { return }
-//
-//        if let oldIndexPath = oldIndexPath, let item = diffableDataSource.itemIdentifier(for: oldIndexPath) {
-//            mySnapShot.insertItems([cell], beforeItem: item)
-//        } else {
-//            if mySnapShot.sectionIdentifiers.isEmpty {
-//                mySnapShot.appendSections([section])
-//                mySnapShot.appendItems([cell])
-//            } else {
-//
-//                var alreadyAdd: Bool = false
-//                /// if section is already create
-//                for (index, sectionIdentifires) in mySnapShot.sectionIdentifiers.enumerated() {
-//                    if sectionIdentifires == section {
-//
-//                        if index == indexPath.section {
-//                            mySnapShot.appendItems([cell], toSection: section)
-//                            alreadyAdd = true
-//                        } else {
-//
-//                            if let section = myDataSource?.favouriteTableView(self, nameOfSectionFor: indexPath.section) {
-//                                mySnapShot.appendSections([section])
-//                                mySnapShot.appendItems([cell])
-//                                alreadyAdd = true
-//                            }
-//                        }
-//                        break
-//                    }
-//                }
-//
-//                if !alreadyAdd {
-//                    if isLastSection {
-//                        mySnapShot.insertSections([section], afterSection: insertSection)
-//                    } else {
-//                        mySnapShot.insertSections([section], beforeSection: insertSection)
-//                    }
-//                    mySnapShot.appendItems([cell], toSection: section)
-//                }
-//            }
-//        }
-//
-//        configureDataSource()
-//        diffableDataSource.apply(mySnapShot)
-//        showEmptyImage()
-//        setScrollEnabled()
-//    }
 }
 
 //MARK: - Private Methods

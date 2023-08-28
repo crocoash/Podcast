@@ -10,13 +10,17 @@ import CoreData
 
 class ListViewModel: NSObject {
    
-   struct Section {
+   struct Section: Equatable {
       
       var rows: [NSManagedObject]
       var isActive: Bool
       var sectionName: String
       var nameOfEntity: String
       var sequenceNumber: Int
+      
+      static func == (lhs: Section, rhs: Section) -> Bool {
+         return lhs.sectionName == rhs.sectionName
+      }
       
       init(entities: [NSManagedObject], listSection: ListSection) {
          self.rows = entities
@@ -96,12 +100,12 @@ class ListViewModel: NSObject {
       
       if object is ListSection {
          let section = sections[index]
-         let activeIndex = activeSections.firstIndex { $0.sectionName == section.sectionName }
+         let activeIndex = activeSections.firstIndex { $0 == section }
          
          sections.remove(at: index)
          sections.insert(section, at: newIndex)
          
-         let activeNewIndex = activeSections.firstIndex { $0.sectionName == section.sectionName }
+         let activeNewIndex = activeSections.firstIndex { $0 == section }
          
          let sectionIsActive = sectionIsActive(section)
          
@@ -174,10 +178,12 @@ class ListViewModel: NSObject {
             guard let indexPath = getIndexPath(forAny: object, in: activeSections) else { return }
             removeItem(indexPath)
          }
+         
+         guard let index = activeSections.firstIndex(where: { $0 == sections[indexPath.section] }) else { return }
          sections[indexPath.section].rows.remove(at: indexPath.row)
          
          if !sectionIsActive(sections[indexPath.section]) {
-            removeSection(indexPath.section)
+            removeSection(index)
          }
       }
    }
@@ -193,7 +199,7 @@ class ListViewModel: NSObject {
          let rows = getRowsFor(entityName: section.nameOfEntity)
          let section = Section(entities: rows, listSection: section)
          self.sections.insert(section, at: indexPath.row)
-         guard let newIndex = activeSections.firstIndex(where: { $0.sectionName == section.sectionName }) else { return }
+         guard let newIndex = activeSections.firstIndex(where: { $0 == section }) else { return }
          insertSection(section, newIndex)
          /// row
       } else  {
@@ -208,7 +214,7 @@ class ListViewModel: NSObject {
          
          sections[indexPath.section].rows.insert(object, at: indexPath.row)
          
-         let activeSectionIndex = activeSections.firstIndex { $0.sectionName == section.sectionName }
+         let activeSectionIndex = activeSections.firstIndex { $0 == section }
          guard let activeSectionIndex = activeSectionIndex else { fatalError() }
          indexPath.section = activeSectionIndex
          
@@ -254,6 +260,10 @@ extension ListViewModel {
    
    var nameOfActiveSections: [String] {
       return activeSections.map { $0.sectionName }
+   }
+   
+   var nameForScopeBar: [String] {
+      return nameOfActiveSections.map { $0.components(separatedBy: " ").first ?? "" }
    }
    
    func sectionIsActive(_ section: Section) -> Bool {
