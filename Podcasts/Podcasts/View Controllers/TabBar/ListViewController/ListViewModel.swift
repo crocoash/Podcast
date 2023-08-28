@@ -10,13 +10,17 @@ import CoreData
 
 class ListViewModel: NSObject {
    
-   struct Section {
+   struct Section: Equatable {
       
       var rows: [NSManagedObject]
       var isActive: Bool
       var sectionName: String
       var nameOfEntity: String
       var sequenceNumber: Int
+      
+      static func == (lhs: Section, rhs: Section) -> Bool {
+         return lhs.sectionName == rhs.sectionName
+      }
       
       init(entities: [NSManagedObject], listSection: ListSection) {
          self.rows = entities
@@ -36,8 +40,6 @@ class ListViewModel: NSObject {
    
    lazy private(set) var listSectionFRC = dataStoreManager.conFigureFRC(for: ListSection.self,
                                                                         with: [NSSortDescriptor(key: #keyPath(ListSection.sequenceNumber), ascending: true)])
-//   ,
-//                                                                        predicates: [NSPredicate(format: "isActive = %d", true)])
    
    private(set) var sections: [Section] = []
    
@@ -57,7 +59,15 @@ class ListViewModel: NSObject {
       configureSections()
    }
    
+   private var searchedSection: String? = nil
+   
+   func changeSearchedSection(searchedSection index: Int) {
+      searchedSection = nil
+      searchedSection = index == 0 ? nil : activeSections[index - 1].sectionName
+   }
+   
    func performSearch(text: String?) {
+      
       if let searchText = text, searchText != "" {
          let predicate = NSPredicate(format: "podcast.trackName CONTAINS [c] %@", "\(searchText)")
          favouriteFRC.fetchRequest.predicate = predicate
@@ -69,48 +79,46 @@ class ListViewModel: NSObject {
          listeningFRC.fetchRequest.predicate = nil
       }
       
-      try? favouriteFRC.performFetch()
-      try? likeMomentFRC.performFetch()
-      try? listeningFRC.performFetch()
-      
+      do {
+         try favouriteFRC.performFetch()
+         try likeMomentFRC.performFetch()
+         try listeningFRC.performFetch()
+      } catch {
+         print(error)
+      }
       configureSections()
    }
+
    
-   ///active
-   func isFirstElementInSection(at index: Int) -> Bool {
-      if activeSections.isEmpty {
-         return sections[index].rows.count == 1
-      }
-      return true
-   }
-
-   ///active
-   var isOnlyOneSection: Bool { return countOfActiveSections == 1 }
-
    ///active
    var countOfActiveSections: Int {
       return activeSections.count
    }
-
-   ///active
-   func isLastSection(at index: Int) -> Bool {
-      countOfActiveSections == index + 1
-   }
-
-   func getIndexOfActiveSection(forAny object: Any) -> Int? {
-      guard let object = object as? NSManagedObject else { fatalError() }
-      return activeSections.firstIndex(where: { $0.nameOfEntity == object.entityName })
-   }
-
-   func moveSection(from index: Int, to newIndex: Int) {
-      let section = sections[index]
-      sections.remove(at: index)
-      sections.insert(section, at: newIndex)
+   
+   func moveSection(_ object: Any, from index: Int, to newIndex: Int,
+                    moveSection: ((_ index: Int, _ newIndex: Int) -> ())) {
+      
+      if object is ListSection {
+         let section = sections[index]
+         let activeIndex = activeSections.firstIndex { $0 == section }
+         
+         sections.remove(at: index)
+         sections.insert(section, at: newIndex)
+         
+         let activeNewIndex = activeSections.firstIndex { $0 == section }
+         
+         let sectionIsActive = sectionIsActive(section)
+         
+         if let activeIndex = activeIndex, let activeNewIndex = activeNewIndex {
+            if sectionIsActive, activeIndex != activeNewIndex {
+               moveSection(activeIndex, activeNewIndex)
+            }
+         }
+      }
    }
    
-   ///active
-   func getIndexPath(forAny object: Any, in sections: [Section]? = nil) -> IndexPath? {
-
+   func getIndexPath(forAny object: Any, in sections: [Section]) -> IndexPath? {
+      
       if let object = object as? FavouritePodcast {
          return getIndexPath(forEntity: object, in: sections)
       } else if let object = object as? ListeningPodcast {
@@ -118,53 +126,103 @@ class ListViewModel: NSObject {
       } else if let object = object as? LikedMoment {
          return getIndexPath(forEntity: object, in: sections)
       }
-
+      
       return nil
    }
-
-   ///active
-   func getIndexPath<T: NSManagedObject>(forEntity object: T, in sections: [Section]? = nil) -> IndexPath? {
-      for (sectionIndex, items) in (sections ?? activeSections).enumerated() {
+  
+   func getIndexPath<T: NSManagedObject>(forEntity object: T, in sections: [Section]) -> IndexPath? {
+      for (sectionIndex, items) in (sections).enumerated() {
          if let indexRow = items.rows.firstIndex(of: object) {
             return IndexPath(row: indexRow, section: sectionIndex)
          }
       }
       return nil
    }
-
-   func getObjectInActiveSection(for indexPath: IndexPath) -> NSManagedObject {
+   
+   func getObjectInSection(for indexPath: IndexPath) -> NSManagedObject {
       return activeSections[indexPath.section].rows[indexPath.row]
    }
-
-   func getObjectsInActiveSections(for indexPath: IndexPath) -> [NSManagedObject] {
+   
+   func getObjectsInSections(for indexPath: IndexPath) -> [NSManagedObject] {
       return activeSections[indexPath.section].rows
    }
-
-   func getNameOfActiveSection(for index: Int) -> String {
+   
+   func getNameOfSection(for index: Int) -> String {
       return activeSections[index].sectionName
    }
-
-   ///active
+   
    func getCountOfRowsInSection(section index: Int) -> Int {
       return activeSections[index].rows.count
    }
-
-   func remove(_ object: Any) {
+   
+   func remove(_ object: Any,
+               removeSection: ((_ index: Int) -> ()),
+               removeItem: ((_ indexPath: IndexPath) -> () )) {
+      
       guard let indexPath = getIndexPath(forAny: object, in: sections) else { return }
-
-      let sectionIndex = indexPath.section
-      let rowIndex = indexPath.row
-
-      sections[sectionIndex].rows.remove(at: rowIndex)
-      //        if sections[sectionIndex].rows.isEmpty {
-      //            sections.remove(at: sectionIndex)
-      //        }
+      
+      if object is ListSection {
+         ///Section
+         let index = indexPath.row
+         let section = sections[index]
+         if sectionIsActive(section) {
+            let index = activeSections.firstIndex { $0.sectionName == section.sectionName }
+            guard let index = index else { return }
+            removeSection(index)
+         }
+         sections.remove(at: index)
+      } else {
+         guard let indexPath = getIndexPath(forAny: object, in: sections) else { return }
+         
+         if sectionIsActive(sections[indexPath.section]) {
+            guard let indexPath = getIndexPath(forAny: object, in: activeSections) else { return }
+            removeItem(indexPath)
+         }
+         
+         guard let index = activeSections.firstIndex(where: { $0 == sections[indexPath.section] }) else { return }
+         sections[indexPath.section].rows.remove(at: indexPath.row)
+         
+         if !sectionIsActive(sections[indexPath.section]) {
+            removeSection(index)
+         }
+      }
    }
-
-   func appendItem(_ object: Any, at index: Int) {
-      if let object = object as? NSManagedObject {
-         guard let indexSection = sections.firstIndex(where: { $0.nameOfEntity == object.entityName }) else { fatalError() }
-         sections[indexSection].rows.insert(object, at: index)
+   
+   func append(_ object: Any, at newIndexPath: IndexPath?,
+                   insertSection: ((_ section: Section,_ index: Int) -> ()),
+                   insertItem: ((_ indexPath: IndexPath) -> ())) {
+      
+      guard let indexPath = newIndexPath else { return }
+      
+      ///Section
+      if let section = object as? ListSection {
+         let rows = getRowsFor(entityName: section.nameOfEntity)
+         let section = Section(entities: rows, listSection: section)
+         self.sections.insert(section, at: indexPath.row)
+         guard let newIndex = activeSections.firstIndex(where: { $0 == section }) else { return }
+         insertSection(section, newIndex)
+         /// row
+      } else  {
+         guard let object = object as? NSManagedObject else { return }
+         let indexSection = sections.firstIndex { $0.nameOfEntity == object.entityName }
+         guard let indexSection = indexSection else { fatalError() }
+         
+         let section = sections[indexSection]
+         var indexPath = IndexPath(row: indexPath.row, section: indexSection)
+         
+         let isFirstElementInSection = section.rows.isEmpty
+         
+         sections[indexPath.section].rows.insert(object, at: indexPath.row)
+         
+         let activeSectionIndex = activeSections.firstIndex { $0 == section }
+         guard let activeSectionIndex = activeSectionIndex else { fatalError() }
+         indexPath.section = activeSectionIndex
+         
+         if isFirstElementInSection && section.isActive {
+            insertSection(section, indexPath.section)
+         }
+         
+         insertItem(indexPath)
       }
    }
 }
@@ -172,32 +230,43 @@ class ListViewModel: NSObject {
 //MARK: - Private Methods
 extension ListViewModel {
    
-   private func configureSections() {
-      let sections: [(name: String, entities: [NSManagedObject])] =
-      [(name: FavouritePodcast.entityName, entities: favouriteFRC.fetchedObjects ?? []),
-       (name: LikedMoment.entityName,      entities: likeMomentFRC.fetchedObjects ?? []),
-       (name: ListeningPodcast.entityName, entities: listeningFRC.fetchedObjects ?? [])]
-
-
-      func createSection(for section: (name: String, entities: [NSManagedObject])) -> Section {
-
-         let name = section.name
-
-         guard let listSections = listSectionFRC.fetchedObjects,
-               let listSection = listSections.filter({ $0.nameOfEntity == name }).first else { fatalError() }
-
-         return Section(entities: section.entities, listSection: listSection)
+   private func getRowsFor(entityName: String) -> [NSManagedObject] {
+      switch entityName {
+      case FavouritePodcast.entityName :
+         return favouriteFRC.fetchedObjects ?? []
+      case ListeningPodcast.entityName :
+         return listeningFRC.fetchedObjects ?? []
+      case LikedMoment.entityName :
+         return likeMomentFRC.fetchedObjects ?? []
+      default:
+         break
       }
-
-      self.sections = sections.map { createSection(for: $0) }
-      self.sections.sort { $0.sequenceNumber < $1.sequenceNumber }
+      fatalError()
    }
-
+   
+   private func configureSections() {
+      var sections = (listSectionFRC.fetchedObjects ?? []).map {
+         let entities = getRowsFor(entityName: $0.nameOfEntity)
+         return Section(entities: entities, listSection: $0)
+      }
+      
+      sections.sort { $0.sequenceNumber < $1.sequenceNumber }
+      self.sections = sections
+   }
+   
    var activeSections: [Section] {
-      return sections.filter { !sectionIsEmpty($0) }
+      return sections.filter { sectionIsActive($0) }
    }
-
-   func sectionIsEmpty(_ section: Section) -> Bool {
-      return section.rows.isEmpty
+   
+   var nameOfActiveSections: [String] {
+      return activeSections.map { $0.sectionName }
+   }
+   
+   var nameForScopeBar: [String] {
+      return nameOfActiveSections.map { $0.components(separatedBy: " ").first ?? "" }
+   }
+   
+   func sectionIsActive(_ section: Section) -> Bool {
+      return !section.rows.isEmpty && searchedSection == nil ? true : section.sectionName == searchedSection
    }
 }

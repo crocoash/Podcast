@@ -114,11 +114,11 @@ extension DataStoreManager: DataStoreManagerInput {
     }
     
     func conFigureFRC<T: CoreDataProtocol>(for entity: T.Type, with sortDescription: [NSSortDescriptor]) -> NSFetchedResultsController<T> {
-        return fetchResultController(sortDescription: sortDescription, predicates: nil, sectionNameKeyPath: nil, fetchLimit: nil)
+        return fetchResultController(sortDescription: sortDescription)
     }
     
     func conFigureFRC<T: CoreDataProtocol>(for entity: T.Type, with sortDescription: [NSSortDescriptor], predicates: [NSPredicate]) -> NSFetchedResultsController<T> {
-        fetchResultController(sortDescription: sortDescription, predicates: predicates, sectionNameKeyPath: nil, fetchLimit: nil)
+        fetchResultController(sortDescription: sortDescription, predicates: predicates)
     }
     
     func fetchResultController<T: CoreDataProtocol>(
@@ -140,7 +140,7 @@ extension DataStoreManager: DataStoreManagerInput {
             fetchRequest: fetchRequest,
             managedObjectContext: viewContext,
             sectionNameKeyPath: sectionNameKeyPath,
-            cacheName: nil
+            cacheName: T.entityName
         )
                 
         do {
