@@ -275,17 +275,19 @@ extension ListViewController {
 extension ListViewController: UISearchBarDelegate {
     
     func searchBar(_ searchBar: UISearchBar, selectedScopeButtonIndexDidChange selectedScope: Int) {
-        model.changeSearchedSection(searchedSection: selectedScope)
+        model.changeSearchedSection(searchedSection: selectedScope == 0 ? nil : selectedScope - 1)
         favouriteTableView.reloadTableViewData()
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         model.changeSearchedSection(searchedSection: .zero)
+        configureScopeBar()
         favouriteTableView.reloadTableViewData()
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         model.performSearch(text: searchText)
+        configureScopeBar()
         favouriteTableView.reloadTableViewData()
     }
 }

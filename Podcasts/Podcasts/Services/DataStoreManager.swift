@@ -140,7 +140,7 @@ extension DataStoreManager: DataStoreManagerInput {
             fetchRequest: fetchRequest,
             managedObjectContext: viewContext,
             sectionNameKeyPath: sectionNameKeyPath,
-            cacheName: T.entityName
+            cacheName: nil//T.entityName
         )
                 
         do {

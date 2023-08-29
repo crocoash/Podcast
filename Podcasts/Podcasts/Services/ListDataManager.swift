@@ -122,5 +122,7 @@ extension ListDataManager: FirebaseDatabaseDelegate {
       }
    }
    
-   func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didUpdate entity: (any FirebaseProtocol)) {}
+   func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didUpdate entity: (any FirebaseProtocol)) {
+      
+   }
 }

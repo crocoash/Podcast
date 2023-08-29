@@ -59,11 +59,17 @@ class ListViewModel: NSObject {
       configureSections()
    }
    
+   var nameForScopeBar: [String] {
+      return nameOfActiveSections.map { $0.components(separatedBy: " ").first ?? "" }
+   }
+   
    private var searchedSection: String? = nil
    
-   func changeSearchedSection(searchedSection index: Int) {
+   func changeSearchedSection(searchedSection index: Int?) {
       searchedSection = nil
-      searchedSection = index == 0 ? nil : activeSections[index - 1].sectionName
+      guard let index = index else { return }
+      let sections = sections.filter { !$0.rows.isEmpty }
+      searchedSection = sections[index].sectionName
    }
    
    func performSearch(text: String?) {
@@ -88,7 +94,6 @@ class ListViewModel: NSObject {
       }
       configureSections()
    }
-
    
    ///active
    var countOfActiveSections: Int {
@@ -254,19 +259,15 @@ extension ListViewModel {
       self.sections = sections
    }
    
-   var activeSections: [Section] {
+   private var activeSections: [Section] {
       return sections.filter { sectionIsActive($0) }
    }
    
-   var nameOfActiveSections: [String] {
+   private var nameOfActiveSections: [String] {
       return activeSections.map { $0.sectionName }
    }
    
-   var nameForScopeBar: [String] {
-      return nameOfActiveSections.map { $0.components(separatedBy: " ").first ?? "" }
-   }
-   
-   func sectionIsActive(_ section: Section) -> Bool {
+   private func sectionIsActive(_ section: Section) -> Bool {
       return !section.rows.isEmpty && searchedSection == nil ? true : section.sectionName == searchedSection
    }
 }
