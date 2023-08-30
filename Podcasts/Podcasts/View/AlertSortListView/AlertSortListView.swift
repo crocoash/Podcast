@@ -67,7 +67,7 @@ class AlertSortListView: UIView {
    }
    
    /// Positions
-   lazy private var hidePositionY = vc.view.frame.height
+   lazy private var hidePositionY = vc.view.frame.height * 2
    lazy private var showPositionY = vc.view.frame.height - height - margin
    lazy private var margin = (vc.view.frame.width - width) / 2
    lazy private var positionYForClosed = showPositionY + height * 0.3
@@ -89,7 +89,7 @@ class AlertSortListView: UIView {
       configureView()
       loadFromXib()
       
-      closeImageView.addMyGestureRecognizer(self, type: .panGestureRecognizer, #selector(panGesture(sender:)))
+      [closeImageView].forEach { $0.addMyGestureRecognizer(self, type: .panGestureRecognizer, #selector(panGesture(sender:))) }
       
       tableView.isEditing = true
       tableView.isScrollEnabled = false
@@ -161,6 +161,10 @@ extension AlertSortListView {
       frame.size.height = height
       frame.origin.y = vc.view.frame.height
       frame.origin.x = margin
+      layer.shadowRadius = 40
+      layer.shadowOpacity = 0.2
+//      layer.shadowOffset = CGSize(width: 100, height: 100)
+      layer.shadowColor = UIColor.white.cgColor
    }
    
    private func show() {
@@ -170,7 +174,7 @@ extension AlertSortListView {
          addGestureView()
       }
       
-      UIView.animate(withDuration: 0.4) { [weak self] in
+      UIView.animate(withDuration: 0.2) { [weak self] in
          guard let self = self else { return }
          frame.origin.y = showPositionY
       }
@@ -203,6 +207,8 @@ extension AlertSortListView: UITableViewDataSource {
    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
       let item = model.listSections[indexPath.row]
       let cell = UITableViewCell()
+      cell.accessoryType = .checkmark
+      cell.isSelected = true
       var content = cell.defaultContentConfiguration()
       content.text = item.nameOfEntity
       cell.contentConfiguration = content

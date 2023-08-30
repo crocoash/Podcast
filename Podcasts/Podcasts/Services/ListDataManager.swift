@@ -106,14 +106,14 @@ extension ListDataManager {
    
    private func updateListData(with listData: ListData) {
       let entities = dataStoreManager.viewContext.fetchObjects(ListData.self)
-
+      
       if let entity = entities.first(matching: listData) {
          entity.updateObject(by: listData)
       } else {
          entities.forEach {
             dataStoreManager.removeFromCoreData(entity: $0)
-            ListData(listData, viewContext: dataStoreManager.viewContext, dataStoreManagerInput: dataStoreManager)
          }
+         let _ = ListData(listData, viewContext: dataStoreManager.viewContext, dataStoreManagerInput: dataStoreManager)
       }
       dataStoreManager.save()
    }
