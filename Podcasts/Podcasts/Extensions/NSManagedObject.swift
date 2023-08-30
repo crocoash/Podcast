@@ -26,52 +26,97 @@ extension NSManagedObject {
 }
 
 extension NSManagedObject {
-  var convert: [String: Any]? {
-    if let self = self as? Encodable {
-        if let data = try? JSONEncoder().encode(self) {
-            if let result = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any] {
-                return result
-            } else {
-                fatalError("Cannot conver object")
+    var convert: [String: Any]? {
+        if let self = self as? Encodable {
+            if let data = try? JSONEncoder().encode(self) {
+                if let result = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any] {
+                    return result
+                } else {
+                    fatalError("Cannot conver object")
+                }
             }
         }
+        return nil
     }
-      return nil
-  }
 }
 
 extension NSManagedObject {
     
+    /// abstruct . init to nil
     convenience init(_ entity: NSManagedObject, withRelationShip: Bool = true) {
         
         self.init(entity: entity.entity, insertInto: nil)
         
         for initProp in self.entity.propertiesByName {
-            if let value = entity.value(forKey: initProp.key) {
-                if let object = value as? NSManagedObject {
-                    if withRelationShip {
-                        let abstructObject = NSManagedObject.init(object, withRelationShip: false)
-                        self.setValue(abstructObject, forKey: initProp.key)
-                    }
-                } else if let objects = value as? Set<NSManagedObject> {
-                    if withRelationShip, !objects.isEmpty {
-                        let abstructObjects = objects.map { NSManagedObject.init($0, withRelationShip: false)}
-                        self.setValue(Set(abstructObjects), forKey: initProp.key)
-                    }
-                } else {
-                    self.setValue(value, forKey: initProp.key)
-                }
+            let key = initProp.key
+            if let value = entity.value(forKey: key) {
+                set(value: value, for: key, withRelationShip: withRelationShip)
             }
         }
     }
     
-    
-    
     func updateObject(by entity: NSManagedObject) {
         for initProp in self.entity.propertiesByName {
-            let value = entity.value(forKey: initProp.key)
-            if let value = value, !(value is NSManagedObject) {
-                self.setValue(value, forKey: initProp.key)
+            let key = initProp.key
+            if let value = entity.value(forKey: key) {
+                set(value: value, for: key, withRelationShip: false)
+            }
+        }
+    }
+}
+
+//MARK: - Private Methods
+extension NSManagedObject {
+    private func set(value: Any, for key: String, withRelationShip: Bool) {
+        if let object = value as? NSManagedObject {
+            if withRelationShip {
+                setObject(by: object, for: key)
+            }
+        } else if let objects = value as? Set<NSManagedObject> {
+            if withRelationShip {
+                setObjects(by: objects, for: key)
+            }
+        } else {
+            setValue(value, forKey: key)
+        }
+    }
+    
+    private func setObject( by value: NSManagedObject, for key: String) {
+        
+        if let viewContext = self.managedObjectContext {
+            
+            if value.managedObjectContext != nil {
+                self.setValue(value, forKey: key)
+            } else {
+                let value = NSManagedObject.init(context: viewContext)
+                self.setValue(value, forKey: key)
+            }
+        } else {
+            if value.managedObjectContext == nil {
+                self.setValue(value, forKey: key)
+            } else {
+                let abstructValue = NSManagedObject.init(value, withRelationShip: false)
+                self.setValue(abstructValue, forKey: key)
+            }
+        }
+    }
+    
+    private func setObjects( by values: Set<NSManagedObject>, for key: String) {
+        guard !values.isEmpty else { return }
+        
+        if let viewContext = self.managedObjectContext {
+            if values.first?.managedObjectContext != nil {
+                self.setValue(values, forKey: key)
+            } else {
+                let values = values.map { NSManagedObject.init(entity: $0.entity, insertInto: viewContext) }
+                self.setValue(values, forKey: key)
+            }
+        } else {
+            if values.first?.managedObjectContext == nil  {
+                self.setValue(values, forKey: key)
+            } else {
+                let abstructValue = values.map { NSManagedObject.init(entity: $0.entity, insertInto: nil) }
+                self.setValue(abstructValue, forKey: key)
             }
         }
     }

@@ -22,15 +22,15 @@ class ListDataManager: ListDataManagerInput {
       self.dataStoreManager = dataStoreManager
       self.firebaseDatabase = firebaseDatabase
       
-      firebaseDatabase.delegate = self
-      
-      firebaseDatabase.update(viewContext: dataStoreManager.viewContext) { (result: Result<[ListData]>) in }
-      
       firebaseDatabase.observe(viewContext: dataStoreManager.viewContext,
                                add: { (result: Result<ListData>) in },
                                remove: { (result: Result<ListData>) in })
       
-      let _ = configureListData()
+      firebaseDatabase.delegate = self
+      
+      DispatchQueue.main.async {
+         firebaseDatabase.update(viewContext: dataStoreManager.viewContext) { (result: Result<[ListData]>) in }
+      }
    }
    
    func change(for entity: ListSection, sequenceNumber: Int) {
@@ -103,26 +103,48 @@ extension ListDataManager {
       
       return listData
    }
+   
+   private func updateListData(with listData: ListData) {
+      let entities = dataStoreManager.viewContext.fetchObjects(ListData.self)
+      
+      if let entity = entities.first(matching: listData) {
+         entity.updateObject(by: listData)
+         dataStoreManager.updateCoreData(entities: [entity])
+      } else {
+         dataStoreManager.updateCoreData(entities: [listData])
+      }
+      dataStoreManager.save()
+   }
 }
 
 //MARK: - FirebaseDatabaseDelegate
 extension ListDataManager: FirebaseDatabaseDelegate {
    
-   func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didGetEmptyData type: any FirebaseProtocol.Type) { }
+   func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didGetEmptyData type: any FirebaseProtocol.Type) {
+      let _ = configureListData()
+   }
    
    func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didAdd entity: (any FirebaseProtocol)) {}
    
    func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didRemove entity: (any FirebaseProtocol)) {}
    
    func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didAdd entities: [any FirebaseProtocol]) {
-      if entities.count > 1 {
-         entities.forEach {
-            firebaseDatabase.remove(entity: $0)
+      if let listsData = entities as? [ListData] {
+         if listsData.count > 1 {
+            listsData.forEach {
+               firebaseDatabase.remove(entity: $0)
+            }
+         } else {
+            guard let listData = listsData.first else { return }
+            updateListData(with: listData)
          }
       }
    }
    
    func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didUpdate entity: (any FirebaseProtocol)) {
-      
+
+      if let listData = entity as? ListData {
+         updateListData(with: listData)
+      }
    }
 }

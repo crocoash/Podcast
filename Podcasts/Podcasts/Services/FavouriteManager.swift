@@ -147,7 +147,7 @@ extension FavouriteManager: FirebaseDatabaseDelegate {
     
     func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didAdd entities: [any FirebaseProtocol]) {
         if entities is [FavouritePodcast] {
-            dataStoreManager.updateCoreData(set: entities)
+            dataStoreManager.updateCoreData(entities: entities)
         }
     }
     

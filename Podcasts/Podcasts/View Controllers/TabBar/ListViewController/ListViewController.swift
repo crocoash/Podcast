@@ -107,7 +107,7 @@ class ListViewController: UIViewController {
         player.delegate = self
         downloadService.delegate = self
         
-        configureNavigationItem()
+        updateUI()
         configureAlertSortListView()
     }
     
@@ -143,17 +143,29 @@ class ListViewController: UIViewController {
 extension ListViewController {
     
     private func configureNavigationItem() {
-        navigationItem.searchController = searchController
-        configureScopeBar()
-        navigationItem.rightBarButtonItem = removeAllButton
-        navigationItem.leftBarButtonItem = editButton
-        navigationItem.title = "Favourite List"
+        navigationItem.rightBarButtonItem =  model.activeSections.isEmpty ? nil : removeAllButton
+        navigationItem.leftBarButtonItem = model.activeSections.isEmpty ? nil : editButton
+        navigationItem.title = "List"
         navigationItem.hidesSearchBarWhenScrolling = false
     }
     
+    private func setSearchController() {
+        navigationItem.searchController = model.activeSections.isEmpty ? nil : searchController
+    }
+    
     private func configureScopeBar() {
-        searchController.searchBar.scopeButtonTitles = model.nameForScopeBar
-        searchController.searchBar.scopeButtonTitles?.insert("All", at: .zero)
+        if model.nameForScopeBar.count != 0 {
+            searchController.searchBar.scopeButtonTitles = model.nameForScopeBar
+            searchController.searchBar.scopeButtonTitles?.insert("All", at: .zero)
+        } else {
+            searchController.searchBar.scopeButtonTitles = nil
+        }
+    }
+    
+    private func updateUI() {
+        configureScopeBar()
+        setSearchController()
+        configureNavigationItem()
     }
     
     private func configureAlertSortListView() {
@@ -233,7 +245,7 @@ extension ListViewController {
         model.remove(object, removeSection: { [weak self] index in
             guard let self = self else { return }
             favouriteTableView.deleteSection(at: index)
-            configureScopeBar()
+            updateUI()
         }, removeItem: { [weak self] indexPath in
             guard let self = self else { return }
             favouriteTableView.deleteItem(at: indexPath)
@@ -245,7 +257,7 @@ extension ListViewController {
         
         model.append(object, at: newIndexPath, insertSection: { [weak self] section, index in
             guard let self = self else { return }
-            configureScopeBar()
+            updateUI()
             favouriteTableView.insertSection(at: index)
         }, insertItem: { [weak self] indexPath in
             guard let self = self else { return }
@@ -266,7 +278,7 @@ extension ListViewController {
         model.moveSection(anObject, from: index, to: newIndex) { [weak self] index, newIndex in
             guard let self = self else { return }
             favouriteTableView.moveSection(from: index, to: newIndex)
-            configureScopeBar()
+            updateUI()
         }
     }
 }
@@ -281,13 +293,13 @@ extension ListViewController: UISearchBarDelegate {
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         model.changeSearchedSection(searchedSection: .zero)
-        configureScopeBar()
+        updateUI()
         favouriteTableView.reloadTableViewData()
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         model.performSearch(text: searchText)
-        configureScopeBar()
+        updateUI()
         favouriteTableView.reloadTableViewData()
     }
 }

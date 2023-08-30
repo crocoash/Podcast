@@ -67,7 +67,7 @@ class ListViewModel: NSObject {
    
    func changeSearchedSection(searchedSection index: Int?) {
       searchedSection = nil
-      guard let index = index else { return }
+      guard let index = index, !activeSections.isEmpty else { return }
       let sections = sections.filter { !$0.rows.isEmpty }
       searchedSection = sections[index].sectionName
    }
@@ -201,11 +201,27 @@ class ListViewModel: NSObject {
       
       ///Section
       if let section = object as? ListSection {
+         let index = indexPath.row
          let rows = getRowsFor(entityName: section.nameOfEntity)
          let section = Section(entities: rows, listSection: section)
-         self.sections.insert(section, at: indexPath.row)
+         if sections.count - 1 < indexPath.row {
+            sections.append(section)
+         } else {
+            sections.insert(section, at: index)
+         }
+         
          guard let newIndex = activeSections.firstIndex(where: { $0 == section }) else { return }
          insertSection(section, newIndex)
+         
+         if sectionIsActive(section) {
+            for (indexRow, row) in rows.enumerated() {
+               let indexPath = IndexPath(row: index, section: indexRow)
+               append(row, at: indexPath) { section, index in } insertItem: { indexPath in
+                  insertItem(indexPath)
+               }
+            }
+         }
+         
          /// row
       } else  {
          guard let object = object as? NSManagedObject else { return }
@@ -259,7 +275,7 @@ extension ListViewModel {
       self.sections = sections
    }
    
-   private var activeSections: [Section] {
+   var activeSections: [Section] {
       return sections.filter { sectionIsActive($0) }
    }
    
