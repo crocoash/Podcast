@@ -195,17 +195,17 @@ extension ListViewModel {
        (name: ListeningPodcast.entityName, entities: listeningFRC.fetchedObjects ?? [])]
       
       
-      func createSection(for section: (name: String, entities: [NSManagedObject])) -> Section {
+      func createSection(for section: (name: String, entities: [NSManagedObject])) -> Section? {
          
          let name = section.name
          
          guard let listSections = listSectionFRC.fetchedObjects,
-               let listSection = listSections.filter({ $0.nameOfEntity == name }).first else { fatalError() }
+               let listSection = listSections.filter({ $0.nameOfEntity == name }).first else { return nil }
          
          return Section(entities: section.entities, listSection: listSection)
       }
       
-      self.sections = sections.map { createSection(for: $0) }
+      self.sections = sections.compactMap { createSection(for: $0) }
       self.sections.sort { $0.sequenceNumber < $1.sequenceNumber }
    }
    
