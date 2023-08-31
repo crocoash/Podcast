@@ -40,7 +40,8 @@ class ListViewModel: NSObject {
    lazy private var listeningFRC = dataStoreManager.conFigureFRC(for: ListeningPodcast.self)
    
    lazy private(set) var listSectionFRC = dataStoreManager.conFigureFRC(for: ListSection.self,
-                                                                        with: [NSSortDescriptor(key: #keyPath(ListSection.sequenceNumber), ascending: true)])
+                                                                        with: [NSSortDescriptor(key: #keyPath(ListSection.sequenceNumber), ascending: true)],
+                                                                        predicates: [NSPredicate(format: "isActive = %d", true)])
    
    private(set) var sections: [Section] = []
    
@@ -213,15 +214,11 @@ class ListViewModel: NSObject {
                removeSection: ((_ index: Int) -> ()),
                removeItem: ((_ indexPath: IndexPath) -> () )) {
       
-      guard let indexPath = getIndexPath(forAny: object, in: sections) else { return }
-      
-      if object is ListSection {
+      if let listSection = object as? ListSection {
          ///Section
-         let index = indexPath.row
-         let section = sections[index]
+         guard let index = activeSections.firstIndex(where: { $0.sectionName == listSection.nameOfSection }) else { return }
+         let section = activeSections[index]
          if sectionIsActive(section) {
-            let index = activeSections.firstIndex { $0.sectionName == section.sectionName }
-            guard let index = index else { return }
             removeSection(index)
          }
          sections.remove(at: index)

@@ -9,6 +9,7 @@ import Foundation
 
 protocol ListDataManagerInput {
    func change(for entity: ListSection, sequenceNumber: Int)
+   func changeActiveState(for listSection: ListSection)
 }
 
 class ListDataManager: ListDataManagerInput {
@@ -39,11 +40,16 @@ class ListDataManager: ListDataManagerInput {
       listSections.remove(at: Int(truncating: entity.sequenceNumber))
       listSections.insert(entity, at: sequenceNumber)
       
-      
       for (index, value) in listSections.enumerated() {
          value.sequenceNumber = index as NSNumber
       }
       
+      dataStoreManager.save()
+      saveListData()
+   }
+   
+   func changeActiveState(for listSection: ListSection) {
+      listSection.isActive.toggle()
       dataStoreManager.save()
       saveListData()
    }

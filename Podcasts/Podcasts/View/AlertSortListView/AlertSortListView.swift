@@ -39,6 +39,15 @@ class AlertSortListViewModel {
       let object = listSections[oldIndex]
       listDataManager.change(for: object, sequenceNumber: newIndex)
    }
+   
+   func getItem(for indexPath: IndexPath) -> ListSection {
+      return listSections[indexPath.row]
+   }
+   
+   func changeActiveState(for indexPath: IndexPath) {
+      let listSection = getItem(for: indexPath)
+      listDataManager.changeActiveState(for: listSection)
+   }
 }
 
 class AlertSortListView: UIView {
@@ -195,7 +204,33 @@ extension AlertSortListView {
 }
 
 //MARK: - UITableViewDelegate
-extension AlertSortListView: UITableViewDelegate {}
+extension AlertSortListView: UITableViewDelegate {
+   
+//   func tableView(_ tableView: UITableView, shouldIndentWhileEditingRowAt indexPath: IndexPath) -> Bool {
+//      return true
+//   }
+   
+   func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+      let item = model.listSections[indexPath.row]
+      return item.isActive ? .delete : .insert
+   }
+   
+   func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+      guard sourceIndexPath != destinationIndexPath else { return }
+      model.moveItem(from: sourceIndexPath.row, to: destinationIndexPath.row)
+   }
+   
+   func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+      model.changeActiveState(for: indexPath)
+      tableView.reloadRows(at: [indexPath], with: .automatic)
+   }
+
+   func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+      model.changeActiveState(for: indexPath)
+      tableView.reloadRows(at: [indexPath], with: .automatic)
+      return []
+   }
+}
 
 //MARK: - UITableViewDataSource
 extension AlertSortListView: UITableViewDataSource {
@@ -213,18 +248,5 @@ extension AlertSortListView: UITableViewDataSource {
       content.text = item.nameOfEntity
       cell.contentConfiguration = content
       return cell
-   }
-   
-   func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
-      return .none
-   }
-   
-   func tableView(_ tableView: UITableView, shouldIndentWhileEditingRowAt indexPath: IndexPath) -> Bool {
-      return false
-   }
-   
-   func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-      guard sourceIndexPath != destinationIndexPath else { return }
-      model.moveItem(from: sourceIndexPath.row, to: destinationIndexPath.row)
    }
 }
