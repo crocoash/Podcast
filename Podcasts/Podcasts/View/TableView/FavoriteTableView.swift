@@ -50,6 +50,8 @@ class FavouriteTableView: UITableView {
     
     override func reloadData() {
         super.reloadData()
+        diffableDataSource.updateTittles(titles: configureTitles())
+        diffableDataSource.apply(mySnapShot)
         showEmptyImage()
         setScrollEnabled()
     }
@@ -93,7 +95,7 @@ class FavouriteTableView: UITableView {
     func deleteSection(at index: Int) {
         let section = mySnapShot.sectionIdentifiers[index]
         mySnapShot.deleteSections([section])
-        diffableDataSource.apply(mySnapShot)
+        reloadData()
     }
     
     func moveSection(from oldIndex: Int, to newIndex: Int) {
@@ -113,14 +115,13 @@ class FavouriteTableView: UITableView {
             let beforeSection = mySnapShot.sectionIdentifiers[newIndex]
             mySnapShot.moveSection(section, beforeSection: beforeSection)
         }
-        diffableDataSource.updateTittles(titles: configureTitles())
-        diffableDataSource.apply(mySnapShot)
+        reloadData()
     }
     
     func deleteItem(at indexPath: IndexPath) {
         guard let item = diffableDataSource.itemIdentifier(for: indexPath) else { return }
         mySnapShot.deleteItems([item])
-        diffableDataSource.apply(mySnapShot)
+        reloadData()
     }
 
     func insertCell(at indexPath: IndexPath) {
@@ -136,7 +137,7 @@ class FavouriteTableView: UITableView {
             mySnapShot.insertItems([cell], beforeItem: beforeItem)
         }
         
-        diffableDataSource.apply(mySnapShot)
+        reloadData()
     }
     
     func insertSection(at index: Int) {
@@ -150,8 +151,7 @@ class FavouriteTableView: UITableView {
             let beforeSection = mySnapShot.sectionIdentifiers[index]
             mySnapShot.insertSections([section], beforeSection: beforeSection)
         }
-        configureDataSource()
-        diffableDataSource.apply(mySnapShot)
+        reloadData()
     }
 }
 
@@ -174,8 +174,9 @@ extension FavouriteTableView {
         guard let myDataSource = myDataSource else { return }
         
         let countOfSections = myDataSource.favouriteTableViewCountOfSections(self)
-        
         self.mySnapShot = SnapShot()
+        
+        guard countOfSections != 0 else { return }
         
         for indexSection in 0..<countOfSections {
             
@@ -195,8 +196,6 @@ extension FavouriteTableView {
         }
         
         diffableDataSource.apply(mySnapShot)
-        showEmptyImage()
-        setScrollEnabled()
     }
     
     private func showEmptyImage() {

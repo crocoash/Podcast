@@ -258,9 +258,8 @@ extension PodcastCell {
     func updatePlayerUI() {
         playStopButton.image = model.isPlaying ? pauseImage : playImage
         playStopButton.isHidden = model.isGoingPlaying
-        
         listeningProgressView.progress = Float(model.listeningProgress ?? 0)
-        listeningProgressView.isHidden = model.listeningProgress == 0
+        listeningProgressView.isHidden = model.listeningProgress == nil
         
         if model.isGoingPlaying {
             playerActivityIndicator.startAnimating()

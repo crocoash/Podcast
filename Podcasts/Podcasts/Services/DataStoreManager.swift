@@ -19,8 +19,9 @@ protocol DataStoreManagerInput {
     func allObjectsFromCoreData<T: NSManagedObject>(type: T.Type) -> Set<T>
     func fetchObject<T: CoreDataProtocol>(entity: T, predicates: [NSPredicate]?) -> T?
     func fetchObject<T: CoreDataProtocol>(entity: T.Type, predicates: [NSPredicate]?) -> T?
-
-    func updateCoreData(set: [(any CoreDataProtocol)])
+    
+    func updateCoreData<T: CoreDataProtocol>(entity: T)
+    func updateCoreData(entities: [(any CoreDataProtocol)])
     func save()
     
     /// inits
@@ -63,9 +64,21 @@ extension CoreDataProtocol {
             if let value = value {
                 if let object = value as? (any CoreDataProtocol) {
                     let object = dataStoreManagerInput.getFromCoreDataIfNoSavedNew(entity: object)
-                    self.setValue(object, forKey: initProp.key)
+                    setValue(object, for: initProp.key)
+                } else if let objects = value as? Set<NSManagedObject> {
+                    let entities: [NSManagedObject] = objects.compactMap {
+                        if let object = $0 as? (any CoreDataProtocol) {
+                            return dataStoreManagerInput.getFromCoreDataIfNoSavedNew(entity: object)
+                        }
+                        return nil
+                    }
+                    setValue(Set(entities) as NSSet, for: initProp.key)
                 } else {
                     self.setValue(value, forKey: initProp.key)
+                }
+                
+                func setValue(_ value: Any, for key: String) {
+                    self.setValue(value, forKey: key)
                 }
             }
         }
@@ -87,7 +100,7 @@ final class DataStoreManager {
         })
         return container
     }()
- 
+    
     lazy var backgroundViewContext = persistentContainer.newBackgroundContext()
     
     func test() {
@@ -96,7 +109,7 @@ final class DataStoreManager {
 }
 
 extension DataStoreManager: DataStoreManagerInput {
-    
+ 
     func save() {
         viewContext.performAndWait {
             if viewContext.hasChanges {
@@ -129,7 +142,7 @@ extension DataStoreManager: DataStoreManagerInput {
     ) -> NSFetchedResultsController<T> {
         
         let fetchRequest: NSFetchRequest<T> = T.fetchRequest() as! NSFetchRequest<T>
-                
+        
         if let predicates = predicates {
             fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
         }
@@ -140,9 +153,9 @@ extension DataStoreManager: DataStoreManagerInput {
             fetchRequest: fetchRequest,
             managedObjectContext: viewContext,
             sectionNameKeyPath: sectionNameKeyPath,
-            cacheName: T.entityName
+            cacheName: nil//T.entityName
         )
-                
+        
         do {
             try fetchResultController.performFetch()
         } catch {
@@ -159,7 +172,7 @@ extension DataStoreManager: DataStoreManagerInput {
     func fetchObject<T: CoreDataProtocol>(entity: T.Type, predicates: [NSPredicate]? = nil) -> T? {
         
         let fetchRequest: NSFetchRequest<T> = T.fetchRequest() as! NSFetchRequest<T>
-       
+        
         fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: predicates ?? [] )
         
         fetchRequest.fetchLimit = 1
@@ -170,7 +183,7 @@ extension DataStoreManager: DataStoreManagerInput {
     func fetchObject<T: CoreDataProtocol>(entity: T, predicates: [NSPredicate]? = nil) -> T? {
         
         let fetchRequest: NSFetchRequest<T> = T.fetchRequest() as! NSFetchRequest<T>
-       
+        
         fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: predicates ?? [entity.defaultPredicate])
         
         fetchRequest.fetchLimit = 1
@@ -191,7 +204,7 @@ extension DataStoreManager: DataStoreManagerInput {
     func fetchObjects<T: CoreDataProtocol>(predicates: [NSPredicate]) -> [T]? {
         
         let fetchRequest: NSFetchRequest<T> = T.fetchRequest() as! NSFetchRequest<T>
-       
+        
         fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
         
         return try? viewContext.fetch(fetchRequest)
@@ -202,12 +215,12 @@ extension DataStoreManager: DataStoreManagerInput {
         return getFromCoreData(entity: entity) ?? T.init(entity, viewContext: viewContext, dataStoreManagerInput: self)
     }
     
-    func updateCoreData(set: [(any CoreDataProtocol)]) {
+    func updateCoreData(entities: [(any CoreDataProtocol)]) {
         
-        guard let allObjectsFromCoreData = self.viewContext.fetchObjects(set.first!.entityName) as? [(any CoreDataProtocol)] else { return
+        guard let allObjectsFromCoreData = self.viewContext.fetchObjects(entities.first!.entityName) as? [(any CoreDataProtocol)] else { return
         }
         
-        let newObjects = set.filter { fetchObject(entity: $0) == nil }
+        let newObjects = entities.filter { fetchObject(entity: $0) == nil }
         
         ///create new
         newObjects.forEach {
@@ -215,7 +228,7 @@ extension DataStoreManager: DataStoreManagerInput {
         }
         
         let removedObjects = allObjectsFromCoreData.filter { object in
-            set.filter { $0.id == object.id }.first == nil
+            entities.filter { $0.id == object.id }.first == nil
         }
         
         /// remove
@@ -230,7 +243,7 @@ extension DataStoreManager: DataStoreManagerInput {
     }
     
     func removeFromCoreData<T: CoreDataProtocol>(entity: T) {
-
+        
         guard let object = getFromCoreData(entity: entity) else { return  }
         
         for key in object.entity.relationshipsByName.keys {
@@ -259,25 +272,25 @@ extension DataStoreManager {
     
     func initAbstractObject<T: NSManagedObject>(for object: T) -> T {
         if let object = NSManagedObject.init(object) as? T {
-           return object
+            return object
         }
         fatalError()
     }
     
     private func checkSubItem<T: NSManagedObject>(item: NSManagedObject, with checkItem: T) {
-
+        
         let keys = item.entity.relationshipsByName.keys
         
         var isEmptyLink = true
         
         for key in keys {
-                        
+            
             guard let relationship = item.entity.relationshipsByName[key],
                   let destinationEntity = relationship.destinationEntity,
                   let destinationEntityName = destinationEntity.name else { fatalError() }
             
             let deleteRule = relationship.deleteRule
-                  
+            
             if destinationEntityName == checkItem.entityName {
                 
                 if item.value(forKey: key) is T {
@@ -301,7 +314,7 @@ extension DataStoreManager {
                 }
             }
         }
-
+        
         if isEmptyLink {
             for key in keys {
                 
