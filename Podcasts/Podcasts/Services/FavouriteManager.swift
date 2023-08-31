@@ -107,12 +107,12 @@ extension FavouriteManager {
     private func removeFavouritePodcast(_ favouritePodcast: FavouritePodcast) {
         if let favouritePodcast = getFavourite(for: favouritePodcast.podcast) {
             
-            let abstructFavourite = dataStoreManager.initAbstractObject(for: favouritePodcast)
+            let abstractFavourite = dataStoreManager.initAbstractObject(for: favouritePodcast)
             dataStoreManager.removeFromCoreData(entity: favouritePodcast)
-            firebaseDatabase.remove(entity: abstructFavourite)
+            firebaseDatabase.remove(entity: abstractFavourite)
             
             delegates {
-                $0.favouriteManager(self, didRemove: abstructFavourite)
+                $0.favouriteManager(self, didRemove: abstractFavourite)
             }
             feedbackGenerator()
         }

@@ -371,7 +371,7 @@ extension ListViewController: DownloadServiceDelegate {
 extension ListViewController: NSFetchedResultsControllerDelegate {
     
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        favouriteTableView.beginUpdates()
+//        favo/uriteTableView.beginUpdates()
     }
     
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
@@ -390,7 +390,7 @@ extension ListViewController: NSFetchedResultsControllerDelegate {
     }
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        favouriteTableView.endUpdates()
+//        favouriteTableView.endUpdates()
     }
 }
 

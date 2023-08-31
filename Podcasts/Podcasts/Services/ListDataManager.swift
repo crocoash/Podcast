@@ -6,13 +6,20 @@
 //
 
 import Foundation
+import CoreData
 
-protocol ListDataManagerInput {
+//MARK: - Delegate
+protocol ListDataManagerDelegate: AnyObject {
+   func listDataManagerDidUpdate(_ ListDataManager: ListDataManager)
+}
+
+//MARK: - Input
+protocol ListDataManagerInput: MultyDelegateServiceInput {
    func change(for entity: ListSection, sequenceNumber: Int)
    func changeActiveState(for listSection: ListSection)
 }
 
-class ListDataManager: ListDataManagerInput {
+class ListDataManager: MultyDelegateService<ListDataManagerDelegate>, ListDataManagerInput {
    
    private let dataStoreManager: DataStoreManagerInput
    private let firebaseDatabase: FirebaseDatabaseInput
@@ -23,9 +30,12 @@ class ListDataManager: ListDataManagerInput {
       self.dataStoreManager = dataStoreManager
       self.firebaseDatabase = firebaseDatabase
       
+      super.init()
+      
       firebaseDatabase.observe(viewContext: dataStoreManager.viewContext,
                                add: { (result: Result<ListData>) in },
                                remove: { (result: Result<ListData>) in })
+      
       
       firebaseDatabase.delegate = self
       
@@ -69,9 +79,9 @@ extension ListDataManager {
       
       if entities.count > 1 {
          entities.forEach {
-            let abstructEntity = dataStoreManager.initAbstractObject(for: $0)
+            let abstractEntity = dataStoreManager.initAbstractObject(for: $0)
             dataStoreManager.removeFromCoreData(entity: $0)
-            firebaseDatabase.remove(entity: abstructEntity)
+            firebaseDatabase.remove(entity: abstractEntity)
          }
          return initListData()
       } else if entities.isEmpty {
@@ -113,9 +123,8 @@ extension ListDataManager {
    private func updateListData(with listData: ListData) {
       let entities = dataStoreManager.viewContext.fetchObjects(ListData.self)
       
-      if let entity = entities.first(matching: listData) {
-         entity.updateObject(by: listData)
-         dataStoreManager.updateCoreData(entities: [entity])
+      if let savedListData = entities.first(matching: listData) {
+         savedListData.updateObject(by: listData)
       } else {
          dataStoreManager.updateCoreData(entities: [listData])
       }
@@ -127,12 +136,18 @@ extension ListDataManager {
 extension ListDataManager: FirebaseDatabaseDelegate {
    
    func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didGetEmptyData type: any FirebaseProtocol.Type) {
-      let _ = configureListData()
+      if type is ListData.Type {
+         let _ = configureListData()
+      }
    }
    
-   func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didAdd entity: (any FirebaseProtocol)) {}
+   func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didAdd entity: (any FirebaseProtocol)) {
+      
+   }
    
-   func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didRemove entity: (any FirebaseProtocol)) {}
+   func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didRemove entity: (any FirebaseProtocol)) {
+      
+   }
    
    func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didAdd entities: [any FirebaseProtocol]) {
       if let listsData = entities as? [ListData] {
@@ -151,6 +166,9 @@ extension ListDataManager: FirebaseDatabaseDelegate {
 
       if let listData = entity as? ListData {
          updateListData(with: listData)
+      }
+      delegates {
+         $0.listDataManagerDidUpdate(self)
       }
    }
 }

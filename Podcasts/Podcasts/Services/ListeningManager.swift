@@ -95,13 +95,13 @@ class ListeningManager: MultyDelegateService<ListeningManagerDelegate>, Listenin
     }
     
     func removeListeningPodcast(_ entity: ListeningPodcast) {
-        let abstructListeningPodcast = dataStoreManager.initAbstractObject(for: entity)
+        let abstractListeningPodcast = dataStoreManager.initAbstractObject(for: entity)
         dataStoreManager.removeFromCoreData(entity: entity)
         
-        firebaseDatabase.remove(entity: abstructListeningPodcast)
+        firebaseDatabase.remove(entity: abstractListeningPodcast)
         
         delegates {
-            $0.listeningManager(self, didRemove: abstructListeningPodcast)
+            $0.listeningManager(self, didRemove: abstractListeningPodcast)
         }
     }
     
