@@ -143,14 +143,16 @@ class ListViewController: UIViewController {
 extension ListViewController {
     
     private func configureNavigationItem() {
-        navigationItem.rightBarButtonItem =  model.activeSections.isEmpty ? nil : removeAllButton
-        navigationItem.leftBarButtonItem = model.activeSections.isEmpty ? nil : editButton
+        let value = model.activeSections.isEmpty && model.isSearchedText
+        
+        navigationItem.rightBarButtonItem = value ? nil : removeAllButton
+        navigationItem.leftBarButtonItem = value ? nil : editButton
         navigationItem.title = "List"
         navigationItem.hidesSearchBarWhenScrolling = false
     }
     
     private func setSearchController() {
-        navigationItem.searchController = model.activeSections.isEmpty ? nil : searchController
+        navigationItem.searchController = (model.activeSections.isEmpty && !model.isSearchedText) ? nil : searchController
     }
     
     private func configureScopeBar() {
@@ -288,19 +290,28 @@ extension ListViewController: UISearchBarDelegate {
     
     func searchBar(_ searchBar: UISearchBar, selectedScopeButtonIndexDidChange selectedScope: Int) {
         model.changeSearchedSection(searchedSection: selectedScope == 0 ? nil : selectedScope - 1)
-        favouriteTableView.reloadTableViewData()
+        favouriteTableView.reloadData()
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        model.changeSearchedSection(searchedSection: .zero)
-        updateUI()
-        favouriteTableView.reloadTableViewData()
+        self.searchBar(searchBar, textDidChange: "")
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        model.performSearch(text: searchText)
+        model.performSearch (text: searchText,
+                             removeSection: { index in
+            favouriteTableView.deleteSection(at: index)
+            
+        }, removeItem: { indexPath in
+            favouriteTableView.deleteItem(at: indexPath)
+        }, insertSection: { section, index in
+            favouriteTableView.insertSection(at: index)
+        }, insertItem: { indexPath in
+            favouriteTableView.insertCell(at: indexPath)
+        })
+        
         updateUI()
-        favouriteTableView.reloadTableViewData()
+        favouriteTableView.reloadData()
     }
 }
 

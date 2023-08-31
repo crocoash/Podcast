@@ -33,6 +33,7 @@ class ListViewModel: NSObject {
    
    private let dataStoreManager: DataStoreManagerInput
    private let listDataManager: ListDataManagerInput
+   private var searchedText = ""
    
    lazy private var favouriteFRC = dataStoreManager.conFigureFRC(for: FavouritePodcast.self)
    lazy private var likeMomentFRC = dataStoreManager.conFigureFRC(for: LikedMoment.self)
@@ -56,7 +57,7 @@ class ListViewModel: NSObject {
       self.listeningFRC.delegate = vc
       self.listSectionFRC.delegate = vc
       
-      configureSections()
+      self.sections = configureSections()
    }
    
    var nameForScopeBar: [String] {
@@ -72,10 +73,16 @@ class ListViewModel: NSObject {
       searchedSection = sections[index].sectionName
    }
    
-   func performSearch(text: String?) {
-      
+   func performSearch(text: String?,
+                      removeSection: ((_ index: Int) -> ()),
+                      removeItem: ((_ indexPath: IndexPath) -> ()),
+                      insertSection: ((_ section: Section,_ index: Int) -> ()),
+                      insertItem: ((_ indexPath: IndexPath) -> ())) {
+
+      self.searchedText = text ?? ""
+
       if let searchText = text, searchText != "" {
-         let predicate = NSPredicate(format: "podcast.trackName CONTAINS [c] %@", "\(searchText)")
+                  let predicate = NSPredicate(format: "podcast.trackName CONTAINS [c] %@", "\(searchText)")
          favouriteFRC.fetchRequest.predicate = predicate
          likeMomentFRC.fetchRequest.predicate = predicate
          listeningFRC.fetchRequest.predicate = predicate
@@ -92,7 +99,49 @@ class ListViewModel: NSObject {
       } catch {
          print(error)
       }
-      configureSections()
+      
+      let newSections = configureSections().filter { sectionIsActive($0) }
+      
+      /// remove
+      for section in activeSections {
+         let rows = section.rows
+         for row in rows {
+            
+            if newSections.isEmpty || !newSections.contains(section) {
+               remove(row, removeSection: removeSection, removeItem: removeItem)
+            } else {
+               for newSection in newSections {
+                  if newSection == section  {
+                     let newRows = newSection.rows
+                     
+                     if !newRows.contains(row) {
+                        remove(row, removeSection: removeSection, removeItem: removeItem)
+                     }
+                  }
+               }
+            }
+         }
+      }
+         
+      /// append
+      for (indexNewSection, newSection) in newSections.enumerated() {
+         let newRows = newSection.rows
+         for (indexNewRow,newRow) in newRows.enumerated() {
+
+            if activeSections.isEmpty || !activeSections.contains(newSection) {
+               append(newRow, at: IndexPath(row: indexNewRow, section: indexNewSection), insertSection: insertSection, insertItem: insertItem)
+            } else {
+               for section in activeSections {
+                  if newSection == section {
+                     let rows = section.rows
+                     if !rows.contains(newRow) {
+                        append(newRow, at: IndexPath(row: indexNewRow, section: indexNewSection), insertSection: insertSection, insertItem: insertItem)
+                     }
+                  }
+               }
+            }
+         }
+      }
    }
    
    ///active
@@ -265,14 +314,18 @@ extension ListViewModel {
       fatalError()
    }
    
-   private func configureSections() {
+   private func configureSections() -> [Section] {
       var sections = (listSectionFRC.fetchedObjects ?? []).map {
          let entities = getRowsFor(entityName: $0.nameOfEntity)
          return Section(entities: entities, listSection: $0)
       }
       
       sections.sort { $0.sequenceNumber < $1.sequenceNumber }
-      self.sections = sections
+      return sections
+   }
+   
+   var isSearchedText: Bool {
+      return searchedText != ""
    }
    
    var activeSections: [Section] {
