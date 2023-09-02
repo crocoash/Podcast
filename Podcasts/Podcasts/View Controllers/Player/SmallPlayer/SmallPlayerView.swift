@@ -157,11 +157,11 @@ extension SmallPlayerView {
 //MARK: - PlayerEventNotification
 extension SmallPlayerView: PlayerDelegate {
    
-    func playerDidEndPlay(with track: OutputPlayerProtocol) {
+    func playerDidEndPlay(_ player: Player, with track: OutputPlayerProtocol) {
         model.updatePlayableInformation(track)
     }
     
-    func playerStartLoading(with track: OutputPlayerProtocol) {
+    func playerStartLoading(_ player: Player, with track: OutputPlayerProtocol) {
         if model == nil {
             let model = SmallPlayerViewModel(track)
             self.model = model
@@ -170,15 +170,15 @@ extension SmallPlayerView: PlayerDelegate {
         }
     }
     
-    func playerDidEndLoading(with track: OutputPlayerProtocol) {
+    func playerDidEndLoading(_ player: Player, with track: OutputPlayerProtocol) {
         model.updatePlayableInformation(track)
     }
     
-    func playerUpdatePlayingInformation(with track: OutputPlayerProtocol) {
+    func playerUpdatePlayingInformation(_ player: Player, with track: OutputPlayerProtocol) {
         model.updatePlayableInformation(track)
     }
     
-    func playerStateDidChanged(with track: OutputPlayerProtocol) {
+    func playerStateDidChanged(_ player: Player, with track: OutputPlayerProtocol) {
         model.updatePlayableInformation(track)
     }
 }

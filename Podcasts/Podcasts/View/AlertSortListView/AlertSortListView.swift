@@ -54,6 +54,8 @@ class AlertSortListView: UIView {
    
    //MARK: Services
    private let dataStoreManager: DataStoreManagerInput
+   private let listDataManager: ListDataManagerInput
+   
    
    @IBOutlet private weak var closeImageView: UIImageView!
    @IBOutlet private weak var tableView: UITableView!
@@ -88,12 +90,14 @@ class AlertSortListView: UIView {
       
       self.dataStoreManager = dataStoreManager
       self.model = AlertSortListViewModel(dataStoreManager: dataStoreManager, listDataManager: listDataManager)
+      self.listDataManager = listDataManager
       
       super.init(frame: .zero)
       
       self.vc = vc
       self.delegate = vc
       self.dataSource = vc
+      self.listDataManager.delegate = self
       
       configureView()
       loadFromXib()
@@ -248,5 +252,13 @@ extension AlertSortListView: UITableViewDataSource {
       content.text = item.nameOfEntity
       cell.contentConfiguration = content
       return cell
+   }
+}
+
+//MARK: - ListDataManagerDelegate
+extension AlertSortListView: ListDataManagerDelegate {
+   
+   func listDataManagerDidUpdate(_ ListDataManager: ListDataManager) {
+      tableView.reloadData()
    }
 }

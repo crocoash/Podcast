@@ -42,10 +42,10 @@ extension NSManagedObject {
 
 extension NSManagedObject {
     
-    /// abstruct . init to nil
-    convenience init(_ entity: NSManagedObject, withRelationShip: Bool = true) {
+    /// abstract . init to nil
+    convenience init(_ entity: NSManagedObject, viewContext: NSManagedObjectContext? = nil, withRelationShip: Bool = true) {
         
-        self.init(entity: entity.entity, insertInto: nil)
+        self.init(entity: entity.entity, insertInto: viewContext)
         
         for initProp in self.entity.propertiesByName {
             let key = initProp.key
@@ -55,18 +55,21 @@ extension NSManagedObject {
         }
     }
     
-    func updateObject(by entity: NSManagedObject) {
+    @discardableResult
+    func updateObject(by entity: NSManagedObject, withRelationShip: Bool = false) -> NSManagedObject {
         for initProp in self.entity.propertiesByName {
             let key = initProp.key
             if let value = entity.value(forKey: key) {
-                set(value: value, for: key, withRelationShip: false)
+                set(value: value, for: key, withRelationShip: withRelationShip)
             }
         }
+        return self
     }
 }
 
 //MARK: - Private Methods
 extension NSManagedObject {
+    
     private func set(value: Any, for key: String, withRelationShip: Bool) {
         if let object = value as? NSManagedObject {
             if withRelationShip {
@@ -81,42 +84,64 @@ extension NSManagedObject {
         }
     }
     
-    private func setObject( by value: NSManagedObject, for key: String) {
+    
+    private func setObject( by object: NSManagedObject, for key: String) {
         
         if let viewContext = self.managedObjectContext {
             
-            if value.managedObjectContext != nil {
-                self.setValue(value, forKey: key)
+            if object.managedObjectContext != nil {
+                self.setValue(object, forKey: key)
             } else {
-                let value = NSManagedObject.init(context: viewContext)
-                self.setValue(value, forKey: key)
+                let value = self.updateObject(by: object, withRelationShip: false)
+                self.setValue(object, forKey: key)
             }
         } else {
-            if value.managedObjectContext == nil {
-                self.setValue(value, forKey: key)
+            if object.managedObjectContext == nil {
+                self.setValue(object, forKey: key)
             } else {
-                let abstructValue = NSManagedObject.init(value, withRelationShip: false)
-                self.setValue(abstructValue, forKey: key)
+                let abstractValue = NSManagedObject.init(object, withRelationShip: false)
+                self.setValue(abstractValue, forKey: key)
             }
         }
     }
     
-    private func setObjects( by values: Set<NSManagedObject>, for key: String) {
+    private func setObjects(by values: Set<NSManagedObject>, for key: String) {
         guard !values.isEmpty else { return }
         
+        /// not abstract
         if let viewContext = self.managedObjectContext {
-            if values.first?.managedObjectContext != nil {
+            
+            ///  view context matched
+            if values.first?.managedObjectContext == viewContext {
                 self.setValue(values, forKey: key)
+            ///  by abstract entity
             } else {
-                let values = values.map { NSManagedObject.init(entity: $0.entity, insertInto: viewContext) }
-                self.setValue(values, forKey: key)
+                if let oldValues = (value(forKey: key) as? Set<NSManagedObject>).map({$0}) {
+                    let updatedValues = oldValues.compactMap { oldValue in
+                        
+                        if let value: NSManagedObject = values.first(where: {
+                            
+                            if let oldId = oldValue.value(forKey: "id") as? String, let id = $0.value(forKey: "id") as? String {
+                                return oldId == id
+                            }
+                            return false
+                        }) {
+                            return oldValue.updateObject(by: value, withRelationShip: false)
+                        }
+                        return nil
+                    }
+                    self.setValue(Set(updatedValues) as NSSet, forKey: key)
+                }
             }
+          /// abstract
         } else {
+            ///  view context matched
             if values.first?.managedObjectContext == nil  {
                 self.setValue(values, forKey: key)
             } else {
-                let abstructValue = values.map { NSManagedObject.init(entity: $0.entity, insertInto: nil) }
-                self.setValue(abstructValue, forKey: key)
+                /// by not abstract 
+                let abstractValue = values.map { NSManagedObject($0, withRelationShip: false) }
+                self.setValue(Set(abstractValue) as NSSet, forKey: key)
             }
         }
     }

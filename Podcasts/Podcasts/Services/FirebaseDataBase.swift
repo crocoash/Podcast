@@ -27,12 +27,12 @@ extension FirebaseProtocol {
 }
 
 //MARK: - Input
-protocol FirebaseDatabaseInput: MultyDelegateServiceInput {
+protocol FirebaseDatabaseInput {
    func update(entity: any FirebaseProtocol)
-   func update<T: FirebaseProtocol>(viewContext: NSManagedObjectContext, completion: @escaping (Result<[T]>) -> Void) 
+   func update<T: FirebaseProtocol>(vc: (any FirebaseDatabaseDelegate), viewContext: NSManagedObjectContext, type: T.Type) 
    func add(entity: any FirebaseProtocol)
    func remove(entity: any FirebaseProtocol)
-   func observe<T: FirebaseProtocol>(viewContext: NSManagedObjectContext, add: @escaping (Result<T>) -> Void, remove: @escaping (Result<T>) -> Void)
+   func observe<T: FirebaseProtocol>(vc: (any FirebaseDatabaseDelegate),viewContext: NSManagedObjectContext, type: T.Type)
 }
  
 //MARK: - Delegate
@@ -45,8 +45,8 @@ protocol FirebaseDatabaseDelegate: AnyObject {
    func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didUpdate entity: (any FirebaseProtocol))
 }
 
-class FirebaseDatabase: MultyDelegateService<FirebaseDatabaseDelegate>, FirebaseDatabaseInput {
-      
+class FirebaseDatabase: FirebaseDatabaseInput {
+    
    private let userID = Auth.auth().currentUser!.uid
    
    private var ref = Database.database(url: "https://podcast-app-8fcd2-default-rtdb.europe-west1.firebasedatabase.app").reference()
@@ -74,30 +74,20 @@ class FirebaseDatabase: MultyDelegateService<FirebaseDatabaseDelegate>, Firebase
       userStorage.child(entity.entityName).child(entity.firebaseKey).removeValue()
    }
    
-   func update<T: FirebaseProtocol>(viewContext: NSManagedObjectContext, completion: @escaping (Result<[T]>) -> Void) {
+   func update<T: FirebaseProtocol>(vc: (any FirebaseDatabaseDelegate), viewContext: NSManagedObjectContext, type: T.Type) {
 
       userStorage.child(T.entityName).getData { [weak self] error, snapShot in
          
          guard let self = self else { return }
          
          if let error = error {
-            completion(.failure(.firebaseDatabase(.error(error as Error))))
+            //TODO:
+            print(error)
             return
          }
 
-         guard let value = snapShot?.value else {
-            delegates {
-               $0.firebaseDatabase(self, didGetEmptyData: T.self)
-            }
-            completion(.failure(.firebaseDatabase(.snapShotIsNil)))
-            return
-         }
-         
-         if snapShot?.value is NSNull {
-            delegates {
-               $0.firebaseDatabase(self, didGetEmptyData: T.self)
-            }
-            completion(.failure(.firebaseDatabase(.snapShotIsNil)))
+         guard let value = snapShot?.value, !(value is NSNull) else {
+            vc.firebaseDatabase(self, didGetEmptyData: T.self)
             return
          }
          
@@ -105,18 +95,16 @@ class FirebaseDatabase: MultyDelegateService<FirebaseDatabaseDelegate>, Firebase
             do {
                let res = try JSONDecoder(context: viewContext).decode([String:T].self, from: data)
                let entities = res.compactMap { $0.value }
-               delegates {
-                  $0.firebaseDatabase(self, didAdd: entities)
-               }
-               completion(.success(result: entities))
+               vc.firebaseDatabase(self, didAdd: entities)
             } catch {
-               completion(.failure(.firebaseDatabase(.error(error))))
+               //TODO:
+//               completion(.failure(.firebaseDatabase(.error(error))))
             }
          }
       }
    }
    
-   func observe<T: FirebaseProtocol>(viewContext: NSManagedObjectContext, add: @escaping (Result<T>) -> Void, remove: @escaping (Result<T>) -> Void) {
+   func observe<T: FirebaseProtocol>(vc: (any FirebaseDatabaseDelegate),viewContext: NSManagedObjectContext, type: T.Type) {
       
       Database.database().isPersistenceEnabled = true
       
@@ -135,12 +123,9 @@ class FirebaseDatabase: MultyDelegateService<FirebaseDatabaseDelegate>, Firebase
                   
                   switch result {
                   case .success(result: let entity):
-                     delegates {
-                        $0.firebaseDatabase(self, didAdd: entity)
-                     }
-                     add(.success(result: entity))
+                     vc.firebaseDatabase(self, didAdd: entity)
                   case .failure(error: let error):
-                     add(.failure(error))
+                     print("erorr \(error)")
                   }
                }
             }
@@ -152,12 +137,9 @@ class FirebaseDatabase: MultyDelegateService<FirebaseDatabaseDelegate>, Firebase
 
                   switch result {
                   case .success(result: let entity):
-                     delegates {
-                        $0.firebaseDatabase(self, didRemove: entity)
-                     }
-                     remove(.success(result: entity))
+                     vc.firebaseDatabase(self, didRemove: entity)
                   case .failure(error: let error) :
-                     remove(.failure(error))
+                     print("erorr \(error)")
                   }
                }
             }
@@ -170,12 +152,9 @@ class FirebaseDatabase: MultyDelegateService<FirebaseDatabaseDelegate>, Firebase
                   
                   switch result {
                   case .success(result: let entity):
-                     
-                     delegates {
-                        $0.firebaseDatabase(self, didUpdate: entity)
-                     }
+                     vc.firebaseDatabase(self, didUpdate: entity)
                   case .failure(error: let error) :
-                     add(.failure(error))
+                     print("erorr \(error)")
                   }
                }
             }

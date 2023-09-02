@@ -36,7 +36,6 @@ class SearchCollectionView: UICollectionView {
         self.configureDataSource()
     }
     
-    
     //MARK: - Public Methods
     func setUp(playlist: [Podcast]) {
         self.playlist = playlist.sortPodcastsByGenre

@@ -33,7 +33,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     lazy private var favouriteManager: FavouriteManagerInput = FavouriteManager(dataStoreManager: dataStoreManager, firebaseDatabase: firebaseDatabase)
     
     lazy private var listeningManager: ListeningManagerInput = {
-        let manager = ListeningManager(dataStoreManager: dataStoreManager, firebaseDatabaseInput: firebaseDatabase)
+       let manager = ListeningManager(dataStoreManager: dataStoreManager, firebaseDatabaseInput: firebaseDatabase, player: player)
         player.delegate = manager
         return manager
     }()

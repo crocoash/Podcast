@@ -39,12 +39,8 @@ class FavouriteManager: MultyDelegateService<FavouriteManagerDelegate>, Favourit
         
         super.init()
         
-        firebaseDatabase.update(viewContext: dataStoreManager.viewContext) { (result: Result<[FavouritePodcast]>) in }
-        firebaseDatabase.observe(viewContext: viewContext,
-                                 add: { (result: Result<FavouritePodcast>) in },
-                                 remove: {  (result: Result<FavouritePodcast>) in })
-        
-        firebaseDatabase.delegate = self
+       firebaseDatabase.update(vc: self, viewContext: dataStoreManager.viewContext, type: FavouritePodcast.self)
+       firebaseDatabase.observe(vc: self, viewContext: viewContext, type: FavouritePodcast.self)
     }
     
     var isEmpty: Bool {
@@ -107,12 +103,12 @@ extension FavouriteManager {
     private func removeFavouritePodcast(_ favouritePodcast: FavouritePodcast) {
         if let favouritePodcast = getFavourite(for: favouritePodcast.podcast) {
             
-            let abstructFavourite = dataStoreManager.initAbstractObject(for: favouritePodcast)
+            let abstractFavourite = dataStoreManager.initAbstractObject(for: favouritePodcast)
             dataStoreManager.removeFromCoreData(entity: favouritePodcast)
-            firebaseDatabase.remove(entity: abstructFavourite)
+            firebaseDatabase.remove(entity: abstractFavourite)
             
             delegates {
-                $0.favouriteManager(self, didRemove: abstructFavourite)
+                $0.favouriteManager(self, didRemove: abstractFavourite)
             }
             feedbackGenerator()
         }
@@ -145,14 +141,12 @@ extension FavouriteManager: FirebaseDatabaseDelegate {
         }
     }
     
+   ///update
     func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didAdd entities: [any FirebaseProtocol]) {
         if entities is [FavouritePodcast] {
             dataStoreManager.updateCoreData(entities: entities)
         }
     }
     
-    func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didUpdate entity: (any FirebaseProtocol)) {
-        if let favouritePodcast = entity as? FavouritePodcast? {
-        }
-    }
+    func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didUpdate entity: (any FirebaseProtocol)) {}
 }

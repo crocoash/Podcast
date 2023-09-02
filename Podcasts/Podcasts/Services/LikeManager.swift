@@ -26,19 +26,16 @@ class LikeManager: MultyDelegateService<LikeManagerDelegate>, LikeManagerInput {
     
     private let dataStoreManager: DataStoreManagerInput
     private let firebaseDatabase: FirebaseDatabaseInput
-    
+      
     init(dataStoreManager: DataStoreManagerInput, firebaseDatabase: FirebaseDatabaseInput) {
         self.dataStoreManager = dataStoreManager
         self.firebaseDatabase = firebaseDatabase
         
         super.init()
         
-        firebaseDatabase.delegate = self
-        
-        firebaseDatabase.update(viewContext: dataStoreManager.viewContext) { (result: Result<[LikedMoment]>) in }
-        firebaseDatabase.observe(viewContext: viewContext,
-                                 add: { (result: Result<LikedMoment>) in },
-                                 remove: { (result: Result<LikedMoment>) in })
+       firebaseDatabase.observe(vc: self, viewContext: viewContext, type:  LikedMoment.self)
+       firebaseDatabase.update(vc: self, viewContext: dataStoreManager.viewContext, type: LikedMoment.self)
+       
     }
     
     func addToLikedMoments(entity: Any, moment: Double) {
@@ -88,7 +85,7 @@ extension LikeManager: FirebaseDatabaseDelegate {
     
     func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didAdd entity: (any FirebaseProtocol)) {
         if let likedMoment = entity as? LikedMoment {
-             saveLikedMoments(entity: likedMoment)
+           saveLikedMoments(entity: likedMoment)
          }
     }
     
@@ -98,11 +95,6 @@ extension LikeManager: FirebaseDatabaseDelegate {
        }
     }
     
-    func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didAdd entities: [any FirebaseProtocol]) {
-        
-    }
-    
-    func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didUpdate entity: (any FirebaseProtocol)) {
-        
-    }
+    func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didAdd entities: [any FirebaseProtocol]) {}
+    func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didUpdate entity: (any FirebaseProtocol)) {}
 }

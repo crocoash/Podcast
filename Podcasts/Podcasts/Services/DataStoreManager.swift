@@ -21,6 +21,7 @@ protocol DataStoreManagerInput {
     func fetchObject<T: CoreDataProtocol>(entity: T.Type, predicates: [NSPredicate]?) -> T?
     
     func updateCoreData<T: CoreDataProtocol>(entity: T)
+    func updateCoreData<T: CoreDataProtocol>(entity: T, withRelationShip: Bool)
     func updateCoreData(entities: [(any CoreDataProtocol)])
     func save()
     
@@ -238,8 +239,15 @@ extension DataStoreManager: DataStoreManagerInput {
     }
     
     func updateCoreData<T: CoreDataProtocol>(entity: T) {
-        let object = getFromCoreData(entity: entity)
-        object?.updateObject(by: entity)
+        updateCoreData(entity: entity, withRelationShip: false)
+    }
+    
+    func updateCoreData<T: CoreDataProtocol>(entity: T, withRelationShip: Bool) {
+        if let object = getFromCoreData(entity: entity) {
+            object.updateObject(by: entity, withRelationShip: withRelationShip)
+        } else {
+            let _ = T.init(entity, viewContext: viewContext, dataStoreManagerInput: self)
+        }
     }
     
     func removeFromCoreData<T: CoreDataProtocol>(entity: T) {

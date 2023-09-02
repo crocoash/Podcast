@@ -9,6 +9,7 @@ import UIKit
 import CoreData
 import SwiftUI
 
+//MARK: - Delegate
 protocol SearchViewControllerDelegate: AnyObject {
 //    func searchViewController                      (_ searchViewController: SearchViewController,_ playlist: [TrackProtocol], track: TrackProtocol)
 //    func searchViewControllerDidSelectDownLoadImage(_ searchViewController: SearchViewController, entity: DownloadInputType, completion: @escaping () -> Void)
@@ -32,11 +33,9 @@ class SearchViewController : UIViewController {
     private var tableViewBottomConstraintConstant = CGFloat(0)
     private let refreshControl = UIRefreshControl()
 
-    private var alert             = Alert()
-    private var podcasts          = Array<Podcast>() {
-        didSet {
-            searchCollectionView.setUp(playlist: podcasts)
-        }
+    private var alert = Alert()
+    private var podcasts = Array<Podcast>() {
+        didSet { searchCollectionView.setUp(playlist: podcasts) }
     }
     private var authors = Array<Author>()
     
@@ -288,6 +287,7 @@ extension SearchViewController: AlertDelegate {
     }
 }
 
+//MARK: - SearchCollectionViewDelegate
 extension SearchViewController: SearchCollectionViewDelegate {
     
     func searchCollectionView(_ searchCollectionView: SearchCollectionView, podcast: Podcast) {

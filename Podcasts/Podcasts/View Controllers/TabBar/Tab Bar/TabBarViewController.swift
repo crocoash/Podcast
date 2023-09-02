@@ -272,19 +272,19 @@ extension TabBarViewController: UIViewControllerTransitioningDelegate {
 //MARK: - PlayerEventNotification
 extension TabBarViewController: PlayerDelegate {
     
-    func playerDidEndPlay(with track: OutputPlayerProtocol) {}
+    func playerDidEndPlay(_ player: Player, with track: OutputPlayerProtocol) {}
     
-    func playerStartLoading(with track: OutputPlayerProtocol) {
+    func playerStartLoading(_ player: Player, with track: OutputPlayerProtocol) {
         presentSmallPlayer(with: track)
     }
     
-    func playerDidEndLoading(with track: OutputPlayerProtocol) {}
+    func playerDidEndLoading(_ player: Player, with track: OutputPlayerProtocol) {}
     
-    func playerUpdatePlayingInformation(with track: OutputPlayerProtocol) {
+    func playerUpdatePlayingInformation(_ player: Player, with track: OutputPlayerProtocol) {
         
     }
     
-    func playerStateDidChanged(with track: OutputPlayerProtocol) {}
+    func playerStateDidChanged(_ player: Player, with track: OutputPlayerProtocol) {}
 }
 
 //MARK: -

@@ -320,25 +320,25 @@ extension DetailViewController: BigPlayerViewControllerDelegate {
 //MARK: - PlayerEventNotification
 extension DetailViewController: PlayerDelegate {
    
-   func playerDidEndPlay(with track: OutputPlayerProtocol) {
+   func playerDidEndPlay(_ player: Player, with track: OutputPlayerProtocol) {
       episodeTableView.update(with: track)
    }
    
-   func playerStartLoading(with track: OutputPlayerProtocol) {
+   func playerStartLoading(_ player: Player, with track: OutputPlayerProtocol) {
       presentSmallPlayer(with: track)
       episodeTableView.update(with: track)
    }
    
-   func playerDidEndLoading(with track: OutputPlayerProtocol) {
+   func playerDidEndLoading(_ player: Player, with track: OutputPlayerProtocol) {
       episodeTableView.update(with: track)
    }
    
-   func playerUpdatePlayingInformation(with track: OutputPlayerProtocol) {
+   func playerUpdatePlayingInformation(_ player: Player, with track: OutputPlayerProtocol) {
       presentSmallPlayer(with: track)
       episodeTableView.update(with: track)
    }
    
-   func playerStateDidChanged(with track: OutputPlayerProtocol) {
+   func playerStateDidChanged(_ player: Player, with track: OutputPlayerProtocol) {
       episodeTableView.update(with: track)
    }
 }
