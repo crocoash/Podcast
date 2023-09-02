@@ -37,3 +37,12 @@ extension Collection {
         return CGFloat(self.count)
     }
 }
+
+extension Collection {
+   
+   func enumerated(_ completion: (Int, Element) throws -> Void) rethrows {
+      for (index, value) in self.enumerated() {
+         try? completion(index, value)
+      }
+   }
+}

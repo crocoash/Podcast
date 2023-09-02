@@ -32,16 +32,8 @@ class ListDataManager: MultyDelegateService<ListDataManagerDelegate>, ListDataMa
       
       super.init()
       
-      firebaseDatabase.observe(viewContext: dataStoreManager.viewContext,
-                               add: { (result: Result<ListData>) in },
-                               remove: { (result: Result<ListData>) in })
-      
-      
-      firebaseDatabase.delegate = self
-      
-      DispatchQueue.main.async {
-         firebaseDatabase.update(viewContext: dataStoreManager.viewContext) { (result: Result<[ListData]>) in }
-      }
+      firebaseDatabase.update(vc: self, viewContext: dataStoreManager.viewContext, type: ListData.self)
+      firebaseDatabase.observe(vc: self, viewContext: dataStoreManager.viewContext, type: ListData.self)
    }
    
    func change(for entity: ListSection, sequenceNumber: Int) {
@@ -121,13 +113,7 @@ extension ListDataManager {
    }
    
    private func updateListData(with listData: ListData) {
-      let entities = dataStoreManager.viewContext.fetchObjects(ListData.self)
-      
-      if let savedListData = entities.first(matching: listData) {
-         savedListData.updateObject(by: listData)
-      } else {
-         dataStoreManager.updateCoreData(entities: [listData])
-      }
+      dataStoreManager.updateCoreData(entity: listData, withRelationShip: true)
       dataStoreManager.save()
    }
 }

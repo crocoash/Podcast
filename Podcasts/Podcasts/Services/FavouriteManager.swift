@@ -39,12 +39,8 @@ class FavouriteManager: MultyDelegateService<FavouriteManagerDelegate>, Favourit
         
         super.init()
         
-        firebaseDatabase.update(viewContext: dataStoreManager.viewContext) { (result: Result<[FavouritePodcast]>) in }
-        firebaseDatabase.observe(viewContext: viewContext,
-                                 add: { (result: Result<FavouritePodcast>) in },
-                                 remove: {  (result: Result<FavouritePodcast>) in })
-        
-        firebaseDatabase.delegate = self
+       firebaseDatabase.update(vc: self, viewContext: dataStoreManager.viewContext, type: FavouritePodcast.self)
+       firebaseDatabase.observe(vc: self, viewContext: viewContext, type: FavouritePodcast.self)
     }
     
     var isEmpty: Bool {
@@ -145,14 +141,12 @@ extension FavouriteManager: FirebaseDatabaseDelegate {
         }
     }
     
+   ///update
     func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didAdd entities: [any FirebaseProtocol]) {
         if entities is [FavouritePodcast] {
             dataStoreManager.updateCoreData(entities: entities)
         }
     }
     
-    func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didUpdate entity: (any FirebaseProtocol)) {
-        if let favouritePodcast = entity as? FavouritePodcast? {
-        }
-    }
+    func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didUpdate entity: (any FirebaseProtocol)) {}
 }

@@ -202,7 +202,7 @@
 		3A5022572A6C294D00600422 /* ListeningPodcastCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListeningPodcastCell.swift; sourceTree = "<group>"; };
 		3A5022582A6C294D00600422 /* ListeningPodcastCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ListeningPodcastCell.xib; sourceTree = "<group>"; };
 		3A50225B2A6E474200600422 /* FavoriteTableView.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = FavoriteTableView.swift; sourceTree = "<group>"; tabWidth = 4; };
-		3A50225D2A6E6CE200600422 /* ListeningManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListeningManager.swift; sourceTree = "<group>"; };
+		3A50225D2A6E6CE200600422 /* ListeningManager.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = ListeningManager.swift; sourceTree = "<group>"; tabWidth = 4; };
 		3A5644522A812AC4007B24ED /* ListSection+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "ListSection+CoreDataClass.swift"; path = "Podcasts/Data/CoreData/Entities/ListSection/ListSection+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
 		3A5644532A812AC4007B24ED /* ListSection+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "ListSection+CoreDataProperties.swift"; path = "Podcasts/Data/CoreData/Entities/ListSection/ListSection+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
 		3A5644582A822EFB007B24ED /* ListData+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ListData+CoreDataClass.swift"; sourceTree = "<group>"; };

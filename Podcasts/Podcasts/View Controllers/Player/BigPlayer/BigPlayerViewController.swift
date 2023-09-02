@@ -245,23 +245,23 @@ extension BigPlayerViewController {
 //MARK: - PlayerEventNotification
 extension BigPlayerViewController: PlayerDelegate {
     
-    func playerDidEndPlay(with track: OutputPlayerProtocol) {
+    func playerDidEndPlay(_ player: Player, with track: OutputPlayerProtocol) {
         model.update(track)
     }
     
-    func playerStartLoading(with track: OutputPlayerProtocol) {
+    func playerStartLoading(_ player: Player, with track: OutputPlayerProtocol) {
         model.update(track)
     }
     
-    func playerDidEndLoading(with track: OutputPlayerProtocol) {
+    func playerDidEndLoading(_ player: Player, with track: OutputPlayerProtocol) {
         model.update(track)
     }
     
-    func playerUpdatePlayingInformation(with track: OutputPlayerProtocol) {
+    func playerUpdatePlayingInformation(_ player: Player, with track: OutputPlayerProtocol) {
         model.update(track)
     }
     
-    func playerStateDidChanged(with track: OutputPlayerProtocol) {
+    func playerStateDidChanged(_ player: Player, with track: OutputPlayerProtocol) {
         model.update(track)
     }
 }

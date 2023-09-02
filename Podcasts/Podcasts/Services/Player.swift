@@ -9,6 +9,7 @@ import Foundation
 import MediaPlayer
 import CoreData
 
+//MARK: - Input
 protocol PlayerInput: MultyDelegateServiceInput {
     
     var currentTrack: (track: Track, index: Int)? { get }
@@ -29,6 +30,7 @@ protocol PlayerInput: MultyDelegateServiceInput {
     func conform(track: any TrackProtocol, trackList: [any TrackProtocol])
 }
 
+//MARK: Type
 protocol TrackProtocol: NSManagedObject {
     var url: URL?                      { get }
     var imageForMpPlayer: String?      { get }
@@ -83,15 +85,16 @@ struct Track: Equatable, OutputPlayerProtocol {
     }
 }
 
+//MARK: - OutPut
 protocol OutputPlayerProtocol: PodcastCellPlayableProtocol, BigPlayerPlayableProtocol, SmallPlayerPlayableProtocol, ListeningPodcastCellPlayableProtocol {}
 
 protocol PlayerDelegate {
     
-    func playerDidEndPlay               (with track: OutputPlayerProtocol)
-    func playerStartLoading             (with track: OutputPlayerProtocol)
-    func playerDidEndLoading            (with track: OutputPlayerProtocol)
-    func playerUpdatePlayingInformation (with track: OutputPlayerProtocol)
-    func playerStateDidChanged          (with track: OutputPlayerProtocol)
+   func playerDidEndPlay                (_ player: Player, with track: OutputPlayerProtocol)
+    func playerStartLoading             (_ player: Player, with track: OutputPlayerProtocol)
+    func playerDidEndLoading            (_ player: Player, with track: OutputPlayerProtocol)
+    func playerUpdatePlayingInformation (_ player: Player, with track: OutputPlayerProtocol)
+    func playerStateDidChanged          (_ player: Player, with track: OutputPlayerProtocol)
 }
 
 class Player: MultyDelegateService<PlayerDelegate> {
@@ -140,8 +143,7 @@ class Player: MultyDelegateService<PlayerDelegate> {
 
 extension Player: PlayerInput {
    
-    //MARK: - public Methods
-    //MARK: Actions
+    //MARK: - public Methods / Actions
     
     func conform(track: any TrackProtocol, trackList: [any TrackProtocol]) {
         if currentTrack?.track.trackId == track.trackId {
@@ -303,35 +305,35 @@ extension Player {
     private func playerDidEndPlay(track: Track?) {
         guard let track = track else { return }
         delegates {
-            $0.playerDidEndPlay(with: track)
+            $0.playerDidEndPlay(self, with: track)
         }
     }
     
     private func playerStartLoading(track: Track?) {
         guard let track = track else { return }
         delegates {
-            $0.playerStartLoading(with: track)
+            $0.playerStartLoading(self, with: track)
         }
     }
     
     private func playerDidEndLoading(track: Track?) {
         guard let track = track else { return }
         delegates {
-            $0.playerDidEndLoading(with: track)
+            $0.playerDidEndLoading(self, with: track)
         }
     }
     
     private func playerUpdatePlayingInformation(track: Track?) {
         guard let track = track else { return }
         delegates {
-            $0.playerUpdatePlayingInformation(with: track)
+            $0.playerUpdatePlayingInformation(self, with: track)
         }
     }
     
     private func playerStateDidChanged(track: Track?) {
         guard let track = track else { return }
         delegates {
-            $0.playerStateDidChanged(with: track)
+           $0.playerStateDidChanged(self, with: track)
         }
     }
     
@@ -344,7 +346,7 @@ extension Player {
         track.duration = listening.duration
         
         delegates {
-            $0.playerUpdatePlayingInformation(with: track)
+            $0.playerUpdatePlayingInformation(self, with: track)
         }
     }
     

@@ -70,9 +70,3 @@ extension ListeningPodcast: CoreDataProtocol {
 //MARK: - FirebaseProtocol
 extension ListeningPodcast: FirebaseProtocol {}
 
-//extension ListeningPodcast: ListeningPodcastCellProtocol {
-//    var podcastName: String? {
-//        podcast.trackName
-//    }
-//    var imageForCell: String? { return podcast.image600 }
-//}

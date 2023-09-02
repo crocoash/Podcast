@@ -111,6 +111,11 @@ class ListViewController: UIViewController {
         configureAlertSortListView()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+    }
+    
     //MARK: Actions
     @objc private func tapFavouritePodcastCell(sender: UITapGestureRecognizer) {
         
@@ -209,29 +214,29 @@ extension ListViewController {
     private func refreshTableView(completion: @escaping () -> ()) {
         let viewContext = dataStoreManager.viewContext
         
-        firebaseDataBase.update(viewContext: viewContext) { [weak self] (result: FavouritePodcast.ResultType) in
-            guard let self = self else { return }
-            
-            switch result {
-            case .failure(error: let error) :
-                error.showAlert(vc: self)
-            default: break
-            }
-            
-            firebaseDataBase.update(viewContext: viewContext) { [weak self] (result: ListeningPodcast.ResultType) in
-                
-                guard let self = self else { return }
-                
-                switch result {
-                case .failure(error: let error) :
-                    error.showAlert(vc: self) {
-                    }
-                default: break
-                }
-                
-                completion()
-            }
-        }
+//        firebaseDataBase.update(viewContext: viewContext) { [weak self] (result: FavouritePodcast.ResultType) in
+//            guard let self = self else { return }
+//
+//            switch result {
+//            case .failure(error: let error) :
+//                error.showAlert(vc: self)
+//            default: break
+//            }
+//
+//            firebaseDataBase.update(viewContext: viewContext) { [weak self] (result: ListeningPodcast.ResultType) in
+//
+//                guard let self = self else { return }
+//
+//                switch result {
+//                case .failure(error: let error) :
+//                    error.showAlert(vc: self) {
+//                    }
+//                default: break
+//                }
+//
+//                completion()
+//            }
+//        }
     }
     
     private func showAlert() {
@@ -318,23 +323,23 @@ extension ListViewController: UISearchBarDelegate {
 //MARK: - PlayerEventNotification
 extension ListViewController: PlayerDelegate {
     
-    func playerDidEndPlay(with track: OutputPlayerProtocol) {
+    func playerDidEndPlay(_ player: Player, with track: OutputPlayerProtocol) {
         favouriteTableView.updateTableView(with: track)
     }
     
-    func playerStartLoading(with track: OutputPlayerProtocol) {
+    func playerStartLoading(_ player: Player, with track: OutputPlayerProtocol) {
         favouriteTableView.updateTableView(with: track)
     }
     
-    func playerDidEndLoading(with track: OutputPlayerProtocol) {
+    func playerDidEndLoading(_ player: Player, with track: OutputPlayerProtocol) {
         favouriteTableView.updateTableView(with: track)
     }
     
-    func playerUpdatePlayingInformation(with track: OutputPlayerProtocol) {
+    func playerUpdatePlayingInformation(_ player: Player, with track: OutputPlayerProtocol) {
         favouriteTableView.updateTableView(with: track)
     }
     
-    func playerStateDidChanged(with track: OutputPlayerProtocol) {
+    func playerStateDidChanged(_ player: Player, with track: OutputPlayerProtocol) {
         favouriteTableView.updateTableView(with: track)
     }
 }
@@ -384,6 +389,10 @@ extension ListViewController: NSFetchedResultsControllerDelegate {
             insert(anObject, newIndexPath: newIndexPath)
         case .move:
             move(anObject, indexPath: indexPath, newIndexPath: newIndexPath)
+        case .update:
+            model.update(with: anObject) { indexPaths in
+//                todo
+            }
         default:
             break
         }

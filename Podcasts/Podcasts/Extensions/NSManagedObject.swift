@@ -56,11 +56,11 @@ extension NSManagedObject {
     }
     
     @discardableResult
-    func updateObject(by entity: NSManagedObject) -> NSManagedObject {
+    func updateObject(by entity: NSManagedObject, withRelationShip: Bool = false) -> NSManagedObject {
         for initProp in self.entity.propertiesByName {
             let key = initProp.key
             if let value = entity.value(forKey: key) {
-                set(value: value, for: key, withRelationShip: true)
+                set(value: value, for: key, withRelationShip: withRelationShip)
             }
         }
         return self
@@ -85,21 +85,21 @@ extension NSManagedObject {
     }
     
     
-    private func setObject( by value: NSManagedObject, for key: String) {
+    private func setObject( by object: NSManagedObject, for key: String) {
         
         if let viewContext = self.managedObjectContext {
             
-            if value.managedObjectContext != nil {
-                self.setValue(value, forKey: key)
+            if object.managedObjectContext != nil {
+                self.setValue(object, forKey: key)
             } else {
-                let value = NSManagedObject.init(entity: value.entity, insertInto: viewContext)
-                self.setValue(value, forKey: key)
+                let value = self.updateObject(by: object, withRelationShip: false)
+                self.setValue(object, forKey: key)
             }
         } else {
-            if value.managedObjectContext == nil {
-                self.setValue(value, forKey: key)
+            if object.managedObjectContext == nil {
+                self.setValue(object, forKey: key)
             } else {
-                let abstractValue = NSManagedObject.init(value, withRelationShip: false)
+                let abstractValue = NSManagedObject.init(object, withRelationShip: false)
                 self.setValue(abstractValue, forKey: key)
             }
         }
@@ -126,7 +126,7 @@ extension NSManagedObject {
                             }
                             return false
                         }) {
-                            return oldValue.updateObject(by: value)
+                            return oldValue.updateObject(by: value, withRelationShip: false)
                         }
                         return nil
                     }

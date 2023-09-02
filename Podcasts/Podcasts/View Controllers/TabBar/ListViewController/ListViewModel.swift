@@ -125,9 +125,9 @@ class ListViewModel: NSObject {
       }
          
       /// append
-      for (indexNewSection, newSection) in newSections.enumerated() {
+      newSections.enumerated { indexNewSection, newSection in
          let newRows = newSection.rows
-         for (indexNewRow,newRow) in newRows.enumerated() {
+         newRows.enumerated { indexNewRow, newRow in
 
             if activeSections.isEmpty || !activeSections.contains(newSection) {
                append(newRow, at: IndexPath(row: indexNewRow, section: indexNewSection), insertSection: insertSection, insertItem: insertItem)
@@ -172,6 +172,33 @@ class ListViewModel: NSObject {
       }
    }
    
+   func update(with object: Any, reloadIndexPath: ([IndexPath]) -> ()) {
+      if let podcast = (object as? ListeningPodcast)?.podcast {
+         var indexPath: [IndexPath] = []
+         activeSections.enumerated { indexSection, section in
+            section.rows.enumerated { indexRow, row in
+               switch row {
+               case let favoritePodcast as FavouritePodcast:
+                  if favoritePodcast.podcast.trackId == podcast.trackId {
+                     indexPath.append(IndexPath(row: indexRow, section: indexSection))
+                  }
+               case let listening as ListeningPodcast:
+                  if listening.podcast.trackId == podcast.trackId {
+                     indexPath.append(IndexPath(row: indexRow, section: indexSection))
+                  }
+               case let likedMoment as LikedMoment:
+                  if likedMoment.podcast.trackId == podcast.trackId {
+                     indexPath.append(IndexPath(row: indexRow, section: indexSection))
+                  }
+               default:
+                  break
+               }
+            }
+         }
+         reloadIndexPath(indexPath)
+      }
+   }
+   
    func getIndexPath(forAny object: Any, in sections: [Section]) -> IndexPath? {
       
       if let object = object as? FavouritePodcast {
@@ -186,12 +213,13 @@ class ListViewModel: NSObject {
    }
   
    func getIndexPath<T: NSManagedObject>(forEntity object: T, in sections: [Section]) -> IndexPath? {
-      for (sectionIndex, items) in (sections).enumerated() {
+      var indexPath: IndexPath?
+      sections.enumerated { sectionIndex, items in
          if let indexRow = items.rows.firstIndex(of: object) {
-            return IndexPath(row: indexRow, section: sectionIndex)
+            indexPath = IndexPath(row: indexRow, section: sectionIndex)
          }
       }
-      return nil
+      return indexPath
    }
    
    func getObjectInSection(for indexPath: IndexPath) -> NSManagedObject {
@@ -260,7 +288,7 @@ class ListViewModel: NSObject {
          insertSection(section, newIndex)
          
          if sectionIsActive(section) {
-            for (indexRow, row) in rows.enumerated() {
+            rows.enumerated { indexRow, row in
                let indexPath = IndexPath(row: index, section: indexRow)
                append(row, at: indexPath) { section, index in } insertItem: { indexPath in
                   insertItem(indexPath)
@@ -272,7 +300,7 @@ class ListViewModel: NSObject {
       } else  {
          guard let object = object as? NSManagedObject else { return }
          let indexSection = sections.firstIndex { $0.nameOfEntity == object.entityName }
-         guard let indexSection = indexSection else { fatalError() }
+         guard let indexSection = indexSection else { return }
          
          let section = sections[indexSection]
          var indexPath = IndexPath(row: indexPath.row, section: indexSection)
