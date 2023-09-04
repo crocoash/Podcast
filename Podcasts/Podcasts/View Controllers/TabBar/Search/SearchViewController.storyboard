@@ -40,6 +40,10 @@
                                     <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                 </collectionViewFlowLayout>
                                 <cells/>
+                                <connections>
+                                    <outlet property="myDataSource" destination="dxT-ao-o0w" id="YGV-II-ztq"/>
+                                    <outlet property="myDelegate" destination="dxT-ao-o0w" id="lA6-TC-xLT"/>
+                                </connections>
                             </collectionView>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" image="doc.text.magnifyingglass" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="f1A-p3-gZv">
                                 <rect key="frame" x="0.0" y="151.33333333333337" width="393" height="668"/>

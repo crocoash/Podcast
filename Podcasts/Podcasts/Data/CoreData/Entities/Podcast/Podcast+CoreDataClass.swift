@@ -268,7 +268,7 @@ extension Podcast {
 }
 
 //MARK: - extension Collection
-extension Collection where Element: Podcast {
+extension Collection where Element == Podcast {
     
     var sortPodcastsByGenre: [(key: String, podcasts: [Podcast])] {
         var array = [(key: String, podcasts: [Podcast])]()
@@ -277,9 +277,13 @@ extension Collection where Element: Podcast {
             if let genres = podcast.genres?.allObjects as? [Genre] {
             loop: for genre in genres {
                 if let genreName = genre.name {
+                    if genreName == "Podcasts" {
+                        continue loop
+                    }
+                        
                     if array.isEmpty {
                         array.append((key: genreName, podcasts: [podcast]))
-                        continue
+                        continue loop
                     }
                     for (index,value) in array.enumerated() {
                         if value.key == genreName {
@@ -323,6 +327,13 @@ extension Collection where Element: Podcast {
             array.append((key: date, podcasts: [element]))
         }
         return array
+    }
+}
+
+extension Collection where Element == (key: String, podcasts: [Podcast]) {
+    
+    subscript(_ indexPath: IndexPath) -> Podcast {
+        return self[indexPath.section as! Self.Index].podcasts[indexPath.row]
     }
 }
 
