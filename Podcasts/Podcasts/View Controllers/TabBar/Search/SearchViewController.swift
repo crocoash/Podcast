@@ -17,6 +17,10 @@ protocol SearchViewControllerDelegate: AnyObject {
     func searchViewControllerDidSelectCell (_ searchViewController: SearchViewController, podcast: Podcast)
 }
 
+typealias PlaylistByNewest  = [(key: String, podcasts: [Podcast])]
+typealias PlayListByOldest = PlaylistByNewest
+typealias PlayListByGenre = PlaylistByNewest
+
 class SearchViewController : UIViewController {
     
     private let apiService: ApiServiceInput
@@ -34,9 +38,15 @@ class SearchViewController : UIViewController {
     private let refreshControl = UIRefreshControl()
 
     private var alert = Alert()
+    
     private var podcasts = Array<Podcast>() {
-        didSet { searchCollectionView.setUp(playlist: podcasts) }
+        didSet {
+            self.playList = podcasts.sortPodcastsByGenre
+        }
     }
+    
+    private var playList: [(key: String, rows: [Podcast])] = []
+   
     private var authors = Array<Author>()
     
     weak var delegate: SearchViewControllerDelegate?
@@ -91,6 +101,11 @@ class SearchViewController : UIViewController {
     }
     
     //MARK: - Actions
+    func tapCell(atIndexPath indexPath: IndexPath) {
+        let podcast = playList[indexPath]
+        delegate?.searchViewControllerDidSelectCell(self, podcast: podcast)
+    }
+    
     @objc func cancelSearch(sender: UITapGestureRecognizer) {
         cancelSearchAction()
     }
@@ -122,7 +137,6 @@ extension SearchViewController {
         configureSegmentalControl()
         configureAlert()
 //        configureActivityIndicator()
-        configureSearchCollectionView()
     }
     
     private func configureGesture() {
@@ -154,10 +168,6 @@ extension SearchViewController {
         searchBar.text?.removeAll()
         podcasts.removeAll()
         showEmptyImage()
-    }
-    
-    private func configureSearchCollectionView() {
-        searchCollectionView.myDelegate = self
     }
     
     private func showEmptyImage() {
@@ -289,8 +299,29 @@ extension SearchViewController: AlertDelegate {
 
 //MARK: - SearchCollectionViewDelegate
 extension SearchViewController: SearchCollectionViewDelegate {
+    func searchCollectionView(_ searchCollectionView: SearchCollectionView, didTapAtIndexPath indexPath: IndexPath) {
+        tapCell(atIndexPath: indexPath)
+    }
+}
+
+//MARK: - SearchCollectionViewDataSource
+extension SearchViewController: SearchCollectionViewDataSource {
     
-    func searchCollectionView(_ searchCollectionView: SearchCollectionView, podcast: Podcast) {
-        delegate?.searchViewControllerDidSelectCell(self, podcast: podcast)
+    func searchCollectionViewNumbersOfSections(_ searchCollectionView: SearchCollectionView) -> Int {
+        return playList.count
+    }
+    
+    func searchCollectionView(_ searchCollectionView: SearchCollectionView, nameOfSectionForIndex index: Int) -> String {
+        return playList[index].key
+    }
+    
+    func searchCollectionView(_ searchCollectionView: SearchCollectionView, numbersOfRowsInSection index: Int) -> Int {
+        return playList[index].rows.count
+    }
+    
+    func searchCollectionView(_ searchCollectionView: SearchCollectionView, rowForIndexPath indexPath: IndexPath) -> SearchCollectionView.Row {
+        let podcast = playList[indexPath]
+        let row = SearchCollectionView.Row(podcast: podcast)
+        return row
     }
 }

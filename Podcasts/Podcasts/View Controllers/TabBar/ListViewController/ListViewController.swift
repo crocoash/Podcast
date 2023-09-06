@@ -212,7 +212,7 @@ extension ListViewController {
     }
     
     private func refreshTableView(completion: @escaping () -> ()) {
-        let viewContext = dataStoreManager.viewContext
+        let _ = dataStoreManager.viewContext
         
 //        firebaseDataBase.update(viewContext: viewContext) { [weak self] (result: FavouritePodcast.ResultType) in
 //            guard let self = self else { return }

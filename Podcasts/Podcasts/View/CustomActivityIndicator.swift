@@ -81,6 +81,7 @@ extension CustomActivityIndicator {
 extension UIView {
     
     func showActivityIndicator() {
+       guard !subviews.contains( where: { $0 is CustomActivityIndicator }) else { return }
         let activityIndicator = CustomActivityIndicator()
         activityIndicator.center = center
         activityIndicator.startAnimation()
