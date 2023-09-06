@@ -8,12 +8,12 @@
 import UIKit
 import CoreData
 
-protocol EpisodeTableViewMyDataSource: AnyObject {
+@objc protocol EpisodeTableViewMyDataSource: AnyObject {
     
-    func episodeTableViewDidChangeHeightTableView(_ episodeTableView: EpisodeTableView, height: CGFloat, with lastCell: Bool)
+    func episodeTableViewDidChangeHeightTableView(_ episodeTableView: EpisodeTableView, height: CGFloat, withLastCell isLastCell: Bool)
 }
 
-protocol EpisodeTableViewMyDelegate: AnyObject {
+@objc protocol EpisodeTableViewMyDelegate: AnyObject {
     
     func episodeTableView(_ episodeTableView: EpisodeTableView, didSelectStar indexPath: IndexPath)
     func episodeTableView(_ episodeTableView: EpisodeTableView, didSelectDownLoadImage indexPath: IndexPath)
@@ -23,24 +23,15 @@ protocol EpisodeTableViewMyDelegate: AnyObject {
 
 class EpisodeTableView: UITableView {
    
-    lazy private(set) var defaultRowHeight = frame.width / 3.5
-    private var sumOfHeightsOfAllHeaders = CGFloat.zero
-    private var paddingBetweenSections = CGFloat(20)
+    lazy private(set) var defaultRowHeight = CGFloat(100)//frame.width / 3.5
+    lazy private(set) var defaultSectionHeight = CGFloat(40)
     
-    weak var myDataSource: EpisodeTableViewMyDataSource?
-    weak var myDelegate: EpisodeTableViewMyDelegate?
-
+    private var paddingBetweenSections = CGFloat(0)
+    
+    @IBOutlet weak var myDataSource: EpisodeTableViewMyDataSource?
+    @IBOutlet weak var myDelegate: EpisodeTableViewMyDelegate?
     
     //MARK: - PublicMethods
-    func configureEpisodeTableView<T: EpisodeTableViewMyDataSource & EpisodeTableViewMyDelegate & UITableViewDelegate & UITableViewDataSource>(_ vc: T) {
-        self.myDataSource = vc
-        self.myDelegate = vc
-        self.delegate = vc
-        self.dataSource = vc
-        
-        reloadData()
-    }
-    
     func openCell(at indexPath: IndexPath) {
         UIView.animate(withDuration: 0.4) { [weak self] in
             guard let self = self,
@@ -52,8 +43,7 @@ class EpisodeTableView: UITableView {
             endUpdates()
          
             let isLastCell = isLastSectionAndRow(indexPath: indexPath)
-            let height = rect(forSection: 0).height
-            myDataSource?.episodeTableViewDidChangeHeightTableView(self, height: height, with: isLastCell)
+            myDataSource?.episodeTableViewDidChangeHeightTableView(self, height: height, withLastCell: isLastCell)
         }
     }
     
@@ -71,6 +61,10 @@ class EpisodeTableView: UITableView {
         return numberOfSections - 1 == indexPath.section && numberOfRows(inSection: indexPath.section) - 1 == indexPath.row
     }
     
+    var height: CGFloat {
+        return (0..<numberOfSections ).reduce(into: 0) { $0 += (rect(forSection: $1).height + paddingBetweenSections) }
+    }
+    
     ///BigPlayer
     func getYPositionYFor(indexPath: IndexPath) -> CGFloat {
         return rectForRow(at: indexPath).origin.y
@@ -83,6 +77,8 @@ class EpisodeTableView: UITableView {
         if #available(iOS 15.0, *) {
             sectionHeaderTopPadding = paddingBetweenSections
         }
+        
+        delegate = self
     }
 }
 
@@ -107,5 +103,31 @@ extension EpisodeTableView: PodcastCellDelegate {
     func podcastCellDidTouchStopButton(_ podcastCell: PodcastCell) {
         guard let indexPath = indexPath(for: podcastCell) else { return }
         myDelegate?.episodeTableView(self, didTouchStopButton: indexPath)
+    }
+}
+
+//MARK: - UITableViewDelegate
+extension EpisodeTableView: UITableViewDelegate {
+   
+   func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+      
+      if let cell = tableView.cellForRow(at: indexPath), cell.isSelected {
+         if let cell = cell as? PodcastCell, cell.moreThanThreeLines {
+            return UITableView.automaticDimension
+         }
+      }
+      return defaultRowHeight
+   }
+   
+   func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+      return defaultSectionHeight
+   }
+    
+    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        return defaultRowHeight
+    }
+    
+    func tableView(_ tableView: UITableView, estimatedHeightForHeaderInSection section: Int) -> CGFloat {
+        return defaultSectionHeight
     }
 }

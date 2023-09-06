@@ -270,8 +270,8 @@ extension Podcast {
 //MARK: - extension Collection
 extension Collection where Element == Podcast {
     
-    var sortPodcastsByGenre: [(key: String, podcasts: [Podcast])] {
-        var array = [(key: String, podcasts: [Podcast])]()
+    var sortPodcastsByGenre: [(key: String, rows: [Podcast])] {
+        var array = [(key: String, rows: [Podcast])]()
         
         for podcast in self {
             if let genres = podcast.genres?.allObjects as? [Genre] {
@@ -282,58 +282,58 @@ extension Collection where Element == Podcast {
                     }
                         
                     if array.isEmpty {
-                        array.append((key: genreName, podcasts: [podcast]))
+                        array.append((key: genreName, rows: [podcast]))
                         continue loop
                     }
                     for (index,value) in array.enumerated() {
                         if value.key == genreName {
-                            array[index].podcasts.append(podcast)
+                            array[index].rows.append(podcast)
                             continue loop
                         }
                     }
-                    array.append((key: genreName, podcasts: [podcast]))
+                    array.append((key: genreName, rows: [podcast]))
                 }
             }
             }
         }
-        let filteredArray = array.filter { !$0.podcasts.isEmpty }
-        let sortedArray = filteredArray.map { (key: $0.key, podcasts: $0.podcasts.sorted { $0.releaseDateInformation < $1.releaseDateInformation })}
+        let filteredArray = array.filter { !$0.rows.isEmpty }
+        let sortedArray = filteredArray.map { (key: $0.key, rows: $0.rows.sorted { $0.releaseDateInformation < $1.releaseDateInformation })}
         return sortedArray
         
     }
     
-    var sortPodcastsByNewest: [(key: String, podcasts: [Podcast])] {
+    var sortPodcastsByNewest: [(key: String, rows: [Podcast])] {
         let array = self.sorted { $0.releaseDateInformation > $1.releaseDateInformation }
         return array.conform
     }
     
-    var sortPodcastsByOldest: [(key: String, podcasts: [Podcast])] {
+    var sortPodcastsByOldest: [(key: String, rows: [Podcast])] {
         let array = self.sorted { $0.releaseDateInformation < $1.releaseDateInformation }
         return array.conform
     }
     
-    private var conform: [(key: String, podcasts: [Podcast])] {
-        var array = [(key: String, podcasts: [Podcast])]()
+    private var conform: [(key: String, rows: [Podcast])] {
+        var array = [(key: String, rows: [Podcast])]()
         loop: for element in self {
             let date = element.formattedDate(dateFormat: "d MMM YYY")
             if array.isEmpty {
-                array.append((key: date, podcasts: [element]))
+                array.append((key: date, rows: [element]))
                 continue
             }
             for value in array.enumerated() where value.element.key == date  {
-                array[value.offset].podcasts.append(element)
+                array[value.offset].rows.append(element)
                 continue loop
             }
-            array.append((key: date, podcasts: [element]))
+            array.append((key: date, rows: [element]))
         }
         return array
     }
 }
 
-extension Collection where Element == (key: String, podcasts: [Podcast]) {
+extension Collection where Element == (key: String, rows: [Podcast]) {
     
     subscript(_ indexPath: IndexPath) -> Podcast {
-        return self[indexPath.section as! Self.Index].podcasts[indexPath.row]
+        return self[indexPath.section as! Self.Index].rows[indexPath.row]
     }
 }
 

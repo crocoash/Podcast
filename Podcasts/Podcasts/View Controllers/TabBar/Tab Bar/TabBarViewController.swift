@@ -144,7 +144,7 @@ extension TabBarViewController {
             return DetailViewController.init(
                 coder: coder,
                 podcast: podcast,
-                playlist: playList,
+                podcasts: playList,
                 player: player,
                 downloadService: downloadService,
                 likeManager: self.likeManager,

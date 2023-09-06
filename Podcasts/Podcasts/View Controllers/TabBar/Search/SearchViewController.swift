@@ -45,7 +45,7 @@ class SearchViewController : UIViewController {
         }
     }
     
-    private var playList: [(key: String, podcasts: [Podcast])] = []
+    private var playList: [(key: String, rows: [Podcast])] = []
    
     private var authors = Array<Author>()
     
@@ -316,7 +316,7 @@ extension SearchViewController: SearchCollectionViewDataSource {
     }
     
     func searchCollectionView(_ searchCollectionView: SearchCollectionView, numbersOfRowsInSection index: Int) -> Int {
-        return playList[index].podcasts.count
+        return playList[index].rows.count
     }
     
     func searchCollectionView(_ searchCollectionView: SearchCollectionView, rowForIndexPath indexPath: IndexPath) -> SearchCollectionView.Row {

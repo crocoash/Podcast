@@ -93,7 +93,7 @@ extension NSManagedObject {
                 self.setValue(object, forKey: key)
             } else {
                 let value = self.updateObject(by: object, withRelationShip: false)
-                self.setValue(object, forKey: key)
+                self.setValue(value, forKey: key)
             }
         } else {
             if object.managedObjectContext == nil {
