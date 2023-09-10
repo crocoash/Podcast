@@ -27,13 +27,13 @@ extension FirebaseProtocol {
 }
 
 //MARK: - Input
-protocol FirebaseDatabaseInput {
-   func update(entity: any FirebaseProtocol)
-   func update<T: FirebaseProtocol>(vc: (any FirebaseDatabaseDelegate), viewContext: NSManagedObjectContext, type: T.Type) 
-   func add(entity: any FirebaseProtocol)
-   func remove(entity: any FirebaseProtocol)
-   func observe<T: FirebaseProtocol>(vc: (any FirebaseDatabaseDelegate),viewContext: NSManagedObjectContext, type: T.Type)
-}
+//protocol FirebaseDatabaseInput {
+//   func update(entity: any FirebaseProtocol)
+//   func update<T: FirebaseProtocol>(vc: (any FirebaseDatabaseDelegate), viewContext: NSManagedObjectContext, type: T.Type)
+//   func add(entity: any FirebaseProtocol)
+//   func remove(entity: any FirebaseProtocol)
+//   func observe<T: FirebaseProtocol>(vc: (any FirebaseDatabaseDelegate),viewContext: NSManagedObjectContext, type: T.Type)
+//}
  
 //MARK: - Delegate
 protocol FirebaseDatabaseDelegate: AnyObject {
@@ -45,8 +45,10 @@ protocol FirebaseDatabaseDelegate: AnyObject {
    func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didUpdate entity: (any FirebaseProtocol))
 }
 
-class FirebaseDatabase: FirebaseDatabaseInput {
-    
+class FirebaseDatabase: ISingleton {
+   
+   required init(container: IContainer, args: ()) {}
+   
    private let userID = Auth.auth().currentUser!.uid
    
    private var ref = Database.database(url: "https://podcast-app-8fcd2-default-rtdb.europe-west1.firebasedatabase.app").reference()

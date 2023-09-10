@@ -44,33 +44,34 @@ struct DownloadServiceType: PodcastCellDownloadProtocol {
 //MARK: - Delegate
 protocol DownloadServiceDelegate: AnyObject {
         
-    func updateDownloadInformation (_ downloadService: DownloadServiceInput, entity: DownloadServiceType)
-    func didEndDownloading         (_ downloadService: DownloadServiceInput, entity: DownloadServiceType)
-    func didPauseDownload          (_ downloadService: DownloadServiceInput, entity: DownloadServiceType)
-    func didContinueDownload       (_ downloadService: DownloadServiceInput, entity: DownloadServiceType)
-    func didStartDownload          (_ downloadService: DownloadServiceInput, entity: DownloadServiceType)
-    func didRemoveEntity           (_ downloadService: DownloadServiceInput, entity: DownloadServiceType)
+    func updateDownloadInformation (_ downloadService: DownloadService, entity: DownloadServiceType)
+    func didEndDownloading         (_ downloadService: DownloadService, entity: DownloadServiceType)
+    func didPauseDownload          (_ downloadService: DownloadService, entity: DownloadServiceType)
+    func didContinueDownload       (_ downloadService: DownloadService, entity: DownloadServiceType)
+    func didStartDownload          (_ downloadService: DownloadService, entity: DownloadServiceType)
+    func didRemoveEntity           (_ downloadService: DownloadService, entity: DownloadServiceType)
 }
 
 //MARK: - Input
-protocol DownloadServiceInput: MultyDelegateServiceInput {
-    func isDownloaded(entity: InputDownloadProtocol) -> Bool
-    func conform(entity: InputDownloadProtocol)
-    func cancelDownload(_ entity: InputDownloadProtocol)
-}
+//protocol DownloadServiceInput: MultyDelegateServiceInput {
+//    func isDownloaded(entity: InputDownloadProtocol) -> Bool
+//    func conform(entity: InputDownloadProtocol)
+//    func cancelDownload(_ entity: InputDownloadProtocol)
+//}
 
-class DownloadService: MultyDelegateService<DownloadServiceDelegate>, DownloadServiceInput {
-  
+class DownloadService: MultyDelegateService<DownloadServiceDelegate>, ISingleton {
+    
     typealias DownloadsSession = [URL: DownloadServiceType]
     
-    private let dataStoreManager: DataStoreManagerInput
+    private let dataStoreManager: DataStoreManager
     private let networkMonitor: NetworkMonitor
     
-    init(dataStoreManager: DataStoreManagerInput, networkMonitor: NetworkMonitor) {
-        self.networkMonitor = networkMonitor
-        self.dataStoreManager = dataStoreManager
+    //MARK: init
+    required init(container: IContainer, args: ()) {
+        self.networkMonitor = container.resolve()
+        self.dataStoreManager = container.resolve()
     }
-   
+  
     lazy var downloadsSession: URLSession = {
         let configuration = URLSessionConfiguration.background(withIdentifier: "BackGroundSession")
         let downloadsSession = URLSession(configuration: configuration, delegate: self, delegateQueue: nil)

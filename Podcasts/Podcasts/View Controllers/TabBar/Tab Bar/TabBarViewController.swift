@@ -19,15 +19,15 @@ class TabBarViewController: UITabBarController {
     private var smallPlayer: SmallPlayerView?
     
     private let userViewModel: UserViewModel
-    private let firestorageDatabase: FirestorageDatabaseInput
-    private var player: PlayerInput
-    private let downloadService: DownloadServiceInput
-    private let favouriteManager: FavouriteManagerInput
-    private let likeManager: LikeManagerInput
-    private let firebaseDataBase: FirebaseDatabaseInput
-    private let apiService: ApiServiceInput
-    private let dataStoreManager: DataStoreManagerInput
-    private let listeningManager: ListeningManagerInput
+    private let firestorageDatabase: FirestorageDatabase
+    private var player: Player
+    private let downloadService: DownloadService
+    private let favouriteManager: FavouriteManager
+    private let likeManager: LikeManager
+    private let firebaseDataBase: FirebaseDatabase
+    private let apiService: ApiService
+    private let dataStoreManager: DataStoreManager
+    private let listeningManager: ListeningManager
     
     lazy private var ListVC: ListViewController = {
         
@@ -40,7 +40,8 @@ class TabBarViewController: UITabBarController {
                                         favouriteManager: favouriteManager,
                                         firebaseDataBase: firebaseDataBase,
                                         dataStoreManager: dataStoreManager,
-                                        listeningManager: listeningManager)
+                                        listeningManager: listeningManager,
+                                        likeManager: likeManager)
             
             guard let vc = vc else { fatalError() }
             
@@ -67,7 +68,7 @@ class TabBarViewController: UITabBarController {
     
     lazy private var settingsVC: SettingsTableViewController =  SettingsTableViewController.create { [weak self] coder in
         guard let self = self,
-              let vc = SettingsTableViewController(coder: coder, userViewModel, firestorageDatabase: firestorageDatabase, apiService: apiService)
+              let vc = SettingsTableViewController(coder: coder)
         else { fatalError() }
         
         vc.transitioningDelegate = self
@@ -79,15 +80,15 @@ class TabBarViewController: UITabBarController {
     //MARK: init
     init?(coder: NSCoder,
                                userViewModel: UserViewModel,
-                               firestorageDatabase: FirestorageDatabaseInput,
-                               player: PlayerInput,
-                               downloadService: DownloadServiceInput,
-                               favouriteManager: FavouriteManagerInput,
-                               likeManager: LikeManagerInput,
-                               firebaseDataBase: FirebaseDatabaseInput,
-                               apiService: ApiServiceInput,
-                               dataStoreManager: DataStoreManagerInput,
-                               listeningManager: ListeningManagerInput) {
+                               firestorageDatabase: FirestorageDatabase,
+                               player: Player,
+                               downloadService: DownloadService,
+                               favouriteManager: FavouriteManager,
+                               likeManager: LikeManager,
+                               firebaseDataBase: FirebaseDatabase,
+                               apiService: ApiService,
+                               dataStoreManager: DataStoreManager,
+                               listeningManager: ListeningManager) {
         
         self.userViewModel = userViewModel
         self.firestorageDatabase = firestorageDatabase
@@ -123,7 +124,7 @@ extension TabBarViewController {
         guard smallPlayer == nil else { return }
         let model = SmallPlayerViewModel(track)
         let smallPlayer = SmallPlayerView(vc: self, model: model, player: player)
-        tabBar.addSubview(smallPlayer)
+        view.addSubview(smallPlayer)
         smallPlayer.isHidden = false
         self.smallPlayer = smallPlayer
         

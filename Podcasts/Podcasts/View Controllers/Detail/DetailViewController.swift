@@ -350,7 +350,12 @@ extension DetailViewController: EpisodeTableViewMyDelegate {
    
    func episodeTableView(_ episodeTableView: EpisodeTableView, didSelectStar indexPath: IndexPath) {
       let podcast = playlist[indexPath.section].rows[indexPath.row] as! Podcast
-      favouriteManager.addOrRemoveFavouritePodcast(entity: podcast)
+       let isFavourite = favouriteManager.isFavourite(podcast)
+       if isFavourite {
+           favouriteManager.removeFavouritePodcast(entity: podcast)
+       } else {
+           favouriteManager.addFavouritePodcast(entity: podcast)
+       }
    }
    
    func episodeTableView(_ episodeTableView: EpisodeTableView, didSelectDownLoadImage indexPath: IndexPath) {
@@ -424,25 +429,45 @@ extension DetailViewController: EpisodeTableViewMyDataSource {
 extension DetailViewController: FavouriteManagerDelegate {
    
    func favouriteManager(_ favouriteManager: FavouriteManagerInput, didRemove favourite: FavouritePodcast) {
-      if let index = podcasts.firstIndex(matching: favourite.podcast) {
-         episodeTableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+      if let indexPath = playlist[favourite.podcast] {
+         episodeTableView.reloadRows(at: [indexPath], with: .automatic)
+          
          view.addToast(title: favourite.podcast.isFavourite ? "Add" : "Remove" + " to favourite" , smallPlayerView.isHidden ? .bottom : .bottomWithPlayer)
       }
    }
    
    func favouriteManager(_ favouriteManager: FavouriteManagerInput, didAdd favourite: FavouritePodcast) {
-      if let index = podcasts.firstIndex(matching: favourite.podcast) {
-         episodeTableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+      if let indexPath = playlist[favourite.podcast]  {
+         episodeTableView.reloadRows(at: [indexPath], with: .automatic)
          view.addToast(title: favourite.podcast.isFavourite ? "Add" : "Remove" + " to favourite" , smallPlayerView.isHidden ? .bottom : .bottomWithPlayer)
       }
+       
+    
    }
 }
-
 
 //MARK: - ++++++++++++++++
 
 extension Collection where Element == (key: (AnyHashable), rows: [(any (Identifiable & AnyObject))]) {
    
+    subscript(_ entity: (any (Identifiable & AnyObject))) -> IndexPath? {
+        for (sectionIndex, section) in self.enumerated() {
+            for (rowIndex, row) in section.rows.enumerated() {
+                print("\(entity.id )")
+                print("\(row.id )")
+                if let idString = entity.id as? String {
+                    if let rowId = row.id as? String {
+                        if idString == rowId {
+                            return IndexPath(row: rowIndex, section: sectionIndex)
+                        }
+                    }
+                }
+            }
+        }
+        return nil
+    }
+    
+    
    func conform(_ playlist: [Element],
                 removeSection: ((_ index: Int) -> ()),
                 removeItem: ((_ indexPath: IndexPath) -> ()),

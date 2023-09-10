@@ -14,28 +14,28 @@ protocol LikeManagerDelegate {
 }
 
 //MARK: -
-protocol LikeManagerInput: MultyDelegateServiceInput {
-    func addToLikedMoments(entity: Any, moment: Double)
-//    func saveLikedMoments(entity: LikedMoment)
+//protocol LikeManagerInput: MultyDelegateServiceInput {
+//    func addToLikedMoments(entity: Any, moment: Double)
+//    func removeAll()
 //    func removeFromLikedMoments(entity: LikedMoment)
-}
+//}
 
-class LikeManager: MultyDelegateService<LikeManagerDelegate>, LikeManagerInput {
+class LikeManager: MultyDelegateService<LikeManagerDelegate>, ISingleton {
     
     lazy private var viewContext = dataStoreManager.viewContext
     
-    private let dataStoreManager: DataStoreManagerInput
-    private let firebaseDatabase: FirebaseDatabaseInput
-      
-    init(dataStoreManager: DataStoreManagerInput, firebaseDatabase: FirebaseDatabaseInput) {
-        self.dataStoreManager = dataStoreManager
-        self.firebaseDatabase = firebaseDatabase
+    private let dataStoreManager: DataStoreManager
+    private let firebaseDatabase: FirebaseDatabase
+    
+    //MARK: init 
+    required init(container: IContainer, args: ()) {
+        self.dataStoreManager = container.resolve()
+        self.firebaseDatabase = container.resolve()
         
         super.init()
         
-       firebaseDatabase.observe(vc: self, viewContext: viewContext, type:  LikedMoment.self)
-       firebaseDatabase.update(vc: self, viewContext: dataStoreManager.viewContext, type: LikedMoment.self)
-       
+        firebaseDatabase.observe(vc: self, viewContext: viewContext, type:  LikedMoment.self)
+        firebaseDatabase.update(vc: self, viewContext: dataStoreManager.viewContext, type: LikedMoment.self)
     }
     
     func addToLikedMoments(entity: Any, moment: Double) {
@@ -43,35 +43,55 @@ class LikeManager: MultyDelegateService<LikeManagerDelegate>, LikeManagerInput {
             let moment = LikedMoment(podcast: podcast, moment: moment, viewContext: viewContext, dataStoreManagerInput: dataStoreManager)
             firebaseDatabase.add(entity: moment)
             delegates {
-               $0.likeManager(self, didAdd: moment)
+                $0.likeManager(self, didAdd: moment)
             }
         }
     }
     
-    ///from FireBase
+    func removeFromLikedMoments(entity: LikedMoment) {
+        removeFromLikedMoments(entity: entity, removeFromFireBase: true)
+    }
+    
+    
+    func removeAll() {
+        dataStoreManager.allObjectsFromCoreData(type: LikedMoment.self).forEach {
+            removeFromLikedMoments(entity: $0, removeFromFireBase: true)
+        }
+    }
+}
+
+//MARK: - Private Methods
+extension LikeManager {
+    
+    private func removeFromLikedMoments(entity: LikedMoment, removeFromFireBase: Bool) {
+                
+        let abstractLiked = dataStoreManager.initAbstractObject(for: entity)
+        dataStoreManager.removeFromCoreData(entity: entity)
+        
+        if removeFromFireBase {
+            firebaseDatabase.remove(entity: abstractLiked)
+        }
+        
+        delegates {
+            $0.likeManager(self, didRemove: abstractLiked)
+        }
+    }
+    
+    private func removeAllOnlyFromCoreData() {
+        dataStoreManager.allObjectsFromCoreData(type: LikedMoment.self).forEach {
+            removeFromLikedMoments(entity: $0, removeFromFireBase: false)
+        }
+    }
+    
     private func saveLikedMoments(entity: LikedMoment) {
         if dataStoreManager.fetchObject(entity: entity, predicates: nil) == nil {
             let moment = LikedMoment(entity, viewContext: viewContext, dataStoreManagerInput: dataStoreManager)
             delegates {
-               $0.likeManager(self, didAdd: moment)
+                $0.likeManager(self, didAdd: moment)
             }
         }
     }
-    
-    ///from FireBase
-    private func removeFromLikedMoments(entity: LikedMoment) {
-        dataStoreManager.removeFromCoreData(entity: entity)
-        delegates {
-            $0.likeManager(self, didRemove: entity)
-        }
-    }
-    
-    ///from FireBase
-    private func removeAll() {
-        dataStoreManager.allObjectsFromCoreData(type: LikedMoment.self).forEach {
-            removeFromLikedMoments(entity: $0)
-        }
-    }
+
 }
 
 //MARK: - FirebaseDatabaseDelegate
@@ -79,20 +99,20 @@ extension LikeManager: FirebaseDatabaseDelegate {
     
     func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didGetEmptyData type: any FirebaseProtocol.Type) {
         if type is LikedMoment.Type {
-          removeAll()
+            removeAllOnlyFromCoreData()
         }
     }
     
     func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didAdd entity: (any FirebaseProtocol)) {
         if let likedMoment = entity as? LikedMoment {
-           saveLikedMoments(entity: likedMoment)
-         }
+            saveLikedMoments(entity: likedMoment)
+        }
     }
     
     func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didRemove entity: (any FirebaseProtocol)) {
         if let likedMoment = entity as? LikedMoment {
-           removeFromLikedMoments(entity: likedMoment)
-       }
+            removeFromLikedMoments(entity: likedMoment, removeFromFireBase: false)
+        }
     }
     
     func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didAdd entities: [any FirebaseProtocol]) {}

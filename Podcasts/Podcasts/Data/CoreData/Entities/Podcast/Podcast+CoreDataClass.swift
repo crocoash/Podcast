@@ -376,11 +376,3 @@ extension Podcast: PodcastCellProtocol, InputPodcastCell {
     
     var imageForPodcastCell: String? { return image600 }
 }
-
-//MARK: - InputFavouriteType
-extension Podcast: InputFavouriteType {
-    
-    var favouriteInputTypeid: String {
-        return id
-    }
-}

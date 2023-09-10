@@ -14,27 +14,27 @@ protocol ListDataManagerDelegate: AnyObject {
 }
 
 //MARK: - Input
-protocol ListDataManagerInput: MultyDelegateServiceInput {
-   func change(for entity: ListSection, sequenceNumber: Int)
-   func changeActiveState(for listSection: ListSection)
-}
+//protocol ListDataManagerInput: MultyDelegateServiceInput {
+//   func change(for entity: ListSection, sequenceNumber: Int)
+//   func changeActiveState(for listSection: ListSection)
+//}
 
-class ListDataManager: MultyDelegateService<ListDataManagerDelegate>, ListDataManagerInput {
+class ListDataManager: MultyDelegateService<ListDataManagerDelegate>, ISingleton {
+    
+    //MARK: init
+    required init(container: IContainer, args: Void) {
+        self.dataStoreManager = container.resolve()
+        self.firebaseDatabase = container.resolve()
+        
+        super.init()
+        
+        firebaseDatabase.update(vc: self, viewContext: dataStoreManager.viewContext, type: ListData.self)
+        firebaseDatabase.observe(vc: self, viewContext: dataStoreManager.viewContext, type: ListData.self)
+    }
    
-   private let dataStoreManager: DataStoreManagerInput
-   private let firebaseDatabase: FirebaseDatabaseInput
-   
-   //MARK: init
-   init(dataStoreManager: DataStoreManagerInput, firebaseDatabase: FirebaseDatabaseInput) {
-      
-      self.dataStoreManager = dataStoreManager
-      self.firebaseDatabase = firebaseDatabase
-      
-      super.init()
-      
-      firebaseDatabase.update(vc: self, viewContext: dataStoreManager.viewContext, type: ListData.self)
-      firebaseDatabase.observe(vc: self, viewContext: dataStoreManager.viewContext, type: ListData.self)
-   }
+   private let dataStoreManager: DataStoreManager
+   private let firebaseDatabase: FirebaseDatabase
+
    
    func change(for entity: ListSection, sequenceNumber: Int) {
       var listSections = dataStoreManager.viewContext.fetchObjectsArray(ListSection.self, sortDescriptors: [NSSortDescriptor(key: #keyPath(ListSection.sequenceNumber), ascending: true)])

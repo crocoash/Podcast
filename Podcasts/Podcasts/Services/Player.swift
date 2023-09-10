@@ -90,22 +90,24 @@ protocol OutputPlayerProtocol: PodcastCellPlayableProtocol, BigPlayerPlayablePro
 
 protocol PlayerDelegate {
     
-   func playerDidEndPlay                (_ player: Player, with track: OutputPlayerProtocol)
+    func playerDidEndPlay                (_ player: Player, with track: OutputPlayerProtocol)
     func playerStartLoading             (_ player: Player, with track: OutputPlayerProtocol)
     func playerDidEndLoading            (_ player: Player, with track: OutputPlayerProtocol)
     func playerUpdatePlayingInformation (_ player: Player, with track: OutputPlayerProtocol)
     func playerStateDidChanged          (_ player: Player, with track: OutputPlayerProtocol)
 }
 
-class Player: MultyDelegateService<PlayerDelegate> {
-    
-    //MARK: init
-    override init() {
+class Player: MultyDelegateService<PlayerDelegate>, ISingleton {
+    required init(container: IContainer, args: ()) {
         super.init()
         addObserverForEndTrack()
         configureMPRemoteCommandCenter()
     }
-   
+    
+    
+   private let defaultIsPlaying = false
+   private let defauisLoading = false
+ 
     private(set) var playlist: [Track] = []
     private(set) var currentTrack: (track: Track, index: Int)?
     private var mpRemoteCommandCenter = MPRemoteCommandCenter.shared()
@@ -156,14 +158,14 @@ extension Player: PlayerInput {
     func pause() {
         playerAVP.pause()
         removeTimeObserve()
-        isPlaying = false
-        isLoading = false
+        isPlaying = defaultIsPlaying
+        isLoading = defauisLoading
     }
     
     func play() {
         playerAVP.play()
         addTimeObserve()
-        isPlaying = true
+        isPlaying = !defaultIsPlaying
     }
     
     func playOrPause() {

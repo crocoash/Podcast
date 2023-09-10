@@ -21,7 +21,12 @@ typealias PlaylistByNewest  = [(key: String, podcasts: [Podcast])]
 typealias PlayListByOldest = PlaylistByNewest
 typealias PlayListByGenre = PlaylistByNewest
 
-class SearchViewController : UIViewController {
+class SearchViewController : UIViewController, IPerRequest {
+
+    
+    
+    typealias Arguments = Void
+    
     
     private let apiService: ApiServiceInput
     
@@ -74,6 +79,10 @@ class SearchViewController : UIViewController {
         self.apiService = apiService
         
         super.init(coder: coder)
+    }
+    
+    required convenience init(container: IContainer, args: Void) {
+        self.init(coder: <#T##NSCoder#>)
     }
     
     required init?(coder: NSCoder) {

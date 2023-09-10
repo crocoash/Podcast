@@ -51,7 +51,7 @@ class FavouriteTableView: UITableView {
     override func reloadData() {
         super.reloadData()
         diffableDataSource.updateTittles(titles: configureTitles())
-        diffableDataSource.apply(mySnapShot)
+        reloadTableView()
         showEmptyImage()
         setScrollEnabled()
     }
@@ -72,24 +72,6 @@ class FavouriteTableView: UITableView {
     func reloadTableViewData() {
         configureDataSource()
         reloadTableView()
-    }
-    
-    func updateTableView(with type: Any) {
-        if !isTracking {
-            visibleCells.forEach {
-                if let podcastCell = $0 as? PodcastCell {
-                    podcastCell.update(with: type)
-                }
-                
-                if let listeningPodcast = $0 as? ListeningPodcastCell {
-                    listeningPodcast.update(with: type)
-                }
-                
-                //                if let likedPodcastTableViewCell = $0 as? LikedPodcastTableViewCell {
-                //                    likedPodcastTableViewCell.update(with: type)
-                //                }
-            }
-        }
     }
     
     func deleteSection(at index: Int) {

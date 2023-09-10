@@ -13,19 +13,29 @@ protocol ListViewControllerDelegate: AnyObject {
     func listViewController(_ listViewController: ListViewController, didSelect podcast: Podcast)
 }
 
-class ListViewController: UIViewController {
+class ListViewController: UIViewController, IHaveViewModel, IPerRequest {
+    
+    typealias Arguments = Void
+    
+    func viewModelChanged() {
+        
+    }
+    
+    func viewModelChanged(_ viewModel: AnyObject) {
+        
+    }
     
     //MARK: services
-    private var downloadService:  DownloadServiceInput
-    private var player:           PlayerInput
-    private let firebaseDataBase: FirebaseDatabaseInput
-    private let favouriteManager: FavouriteManagerInput
-    private let dataStoreManager: DataStoreManagerInput
-    private let listeningManager: ListeningManagerInput
+    private var downloadService:  DownloadService
+    private var player:           Player
+    private let firebaseDataBase: FirebaseDatabase
+    private let favouriteManager: FavouriteManager
+    private let dataStoreManager: DataStoreManager
+    private let listeningManager: ListeningManager
+    private let likeManager:      LikeManager
+    private var listDataManager: ListDataManager
     
-    lazy private var listDataManager: ListDataManagerInput = ListDataManager(dataStoreManager: dataStoreManager, firebaseDatabase: firebaseDataBase)
-    
-    weak var delegate: ListViewControllerDelegate?
+   weak var delegate: ListViewControllerDelegate?
     
     private let refreshControl = UIRefreshControl()
     private var alertTopConstraint: NSLayoutConstraint?
@@ -35,32 +45,29 @@ class ListViewController: UIViewController {
     lazy private var heightTabBarItem = tabBarController?.tabBar.frame.height ?? 0
     
     //MARK: Outlets
+   @IBOutlet private weak var listView: ListView!
+
     @IBOutlet private weak var favouriteTableView: FavouriteTableView!
     @IBOutlet private weak var bottomTableViewConstraint: NSLayoutConstraint!
     
     private var alertSortListView: AlertSortListView?
     
-    lazy private var model = ListViewModel(vc: self, dataStoreManager: dataStoreManager, listDataManager: listDataManager)
+    lazy private var model = ListViewModel(vc: self, dataStoreManager: dataStoreManager)
     
     //MARK: init
-    init?<T: ListViewControllerDelegate>(coder: NSCoder,
-                                         _ vc: T,
-                                         downloadService: DownloadServiceInput,
-                                         player: PlayerInput,
-                                         favouriteManager: FavouriteManagerInput,
-                                         firebaseDataBase: FirebaseDatabaseInput,
-                                         dataStoreManager: DataStoreManagerInput,
-                                         listeningManager: ListeningManagerInput) {
-        
-        self.downloadService = downloadService
-        self.player = player
-        self.favouriteManager = favouriteManager
-        self.firebaseDataBase = firebaseDataBase
-        self.dataStoreManager = dataStoreManager
-        self.delegate = vc
-        self.listeningManager = listeningManager
-        
-        super.init(coder: coder)
+    init?<T: ListViewControllerDelegate>(coder: NSCoder,_ vc: T) {
+        self.viewModel = model
+    }
+    
+    required init(container: IContainer, args: Void) {
+        self.downloadService = container.resolve()
+        self.player = container.resolve()
+        self.firebaseDataBase = container.resolve()
+        self.favouriteManager = container.resolve()
+        self.dataStoreManager = container.resolve()
+        self.listeningManager = container.resolve()
+        self.likeManager = container.resolve()
+        self.listDataManager = container.resolve()
     }
     
     required init?(coder: NSCoder) {
@@ -122,7 +129,6 @@ class ListViewController: UIViewController {
         guard let cell = sender.view as? UITableViewCell,
               let indexPath = favouriteTableView.indexPath(for: cell),
               let favouritePodcast = model.getObjectInSection(for: indexPath) as? FavouritePodcast else { return }
-        
         delegate?.listViewController(self, didSelect: favouritePodcast.podcast)
     }
     
@@ -141,6 +147,8 @@ class ListViewController: UIViewController {
     
     private func removeAllAction() {
         favouriteManager.removeAll()
+        listeningManager.removeAll()
+        likeManager.removeAll()
     }
 }
 
@@ -148,7 +156,7 @@ class ListViewController: UIViewController {
 extension ListViewController {
     
     private func configureNavigationItem() {
-        let value = model.activeSections.isEmpty && model.isSearchedText
+        let value = model.sectionsIsEmpty && model.isSearchedText
         
         navigationItem.rightBarButtonItem = value ? nil : removeAllButton
         navigationItem.leftBarButtonItem = value ? nil : editButton
@@ -157,7 +165,7 @@ extension ListViewController {
     }
     
     private func setSearchController() {
-        navigationItem.searchController = (model.activeSections.isEmpty && !model.isSearchedText) ? nil : searchController
+        navigationItem.searchController = (model.sectionsIsEmpty && !model.isSearchedText) ? nil : searchController
     }
     
     private func configureScopeBar() {
@@ -179,8 +187,7 @@ extension ListViewController {
         guard let tabBarController = tabBarController else { fatalError() }
         
         let vc = AlertSortListView(vc: self, dataStoreManager: dataStoreManager, listDataManager: listDataManager)
-        tabBarController.view.addSubview(vc)
-        
+        tabBarController.view.superview?.addSubview(vc)
         alertSortListView = vc
     }
     
@@ -320,57 +327,9 @@ extension ListViewController: UISearchBarDelegate {
     }
 }
 
-//MARK: - PlayerEventNotification
-extension ListViewController: PlayerDelegate {
-    
-    func playerDidEndPlay(_ player: Player, with track: OutputPlayerProtocol) {
-        favouriteTableView.updateTableView(with: track)
-    }
-    
-    func playerStartLoading(_ player: Player, with track: OutputPlayerProtocol) {
-        favouriteTableView.updateTableView(with: track)
-    }
-    
-    func playerDidEndLoading(_ player: Player, with track: OutputPlayerProtocol) {
-        favouriteTableView.updateTableView(with: track)
-    }
-    
-    func playerUpdatePlayingInformation(_ player: Player, with track: OutputPlayerProtocol) {
-        favouriteTableView.updateTableView(with: track)
-    }
-    
-    func playerStateDidChanged(_ player: Player, with track: OutputPlayerProtocol) {
-        favouriteTableView.updateTableView(with: track)
-    }
-}
 
 //MARK: - DownloadEventNotifications
-extension ListViewController: DownloadServiceDelegate {
-    
-    func updateDownloadInformation(_ downloadService: DownloadServiceInput, entity: DownloadServiceType) {
-        favouriteTableView.updateTableView(with: entity)
-    }
-    
-    func didEndDownloading(_ downloadService: DownloadServiceInput, entity: DownloadServiceType) {
-        favouriteTableView.updateTableView(with: entity)
-    }
-    
-    func didPauseDownload(_ downloadService: DownloadServiceInput, entity: DownloadServiceType) {
-        favouriteTableView.updateTableView(with: entity)
-    }
-    
-    func didContinueDownload(_ downloadService: DownloadServiceInput, entity: DownloadServiceType) {
-        favouriteTableView.updateTableView(with: entity)
-    }
-    
-    func didStartDownload(_ downloadService: DownloadServiceInput, entity: DownloadServiceType) {
-        favouriteTableView.updateTableView(with: entity)
-    }
-    
-    func didRemoveEntity(_ downloadService: DownloadServiceInput, entity: DownloadServiceType) {
-        favouriteTableView.updateTableView(with: entity)
-    }
-}
+
 
 //MARK: - NSFetchedResultsControllerDelegate
 extension ListViewController: NSFetchedResultsControllerDelegate {
@@ -421,7 +380,7 @@ extension ListViewController: FavouriteTableDataSource {
     }
     
     func favouriteTableViewCountOfSections(_ favouriteTableView: FavouriteTableView) -> Int {
-        return model.countOfActiveSections
+        return model.countOfSections
     }
     
     func favouriteTableView(_ favouriteTableView: FavouriteTableView, countOfRowsInSection index: Int) -> Int {
@@ -440,19 +399,19 @@ extension ListViewController: PodcastCellDelegate {
         guard let indexPath = favouriteTableView.indexPath(for: podcastCell),
               let favouritePodcast = model.getObjectInSection(for: indexPath) as? FavouritePodcast else { return }
         
-        favouriteManager.addOrRemoveFavouritePodcast(entity: favouritePodcast.podcast)
+        favouriteManager.removeFavouritePodcast(entity: favouritePodcast)
     }
     
     func podcastCellDidSelectDownLoadImage(_ podcastCell: PodcastCell) {
         guard let indexPath = favouriteTableView.indexPath(for: podcastCell) else { return }
-        guard let entity = model.getObjectInSection(for: indexPath) as? InputDownloadProtocol else { return }
+        guard let entity = model.getObjectInSection(for: indexPath) as? DownloadProtocol else { return }
         downloadService.conform(entity: entity)
     }
     
     func podcastCellDidTouchPlayButton(_ podcastCell: PodcastCell) {
         guard let indexPath = favouriteTableView.indexPath(for: podcastCell),
               let favouritePodcast = model.getObjectInSection(for: indexPath) as? FavouritePodcast,
-              let favouritePodcasts = model.getObjectsInSections(for: indexPath) as? [FavouritePodcast] else { fatalError() }
+              let favouritePodcasts = model.getObjectsInSections(for: indexPath.section) as? [FavouritePodcast] else { fatalError() }
         
         player.conform(track: favouritePodcast.podcast, trackList: favouritePodcasts.map { $0.podcast })
     }

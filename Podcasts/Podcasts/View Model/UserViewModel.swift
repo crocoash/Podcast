@@ -7,7 +7,13 @@
 
 import Foundation
 
-class UserViewModel {
+class UserViewModel: IPerRequest {
+    
+    required init(container: IContainer, args: Void) {
+        userDocument = UserModel(json: UserDefaults.standard.data(forKey: String(describing: Self.self))) ?? UserModel()
+    }
+    
+    typealias Arguments = Void
     
     var userLogin: String? {
         return userDocument.user.userName
@@ -28,7 +34,7 @@ class UserViewModel {
     }
     
     init() {
-       userDocument = UserModel(json: UserDefaults.standard.data(forKey: String(describing: Self.self))) ?? UserModel()
+      
     }
     
     func changeUserName(newName: String) {

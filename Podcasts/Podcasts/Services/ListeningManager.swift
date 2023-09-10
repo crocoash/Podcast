@@ -23,27 +23,30 @@ protocol ListeningManagerDelegate: AnyObject {
 //}
 
 //MARK: - Input
-protocol ListeningManagerInput: MultyDelegateServiceInput {
-    func saveListeningProgress(by entity: Track)
-    func removeListeningPodcast(_ entity: ListeningPodcast)
-}
+//protocol ListeningManagerInput: MultyDelegateServiceInput {
+//    func saveListeningProgress(by entity: Track)
+//    func removeListeningPodcast(_ entity: ListeningPodcast)
+//    func removeAll()
+//}
 
-class ListeningManager: MultyDelegateService<ListeningManagerDelegate>, ListeningManagerInput {
+class ListeningManager: MultyDelegateService<ListeningManagerDelegate>, ISingleton {
     
-    private let dataStoreManager: DataStoreManagerInput
-    private let firebaseDatabase: FirebaseDatabaseInput
-    private let player: PlayerInput
-    
-    init(dataStoreManager: DataStoreManagerInput, firebaseDatabaseInput: FirebaseDatabaseInput, player: PlayerInput) {
-        self.dataStoreManager = dataStoreManager
-        self.firebaseDatabase = firebaseDatabaseInput
-        self.player = player
+    required init(container: IContainer, args: ()) {
         
+        self.dataStoreManager = container.resolve()
+        self.firebaseDatabase = container.resolve()
+        self.player = container.resolve()
+
         super.init()
-        
+
         firebaseDatabase.update(vc: self, viewContext: dataStoreManager.viewContext, type: ListeningPodcast.self)
         firebaseDatabase.observe(vc: self, viewContext: dataStoreManager.viewContext, type: ListeningPodcast.self)
     }
+    
+    private let dataStoreManager: DataStoreManager
+    private let firebaseDatabase: FirebaseDatabase
+    private let player: Player
+   
     
     func saveListeningProgress(by entity: Track) {
         
@@ -79,19 +82,14 @@ class ListeningManager: MultyDelegateService<ListeningManagerDelegate>, Listenin
     }
     
     func removeListeningPodcast(_ entity: ListeningPodcast) {
-        let abstractListeningPodcast = dataStoreManager.initAbstractObject(for: entity)
-        dataStoreManager.removeFromCoreData(entity: entity)
-        
-        firebaseDatabase.remove(entity: abstractListeningPodcast)
-        
-        delegates {
-            $0.listeningManager(self, didRemove: abstractListeningPodcast)
-        }
+        removeListeningPodcast(entity, removeFromFireBase: true)
     }
+    
+    
     
     func removeAll() {
         dataStoreManager.allObjectsFromCoreData(type: ListeningPodcast.self).forEach {
-            removeListeningPodcast($0)
+            removeListeningPodcast($0, removeFromFireBase: true)
         }
     }
 }
@@ -106,6 +104,26 @@ extension ListeningManager {
             $0.listeningManager(self, didSave: listeningPodcast)
         }
     }
+    
+    private func removeListeningPodcast(_ entity: ListeningPodcast, removeFromFireBase: Bool) {
+        
+        let abstractListeningPodcast = dataStoreManager.initAbstractObject(for: entity)
+        dataStoreManager.removeFromCoreData(entity: entity)
+        
+        if removeFromFireBase {
+            firebaseDatabase.remove(entity: abstractListeningPodcast)
+        }
+        
+        delegates {
+            $0.listeningManager(self, didRemove: abstractListeningPodcast)
+        }
+    }
+    
+    private func removeAllOnlyFromCoreData() {
+        dataStoreManager.allObjectsFromCoreData(type: ListeningPodcast.self).forEach {
+            removeListeningPodcast($0, removeFromFireBase: false)
+        }
+    }
 }
 
 //MARK: - FirebaseDatabaseDelegate
@@ -113,7 +131,7 @@ extension ListeningManager: FirebaseDatabaseDelegate {
     
     func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didGetEmptyData type: any FirebaseProtocol.Type) {
         if type is ListeningPodcast.Type {
-            removeAll()
+            removeAllOnlyFromCoreData()
         }
     }
     
@@ -125,7 +143,7 @@ extension ListeningManager: FirebaseDatabaseDelegate {
     
     func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didRemove entity: (any FirebaseProtocol)) {
         if let listeningPodcast = entity as? ListeningPodcast {
-            removeListeningPodcast(listeningPodcast)
+            removeListeningPodcast(listeningPodcast, removeFromFireBase: true)
         }
     }
     

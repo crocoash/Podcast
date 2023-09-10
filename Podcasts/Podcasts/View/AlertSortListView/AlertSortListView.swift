@@ -18,10 +18,10 @@ import UIKit
 
 class AlertSortListViewModel {
    
-   private let dataStoreManager: DataStoreManagerInput
-   private let listDataManager: ListDataManagerInput
+   private let dataStoreManager: DataStoreManager
+   private let listDataManager: ListDataManager
    
-   init(dataStoreManager: DataStoreManagerInput, listDataManager: ListDataManagerInput) {
+   init(dataStoreManager: DataStoreManager, listDataManager: ListDataManager) {
       self.dataStoreManager = dataStoreManager
       self.listDataManager = listDataManager
    }
@@ -53,8 +53,8 @@ class AlertSortListViewModel {
 class AlertSortListView: UIView {
    
    //MARK: Services
-   private let dataStoreManager: DataStoreManagerInput
-   private let listDataManager: ListDataManagerInput
+   private let dataStoreManager: DataStoreManager
+   private let listDataManager: ListDataManager
    
    
    @IBOutlet private weak var closeImageView: UIImageView!
@@ -86,7 +86,7 @@ class AlertSortListView: UIView {
    typealias InputType = AlertSortListViewDelegate & AlertSortListViewDataSource & UIViewController
    
    //MARK: init
-   init(vc: InputType, dataStoreManager: DataStoreManagerInput, listDataManager: ListDataManagerInput) {
+   init(vc: Type, dataStoreManager: DataStoreManager, listDataManager: ListDataManager) {
       
       self.dataStoreManager = dataStoreManager
       self.model = AlertSortListViewModel(dataStoreManager: dataStoreManager, listDataManager: listDataManager)

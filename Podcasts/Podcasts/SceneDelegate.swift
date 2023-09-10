@@ -26,7 +26,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }(NetworkMonitor())
     
     private let firebaseDatabase: FirebaseDatabaseInput = FirebaseDatabase()
-    private let dataStoreManager: DataStoreManagerInput = (DataStoreManager())
+    private let dataStoreManager: DataStoreManagerInput = DataStoreManager()
 
     lazy private var player: PlayerInput = Player()
         
@@ -101,3 +101,5 @@ extension SceneDelegate: NetworkMonitorDelegate {
         window?.rootViewController?.view.addSubview(view)
     }
 }
+
+
