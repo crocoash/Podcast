@@ -8,11 +8,12 @@
 import Foundation
 import CoreData
 
-class ListViewModel {
-   
+class ListViewModel: IPerRequest {
+  
+   typealias Arguments = NSFetchedResultsControllerDelegate
    typealias Section = SectionDocument.Section
    
-   private let dataStoreManager: DataStoreManagerInput
+   private let dataStoreManager: DataStoreManager
    private var searchedText = ""
    
    lazy private var favouriteFRC = dataStoreManager.conFigureFRC(for: FavouritePodcast.self)
@@ -26,14 +27,14 @@ class ListViewModel {
    private var sectionsDocument: SectionDocument = SectionDocument()
    
    //MARK: Init
-   init(vc: NSFetchedResultsControllerDelegate, dataStoreManager: DataStoreManagerInput) {
+   required init(container: IContainer, args: Arguments) {
       
-      self.dataStoreManager = dataStoreManager
-      
-      self.favouriteFRC.delegate = vc
-      self.likeMomentFRC.delegate = vc
-      self.listeningFRC.delegate = vc
-      self.listSectionFRC.delegate = vc
+      self.dataStoreManager = container.resolve()
+  
+      favouriteFRC.delegate = args
+      likeMomentFRC.delegate = args
+      listeningFRC.delegate = args
+      listSectionFRC.delegate = args
       
       let sections = configureSections()
       sectionsDocument.setNewSections(sections)

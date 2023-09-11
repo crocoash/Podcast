@@ -27,7 +27,12 @@ protocol PodcastCellDownloadProtocol {
 
 protocol UpdatingTypes: PodcastCellDownloadProtocol, PodcastCellPlayableProtocol {}
 
-class PodcastCellViewModel: UpdatingTypes {
+class PodcastCellViewModel: IPerRequest, UpdatingTypes {
+    
+    let listeningManager: ListeningManager
+    let favouriteManager: FavouriteManager
+    
+    typealias Arguments = Podcast
     
     var id: String
     var isFavourite: Bool 
@@ -54,20 +59,23 @@ class PodcastCellViewModel: UpdatingTypes {
     var duration: Double? 
     var trackId: String
     
-    init(podcast: Podcast) {
+    required init(container: IContainer, args: Podcast) {
+        self.id = args.id
+        self.dateDuration = "args.dateDuration"
+        self.descriptionMy = args.descriptionMy
+        self.trackName = args.trackName
+        self.imageForPodcastCell = args.image600
+        self.listeningProgress = args.listeningProgress
         
-        self.id = podcast.id
-        self.isFavourite = podcast.isFavourite
-        self.trackDuration = podcast.trackDuration
-        self.dateDuration = podcast.dateDuration
-        self.descriptionMy = podcast.descriptionMy
-        self.trackName = podcast.trackName
-        self.imageForPodcastCell = podcast.imageForPodcastCell
-        self.listeningProgress = podcast.listeningProgress
+        self.listeningManager = container.resolve()
+        self.favouriteManager = container.resolve()
         
-        self.trackId = podcast.id
-        self.downloadId = podcast.id
+        let listeningPodcast = listeningManager
+        
+        self.trackId = args.id
+        self.downloadId = args.id
         self.downloadingProgress = 0
+        
         self.isDownloading = false
         self.isGoingDownload = false
         self.downloadTotalSize = ""
@@ -75,6 +83,8 @@ class PodcastCellViewModel: UpdatingTypes {
         self.isPlaying = false
         self.isGoingPlaying = false
         self.duration =  0
+        self.trackDuration = "args.listeningPodcast?.duration"
+        self.isFavourite = favouriteManager.isFavourite(args)
     }
 }
 

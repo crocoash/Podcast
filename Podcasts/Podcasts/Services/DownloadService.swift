@@ -70,6 +70,11 @@ class DownloadService: MultyDelegateService<DownloadServiceDelegate>, ISingleton
     required init(container: IContainer, args: ()) {
         self.networkMonitor = container.resolve()
         self.dataStoreManager = container.resolve()
+        
+        super.init()
+        
+        let favoriteManager: FavouriteManager = container.resolve()
+        favoriteManager.delegate = self
     }
   
     lazy var downloadsSession: URLSession = {
@@ -280,9 +285,9 @@ extension DownloadService: URLSessionDelegate, URLSessionDownloadDelegate {
 //MARK: - FavouriteManagerDelegate
 extension DownloadService: FavouriteManagerDelegate {
     
-    func favouriteManager(_ favouriteManager: FavouriteManagerInput, didRemove favourite: FavouritePodcast) {
+    func favouriteManager(_ favouriteManager: FavouriteManager, didRemove favourite: FavouritePodcast) {
        cancelDownload(favourite)
     }
     
-    func favouriteManager(_ favouriteManager: FavouriteManagerInput, didAdd favourite: FavouritePodcast) {}
+    func favouriteManager(_ favouriteManager: FavouriteManager, didAdd favourite: FavouritePodcast) {}
 }

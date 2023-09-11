@@ -10,8 +10,8 @@ import CoreData
 
 //MARK: - Delegate
 protocol FavouriteManagerDelegate: AnyObject {
-    func favouriteManager(_ favouriteManager: FavouriteManagerInput, didRemove favourite: FavouritePodcast)
-    func favouriteManager(_ favouriteManager: FavouriteManagerInput, didAdd favourite: FavouritePodcast)
+    func favouriteManager(_ favouriteManager: FavouriteManager, didRemove favourite: FavouritePodcast)
+    func favouriteManager(_ favouriteManager: FavouriteManager, didAdd favourite: FavouritePodcast)
 }
 
 //MARK: - Type
@@ -26,9 +26,7 @@ protocol FavouriteManagerInput: MultyDelegateServiceInput {
     func removeAll()
 }
 
-class FavouriteManager: MultyDelegateService<FavouriteManagerDelegate>, FavouriteManagerInput, ISingleton {
-    
-    
+class FavouriteManager: MultyDelegateService<FavouriteManagerDelegate>, ISingleton {
 
     private let dataStoreManager: DataStoreManager
     private let firebaseDatabase: FirebaseDatabase

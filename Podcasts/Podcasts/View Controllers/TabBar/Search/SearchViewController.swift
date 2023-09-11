@@ -12,7 +12,7 @@ import SwiftUI
 //MARK: - Delegate
 protocol SearchViewControllerDelegate: AnyObject {
 //    func searchViewController                      (_ searchViewController: SearchViewController,_ playlist: [TrackProtocol], track: TrackProtocol)
-//    func searchViewControllerDidSelectDownLoadImage(_ searchViewController: SearchViewController, entity: DownloadInputType, completion: @escaping () -> Void)
+//    func searchViewControllerDidSelectDownLoadImage(_ searchViewController: SearchViewController, entity: DownloadType, completion: @escaping () -> Void)
 //    func searchViewControllerDidSelectFavouriteStar (_ searchViewController: SearchViewController, podcast: Podcast)
     func searchViewControllerDidSelectCell (_ searchViewController: SearchViewController, podcast: Podcast)
 }
@@ -23,12 +23,9 @@ typealias PlayListByGenre = PlaylistByNewest
 
 class SearchViewController : UIViewController, IPerRequest {
 
+    typealias Arguments = SearchViewControllerDelegate
     
-    
-    typealias Arguments = Void
-    
-    
-    private let apiService: ApiServiceInput
+    private let apiService: ApiService
     
     @IBOutlet private weak var searchBar: UISearchBar!
     @IBOutlet private weak var searchCollectionView: SearchCollectionView!
@@ -72,17 +69,9 @@ class SearchViewController : UIViewController, IPerRequest {
     private var isPodcast: Bool { searchSegmentalControl.selectedSegmentIndex == 0 }
     
     //MARK: init
-    init?<T: SearchViewControllerDelegate>(coder: NSCoder,
-                                           _ vc : T,
-                                           apiService: ApiServiceInput) {
-        self.delegate = vc
-        self.apiService = apiService
-        
-        super.init(coder: coder)
-    }
-    
-    required convenience init(container: IContainer, args: Void) {
-        self.init(coder: <#T##NSCoder#>)
+    required init(container: IContainer, args: Arguments) {
+        self.apiService = container.resolve()
+        super.init(nibName: Self.identifier, bundle: nil)
     }
     
     required init?(coder: NSCoder) {

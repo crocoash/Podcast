@@ -22,6 +22,7 @@ class PreLoaderViewController: UIViewController, IPerRequest {
     private let apiService: ApiService
     private let dataStoreManager: DataStoreManager
     private let listeningManager: ListeningManager
+    private let container: IContainer
     
     @IBOutlet private weak var logoImageView: UIImageView!
     @IBOutlet private weak var horizontalCenterConstraint: NSLayoutConstraint!
@@ -34,19 +35,7 @@ class PreLoaderViewController: UIViewController, IPerRequest {
         
         guard let self = self else { fatalError() }
         
-        let tabBarViewController = TabBarViewController(coder: coder,
-                                                        userViewModel: userViewModel,
-                                                        firestorageDatabase: firestorageDatabase,
-                                                        player: player,
-                                                        downloadService: downloadService,
-                                                        favouriteManager: favouriteManager,
-                                                        likeManager: likeManager,
-                                                        firebaseDataBase: firebaseDataBase,
-                                                        apiService: apiService,
-                                                        dataStoreManager: dataStoreManager,
-                                                        listeningManager: listeningManager)
-        
-        guard let tabBarViewController = tabBarViewController else { fatalError() }
+        let tabBarViewController: TabBarViewController = container.resolve()
         tabBarViewController.modalPresentationStyle = .custom
         tabBarViewController.transitioningDelegate = self
         return tabBarViewController
@@ -56,26 +45,10 @@ class PreLoaderViewController: UIViewController, IPerRequest {
     lazy private var registrationVC = RegistrationViewController.storyboard.instantiateViewController(identifier: RegistrationViewController.identifier) { [weak self] coder in
         guard let self = self else { fatalError() }
         
-        let registrationVC = RegistrationViewController(coder: coder,
-                                                        userViewModel: userViewModel,
-                                                        favouriteManager: favouriteManager,
-                                                        likeManager: likeManager,
-                                                        player: player,
-                                                        firebaseDataBase: firebaseDataBase,
-                                                        apiService: apiService,
-                                                        downloadService: downloadService,
-                                                        dataStoreManager: dataStoreManager,
-                                                        listeningManager: listeningManager)
-        
-        guard let registrationVC = registrationVC else { fatalError() }
-        
+        let registrationVC: RegistrationViewController = container.resolve()
         registrationVC.modalPresentationStyle = .custom
         registrationVC.transitioningDelegate = self
         return registrationVC
-    }
-        
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
     }
     
     required init(container: IContainer, args: Void) {
@@ -90,6 +63,9 @@ class PreLoaderViewController: UIViewController, IPerRequest {
         self.apiService = container.resolve()
         self.dataStoreManager = container.resolve()
         self.listeningManager = container.resolve()
+        self.container = container
+        
+        super.init(nibName: Self.identifier, bundle: nil)
     }
     
     required init?(coder: NSCoder) {

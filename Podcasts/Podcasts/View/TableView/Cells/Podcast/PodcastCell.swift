@@ -75,7 +75,6 @@ class PodcastCell: UITableViewCell, IHaveViewModel {
     func configureCell(_ delegate: PodcastCellDelegate?, with podcast: Podcast) {
         self.delegate = delegate
         
-        self.viewModel = PodcastCellViewModel(podcast: podcast)
         self.heightOfImageView.constant = (frame.height - dateLabel.frame.height) - 10
         
         configureGestures()

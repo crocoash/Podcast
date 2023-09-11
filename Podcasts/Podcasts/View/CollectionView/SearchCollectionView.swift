@@ -92,7 +92,7 @@ extension SearchCollectionView {
    private func register() {
       
       let cellRegistration = UICollectionView.CellRegistration<SearchCollectionViewCell, Podcast> { cell, indexPath, item in
-         cell.setUP(entity: item)
+//          cell.
          cell.addMyGestureRecognizer(self, type: .tap(), #selector(self.selectCell))
       }
       

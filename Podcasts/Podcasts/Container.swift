@@ -48,22 +48,22 @@ protocol IResolvable: AnyObject {
 final class Container {
     private var singletons: [ObjectIdentifier: AnyObject] = [:]
     
-    func makeInstance<T: IResolvable>(args: T.Arguments) -> T {
-        return T(container: self, args: args)
-    }
+//    func makeInstance<T: IResolvable>(args: T.Arguments) -> T {
+//        return T(container: self, args: args)
+//    }
 }
 
 extension Container: IContainer {
     public func resolve<T: IResolvable>(args: T.Arguments) -> T {
         switch T.instanceScope {
         case .perRequest:
-            return makeInstance(args: args)
+            return T(container: self, args: args)
         case .singleton:
             let key = ObjectIdentifier(T.self)
             if let cached = singletons[key], let instance = cached as? T {
                 return instance
             } else {
-                let instance: T = makeInstance(args: args)
+                let instance: T = T(container: self, args: args)
                 singletons[key] = instance
                 return instance
             }

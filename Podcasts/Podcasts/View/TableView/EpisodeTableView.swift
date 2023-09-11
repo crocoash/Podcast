@@ -47,16 +47,6 @@ class EpisodeTableView: UITableView {
         }
     }
     
-    func update(with entity: Any) {
-        visibleCells.forEach {
-            if let podcastCell = $0 as? PodcastCell {
-                podcastCell.update(with: entity)
-            } else if let listCell = $0 as? ListeningPodcastCell {
-                listCell.update(with: entity)
-            }
-        }
-    }
-    
     func isLastSectionAndRow(indexPath: IndexPath) -> Bool {
         return numberOfSections - 1 == indexPath.section && numberOfRows(inSection: indexPath.section) - 1 == indexPath.row
     }

@@ -8,7 +8,9 @@
 import UIKit
 import FirebaseAuth
 
-class RegistrationViewController: UIViewController {
+class RegistrationViewController: UIViewController, IPerRequest {
+    
+    typealias Arguments = Void
     
     @IBOutlet private weak var iconImageView: UIImageView!
     @IBOutlet private weak var segmentedControl: UISegmentedControl!
@@ -44,28 +46,20 @@ class RegistrationViewController: UIViewController {
         return tabBar
     }
     
-    init?(coder: NSCoder,
-          userViewModel: UserViewModel,
-          favouriteManager: FavouriteManager,
-          likeManager: LikeManager,
-          player: Player,
-          firebaseDataBase: FirebaseDatabase,
-          apiService: ApiService,
-          downloadService: DownloadService,
-          dataStoreManager: DataStoreManager,
-          listeningManager: ListeningManager) {
+    //MARK: init
+    required init(container: IContainer, args: Void) {
         
-        self.userViewModel = userViewModel
-        self.favouriteManager = favouriteManager
-        self.likeManager = likeManager
-        self.player = player
-        self.firebaseDataBase = firebaseDataBase
-        self.apiService = apiService
-        self.downloadService = downloadService
-        self.dataStoreManager = dataStoreManager
-        self.listeningManager = listeningManager
+        self.userViewModel = container.resolve()
+        self.favouriteManager = container.resolve()
+        self.likeManager = container.resolve()
+        self.player = container.resolve()
+        self.firebaseDataBase = container.resolve()
+        self.apiService = container.resolve()
+        self.downloadService = container.resolve()
+        self.dataStoreManager = container.resolve()
+        self.listeningManager = container.resolve()
         
-        super.init(coder: coder)
+        super.init(nibName: Self.identifier, bundle: nil)
     }
     
     required init?(coder: NSCoder) {

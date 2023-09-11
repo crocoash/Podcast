@@ -47,7 +47,6 @@ class ListeningManager: MultyDelegateService<ListeningManagerDelegate>, ISinglet
     private let firebaseDatabase: FirebaseDatabase
     private let player: Player
    
-    
     func saveListeningProgress(by entity: Track) {
         
         if let podcast = entity.inputType as? Podcast {
@@ -84,8 +83,6 @@ class ListeningManager: MultyDelegateService<ListeningManagerDelegate>, ISinglet
     func removeListeningPodcast(_ entity: ListeningPodcast) {
         removeListeningPodcast(entity, removeFromFireBase: true)
     }
-    
-    
     
     func removeAll() {
         dataStoreManager.allObjectsFromCoreData(type: ListeningPodcast.self).forEach {

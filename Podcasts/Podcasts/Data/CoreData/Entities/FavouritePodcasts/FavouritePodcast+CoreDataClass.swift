@@ -60,13 +60,7 @@ extension FavouritePodcast: CoreDataProtocol {
 //MARK: - FirebaseProtocol
 extension FavouritePodcast: FirebaseProtocol { }
 
-//MARK: - InputPodcastCell
-extension FavouritePodcast: InputPodcastCell {
-    
-    var inputPodcastCell: PodcastCellProtocol {
-        return podcast
-    }
-}
+
 
 //MARK: - InputDownloadProtocol
 extension FavouritePodcast: InputDownloadProtocol {

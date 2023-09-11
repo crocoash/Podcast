@@ -3,7 +3,10 @@
 import UIKit
 import CoreData
 
-class TabBarViewController: UITabBarController {
+class TabBarViewController: UITabBarController, IPerRequest {
+   
+    typealias Arguments = Void
+    
     
     // MARK: - variables
     private var trailConstraint: NSLayoutConstraint?
@@ -28,38 +31,19 @@ class TabBarViewController: UITabBarController {
     private let apiService: ApiService
     private let dataStoreManager: DataStoreManager
     private let listeningManager: ListeningManager
+    private let container: IContainer
     
     lazy private var ListVC: ListViewController = {
         
-        let vc = ListViewController.create(creator: { [weak self] coder in
-            guard let self = self else { fatalError() }
-            
-            let vc = ListViewController(coder: coder, self,
-                                        downloadService: downloadService,
-                                        player: player,
-                                        favouriteManager: favouriteManager,
-                                        firebaseDataBase: firebaseDataBase,
-                                        dataStoreManager: dataStoreManager,
-                                        listeningManager: listeningManager,
-                                        likeManager: likeManager)
-            
-            guard let vc = vc else { fatalError() }
-            
-            vc.transitioningDelegate = self
-            vc.modalPresentationStyle = .custom
-            
-            return vc
-            
-        })
-            
+        let vc: ListViewController = container.resolve(args: self)
+        vc.transitioningDelegate = self
+        vc.modalPresentationStyle = .custom
         return createTabBar(vc, title: "Playlist", imageName: "folder.fill")
     }()
     
     lazy private var searchVC: SearchViewController = SearchViewController.create { [weak self] coder in
-        guard let self = self,
-              let vc = SearchViewController(coder: coder, self, apiService: apiService)
-        else { fatalError() }
-        
+        guard let self = self else { fatalError() }
+        let vc: SearchViewController = container.resolve(args: self)
         vc.transitioningDelegate = self
         modalPresentationStyle = .custom
         
@@ -67,41 +51,29 @@ class TabBarViewController: UITabBarController {
     }
     
     lazy private var settingsVC: SettingsTableViewController =  SettingsTableViewController.create { [weak self] coder in
-        guard let self = self,
-              let vc = SettingsTableViewController(coder: coder)
-        else { fatalError() }
-        
+        guard let self = self else { fatalError() }
+        let vc: SettingsTableViewController = container.resolve()
         vc.transitioningDelegate = self
         modalPresentationStyle = .custom
         
         return createTabBar(vc, title: "Settings", imageName: "gear")
     }
-    
-    //MARK: init
-    init?(coder: NSCoder,
-                               userViewModel: UserViewModel,
-                               firestorageDatabase: FirestorageDatabase,
-                               player: Player,
-                               downloadService: DownloadService,
-                               favouriteManager: FavouriteManager,
-                               likeManager: LikeManager,
-                               firebaseDataBase: FirebaseDatabase,
-                               apiService: ApiService,
-                               dataStoreManager: DataStoreManager,
-                               listeningManager: ListeningManager) {
+
+   //MARK: init
+    required init(container: IContainer, args: Void) {
+        self.userViewModel = container.resolve()
+        self.firestorageDatabase = container.resolve()
+        self.player = container.resolve()
+        self.downloadService = container.resolve()
+        self.favouriteManager = container.resolve()
+        self.likeManager = container.resolve()
+        self.firebaseDataBase = container.resolve()
+        self.apiService = container.resolve()
+        self.dataStoreManager = container.resolve()
+        self.listeningManager = container.resolve()
+        self.container = container
         
-        self.userViewModel = userViewModel
-        self.firestorageDatabase = firestorageDatabase
-        self.player = player
-        self.downloadService = downloadService
-        self.favouriteManager = favouriteManager
-        self.likeManager = likeManager
-        self.firebaseDataBase = firebaseDataBase
-        self.apiService = apiService
-        self.dataStoreManager = dataStoreManager
-        self.listeningManager = listeningManager
-        
-        super.init(coder: coder)
+        super.init(nibName: Self.identifier, bundle: nil)
     }
     
     required init?(coder: NSCoder) {
@@ -138,19 +110,7 @@ extension TabBarViewController {
     
     private func configureDetailViewController(podcast: Podcast, playList: [Podcast]) -> DetailViewController {
         
-        let detailViewController: DetailViewController = DetailViewController.create { [weak self] coder in
-
-            guard let self = self else { fatalError() }
-
-            return DetailViewController.init(
-                coder: coder,
-                podcast: podcast,
-                podcasts: playList,
-                player: player,
-                downloadService: downloadService,
-                likeManager: self.likeManager,
-                favouriteManager: favouriteManager)
-        }
+        let detailViewController: DetailViewController = container.resolve(args: podcast)
         
         detailViewController.modalPresentationStyle = .custom
         detailViewController.transitioningDelegate = self
@@ -240,7 +200,7 @@ extension TabBarViewController: SmallPlayerViewControllerDelegate {
     
     func smallPlayerViewControllerSwipeOrTouch(_ smallPlayerViewController: SmallPlayerView) {
         guard let track = player.currentTrack?.track else { return }
-        let bigPlayerViewController = BigPlayerViewController(self, player: player, track: track, likeManager: likeManager)
+        let bigPlayerViewController: BigPlayerViewController = container.resolve(args: self)
         bigPlayerViewController.modalPresentationStyle = .fullScreen
         self.present(bigPlayerViewController, animated: true)
     }
@@ -288,7 +248,7 @@ extension TabBarViewController: PlayerDelegate {
     func playerStateDidChanged(_ player: Player, with track: OutputPlayerProtocol) {}
 }
 
-//MARK: -
+//MARK: - ListViewControllerDelegate
 extension TabBarViewController: ListViewControllerDelegate {
     
     func listViewController(_ listViewController: ListViewController, didSelect podcast: Podcast) {
