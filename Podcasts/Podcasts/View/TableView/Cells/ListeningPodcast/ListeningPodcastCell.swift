@@ -17,8 +17,8 @@ import UIKit
 //}
 
 //MARK: - PlayableProtocol
-protocol ListeningPodcastCellPlayableProtocol {
-    var trackId: String { get }
+protocol ListeningPodcastCellPlayableProtocol: Identifiable {
+    var id: String { get }
     var listeningProgress: Double? { get }
     var duration: Double? { get }
 }
@@ -28,7 +28,6 @@ struct ListeningPodcastCellModel: ListeningPodcastCellPlayableProtocol {
     var id: String
     var listeningProgress: Double?
     var duration: Double?
-    var trackId: String
     var podcastName: String?
     var image: String?
     
@@ -38,16 +37,16 @@ struct ListeningPodcastCellModel: ListeningPodcastCellPlayableProtocol {
         self.podcastName = input.podcast.trackName
         self.duration = input.duration
         self.listeningProgress = input.progress
-        self.trackId = input.podcast.trackId
+        self.id = input.podcast.id
        
         self.id = input.id
     }
     
     mutating func updateModel(_ input: Any) {
         
-        if let player = input as? ListeningPodcastCellPlayableProtocol {
+        if let player = input as? any ListeningPodcastCellPlayableProtocol {
             
-            if player.trackId == trackId {
+            if player.id == id {
                 self.listeningProgress = player.listeningProgress
                 self.duration = player.duration
             }

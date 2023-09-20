@@ -12,7 +12,7 @@ import SwiftUI
 //MARK: - Delegate
 protocol SearchViewControllerDelegate: AnyObject {
 //    func searchViewController                      (_ searchViewController: SearchViewController,_ playlist: [TrackProtocol], track: TrackProtocol)
-//    func searchViewControllerDidSelectDownLoadImage(_ searchViewController: SearchViewController, entity: DownloadInputType, completion: @escaping () -> Void)
+//    func searchViewControllerDidSelectDownLoadImage(_ searchViewController: SearchViewController, entity: DownloadType, completion: @escaping () -> Void)
 //    func searchViewControllerDidSelectFavouriteStar (_ searchViewController: SearchViewController, podcast: Podcast)
     func searchViewControllerDidSelectCell (_ searchViewController: SearchViewController, podcast: Podcast)
 }
@@ -21,9 +21,11 @@ typealias PlaylistByNewest  = [(key: String, podcasts: [Podcast])]
 typealias PlayListByOldest = PlaylistByNewest
 typealias PlayListByGenre = PlaylistByNewest
 
-class SearchViewController : UIViewController {
+class SearchViewController : UIViewController, IHaveStoryBoard {
+
+    typealias Args = SearchViewControllerDelegate
     
-    private let apiService: ApiServiceInput
+    private let apiService: ApiService
     
     @IBOutlet private weak var searchBar: UISearchBar!
     @IBOutlet private weak var searchCollectionView: SearchCollectionView!
@@ -67,13 +69,11 @@ class SearchViewController : UIViewController {
     private var isPodcast: Bool { searchSegmentalControl.selectedSegmentIndex == 0 }
     
     //MARK: init
-    init?<T: SearchViewControllerDelegate>(coder: NSCoder,
-                                           _ vc : T,
-                                           apiService: ApiServiceInput) {
-        self.delegate = vc
-        self.apiService = apiService
-        
-        super.init(coder: coder)
+    
+    required init?(container: IContainer, args: (args: Args, coder: NSCoder)) {
+        self.apiService = container.resolve()
+        self.delegate = args.args
+        super.init(coder: args.coder)
     }
     
     required init?(coder: NSCoder) {

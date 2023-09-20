@@ -7,18 +7,21 @@
 
 import UIKit
 
-class PreLoaderViewController: UIViewController {
+class PreLoaderViewController: UIViewController, IHaveStoryBoard {
+    
+    typealias Args = Void
     
     private let userViewModel: UserViewModel
-    private let likeManager: LikeManagerInput
-    private let favouriteManager: FavouriteManagerInput
-    private let firestorageDatabase: FirestorageDatabaseInput
-    private let player: PlayerInput
-    private let downloadService: DownloadServiceInput
-    private let firebaseDataBase: FirebaseDatabaseInput
-    private let apiService: ApiServiceInput
-    private let dataStoreManager: DataStoreManagerInput
-    private let listeningManager: ListeningManagerInput
+    private let likeManager: LikeManager
+    private let favouriteManager: FavouriteManager
+    private let firestorageDatabase: FirestorageDatabase
+    private let player: Player
+    private let downloadService: DownloadService
+    private let firebaseDataBase: FirebaseDatabase
+    private let apiService: ApiService
+    private let dataStoreManager: DataStoreManager
+    private let listeningManager: ListeningManager
+    private let container: IContainer
     
     @IBOutlet private weak var logoImageView: UIImageView!
     @IBOutlet private weak var horizontalCenterConstraint: NSLayoutConstraint!
@@ -27,74 +30,36 @@ class PreLoaderViewController: UIViewController {
     
     lazy private var topAnchorConst = view.frame.height / 2 - logoImageView.frame.height / 2
     
-    lazy private var tabBarVC: TabBarViewController = TabBarViewController.create { [weak self] coder in
-        
-        guard let self = self else { fatalError() }
-        
-        let tabBarViewController = TabBarViewController(coder: coder,
-                                                        userViewModel: userViewModel,
-                                                        firestorageDatabase: firestorageDatabase,
-                                                        player: player,
-                                                        downloadService: downloadService,
-                                                        favouriteManager: favouriteManager,
-                                                        likeManager: likeManager,
-                                                        firebaseDataBase: firebaseDataBase,
-                                                        apiService: apiService,
-                                                        dataStoreManager: dataStoreManager,
-                                                        listeningManager: listeningManager)
-        
-        guard let tabBarViewController = tabBarViewController else { fatalError() }
+    lazy private var tabBarVC: TabBarViewController = {
+        let tabBarViewController: TabBarViewController = container.resolve()
         tabBarViewController.modalPresentationStyle = .custom
         tabBarViewController.transitioningDelegate = self
         return tabBarViewController
-        
-    }
+    }()
     
     lazy private var registrationVC = RegistrationViewController.storyboard.instantiateViewController(identifier: RegistrationViewController.identifier) { [weak self] coder in
         guard let self = self else { fatalError() }
         
-        let registrationVC = RegistrationViewController(coder: coder,
-                                                        userViewModel: userViewModel,
-                                                        favouriteManager: favouriteManager,
-                                                        likeManager: likeManager,
-                                                        player: player,
-                                                        firebaseDataBase: firebaseDataBase,
-                                                        apiService: apiService,
-                                                        downloadService: downloadService,
-                                                        dataStoreManager: dataStoreManager,
-                                                        listeningManager: listeningManager)
-        
-        guard let registrationVC = registrationVC else { fatalError() }
-        
+        let registrationVC: RegistrationViewController = container.resolve()
         registrationVC.modalPresentationStyle = .custom
         registrationVC.transitioningDelegate = self
         return registrationVC
     }
-        
-    init?(coder: NSCoder,
-          userViewModel: UserViewModel,
-          likeManager: LikeManagerInput,
-          favouriteManager: FavouriteManagerInput,
-          firestorageDatabase: FirestorageDatabaseInput,
-          player: PlayerInput,
-          downloadService: DownloadServiceInput,
-          firebaseDataBase: FirebaseDatabaseInput,
-          apiService: ApiServiceInput,
-          dataStoreManager: DataStoreManagerInput,
-          listeningManager: ListeningManagerInput) {
-        
-        self.favouriteManager = favouriteManager
-        self.likeManager = likeManager
-        self.userViewModel = userViewModel
-        self.player = player
-        self.downloadService = downloadService
-        self.firestorageDatabase = firestorageDatabase
-        self.firebaseDataBase = firebaseDataBase
-        self.apiService = apiService
-        self.dataStoreManager = dataStoreManager
-        self.listeningManager = listeningManager
-        
-        super.init(coder: coder)
+    
+    required init?(container: IContainer, args: (args: Args, coder: NSCoder)) {
+        self.favouriteManager = container.resolve()
+        self.likeManager = container.resolve()
+        self.userViewModel = container.resolve()
+        self.player = container.resolve()
+        self.downloadService = container.resolve()
+        self.firestorageDatabase = container.resolve()
+        self.firebaseDataBase = container.resolve()
+        self.apiService = container.resolve()
+        self.dataStoreManager = container.resolve()
+        self.listeningManager = container.resolve()
+        self.container = container
+
+        super.init(coder: args.coder)
     }
     
     required init?(coder: NSCoder) {

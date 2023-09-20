@@ -9,7 +9,7 @@ import CoreData
 
 
 //MARK: - Input
-protocol DataStoreManagerInput {
+protocol DataStoreManagerInput{
     
     var viewContext: NSManagedObjectContext { get }
     var backgroundViewContext: NSManagedObjectContext { get }
@@ -47,7 +47,7 @@ protocol CoreDataProtocol where Self: NSManagedObject & Hashable & Identifiable 
     var id: String { get }
     static var defaultSortDescription: [NSSortDescriptor] { get }
     
-    init(_ entity: Self, viewContext: NSManagedObjectContext, dataStoreManagerInput: DataStoreManagerInput)
+    init(_ entity: Self, viewContext: NSManagedObjectContext, dataStoreManagerInput: any DataStoreManagerInput)
 }
 
 extension CoreDataProtocol {
@@ -56,7 +56,7 @@ extension CoreDataProtocol {
         return NSPredicate(format: "id == %@", "\(id)")
     }
     
-    init(_ entity: Self, viewContext: NSManagedObjectContext, dataStoreManagerInput: DataStoreManagerInput) {
+    init(_ entity: Self, viewContext: NSManagedObjectContext, dataStoreManagerInput: any DataStoreManagerInput) {
         
         self.init(entity: entity.entity, insertInto: viewContext)
         
@@ -86,7 +86,9 @@ extension CoreDataProtocol {
     }
 }
 
-final class DataStoreManager {
+final class DataStoreManager: ISingleton {
+    
+    init(container: IContainer, args: ()) {}
     
     lazy var viewContext = persistentContainer.viewContext
     lazy var backgroundContext = persistentContainer.newBackgroundContext()
@@ -170,7 +172,7 @@ extension DataStoreManager: DataStoreManagerInput {
         viewContext.fetchObjects(T.self)
     }
     
-    func fetchObject<T: CoreDataProtocol>(entity: T.Type, predicates: [NSPredicate]? = nil) -> T? {
+    func fetchObject<T: CoreDataProtocol>(entity: T.Type, predicates: [NSPredicate]?) -> T? {
         
         let fetchRequest: NSFetchRequest<T> = T.fetchRequest() as! NSFetchRequest<T>
         
@@ -181,7 +183,7 @@ extension DataStoreManager: DataStoreManagerInput {
         return result?.first
     }
     
-    func fetchObject<T: CoreDataProtocol>(entity: T, predicates: [NSPredicate]? = nil) -> T? {
+    func fetchObject<T: CoreDataProtocol>(entity: T, predicates: [NSPredicate]?) -> T? {
         
         let fetchRequest: NSFetchRequest<T> = T.fetchRequest() as! NSFetchRequest<T>
         
@@ -193,7 +195,7 @@ extension DataStoreManager: DataStoreManagerInput {
     }
     
     func getFromCoreData<T: CoreDataProtocol>(entity: T) -> T? {
-        return fetchObject(entity: entity)
+        return fetchObject(entity: entity, predicates: nil)
     }
     
     func saveInCoredataIfNotSaved<T: CoreDataProtocol>(entity: T) {
@@ -221,7 +223,7 @@ extension DataStoreManager: DataStoreManagerInput {
         guard let allObjectsFromCoreData = self.viewContext.fetchObjects(entities.first!.entityName) as? [(any CoreDataProtocol)] else { return
         }
         
-        let newObjects = entities.filter { fetchObject(entity: $0) == nil }
+        let newObjects = entities.filter { fetchObject(entity: $0, predicates: nil) == nil }
         
         ///create new
         newObjects.forEach {

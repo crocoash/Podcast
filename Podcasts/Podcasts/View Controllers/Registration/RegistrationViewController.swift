@@ -8,7 +8,9 @@
 import UIKit
 import FirebaseAuth
 
-class RegistrationViewController: UIViewController {
+class RegistrationViewController: UIViewController, IPerRequest {
+    
+    typealias Arguments = Void
     
     @IBOutlet private weak var iconImageView: UIImageView!
     @IBOutlet private weak var segmentedControl: UISegmentedControl!
@@ -22,29 +24,19 @@ class RegistrationViewController: UIViewController {
     @IBOutlet private weak var backGroundView: UIView!
     
     private let userViewModel: UserViewModel
-    private let favouriteManager: FavouriteManagerInput
-    private let likeManager: LikeManagerInput
-    private let firebaseDataBase: FirebaseDatabaseInput
-    private let player: PlayerInput
-    private let apiService: ApiServiceInput
-    private let downloadService: DownloadServiceInput
-    private let dataStoreManager: DataStoreManagerInput
-    private let listeningManager: ListeningManagerInput
+    private let favouriteManager: FavouriteManager
+    private let likeManager: LikeManager
+    private let firebaseDataBase: FirebaseDatabase
+    private let player: Player
+    private let apiService: ApiService
+    private let downloadService: DownloadService
+    private let dataStoreManager: DataStoreManager
+    private let listeningManager: ListeningManager
     
     lazy private var tabBarVc = TabBarViewController.create { [weak self] coder in
         guard let self = self else { fatalError() }
         
-        let tabBar = TabBarViewController(coder: coder,
-                                          userViewModel: userViewModel,
-                                          firestorageDatabase: FirestorageDatabase(),
-                                          player: player,
-                                          downloadService: downloadService,
-                                          favouriteManager: favouriteManager,
-                                          likeManager: likeManager,
-                                          firebaseDataBase: firebaseDataBase,
-                                          apiService: apiService,
-                                          dataStoreManager: dataStoreManager,
-                                          listeningManager: listeningManager)
+        let tabBar = TabBarViewController(coder: coder)
         
         guard let tabBar = tabBar else { fatalError() }
         
@@ -54,28 +46,20 @@ class RegistrationViewController: UIViewController {
         return tabBar
     }
     
-    init?(coder: NSCoder,
-          userViewModel: UserViewModel,
-          favouriteManager: FavouriteManagerInput,
-          likeManager: LikeManagerInput,
-          player: PlayerInput,
-          firebaseDataBase: FirebaseDatabaseInput,
-          apiService: ApiServiceInput,
-          downloadService: DownloadServiceInput,
-          dataStoreManager: DataStoreManagerInput,
-          listeningManager: ListeningManagerInput) {
+    //MARK: init
+    required init(container: IContainer, args: Void) {
         
-        self.userViewModel = userViewModel
-        self.favouriteManager = favouriteManager
-        self.likeManager = likeManager
-        self.player = player
-        self.firebaseDataBase = firebaseDataBase
-        self.apiService = apiService
-        self.downloadService = downloadService
-        self.dataStoreManager = dataStoreManager
-        self.listeningManager = listeningManager
+        self.userViewModel = container.resolve()
+        self.favouriteManager = container.resolve()
+        self.likeManager = container.resolve()
+        self.player = container.resolve()
+        self.firebaseDataBase = container.resolve()
+        self.apiService = container.resolve()
+        self.downloadService = container.resolve()
+        self.dataStoreManager = container.resolve()
+        self.listeningManager = container.resolve()
         
-        super.init(coder: coder)
+        super.init(nibName: Self.identifier, bundle: nil)
     }
     
     required init?(coder: NSCoder) {

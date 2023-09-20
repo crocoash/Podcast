@@ -10,25 +10,25 @@ import MediaPlayer
 import CoreData
 
 //MARK: - Input
-protocol PlayerInput: MultyDelegateServiceInput {
-    
-    var currentTrack: (track: Track, index: Int)? { get }
-    
-    var isPlaying: Bool { get }
-    
-    func pause()
-    func play()
-    
-    func playOrPause()
-    func playPreviewsTrack()
-    func playNextPodcast()
-    func update(with listening: ListeningPodcast)
-    
-    func playerSeek(to seconds: Double)
-    
-    func playerRewindSeek(to seconds: Double)
-    func conform(track: any TrackProtocol, trackList: [any TrackProtocol])
-}
+//protocol PlayerInput: MultyDelegateServiceInput {
+//    
+//    var currentTrack: (track: Track, index: Int)? { get }
+//    
+//    var isPlaying: Bool { get }
+//    
+//    func pause()
+//    func play()
+//    
+//    func playOrPause()
+//    func playPreviewsTrack()
+//    func playNextPodcast()
+//    func update(with listening: ListeningPodcast)
+//    
+//    func playerSeek(to seconds: Double)
+//    
+//    func playerRewindSeek(to seconds: Double)
+//    func conform(track: any TrackProtocol, trackList: [any TrackProtocol])
+//}
 
 //MARK: Type
 protocol TrackProtocol: NSManagedObject {
@@ -38,16 +38,15 @@ protocol TrackProtocol: NSManagedObject {
     var imageForSmallPlayer: String?   { get }
     var trackName: String?             { get }
     var descriptionMy: String?         { get }
-    var trackId: String                { get }
+    var id: String                     { get }
     var listeningProgress: Double?     { get }
     var currentTime: Float?            { get }
-    var duration: Double?              { get }
 }
 
 struct Track: Equatable, OutputPlayerProtocol {
     
     static func == (lhs: Track, rhs: Track) -> Bool {
-        lhs.trackId == rhs.trackId
+        lhs.id == rhs.id
     }
     
     var inputType: TrackProtocol
@@ -61,7 +60,7 @@ struct Track: Equatable, OutputPlayerProtocol {
     var listeningProgress: Double?
     var isPlaying: Bool = false
     var isGoingPlaying: Bool = false
-    var trackId: String
+    var id: String
     var imageForMpPlayer: String?
     var trackName: String?
     var url: URL?
@@ -72,7 +71,7 @@ struct Track: Equatable, OutputPlayerProtocol {
     init(input: any TrackProtocol, isLast: Bool, isFirst: Bool) {
         self.currentTime = input.currentTime
         self.listeningProgress = input.listeningProgress
-        self.trackId = input.trackId
+        self.id = input.id
         self.imageForMpPlayer = input.imageForMpPlayer
         self.trackName = input.trackName
         self.url = input.url
@@ -81,31 +80,55 @@ struct Track: Equatable, OutputPlayerProtocol {
         self.isFirst = isFirst
         self.imageForSmallPlayer = input.imageForSmallPlayer
         self.imageForBigPlayer = input.imageForBigPlayer
-        self.duration = input.duration
     }
 }
 
 //MARK: - OutPut
-protocol OutputPlayerProtocol: PodcastCellPlayableProtocol, BigPlayerPlayableProtocol, SmallPlayerPlayableProtocol, ListeningPodcastCellPlayableProtocol {}
+protocol OutputPlayerProtocol: PodcastCellPlayableProtocol, SmallPlayerPlayableProtocol, ListeningPodcastCellPlayableProtocol {}
 
 protocol PlayerDelegate {
     
-   func playerDidEndPlay                (_ player: Player, with track: OutputPlayerProtocol)
-    func playerStartLoading             (_ player: Player, with track: OutputPlayerProtocol)
-    func playerDidEndLoading            (_ player: Player, with track: OutputPlayerProtocol)
-    func playerUpdatePlayingInformation (_ player: Player, with track: OutputPlayerProtocol)
-    func playerStateDidChanged          (_ player: Player, with track: OutputPlayerProtocol)
+    func playerDidEndPlay               (_ player: Player, with track: any OutputPlayerProtocol)
+    func playerStartLoading             (_ player: Player, with track: any OutputPlayerProtocol)
+    func playerDidEndLoading            (_ player: Player, with track: any OutputPlayerProtocol)
+    func playerUpdatePlayingInformation (_ player: Player, with track: any OutputPlayerProtocol)
+    func playerStateDidChanged          (_ player: Player, with track: any OutputPlayerProtocol)
 }
 
-class Player: MultyDelegateService<PlayerDelegate> {
+extension PlayerDelegate where Self: IViewModelUpdating {
     
-    //MARK: init
-    override init() {
+    func playerDidEndPlay(_ player: Player, with track: any OutputPlayerProtocol) {
+        update(with: track)
+    }
+    
+    func playerStartLoading(_ player: Player, with track: any OutputPlayerProtocol) {
+        update(with: track)
+    }
+    
+    func playerDidEndLoading(_ player: Player, with track: any OutputPlayerProtocol) {
+        update(with: track)
+    }
+    
+    func playerUpdatePlayingInformation(_ player: Player, with track: any OutputPlayerProtocol) {
+        update(with: track)
+    }
+    
+    func playerStateDidChanged(_ player: Player, with track: any OutputPlayerProtocol) {
+        update(with: track)
+    }
+}
+
+class Player: MultyDelegateService<PlayerDelegate>, ISingleton {
+    required init(container: IContainer, args: ()) {
         super.init()
         addObserverForEndTrack()
         configureMPRemoteCommandCenter()
     }
-   
+    
+    
+   private let defaultIsPlaying = false
+   private let defauisLoading = false
+ 
     private(set) var playlist: [Track] = []
     private(set) var currentTrack: (track: Track, index: Int)?
     private var mpRemoteCommandCenter = MPRemoteCommandCenter.shared()
@@ -115,7 +138,7 @@ class Player: MultyDelegateService<PlayerDelegate> {
     
     private var observe: Any?
     
-    private(set) var isPlaying = false {
+    var isPlaying = false {
         didSet {
             if oldValue != isPlaying {
                 currentTrack?.track.isPlaying = isPlaying
@@ -127,7 +150,7 @@ class Player: MultyDelegateService<PlayerDelegate> {
     private var isLast: Bool { (currentTrack?.index ?? (Int.max - 1)) + 1 == playlist.count }
     private var isFirst: Bool { currentTrack?.index ?? 1 == 0 }
     
-    private(set) var isLoading: Bool = false {
+    var isLoading: Bool = false {
         didSet {
             if oldValue != isLoading {
                 currentTrack?.track.isGoingPlaying = isLoading
@@ -141,12 +164,15 @@ class Player: MultyDelegateService<PlayerDelegate> {
     }
 }
 
-extension Player: PlayerInput {
+extension Player {
    
     //MARK: - public Methods / Actions
+    func isCurrentTrack(_ track: any TrackProtocol) -> Bool {
+        return currentTrack?.track.id == track.id
+    }
     
     func conform(track: any TrackProtocol, trackList: [any TrackProtocol]) {
-        if currentTrack?.track.trackId == track.trackId {
+        if currentTrack?.track.id == track.id {
             playOrPause()
         } else {
             startPlay(track: track, tracks: trackList)
@@ -155,15 +181,14 @@ extension Player: PlayerInput {
     
     func pause() {
         playerAVP.pause()
-        removeTimeObserve()
-        isPlaying = false
-        isLoading = false
+        isPlaying = defaultIsPlaying
+        isLoading = defauisLoading
     }
     
     func play() {
         playerAVP.play()
         addTimeObserve()
-        isPlaying = true
+        isPlaying = !defaultIsPlaying
     }
     
     func playOrPause() {
@@ -190,10 +215,13 @@ extension Player: PlayerInput {
     }
     
     @objc func playNextPodcast() {
-       guard !playlist.isEmpty, let currentItem = currentTrack, !isLast else { return } // play or pause
-        let index = currentItem.index + 1
-        let track = playlist[index]
-        startPlay(track: track, indexInPlaylist: index)
+       if !playlist.isEmpty, let currentItem = currentTrack, !isLast {
+           let index = currentItem.index + 1
+           let track = playlist[index]
+           startPlay(track: track, indexInPlaylist: index)
+       } else {
+           pause()
+       }
     }
 }
 
@@ -205,6 +233,7 @@ extension Player {
 
         if currentTrack != nil {
             pause()
+            removeTimeObserve()
         }
         
         currentTrack = (track: track, index: indexInPlaylist)
@@ -238,7 +267,7 @@ extension Player {
     
     private func addTimeObserve() {
         
-        guard observe == nil else { fatalError() }
+        guard observe == nil else { return }
         
         observe = playerAVP.addPeriodicTimeObserver(forInterval: CMTimeMakeWithSeconds(1, preferredTimescale: Int32(NSEC_PER_SEC)), queue: .main ) { [weak self] time in
             guard let self = self,
@@ -267,6 +296,7 @@ extension Player {
         if let observe = observe {
             playerAVP.removeTimeObserver(observe)
             self.observe = nil
+            currentTrack = nil
         }
     }
     
@@ -338,7 +368,7 @@ extension Player {
     }
     
     func update(with listening: ListeningPodcast) {
-        guard currentTrack?.track.trackId != listening.podcast.trackId else { return }
+        guard currentTrack?.track.id != listening.podcast.id else { return }
        
         var track = Track(input: listening.podcast, isLast: false, isFirst: false)
         track.listeningProgress = listening.progress
@@ -352,15 +382,15 @@ extension Player {
     
     private func startPlay(track: (any TrackProtocol), tracks: [any TrackProtocol]) {
         
-        guard track.trackId != currentTrack?.track.trackId else { playOrPause(); return }
+        guard track.id != currentTrack?.track.id else { playOrPause(); return }
         
-        let isLast = tracks.firstIndex { $0.trackId == track.trackId } ?? Int.max - 1 == tracks.count - 1
-        let isFirst = tracks.firstIndex { $0.trackId == track.trackId } ?? 1 == 0
+        let isLast = tracks.firstIndex { $0.id == track.id } ?? Int.max - 1 == tracks.count - 1
+        let isFirst = tracks.firstIndex { $0.id == track.id } ?? 1 == 0
         
         self.playlist = tracks.map { Track(input: $0, isLast: isLast, isFirst: isFirst) }
         let track: Track = Track(input: track, isLast: isLast, isFirst: isFirst)
         
-        if let index = tracks.firstIndex(where: { track.trackId == $0.trackId }) {
+        if let index = tracks.firstIndex(where: { track.id == $0.id }) {
             startPlay(track: track, indexInPlaylist: index)
         }
     }

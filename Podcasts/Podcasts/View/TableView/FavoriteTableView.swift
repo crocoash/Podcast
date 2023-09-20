@@ -74,24 +74,6 @@ class FavouriteTableView: UITableView {
         reloadTableView()
     }
     
-    func updateTableView(with type: Any) {
-        if !isTracking {
-            visibleCells.forEach {
-                if let podcastCell = $0 as? PodcastCell {
-                    podcastCell.update(with: type)
-                }
-                
-                if let listeningPodcast = $0 as? ListeningPodcastCell {
-                    listeningPodcast.update(with: type)
-                }
-                
-                //                if let likedPodcastTableViewCell = $0 as? LikedPodcastTableViewCell {
-                //                    likedPodcastTableViewCell.update(with: type)
-                //                }
-            }
-        }
-    }
-    
     func deleteSection(at index: Int) {
         let section = mySnapShot.sectionIdentifiers[index]
         mySnapShot.deleteSections([section])

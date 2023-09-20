@@ -7,15 +7,12 @@
 
 import UIKit
 
-protocol SearchCollectionViewCellType {
-    var mainImageForSearchCollectionViewCell: String? { get }
-}
 
 class SearchCollectionViewCell: UICollectionViewCell {
     
     @IBOutlet weak var podcastImageView: UIImageView!
     
-    private var entity: SearchCollectionViewCellType!
+    private var entity: Podcast!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -31,10 +28,11 @@ class SearchCollectionViewCell: UICollectionViewCell {
         super.init(coder: coder)
     }
     
-    func setUP(entity: SearchCollectionViewCellType) {
-        self.entity = entity
-        DataProvider.shared.downloadImage(string: entity.mainImageForSearchCollectionViewCell) {
-            self.podcastImageView.image = $0
+    func setUP(podcast: Podcast) {
+        self.entity = podcast
+        DataProvider.shared.downloadImage(string: podcast.artworkUrl160) { [weak self] in
+            guard let self = self else { return }
+            podcastImageView.image = $0
         }
     }
 }

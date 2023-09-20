@@ -40,9 +40,9 @@ extension Collection {
 
 extension Collection {
    
-   func enumerated(_ completion: (Int, Element) throws -> Void) rethrows {
+   func enumerated(_ completion: (Int, Element) -> Void)  {
       for (index, value) in self.enumerated() {
-         try? completion(index, value)
+         completion(index, value)
       }
    }
 }

@@ -3,7 +3,10 @@
 import UIKit
 import CoreData
 
-class TabBarViewController: UITabBarController {
+class TabBarViewController: UITabBarController, IHaveStoryBoard {
+    
+    
+    typealias Args = Void
     
     // MARK: - variables
     private var trailConstraint: NSLayoutConstraint?
@@ -19,89 +22,59 @@ class TabBarViewController: UITabBarController {
     private var smallPlayer: SmallPlayerView?
     
     private let userViewModel: UserViewModel
-    private let firestorageDatabase: FirestorageDatabaseInput
-    private var player: PlayerInput
-    private let downloadService: DownloadServiceInput
-    private let favouriteManager: FavouriteManagerInput
-    private let likeManager: LikeManagerInput
-    private let firebaseDataBase: FirebaseDatabaseInput
-    private let apiService: ApiServiceInput
-    private let dataStoreManager: DataStoreManagerInput
-    private let listeningManager: ListeningManagerInput
+    private let firestorageDatabase: FirestorageDatabase
+    private var player: Player
+    private let downloadService: DownloadService
+    private let favouriteManager: FavouriteManager
+    private let likeManager: LikeManager
+    private let firebaseDataBase: FirebaseDatabase
+    private let apiService: ApiService
+    private let dataStoreManager: DataStoreManager
+    private let listeningManager: ListeningManager
+    private let container: IContainer
     
     lazy private var ListVC: ListViewController = {
         
-        let vc = ListViewController.create(creator: { [weak self] coder in
-            guard let self = self else { fatalError() }
-            
-            let vc = ListViewController(coder: coder, self,
-                                        downloadService: downloadService,
-                                        player: player,
-                                        favouriteManager: favouriteManager,
-                                        firebaseDataBase: firebaseDataBase,
-                                        dataStoreManager: dataStoreManager,
-                                        listeningManager: listeningManager)
-            
-            guard let vc = vc else { fatalError() }
-            
-            vc.transitioningDelegate = self
-            vc.modalPresentationStyle = .custom
-            
-            return vc
-            
-        })
-            
+        let vc: ListViewController = container.resolveWithModel(args: self)
+        vc.transitioningDelegate = self
+        vc.modalPresentationStyle = .custom
         return createTabBar(vc, title: "Playlist", imageName: "folder.fill")
     }()
     
-    lazy private var searchVC: SearchViewController = SearchViewController.create { [weak self] coder in
-        guard let self = self,
-              let vc = SearchViewController(coder: coder, self, apiService: apiService)
-        else { fatalError() }
-        
+    lazy private var searchVC: SearchViewController = {
+        let vc: SearchViewController = container.resolve(args: self)
         vc.transitioningDelegate = self
         modalPresentationStyle = .custom
         
         return createTabBar(vc, title: "Search", imageName: "magnifyingglass")
-    }
+    }()
     
-    lazy private var settingsVC: SettingsTableViewController =  SettingsTableViewController.create { [weak self] coder in
-        guard let self = self,
-              let vc = SettingsTableViewController(coder: coder, userViewModel, firestorageDatabase: firestorageDatabase, apiService: apiService)
-        else { fatalError() }
-        
+    lazy private var settingsVC: SettingsTableViewController = {
+        let vc: SettingsTableViewController = container.resolve()
         vc.transitioningDelegate = self
         modalPresentationStyle = .custom
         
         return createTabBar(vc, title: "Settings", imageName: "gear")
+    }()
+
+   //MARK: init
+    required init?(container: IContainer, args: (args: Args, coder: NSCoder)) {
+     
+        self.userViewModel = container.resolve()
+        self.firestorageDatabase = container.resolve()
+        self.player = container.resolve()
+        self.downloadService = container.resolve()
+        self.favouriteManager = container.resolve()
+        self.likeManager = container.resolve()
+        self.firebaseDataBase = container.resolve()
+        self.apiService = container.resolve()
+        self.dataStoreManager = container.resolve()
+        self.listeningManager = container.resolve()
+        self.container = container
+
+        super.init(coder: args.coder)
     }
-    
-    //MARK: init
-    init?(coder: NSCoder,
-                               userViewModel: UserViewModel,
-                               firestorageDatabase: FirestorageDatabaseInput,
-                               player: PlayerInput,
-                               downloadService: DownloadServiceInput,
-                               favouriteManager: FavouriteManagerInput,
-                               likeManager: LikeManagerInput,
-                               firebaseDataBase: FirebaseDatabaseInput,
-                               apiService: ApiServiceInput,
-                               dataStoreManager: DataStoreManagerInput,
-                               listeningManager: ListeningManagerInput) {
-        
-        self.userViewModel = userViewModel
-        self.firestorageDatabase = firestorageDatabase
-        self.player = player
-        self.downloadService = downloadService
-        self.favouriteManager = favouriteManager
-        self.likeManager = likeManager
-        self.firebaseDataBase = firebaseDataBase
-        self.apiService = apiService
-        self.dataStoreManager = dataStoreManager
-        self.listeningManager = listeningManager
-        
-        super.init(coder: coder)
-    }
+
     
     required init?(coder: NSCoder) {
         fatalError()
@@ -123,7 +96,7 @@ extension TabBarViewController {
         guard smallPlayer == nil else { return }
         let model = SmallPlayerViewModel(track)
         let smallPlayer = SmallPlayerView(vc: self, model: model, player: player)
-        tabBar.addSubview(smallPlayer)
+        view.addSubview(smallPlayer)
         smallPlayer.isHidden = false
         self.smallPlayer = smallPlayer
         
@@ -137,19 +110,8 @@ extension TabBarViewController {
     
     private func configureDetailViewController(podcast: Podcast, playList: [Podcast]) -> DetailViewController {
         
-        let detailViewController: DetailViewController = DetailViewController.create { [weak self] coder in
-
-            guard let self = self else { fatalError() }
-
-            return DetailViewController.init(
-                coder: coder,
-                podcast: podcast,
-                podcasts: playList,
-                player: player,
-                downloadService: downloadService,
-                likeManager: self.likeManager,
-                favouriteManager: favouriteManager)
-        }
+        let argument = DetailViewController.Args(podcast: podcast, podcasts: playList)
+        let detailViewController: DetailViewController = container.resolve(args: argument)
         
         detailViewController.modalPresentationStyle = .custom
         detailViewController.transitioningDelegate = self
@@ -239,7 +201,9 @@ extension TabBarViewController: SmallPlayerViewControllerDelegate {
     
     func smallPlayerViewControllerSwipeOrTouch(_ smallPlayerViewController: SmallPlayerView) {
         guard let track = player.currentTrack?.track else { return }
-        let bigPlayerViewController = BigPlayerViewController(self, player: player, track: track, likeManager: likeManager)
+        let argsVM: BigPlayerViewModel.Arguments = track
+        let args: BigPlayerViewController.Arguments = self
+        let bigPlayerViewController: BigPlayerViewController = container.resolveWithModel(args: args, argsVM: argsVM)
         bigPlayerViewController.modalPresentationStyle = .fullScreen
         self.present(bigPlayerViewController, animated: true)
     }
@@ -272,22 +236,22 @@ extension TabBarViewController: UIViewControllerTransitioningDelegate {
 //MARK: - PlayerEventNotification
 extension TabBarViewController: PlayerDelegate {
     
-    func playerDidEndPlay(_ player: Player, with track: OutputPlayerProtocol) {}
+    func playerDidEndPlay(_ player: Player, with track: any OutputPlayerProtocol) {}
     
-    func playerStartLoading(_ player: Player, with track: OutputPlayerProtocol) {
+    func playerStartLoading(_ player: Player, with track: any OutputPlayerProtocol) {
         presentSmallPlayer(with: track)
     }
     
-    func playerDidEndLoading(_ player: Player, with track: OutputPlayerProtocol) {}
+    func playerDidEndLoading(_ player: Player, with track: any OutputPlayerProtocol) {}
     
-    func playerUpdatePlayingInformation(_ player: Player, with track: OutputPlayerProtocol) {
+    func playerUpdatePlayingInformation(_ player: Player, with track: any OutputPlayerProtocol) {
         
     }
     
-    func playerStateDidChanged(_ player: Player, with track: OutputPlayerProtocol) {}
+    func playerStateDidChanged(_ player: Player, with track: any OutputPlayerProtocol) {}
 }
 
-//MARK: -
+//MARK: - ListViewControllerDelegate
 extension TabBarViewController: ListViewControllerDelegate {
     
     func listViewController(_ listViewController: ListViewController, didSelect podcast: Podcast) {

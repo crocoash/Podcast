@@ -14,14 +14,15 @@ protocol ApiServiceInput {
     func getData<T: Decodable>(for request: String, completion: @escaping (Result<T>) -> Void)
 }
 
-class ApiService: ApiServiceInput {
-   
-    private var viewContext: NSManagedObjectContext
+class ApiService: ISingleton {
     
-    init(viewContext: NSManagedObjectContext) {
-        self.viewContext = viewContext
+    required init(container: IContainer, args: ()) {
+        let dataStoreManager: DataStoreManager = container.resolve()
+        self.viewContext = dataStoreManager.viewContext
     }
     
+    private var viewContext: NSManagedObjectContext
+
     func getData<T: Decodable>(for request: String, completion: @escaping (Result<T>) -> Void) {
         
         guard let url = URL(string: request.encodeUrl) else { fatalError() }

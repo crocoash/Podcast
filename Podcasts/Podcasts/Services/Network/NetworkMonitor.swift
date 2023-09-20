@@ -13,7 +13,7 @@ protocol NetworkMonitorDelegate: AnyObject {
     func internetConnectionDidRestore(_ networkMonitior: NetworkMonitor, isConnection: Bool)
 }
 
-class NetworkMonitor {
+class NetworkMonitor: ISingleton {
     
     weak var delegate: NetworkMonitorDelegate?
     
@@ -31,11 +31,6 @@ class NetworkMonitor {
         }
     }
     
-    init() {
-        self.monitor = NWPathMonitor()
-        monitor.start(queue: queue)
-    }
-    
     private(set) var connectionType: ConnectionType = .unknown
     
     enum ConnectionType: String {
@@ -43,6 +38,12 @@ class NetworkMonitor {
         case cellular
         case ethernet
         case unknown
+    }
+    
+    //MARK: init
+    required init(container: IContainer, args: ()) {
+        self.monitor = NWPathMonitor()
+        monitor.start(queue: queue)
     }
     
     func starMonitor() {

@@ -15,7 +15,9 @@ protocol FirestorageDatabaseInput {
     func getLogo(comletion: @escaping (UIImage) -> Void)
 }
  
-class FirestorageDatabase: FirestorageDatabaseInput {
+class FirestorageDatabase: ISingleton {
+    
+    required init(container: IContainer, args: ()) { }
     
     let storage = Storage.storage()
     lazy var userID = Auth.auth().currentUser?.uid

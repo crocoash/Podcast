@@ -8,22 +8,23 @@
 import UIKit
 import CoreData
 
-//MARK: - Type
-protocol InputDownloadProtocol {
-    var downloadEntity: DownloadProtocol { get }
-}
 
 //MARK: - Type
 protocol DownloadProtocol {
     var downloadUrl: String? { get }
-    var downloadId: String { get }
+    var id: String           { get }
+}
+
+extension DownloadProtocol {
+    var url: URL? {
+        return downloadUrl.url
+    }
 }
 
 //MARK: - OutputType
 struct DownloadServiceType: PodcastCellDownloadProtocol {
-    
+    var id: String
     var downloadId: String
-    var inputDownloadProtocol: InputDownloadProtocol
     var downloadDataTask: URLSessionDownloadTask
     var isDownloaded: Bool = false
     var isDownloading: Bool = false
@@ -33,67 +34,108 @@ struct DownloadServiceType: PodcastCellDownloadProtocol {
     
     var downloadUrl: URL?
     
-    init(inputDownloadProtocol: InputDownloadProtocol, downloadDataTask: URLSessionDownloadTask) {
-        self.downloadId = inputDownloadProtocol.downloadEntity.downloadId
-        self.inputDownloadProtocol = inputDownloadProtocol
+    init(inputDownloadProtocol: DownloadProtocol, downloadDataTask: URLSessionDownloadTask) {
+        self.downloadId = inputDownloadProtocol.id
         self.downloadDataTask = downloadDataTask
-        self.downloadUrl = inputDownloadProtocol.downloadEntity.downloadUrl.url
+        self.downloadUrl = inputDownloadProtocol.url
+        self.id = inputDownloadProtocol.id
     }
 }
 
 //MARK: - Delegate
 protocol DownloadServiceDelegate: AnyObject {
         
-    func updateDownloadInformation (_ downloadService: DownloadServiceInput, entity: DownloadServiceType)
-    func didEndDownloading         (_ downloadService: DownloadServiceInput, entity: DownloadServiceType)
-    func didPauseDownload          (_ downloadService: DownloadServiceInput, entity: DownloadServiceType)
-    func didContinueDownload       (_ downloadService: DownloadServiceInput, entity: DownloadServiceType)
-    func didStartDownload          (_ downloadService: DownloadServiceInput, entity: DownloadServiceType)
-    func didRemoveEntity           (_ downloadService: DownloadServiceInput, entity: DownloadServiceType)
+    func updateDownloadInformation (_ downloadService: DownloadService, entity: DownloadServiceType)
+    func didEndDownloading         (_ downloadService: DownloadService, entity: DownloadServiceType)
+    func didPauseDownload          (_ downloadService: DownloadService, entity: DownloadServiceType)
+    func didContinueDownload       (_ downloadService: DownloadService, entity: DownloadServiceType)
+    func didStartDownload          (_ downloadService: DownloadService, entity: DownloadServiceType)
+    func didRemoveEntity           (_ downloadService: DownloadService, entity: DownloadServiceType)
+}
+
+extension DownloadServiceDelegate where Self: IViewModelUpdating {
+        
+    func updateDownloadInformation (_ downloadService: DownloadService, entity: DownloadServiceType) {
+        update(with: entity)
+    }
+    func didEndDownloading         (_ downloadService: DownloadService, entity: DownloadServiceType) {
+        update(with: entity)
+    }
+    func didPauseDownload          (_ downloadService: DownloadService, entity: DownloadServiceType) {
+        update(with: entity)
+    }
+    func didContinueDownload       (_ downloadService: DownloadService, entity: DownloadServiceType) {
+        update(with: entity)
+    }
+    func didStartDownload          (_ downloadService: DownloadService, entity: DownloadServiceType) {
+        update(with: entity)
+    }
+    func didRemoveEntity           (_ downloadService: DownloadService, entity: DownloadServiceType) {
+        update(with: entity)
+    }
 }
 
 //MARK: - Input
-protocol DownloadServiceInput: MultyDelegateServiceInput {
-    func isDownloaded(entity: InputDownloadProtocol) -> Bool
-    func conform(entity: InputDownloadProtocol)
-    func cancelDownload(_ entity: InputDownloadProtocol)
-}
+//protocol DownloadServiceInput: MultyDelegateServiceInput {
+//    func isDownloaded(entity: InputDownloadProtocol) -> Bool
+//    func conform(entity: InputDownloadProtocol)
+//    func cancelDownload(_ entity: InputDownloadProtocol)
+//}
 
-class DownloadService: MultyDelegateService<DownloadServiceDelegate>, DownloadServiceInput {
-  
+class DownloadService: MultyDelegateService<DownloadServiceDelegate>, ISingleton {
+    
     typealias DownloadsSession = [URL: DownloadServiceType]
     
-    private let dataStoreManager: DataStoreManagerInput
+    private let dataStoreManager: DataStoreManager
     private let networkMonitor: NetworkMonitor
     
-    init(dataStoreManager: DataStoreManagerInput, networkMonitor: NetworkMonitor) {
-        self.networkMonitor = networkMonitor
-        self.dataStoreManager = dataStoreManager
+    //MARK: init
+    required init(container: IContainer, args: ()) {
+        self.networkMonitor = container.resolve()
+        self.dataStoreManager = container.resolve()
+        
+        super.init()
+        
+        let favoriteManager: FavouriteManager = container.resolve()
+        favoriteManager.delegate = self
     }
-   
+  
     lazy var downloadsSession: URLSession = {
         let configuration = URLSessionConfiguration.background(withIdentifier: "BackGroundSession")
         let downloadsSession = URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
         return downloadsSession
     }()
     
+    private var isGoingDownload: Bool = false
+    
     private(set) var activeDownloads: DownloadsSession = [:]
     
-    func isDownloaded(entity: InputDownloadProtocol) -> Bool {
-        return entity.downloadEntity.downloadUrl.isDownloaded
+    func isDownloaded(entity: DownloadProtocol) -> Bool {1
+        return entity.downloadUrl.isDownloaded
     }
     
-    func conform(entity: InputDownloadProtocol) {
-        var entity = entity
+    func isDownloading(entity: DownloadProtocol) -> Bool {
+        guard let url = entity.url else { return false }
+        return activeDownloads[url] != nil
+    }
+    
+    func downloadProgress(for entity: DownloadProtocol) -> Float {
+        guard let url = entity.url else { return 0 }
+        return activeDownloads[url]?.downloadingProgress ?? 0
+    }
 
-        if let coredataProtocol = entity as? (any CoreDataProtocol) {
-            
-            if let savedEntity = dataStoreManager.fetchObject(entity: coredataProtocol, predicates: nil) as? InputDownloadProtocol {
-                entity = savedEntity
-            }
-        }
+    func isGoingDownload(entity: DownloadProtocol) -> Bool {
+        guard let url = entity.url,
+              let entity = activeDownloads[url] else { return false }
         
-        guard let url = entity.downloadEntity.downloadUrl.url else { fatalError() }
+        return entity.isGoingDownload
+    }
+
+    
+    
+    func conform(entity: DownloadProtocol) {
+       
+        guard let url = entity.url else { fatalError() }
         
         if var activeDownload = activeDownloads[url] {
             let downloadState = activeDownload.downloadDataTask.state
@@ -105,18 +147,18 @@ class DownloadService: MultyDelegateService<DownloadServiceDelegate>, DownloadSe
                 continueDownload(&activeDownload)
             default: break
             }
-            activeDownloads[url] = activeDownload
+//            activeDownloads[url] = activeDownload
         } else {
             if isDownloaded(entity: entity) {
                 cancelDownload(entity)
             } else {
-                startDownload(InputDownloadProtocol: entity)
+                startDownload(entity: entity)
             }
         }
     }
     
-    func cancelDownload(_ entity: InputDownloadProtocol) {
-        guard let url = entity.downloadEntity.downloadUrl.localPath else { return }
+    func cancelDownload(_ entity: DownloadProtocol) {
+        guard let url = entity.url.localPath else { return }
         
         do {
             try FileManager.default.removeItem(atPath: url.path)
@@ -142,7 +184,7 @@ class DownloadService: MultyDelegateService<DownloadServiceDelegate>, DownloadSe
 //MARK: - Private Methods
 extension DownloadService {
 
-    private func startDownload(InputDownloadProtocol: InputDownloadProtocol) {
+    private func startDownload(entity: DownloadProtocol) {
         
 //        if !networkMonitor.isConnection {
 //            Alert().create(for: vc, title: "No Internet") { _ in
@@ -159,12 +201,13 @@ extension DownloadService {
 //            }
 //        }
         
-        guard let url = InputDownloadProtocol.downloadEntity.downloadUrl.url else { fatalError() }
+        guard let url = entity.url else { fatalError() }
 
         let downloadDataTask = downloadsSession.downloadTask(with: url)
         downloadDataTask.resume()
-        var downloadServiceType = DownloadServiceType(inputDownloadProtocol: InputDownloadProtocol, downloadDataTask: downloadDataTask)
+        var downloadServiceType = DownloadServiceType(inputDownloadProtocol: entity, downloadDataTask: downloadDataTask)
         downloadServiceType.isGoingDownload = true
+        
         activeDownloads[url] = downloadServiceType
         delegates {
             $0.didStartDownload(self, entity: downloadServiceType)
@@ -279,9 +322,9 @@ extension DownloadService: URLSessionDelegate, URLSessionDownloadDelegate {
 //MARK: - FavouriteManagerDelegate
 extension DownloadService: FavouriteManagerDelegate {
     
-    func favouriteManager(_ favouriteManager: FavouriteManagerInput, didRemove favourite: FavouritePodcast) {
-       cancelDownload(favourite)
+    func favouriteManager(_ favouriteManager: FavouriteManager, didRemove favourite: FavouritePodcast) {
+        cancelDownload(favourite.podcast)
     }
     
-    func favouriteManager(_ favouriteManager: FavouriteManagerInput, didAdd favourite: FavouritePodcast) {}
+    func favouriteManager(_ favouriteManager: FavouriteManager, didAdd favourite: FavouritePodcast) {}
 }

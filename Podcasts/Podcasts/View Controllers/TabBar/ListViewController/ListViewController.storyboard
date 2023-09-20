@@ -13,7 +13,7 @@
         <scene sceneID="zz7-Hv-tBW">
             <objects>
                 <viewController storyboardIdentifier="ListViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="xYZ-zp-521" customClass="ListViewController" customModule="Podcasts" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="UzT-pb-Dyn">
+                    <view key="view" contentMode="scaleToFill" id="UzT-pb-Dyn" customClass="ListView" customModule="Podcasts" customModuleProvider="target">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
@@ -38,6 +38,7 @@
                     <connections>
                         <outlet property="bottomTableViewConstraint" destination="sTV-2l-Ibh" id="naW-57-4Vt"/>
                         <outlet property="favouriteTableView" destination="Hpg-QP-mbV" id="TZl-fn-8ew"/>
+                        <outlet property="listView" destination="UzT-pb-Dyn" id="WDm-vW-7cx"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="yik-Wu-5rm" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

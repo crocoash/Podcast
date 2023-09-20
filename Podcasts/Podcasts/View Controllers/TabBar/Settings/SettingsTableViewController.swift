@@ -13,11 +13,13 @@ protocol SettingsTableViewControllerDelegate: AnyObject {
     func settingsTableViewControllerDidDisappear(_ settingsTableViewController: SettingsTableViewController)
 }
 
-class SettingsTableViewController: UITableViewController {
+class SettingsTableViewController: UITableViewController, IPerRequest {
+    
+    typealias Arguments = Void
     
     private var userViewModel: UserViewModel
-    private let firestorageDatabase: FirestorageDatabaseInput
-    private let apiService: ApiServiceInput
+    private let firestorageDatabase: FirestorageDatabase
+    private let apiService: ApiService
 
     private var user: User { userViewModel.userDocument.user }
     weak var delegate: SettingsTableViewControllerDelegate?
@@ -45,16 +47,13 @@ class SettingsTableViewController: UITableViewController {
     }(UIImagePickerController())
     
     //MARK: init
-    init?(coder: NSCoder,
-          _ userViewModel: UserViewModel,
-          firestorageDatabase: FirestorageDatabaseInput,
-          apiService: ApiServiceInput) {
+    required init(container: IContainer, args: Void) {
         
-        self.userViewModel = userViewModel
-        self.firestorageDatabase = firestorageDatabase
-        self.apiService = apiService
+        self.userViewModel = container.resolve()
+        self.firestorageDatabase = container.resolve()
+        self.apiService = container.resolve()
         
-        super.init(coder: coder)
+        super.init(nibName: nil, bundle: nil)
     }
     
     required init(coder: NSCoder) {

@@ -7,61 +7,85 @@
 
 import UIKit
 import CoreData
- 
+
 //MARK: - Delegate
 protocol FavouriteManagerDelegate: AnyObject {
-    func favouriteManager(_ favouriteManager: FavouriteManagerInput, didRemove favourite: FavouritePodcast)
-    func favouriteManager(_ favouriteManager: FavouriteManagerInput, didAdd favourite: FavouritePodcast)
+    func favouriteManager(_ favouriteManager: FavouriteManager, didRemove favourite: FavouritePodcast)
+    func favouriteManager(_ favouriteManager: FavouriteManager, didAdd favourite: FavouritePodcast)
+}
+
+extension FavouriteManagerDelegate where Self: IViewModelUpdating {
+    
+    func favouriteManager(_ favouriteManager: FavouriteManager, didRemove favourite: FavouritePodcast) {
+        update(with: favourite)
+    }
+    
+    func favouriteManager(_ favouriteManager: FavouriteManager, didAdd favourite: FavouritePodcast) {
+        update(with: favourite)
+    }
 }
 
 //MARK: - Type
-protocol InputFavouriteType: CoreDataProtocol {
-    var favouriteInputTypeid: String { get }
-}
 
 //MARK: - Input
 protocol FavouriteManagerInput: MultyDelegateServiceInput {
-    func addOrRemoveFavouritePodcast(entity: (any InputFavouriteType))
-    func isFavourite(_ entity: any InputFavouriteType) -> Bool
+    func addFavouritePodcast(entity: Podcast)
+    func removeFavouritePodcast(entity: FavouritePodcast)
+    func removeFavouritePodcast(entity: Podcast)
+    
+    func isFavourite(_ entity: Podcast) -> Bool
     func removeAll()
 }
 
-class FavouriteManager: MultyDelegateService<FavouriteManagerDelegate>, FavouriteManagerInput {
-    
-    private let dataStoreManager: DataStoreManagerInput
-    private let firebaseDatabase: FirebaseDatabaseInput
+class FavouriteManager: MultyDelegateService<FavouriteManagerDelegate>, ISingleton {
+
+    private let dataStoreManager: DataStoreManager
+    private let firebaseDatabase: FirebaseDatabase
     lazy private var viewContext = dataStoreManager.viewContext
     
-    //MARK: init
-    init(dataStoreManager: DataStoreManagerInput, firebaseDatabase: FirebaseDatabaseInput) {
-        self.firebaseDatabase = firebaseDatabase
-        self.dataStoreManager = dataStoreManager
+    required init(container: IContainer, args: ()) {
+        
+        self.firebaseDatabase = container.resolve()
+        self.dataStoreManager = container.resolve()
         
         super.init()
         
-       firebaseDatabase.update(vc: self, viewContext: dataStoreManager.viewContext, type: FavouritePodcast.self)
-       firebaseDatabase.observe(vc: self, viewContext: viewContext, type: FavouritePodcast.self)
+        firebaseDatabase.update(vc: self, viewContext: dataStoreManager.viewContext, type: FavouritePodcast.self)
+        firebaseDatabase.observe(vc: self, viewContext: viewContext, type: FavouritePodcast.self)
+    }
+    
+    func removeFavouritePodcast(favouritePodcast: FavouritePodcast) {
+        removeFavouritePodcast(favouritePodcast, removeFromFireBase: true)
+    }
+    
+    func addFavouritePodcast(podcast: Podcast) {
+        if getFavourite(for: podcast) == nil {
+            let favouritePodcast = FavouritePodcast(podcast, viewContext: viewContext, dataStoreManager: dataStoreManager)
+            dataStoreManager.save()
+            firebaseDatabase.add(entity: favouritePodcast)
+            delegates {
+                $0.favouriteManager(self, didAdd: favouritePodcast)
+            }
+        }
     }
     
     var isEmpty: Bool {
         dataStoreManager.allObjectsFromCoreData(type: FavouritePodcast.self).count == 0
     }
     
-    func addOrRemoveFavouritePodcast(entity: (any InputFavouriteType)) {
-        if let favouritePodcast = getFavourite(for: entity) {
-            removeFavouritePodcast(favouritePodcast)
-        } else {
-            addFavouritePodcast(entity: entity)
-        }
-    }
-    
-    func isFavourite(_ entity: any InputFavouriteType) -> Bool {
+    func isFavourite(_ entity: Podcast) -> Bool {
         return getFavourite(for: entity) != nil
     }
     
     func removeAll() {
         dataStoreManager.allObjectsFromCoreData(type: FavouritePodcast.self).forEach {
-            removeFavouritePodcast($0)
+            removeFavouritePodcast($0, removeFromFireBase: true)
+        }
+    }
+    
+    func removeFavouritePodcast(podcast: Podcast) {
+        if let favouritePodcast = getFavourite(for: podcast) {
+            removeFavouritePodcast(favouritePodcast: favouritePodcast)
         }
     }
 }
@@ -69,48 +93,28 @@ class FavouriteManager: MultyDelegateService<FavouriteManagerDelegate>, Favourit
 //MARK: - Private Methods
 extension FavouriteManager {
     
-    private func addFavouritePodcast(entity: (any InputFavouriteType)) {
-        if getFavourite(for: entity) == nil {
-            
-            if let podcast = entity as? Podcast {
-                let favouritePodcast = FavouritePodcast(podcast, viewContext: viewContext, dataStoreManager: dataStoreManager)
-                dataStoreManager.save()
-                firebaseDatabase.add(entity: favouritePodcast)
-                delegates {
-                    $0.favouriteManager(self, didAdd: favouritePodcast)
-                }
-            } else {
-                //TODO: -
-                fatalError()
-                // dataStoreManagerInput.removeFromCoreData(entity: entity)
-            }
-            feedbackGenerator()
+    private func removeAllOnlyFromCoredata() {
+        dataStoreManager.allObjectsFromCoreData(type: FavouritePodcast.self).forEach {
+            removeFavouritePodcast($0, removeFromFireBase: false)
         }
     }
     
-    private func getFavourite(for entity: any InputFavouriteType) -> FavouritePodcast? {
-        let predicate = NSPredicate(format: "podcast.id == %@", "\(entity.favouriteInputTypeid)")
+    private func getFavourite(for entity: Podcast) -> FavouritePodcast? {
+        let predicate = NSPredicate(format: "podcast.id == %@", "\(entity.id)")
         let favouritePodcast = dataStoreManager.fetchObject(entity: FavouritePodcast.self, predicates: [predicate])
         return favouritePodcast
     }
     
-    private func feedbackGenerator() {
-        let feedbackGenerator = UIImpactFeedbackGenerator()
-        feedbackGenerator.prepare()
-        feedbackGenerator.impactOccurred()
-    }
-    
-    private func removeFavouritePodcast(_ favouritePodcast: FavouritePodcast) {
-        if let favouritePodcast = getFavourite(for: favouritePodcast.podcast) {
-            
-            let abstractFavourite = dataStoreManager.initAbstractObject(for: favouritePodcast)
-            dataStoreManager.removeFromCoreData(entity: favouritePodcast)
+    private func removeFavouritePodcast(_ favouritePodcast: FavouritePodcast, removeFromFireBase: Bool = true) {
+        
+        let abstractFavourite = dataStoreManager.initAbstractObject(for: favouritePodcast)
+        dataStoreManager.removeFromCoreData(entity: favouritePodcast)
+        
+        if removeFromFireBase {
             firebaseDatabase.remove(entity: abstractFavourite)
-            
-            delegates {
-                $0.favouriteManager(self, didRemove: abstractFavourite)
-            }
-            feedbackGenerator()
+        }
+        delegates {
+            $0.favouriteManager(self, didRemove: abstractFavourite)
         }
     }
 }
@@ -120,7 +124,7 @@ extension FavouriteManager: FirebaseDatabaseDelegate {
     
     func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didGetEmptyData type: any FirebaseProtocol.Type) {
         if type is FavouritePodcast.Type {
-            removeAll()
+            removeAllOnlyFromCoredata()
         }
     }
     
@@ -137,11 +141,11 @@ extension FavouriteManager: FirebaseDatabaseDelegate {
     
     func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didRemove entity: (any FirebaseProtocol)) {
         if let favouritePodcast = entity as? FavouritePodcast {
-            removeFavouritePodcast(favouritePodcast)
+            removeFavouritePodcast(favouritePodcast, removeFromFireBase: false)
         }
     }
     
-   ///update
+    ///update
     func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didAdd entities: [any FirebaseProtocol]) {
         if entities is [FavouritePodcast] {
             dataStoreManager.updateCoreData(entities: entities)

@@ -14,37 +14,38 @@ protocol ListeningManagerDelegate: AnyObject {
     func listeningManager(_ listeningManager: ListeningManager, didUpdate listeningPodcast: ListeningPodcast)
 }
 
-//MARK: - Type
-//protocol ListeningManagerProtocol {
-//    var trackId: String { get }
-//    var listeningProgress: Double? { get }
-//    var currentTime: Float? { get }
-//    var duration: Double? { get }
-//}
-
-//MARK: - Input
-protocol ListeningManagerInput: MultyDelegateServiceInput {
-    func saveListeningProgress(by entity: Track)
-    func removeListeningPodcast(_ entity: ListeningPodcast)
+extension ListeningManagerDelegate where Self: IViewModelUpdating {
+    
+    func listeningManager(_ listeningManager: ListeningManager, didSave listeningPodcast : ListeningPodcast) {
+        update(with: listeningPodcast)
+    }
+    func listeningManager(_ listeningManager: ListeningManager, didRemove listeningPodcast: ListeningPodcast) {
+        update(with: listeningPodcast)
+    }
+    func listeningManager(_ listeningManager: ListeningManager, didUpdate listeningPodcast: ListeningPodcast) {
+        update(with: listeningPodcast)
+    }
 }
 
-class ListeningManager: MultyDelegateService<ListeningManagerDelegate>, ListeningManagerInput {
+class ListeningManager: MultyDelegateService<ListeningManagerDelegate>, ISingleton {
     
-    private let dataStoreManager: DataStoreManagerInput
-    private let firebaseDatabase: FirebaseDatabaseInput
-    private let player: PlayerInput
-    
-    init(dataStoreManager: DataStoreManagerInput, firebaseDatabaseInput: FirebaseDatabaseInput, player: PlayerInput) {
-        self.dataStoreManager = dataStoreManager
-        self.firebaseDatabase = firebaseDatabaseInput
-        self.player = player
+    required init(container: IContainer, args: ()) {
+        
+        self.dataStoreManager = container.resolve()
+        self.firebaseDatabase = container.resolve()
+        self.player = container.resolve()
         
         super.init()
-        
+
+        self.player.delegate = self
         firebaseDatabase.update(vc: self, viewContext: dataStoreManager.viewContext, type: ListeningPodcast.self)
         firebaseDatabase.observe(vc: self, viewContext: dataStoreManager.viewContext, type: ListeningPodcast.self)
     }
     
+    private let dataStoreManager: DataStoreManager
+    private let firebaseDatabase: FirebaseDatabase
+    private let player: Player
+   
     func saveListeningProgress(by entity: Track) {
         
         if let podcast = entity.inputType as? Podcast {
@@ -79,19 +80,12 @@ class ListeningManager: MultyDelegateService<ListeningManagerDelegate>, Listenin
     }
     
     func removeListeningPodcast(_ entity: ListeningPodcast) {
-        let abstractListeningPodcast = dataStoreManager.initAbstractObject(for: entity)
-        dataStoreManager.removeFromCoreData(entity: entity)
-        
-        firebaseDatabase.remove(entity: abstractListeningPodcast)
-        
-        delegates {
-            $0.listeningManager(self, didRemove: abstractListeningPodcast)
-        }
+        removeListeningPodcast(entity, removeFromFireBase: true)
     }
     
     func removeAll() {
         dataStoreManager.allObjectsFromCoreData(type: ListeningPodcast.self).forEach {
-            removeListeningPodcast($0)
+            removeListeningPodcast($0, removeFromFireBase: true)
         }
     }
 }
@@ -106,6 +100,26 @@ extension ListeningManager {
             $0.listeningManager(self, didSave: listeningPodcast)
         }
     }
+    
+    private func removeListeningPodcast(_ entity: ListeningPodcast, removeFromFireBase: Bool) {
+        
+        let abstractListeningPodcast = dataStoreManager.initAbstractObject(for: entity)
+        dataStoreManager.removeFromCoreData(entity: entity)
+        
+        if removeFromFireBase {
+            firebaseDatabase.remove(entity: abstractListeningPodcast)
+        }
+        
+        delegates {
+            $0.listeningManager(self, didRemove: abstractListeningPodcast)
+        }
+    }
+    
+    private func removeAllOnlyFromCoreData() {
+        dataStoreManager.allObjectsFromCoreData(type: ListeningPodcast.self).forEach {
+            removeListeningPodcast($0, removeFromFireBase: false)
+        }
+    }
 }
 
 //MARK: - FirebaseDatabaseDelegate
@@ -113,7 +127,7 @@ extension ListeningManager: FirebaseDatabaseDelegate {
     
     func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didGetEmptyData type: any FirebaseProtocol.Type) {
         if type is ListeningPodcast.Type {
-            removeAll()
+            removeAllOnlyFromCoreData()
         }
     }
     
@@ -125,21 +139,19 @@ extension ListeningManager: FirebaseDatabaseDelegate {
     
     func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didRemove entity: (any FirebaseProtocol)) {
         if let listeningPodcast = entity as? ListeningPodcast {
-            removeListeningPodcast(listeningPodcast)
+            removeListeningPodcast(listeningPodcast, removeFromFireBase: true)
         }
     }
     
     func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didAdd entities: [any FirebaseProtocol]) {
         if let listeningPodcast = entities as? [ListeningPodcast] {
-            listeningPodcast.forEach {
-                saveListeningPodcast($0)
-            }
+            dataStoreManager.updateCoreData(entities: entities)
         }
     }
     
     func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didUpdate entity: (any FirebaseProtocol)) {
         if let listeningPodcast = entity as? ListeningPodcast {
-            if player.currentTrack?.track.inputType.trackId != listeningPodcast.podcast.trackId {
+            if player.currentTrack?.track.inputType.id != listeningPodcast.podcast.trackId {
                 dataStoreManager.updateCoreData(entity: listeningPodcast)
                 dataStoreManager.save()
                 delegates {
@@ -153,15 +165,15 @@ extension ListeningManager: FirebaseDatabaseDelegate {
 //MARK: - PlayerDelegate
 extension ListeningManager: PlayerDelegate {
     
-    func playerDidEndPlay(_ player: Player, with track: OutputPlayerProtocol) {}
+    func playerDidEndPlay(_ player: Player, with track: any OutputPlayerProtocol) {}
     
-    func playerStartLoading(_ player: Player, with track: OutputPlayerProtocol) {}
+    func playerStartLoading(_ player: Player, with track: any OutputPlayerProtocol) {}
     
-    func playerDidEndLoading(_ player: Player, with track: OutputPlayerProtocol) {}
+    func playerDidEndLoading(_ player: Player, with track: any OutputPlayerProtocol) {}
     
-    func playerUpdatePlayingInformation(_ player: Player, with track: OutputPlayerProtocol) {
+    func playerUpdatePlayingInformation(_ player: Player, with track: any OutputPlayerProtocol) {
         saveListeningProgress(by: track as! Track)
     }
     
-    func playerStateDidChanged(_ player: Player, with track: OutputPlayerProtocol) {}
+    func playerStateDidChanged(_ player: Player, with track: any OutputPlayerProtocol) {}
 }
