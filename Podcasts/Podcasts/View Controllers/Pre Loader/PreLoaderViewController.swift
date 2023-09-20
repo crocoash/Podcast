@@ -7,10 +7,9 @@
 
 import UIKit
 
-class PreLoaderViewController: UIViewController, IPerRequest {
+class PreLoaderViewController: UIViewController, IHaveStoryBoard {
     
-    
-    typealias Arguments = Void
+    typealias Args = Void
     
     private let userViewModel: UserViewModel
     private let likeManager: LikeManager
@@ -31,16 +30,12 @@ class PreLoaderViewController: UIViewController, IPerRequest {
     
     lazy private var topAnchorConst = view.frame.height / 2 - logoImageView.frame.height / 2
     
-    lazy private var tabBarVC: TabBarViewController = TabBarViewController.create { [weak self] coder in
-        
-        guard let self = self else { fatalError() }
-        
+    lazy private var tabBarVC: TabBarViewController = {
         let tabBarViewController: TabBarViewController = container.resolve()
         tabBarViewController.modalPresentationStyle = .custom
         tabBarViewController.transitioningDelegate = self
         return tabBarViewController
-        
-    }
+    }()
     
     lazy private var registrationVC = RegistrationViewController.storyboard.instantiateViewController(identifier: RegistrationViewController.identifier) { [weak self] coder in
         guard let self = self else { fatalError() }
@@ -51,8 +46,7 @@ class PreLoaderViewController: UIViewController, IPerRequest {
         return registrationVC
     }
     
-    required init(container: IContainer, args: Void) {
-        
+    required init?(container: IContainer, args: (args: Args, coder: NSCoder)) {
         self.favouriteManager = container.resolve()
         self.likeManager = container.resolve()
         self.userViewModel = container.resolve()
@@ -64,8 +58,8 @@ class PreLoaderViewController: UIViewController, IPerRequest {
         self.dataStoreManager = container.resolve()
         self.listeningManager = container.resolve()
         self.container = container
-        
-        super.init(nibName: Self.identifier, bundle: nil)
+
+        super.init(coder: args.coder)
     }
     
     required init?(coder: NSCoder) {

@@ -15,7 +15,6 @@ protocol SettingsTableViewControllerDelegate: AnyObject {
 
 class SettingsTableViewController: UITableViewController, IPerRequest {
     
-    
     typealias Arguments = Void
     
     private var userViewModel: UserViewModel
@@ -54,7 +53,7 @@ class SettingsTableViewController: UITableViewController, IPerRequest {
         self.firestorageDatabase = container.resolve()
         self.apiService = container.resolve()
         
-        super.init(nibName: Self.identifier, bundle: nil)
+        super.init(nibName: nil, bundle: nil)
     }
     
     required init(coder: NSCoder) {

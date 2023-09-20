@@ -13,9 +13,9 @@ protocol ListViewControllerDelegate: AnyObject {
     func listViewController(_ listViewController: ListViewController, didSelect podcast: Podcast)
 }
 
-class ListViewController: UIViewController, IHaveViewModel, IPerRequest {
-    
-    typealias Arguments = ListViewControllerDelegate
+class ListViewController: UIViewController, IHaveViewModel, IHaveStoryBoard {
+   
+    typealias Args = ListViewControllerDelegate
     typealias ViewModel = ListViewModel
     
     func viewModelChanged() {
@@ -23,9 +23,9 @@ class ListViewController: UIViewController, IHaveViewModel, IPerRequest {
     }
     
     func viewModelChanged(_ viewModel: ListViewModel) {
-        
+        updateUI()
     }
-    
+  
     //MARK: services
     private var downloadService:  DownloadService
     private var player:           Player
@@ -55,20 +55,22 @@ class ListViewController: UIViewController, IHaveViewModel, IPerRequest {
     private let container: IContainer
     
     //MARK: init
-    required init(container: IContainer, args: Arguments) {
+    required init?(container: IContainer, args: (args: Args, coder: NSCoder)) {
+
         self.downloadService = container.resolve()
         self.player = container.resolve()
+        self.listDataManager = container.resolve()
         self.firebaseDataBase = container.resolve()
         self.favouriteManager = container.resolve()
         self.dataStoreManager = container.resolve()
         self.listeningManager = container.resolve()
         self.likeManager = container.resolve()
-        self.listDataManager = container.resolve()
+
         self.container = container
-        
-        self.delegate = args
-        
-        super.init(nibName: Self.identifier, bundle: nil)
+
+        self.delegate = args.args
+
+        super.init(coder: args.coder)
     }
     
     required init?(coder: NSCoder) {
@@ -111,17 +113,8 @@ class ListViewController: UIViewController, IHaveViewModel, IPerRequest {
     //MARK: View Methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        player.delegate = self
-        downloadService.delegate = self
-        
-        updateUI()
+        observeViewModel()
         configureAlertSortListView()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
     }
     
     //MARK: Actions
@@ -140,6 +133,10 @@ class ListViewController: UIViewController, IHaveViewModel, IPerRequest {
         
         listeningManager.removeListeningPodcast(listeningPodcast)
     }
+}
+
+//MARK: - Private methods
+extension ListViewController {
     
     private func editButtonDidTouch() {
         guard let alertSortListView = alertSortListView else { fatalError() }
@@ -151,22 +148,18 @@ class ListViewController: UIViewController, IHaveViewModel, IPerRequest {
         listeningManager.removeAll()
         likeManager.removeAll()
     }
-}
-
-//MARK: - Private methods
-extension ListViewController {
     
     private func configureNavigationItem() {
-        let value = viewModel.sectionsIsEmpty && viewModel.isSearchedText
+        let isEmpty = viewModel.sectionsIsEmpty && !viewModel.isSearching
         
-        navigationItem.rightBarButtonItem = value ? nil : removeAllButton
-        navigationItem.leftBarButtonItem = value ? nil : editButton
+        navigationItem.rightBarButtonItem = isEmpty ? nil : removeAllButton
+        navigationItem.leftBarButtonItem = isEmpty ? nil : editButton
         navigationItem.title = "List"
         navigationItem.hidesSearchBarWhenScrolling = false
     }
     
     private func setSearchController() {
-        navigationItem.searchController = (viewModel.sectionsIsEmpty && !viewModel.isSearchedText) ? nil : searchController
+        navigationItem.searchController = (viewModel.sectionsIsEmpty && !viewModel.isSearching) ? nil : searchController
     }
     
     private func configureScopeBar() {
@@ -186,7 +179,7 @@ extension ListViewController {
     
     private func configureAlertSortListView() {
         guard let tabBarController = tabBarController else { fatalError() }
-        let vc: AlertSortListView = container.resolve(args: self)
+        let vc: AlertSortListView = container.resolveWithModel(args: self)
         tabBarController.view.superview?.addSubview(vc)
         alertSortListView = vc
     }
@@ -194,20 +187,17 @@ extension ListViewController {
     private func configureCell(for tableView: UITableView, at indexPath: IndexPath) -> UITableViewCell {
         
         let item = viewModel.getObjectInSection(for: indexPath)
+        let playlist = viewModel.getPlaylist(for: indexPath.section)
         
         if let podcast = (item as? FavouritePodcast)?.podcast {
             let cell = tableView.getCell(cell: PodcastCell.self, indexPath: indexPath)
-            
-            let isFavourite = true
-            let isDownloaded = downloadService.isDownloaded(entity: podcast)
-//            cell.viewModel = PodcastCellViewModel(podcast: podcast)
-            cell.configureCell(self, with: podcast)
+            let args = PodcastCellViewModel.Arguments.init(podcast: podcast, playlist: playlist)
+            cell.viewModel = container.resolve(args: args)
             cell.addMyGestureRecognizer(self, type: .tap(), #selector(tapFavouritePodcastCell(sender:)))
+            
             return cell
         } else if let item = item as? LikedMoment {
             let cell = tableView.getCell(cell: LikedPodcastTableViewCell.self, indexPath: indexPath)
-//            cell.configureCell(with: item.podcast)
-        
             return cell
         } else if let item = item as? ListeningPodcast {
             let cell = tableView.getCell(cell: ListeningPodcastCell.self, indexPath: indexPath)
@@ -255,42 +245,36 @@ extension ListViewController {
 //        }
     }
     
-    private func delete(_ object: Any, indexPath: IndexPath?) {
-        
-        viewModel.remove(object, removeSection: { [weak self] index in
+    private func observeViewModel() {
+        viewModel.removeSection { [weak self] index in
             guard let self = self else { return }
             favouriteTableView.deleteSection(at: index)
             updateUI()
-        }, removeItem: { [weak self] indexPath in
+        }
+        
+        viewModel.removeItem { [weak self] indexPath in
             guard let self = self else { return }
             favouriteTableView.deleteItem(at: indexPath)
-        })
+        }
         
-    }
-    
-    private func insert(_ object: Any, newIndexPath: IndexPath?) {
-        
-        viewModel.append(object, at: newIndexPath, insertSection: { [weak self] section, index in
-            guard let self = self else { return }
-            updateUI()
-            favouriteTableView.insertSection(at: index)
-        }, insertItem: { [weak self] indexPath in
+        viewModel.insertItem { [weak self] item, indexPath in
             guard let self = self else { return }
             favouriteTableView.insertCell(at: indexPath)
-        })
-        
-        if let favouritePodcast = object as? FavouritePodcast {
-            let name = favouritePodcast.podcast.trackName ?? ""
-            let title = "\(name) podcast is added to playlist"
-            addToast(title: title, (playerIsSHidden ? .bottom : .bottomWithPlayer))
+            
+            if let favouritePodcast = item as? FavouritePodcast {
+                let name = favouritePodcast.podcast.trackName ?? ""
+                let title = "\(name) podcast is added to playlist"
+                addToast(title: title, (playerIsSHidden ? .bottom : .bottomWithPlayer))
+            }
         }
-    }
-    
-    private func move(_ anObject: Any, indexPath: IndexPath?, newIndexPath: IndexPath?) {
-        guard let index = indexPath?.row,
-              let newIndex = newIndexPath?.row  else { return }
         
-        viewModel.moveSection(anObject, from: index, to: newIndex) { [weak self] index, newIndex in
+        viewModel.insertSection { [weak self] section, index in
+            guard let self = self else { return }
+            favouriteTableView.insertSection(at: index)
+            updateUI()
+        }
+        
+        viewModel.moveSection { [weak self] index, newIndex in
             guard let self = self else { return }
             favouriteTableView.moveSection(from: index, to: newIndex)
             updateUI()
@@ -311,57 +295,10 @@ extension ListViewController: UISearchBarDelegate {
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        viewModel.performSearch (text: searchText,
-                             removeSection: { index in
-            favouriteTableView.deleteSection(at: index)
-            
-        }, removeItem: { indexPath in
-            favouriteTableView.deleteItem(at: indexPath)
-        }, insertSection: { section, index in
-            favouriteTableView.insertSection(at: index)
-        }, insertItem: { indexPath in
-            favouriteTableView.insertCell(at: indexPath)
-        })
-        
-        updateUI()
-        favouriteTableView.reloadData()
+        viewModel.performSearch (text: searchText)
     }
 }
 
-
-//MARK: - DownloadEventNotifications
-
-
-//MARK: - NSFetchedResultsControllerDelegate
-extension ListViewController: NSFetchedResultsControllerDelegate {
-    
-    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-//        favo/uriteTableView.beginUpdates()
-    }
-    
-    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        
-        switch type {
-            
-        case .delete:
-            delete(anObject, indexPath: indexPath)
-        case .insert:
-            insert(anObject, newIndexPath: newIndexPath)
-        case .move:
-            move(anObject, indexPath: indexPath, newIndexPath: newIndexPath)
-        case .update:
-            viewModel.update(with: anObject) { indexPaths in
-//                todo
-            }
-        default:
-            break
-        }
-    }
-    
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-//        favouriteTableView.endUpdates()
-    }
-}
 
 //MARK: - FavouriteTableViewDelegate
 extension ListViewController: FavouriteTableViewDelegate {
@@ -390,35 +327,6 @@ extension ListViewController: FavouriteTableDataSource {
     
     func favouriteTableView(_ favouriteTableView: FavouriteTableView, nameOfSectionFor index: Int) -> String {
         return viewModel.getNameOfSection(for: index)
-    }
-}
-
-//MARK: - PodcastCellDelegate
-extension ListViewController: PodcastCellDelegate {
-    
-    func podcastCellDidSelectStar(_ podcastCell: PodcastCell) {
-        guard let indexPath = favouriteTableView.indexPath(for: podcastCell),
-              let favouritePodcast = viewModel.getObjectInSection(for: indexPath) as? FavouritePodcast else { return }
-        
-        favouriteManager.removeFavouritePodcast(entity: favouritePodcast)
-    }
-    
-    func podcastCellDidSelectDownLoadImage(_ podcastCell: PodcastCell) {
-        guard let indexPath = favouriteTableView.indexPath(for: podcastCell) else { return }
-        guard let entity = viewModel.getObjectInSection(for: indexPath) as? DownloadProtocol else { return }
-//        downloadService.conform(entity: entity)
-    }
-    
-    func podcastCellDidTouchPlayButton(_ podcastCell: PodcastCell) {
-        guard let indexPath = favouriteTableView.indexPath(for: podcastCell),
-              let favouritePodcast = viewModel.getObjectInSection(for: indexPath) as? FavouritePodcast,
-              let favouritePodcasts = viewModel.getObjectsInSections(for: indexPath.section) as? [FavouritePodcast] else { fatalError() }
-        
-        player.conform(track: favouritePodcast.podcast, trackList: favouritePodcasts.map { $0.podcast })
-    }
-    
-    func podcastCellDidTouchStopButton(_ podcastCell: PodcastCell) {
-        player.playOrPause()
     }
 }
 

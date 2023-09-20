@@ -51,7 +51,7 @@ class FavouriteTableView: UITableView {
     override func reloadData() {
         super.reloadData()
         diffableDataSource.updateTittles(titles: configureTitles())
-        reloadTableView()
+        diffableDataSource.apply(mySnapShot)
         showEmptyImage()
         setScrollEnabled()
     }

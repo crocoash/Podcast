@@ -11,45 +11,18 @@ import UIKit
     func smallPlayerViewControllerSwipeOrTouch(_ smallPlayerView: SmallPlayerView)
 }
 
-protocol SmallPlayerPlayableProtocol {
-    var imageForSmallPlayer: String? { get }
-    var trackName: String? { get }
-    var listeningProgress: Double? { get }
-    var isPlaying: Bool { get }
-    var isGoingPlaying: Bool { get }
-    var trackId: String { get }
-}
-
-struct SmallPlayerViewModel: SmallPlayerPlayableProtocol {
-    var isGoingPlaying: Bool = true
-    var imageForSmallPlayer: String?
-    var trackName: String?
-    var listeningProgress: Double?
-    var isPlaying: Bool = false
-    var trackId: String
-    
-    init(_ entity: SmallPlayerPlayableProtocol) {
-        self.imageForSmallPlayer = entity.imageForSmallPlayer
-        self.trackName = entity.trackName
-        self.listeningProgress = entity.listeningProgress
-        self.trackId = entity.trackId
-        self.imageForSmallPlayer = entity.imageForSmallPlayer
-    }
-    
-    mutating func updatePlayableInformation(_ input: Any) {
-        
-        if let player = input as? SmallPlayerPlayableProtocol {
-            self.imageForSmallPlayer = player.imageForSmallPlayer
-            self.trackName = player.trackName
-            self.listeningProgress = player.listeningProgress
-            self.isPlaying = player.isPlaying
-            self.isGoingPlaying = player.isGoingPlaying
-        }
-    }
-}
-
 @IBDesignable
-class SmallPlayerView: UIView {
+class SmallPlayerView: UIView, IHaveViewModel {
+    
+    func viewModelChanged() {
+        
+    }
+    
+    func viewModelChanged(_ viewModel: SmallPlayerViewModel) {
+        updateView()
+    }
+    
+    typealias ViewModel = SmallPlayerViewModel
     
     @IBOutlet private weak var playPauseButton: UIButton!
     @IBOutlet private weak var trackImageView: UIImageView!
@@ -62,33 +35,26 @@ class SmallPlayerView: UIView {
     private var pauseImage = UIImage(systemName: "pause.fill")!
     private var playImage = UIImage(systemName: "play.fill")!
     
-    private(set) var model: SmallPlayerViewModel! {
-        didSet {
-            updateView()
-        }
-    }
-    
-    private var player: PlayerInput!
+    private var player: Player!
     
     // MARK: - Init
-    init<T: SmallPlayerViewControllerDelegate>(vc: T, frame: CGRect = .zero, model: SmallPlayerViewModel, player: PlayerInput) {
-        self.model = model
+    init<T: SmallPlayerViewControllerDelegate>(vc: T, frame: CGRect = .zero, model: SmallPlayerViewModel, player: Player) {
         self.player = player
         self.delegate = vc
         
         super.init(frame: frame)
-        
+       
         initial()
-        self.player.delegate = self
-        updateView()
+        viewModel = model
+        player.delegate = model
     }
     
-    func configure(with model: SmallPlayerPlayableProtocol, player: PlayerInput) {
+    func configure(with model: SmallPlayerPlayableProtocol, player: Player) {
         let model = SmallPlayerViewModel(model)
-        self.model = model
+        self.viewModel = model
         self.player = player
         
-        self.player.delegate = self
+        self.player.delegate = viewModel
         updateView()
     }
     
@@ -127,13 +93,13 @@ extension SmallPlayerView {
     }
     
     private func updateView() {
-        if model.listeningProgress == 0 {
+        if viewModel.listeningProgress == 0 {
             progressView.progress = 1
         } else {
-            progressView.progress = Float(model.listeningProgress ?? 0)
+            progressView.progress = Float(viewModel.listeningProgress ?? 0)
         }
         
-        if model.isGoingPlaying {
+        if viewModel.isGoingPlaying {
             activityIndicator.startAnimating()
             activityIndicator.isHidden = false
         } else {
@@ -141,44 +107,15 @@ extension SmallPlayerView {
             activityIndicator.isHidden = true
         }
         
-        playPauseButton.setImage( model.isPlaying || model.isGoingPlaying ? pauseImage : playImage, for: .normal)
+        playPauseButton.setImage( viewModel.isPlaying || viewModel.isGoingPlaying ? pauseImage : playImage, for: .normal)
         
-        trackNameLabel.text = model.trackName
-        DataProvider.shared.downloadImage(string: model.imageForSmallPlayer) { [weak self] image in
+        trackNameLabel.text = viewModel.trackName
+        DataProvider.shared.downloadImage(string: viewModel.imageForSmallPlayer) { [weak self] image in
             self?.trackImageView.image = image
         }
     }
     
     private func configureGesture() {
         addMyGestureRecognizer(self, type: [.swipe(directions: [.up]),.tap()], #selector(respondToSwipeOrTouch))
-    }
-}
-
-//MARK: - PlayerEventNotification
-extension SmallPlayerView: PlayerDelegate {
-   
-    func playerDidEndPlay(_ player: Player, with track: OutputPlayerProtocol) {
-        model.updatePlayableInformation(track)
-    }
-    
-    func playerStartLoading(_ player: Player, with track: OutputPlayerProtocol) {
-        if model == nil {
-            let model = SmallPlayerViewModel(track)
-            self.model = model
-        } else {
-            model.updatePlayableInformation(track)
-        }
-    }
-    
-    func playerDidEndLoading(_ player: Player, with track: OutputPlayerProtocol) {
-        model.updatePlayableInformation(track)
-    }
-    
-    func playerUpdatePlayingInformation(_ player: Player, with track: OutputPlayerProtocol) {
-        model.updatePlayableInformation(track)
-    }
-    
-    func playerStateDidChanged(_ player: Player, with track: OutputPlayerProtocol) {
-        model.updatePlayableInformation(track)
     }
 }

@@ -9,7 +9,7 @@ import UIKit
 
 //MARK: - MyDataSource
 
-class AlertSortListView: UIView, IHaveViewModel, IPerRequest {
+class AlertSortListView: UIView, IHaveViewModel, IHaveXib {
         
     typealias ViewModel = AlertSortListViewModel
     
@@ -18,7 +18,7 @@ class AlertSortListView: UIView, IHaveViewModel, IPerRequest {
     }
     
     func viewModelChanged(_ viewModel: AlertSortListViewModel) {
-        
+        setupUI()
     }
     
     typealias Arguments = UIViewController
@@ -51,26 +51,25 @@ class AlertSortListView: UIView, IHaveViewModel, IPerRequest {
    lazy private var margin = (vc.view.frame.width - width) / 2
    lazy private var positionYForClosed = showPositionY + height * 0.3
    
-   
    //MARK: init
     required init(container: IContainer, args: Arguments) {
-        
+
         self.dataStoreManager = container.resolve()
         self.listDataManager = container.resolve()
-        
+
         super.init(frame: .zero)
         
         self.vc = args
         self.listDataManager.delegate = self
-
         configureView()
-        loadFromXib()
-
+   }
+    
+    func setupUI() {
         [closeImageView].forEach { $0.addMyGestureRecognizer(self, type: .panGestureRecognizer, #selector(panGesture(sender:))) }
 
         tableView.isEditing = true
         tableView.isScrollEnabled = false
-   }
+    }
     
    required init?(coder: NSCoder) {
       fatalError("init(coder:) has not been implemented")
@@ -84,9 +83,7 @@ class AlertSortListView: UIView, IHaveViewModel, IPerRequest {
          show()
       }
    }
-    
-    
-   
+       
    @objc private func panGesture(sender: UIPanGestureRecognizer) {
       switch sender.state {
       case .began:

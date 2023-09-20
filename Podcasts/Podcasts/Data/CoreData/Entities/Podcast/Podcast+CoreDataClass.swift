@@ -13,6 +13,39 @@ import UIKit
 @objc(Podcast)
 public class Podcast: NSManagedObject, Codable {
     
+    @NSManaged private(set) var artistName: String?
+    @NSManaged private(set) var artworkUrl60: String?
+    @NSManaged private(set) var artworkUrl160: String?
+    @NSManaged private(set) var artworkUrl600: String?
+    @NSManaged private(set) var closedCaptioning: String?
+    @NSManaged private(set) var collectionId: NSNumber?
+    @NSManaged private(set) var collectionName: String?
+    @NSManaged private(set) var collectionViewUrl: String?
+    @NSManaged private(set) var contentAdvisoryRating: String?
+    @NSManaged private(set) var country: String?
+    @NSManaged private(set) var descriptionMy: String?
+    @NSManaged private(set) var episodeContentType: String?
+    @NSManaged private(set) var episodeFileExtension: String?
+    @NSManaged private(set) var episodeGuid: String?
+    @NSManaged private(set) var episodeUrl: String?
+    @NSManaged private(set) var feedUrl: String?
+    @NSManaged public private(set) var id: String
+    @NSManaged private(set) var kind: String?
+    @NSManaged private(set) var previewUrl: String?
+    @NSManaged private(set) var releaseDate: String?
+    @NSManaged private(set) var shortDescriptionMy: String?
+    @NSManaged private(set) var trackCount: NSNumber?
+    @NSManaged private(set) var trackName: String?
+    @NSManaged private(set) var trackTimeMillis: NSNumber?
+    @NSManaged private(set) var trackViewUrl: String?
+    @NSManaged private(set) var wrapperType: String?
+    @NSManaged private(set) var artistId: NSNumber?
+    @NSManaged private(set) var favouritePodcast: FavouritePodcast?
+    @NSManaged private(set) var genres: NSSet?
+    @NSManaged private(set) var likedMoment: NSSet?
+    @NSManaged private(set) var listeningPodcast: ListeningPodcast?
+    @NSManaged private(set) var podcastData: PodcastData?
+    
     private enum CodingKeys: String, CodingKey {
         case previewUrl
         case episodeFileExtension
@@ -90,7 +123,6 @@ public class Podcast: NSManagedObject, Codable {
         self.artistId =              try container.decodeIfPresent(Int   .self, forKey: .artistId) as? NSNumber
         self.wrapperType =           try container.decodeIfPresent(String.self, forKey: .wrapperType)
         
-        
         if let genres = try? container.decode(Set<Genre>.self, forKey: .genres) as NSSet {
             self.genres = genres
         } else {
@@ -106,7 +138,6 @@ public class Podcast: NSManagedObject, Codable {
             }
             self.genres = NSSet(array: genres)
         }
-        
     }
     
     //MARK: encode
@@ -197,6 +228,10 @@ extension Podcast: CoreDataProtocol {
 //MARK: - PlayerInputProtocol
 extension Podcast: TrackProtocol {
     
+    var listeningProgress: Double? {
+        return listeningPodcast?.progress
+    }
+    
     var duration: Double? {
         return listeningPodcast?.duration
     }
@@ -219,11 +254,7 @@ extension Podcast: TrackProtocol {
     var currentTime: Float? {
         return listeningPodcast?.currentTime
     }
-    
-    var listeningProgress: Double? {
-        return listeningPodcast?.progress
-    }
-    
+
     var url: URL? {
 //        if episodeFileExtension == "mp3" {
             return episodeUrl.url
@@ -236,7 +267,7 @@ extension Podcast: TrackProtocol {
 }
 
 //MARK: - DownloadServiceProtocol
-extension Podcast: DownloadProtocol, InputDownloadProtocol {
+extension Podcast: DownloadProtocol {
   
     var downloadEntity: DownloadProtocol {
         return self

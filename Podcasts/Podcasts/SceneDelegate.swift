@@ -17,14 +17,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var videoViewController: Player? = nil
     private var avPlayerSavedReference: AVPlayer? = nil
     
-
+    
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let scene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: scene)
         self.window?.rootViewController = preLoaderViewController()
         self.window?.makeKeyAndVisible()
         
-//        window?.overrideUserInterfaceStyle = userViewModel.userInterfaceStyleIsDark ? .dark : .light
+        //        window?.overrideUserInterfaceStyle = userViewModel.userInterfaceStyleIsDark ? .dark : .light
     }
     
     func sceneDidEnterBackground(_ scene: UIScene) {

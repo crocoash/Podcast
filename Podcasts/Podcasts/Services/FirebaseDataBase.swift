@@ -106,7 +106,7 @@ class FirebaseDatabase: ISingleton {
       }
    }
    
-   func observe<T: FirebaseProtocol>(vc: (any FirebaseDatabaseDelegate),viewContext: NSManagedObjectContext, type: T.Type) {
+   func observe<T: FirebaseProtocol>(vc: (any FirebaseDatabaseDelegate), viewContext: NSManagedObjectContext, type: T.Type) {
       
       Database.database().isPersistenceEnabled = true
       

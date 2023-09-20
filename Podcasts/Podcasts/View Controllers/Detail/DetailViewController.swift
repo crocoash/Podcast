@@ -8,9 +8,9 @@
 import UIKit
 import CoreData
 
-class DetailViewController: UIViewController, IPerRequest {
+class DetailViewController: UIViewController, IHaveStoryBoard {
     
-    typealias Arguments = Podcast
+    typealias Args = (podcast: Podcast, podcasts: [Podcast])
    
    @IBOutlet private weak var scrollView: UIScrollView!
    
@@ -81,20 +81,20 @@ class DetailViewController: UIViewController, IPerRequest {
    }
    
    //MARK: Public Methods
-    required init(container: IContainer, args: Podcast) {
-        
+    required init?(container: IContainer, args: (args: (podcast: Podcast, podcasts: [Podcast]), coder: NSCoder)) {
+   
         self.player = container.resolve()
         self.downloadService = container.resolve()
         self.likeManager = container.resolve()
         self.favouriteManager = container.resolve()
         self.container = container
-        self.podcast = args
         
-        super.init(nibName: Self.identifier, bundle: nil)
+        self.podcast = args.args.podcast
+        self.podcasts = args.args.podcasts
         
-        self.downloadService.delegate = self
+        super.init(coder: args.coder)
+
         self.favouriteManager.delegate = self
-        self.player.delegate = self
     }
    
    required init?(coder: NSCoder) {
@@ -201,19 +201,21 @@ extension DetailViewController {
       present(shareVC, animated: true)
    }
    
-   private func presentSmallPlayer(with viewModel: OutputPlayerProtocol) {
+   private func presentSmallPlayer(with viewModel: any OutputPlayerProtocol) {
       
       if smallPlayerView.isHidden {
          let model = SmallPlayerViewModel(viewModel)
-         self.smallPlayerView.configure(with: model, player: player)
+          self.smallPlayerView.configure(with: model, player: player)
          smallPlayerView.isHidden = false
          bottomPlayerConstraint.constant = 50
          view.layoutIfNeeded()
       }
    }
    
-   private func presentBigPlayer(with track: BigPlayerPlayableProtocol) {
-       let bigPlayerViewController: BigPlayerViewController = container.resolve(args: self)
+   private func presentBigPlayer(with track: Track) {
+       let argsVM: BigPlayerViewModel.Arguments = track
+       let args: BigPlayerViewController.Arguments = self
+       let bigPlayerViewController: BigPlayerViewController = container.resolveWithModel(args: args, argsVM: argsVM)
        self.bigPlayerViewController = bigPlayerViewController
        bigPlayerViewController.modalPresentationStyle = .fullScreen
        self.present(bigPlayerViewController, animated: true)
@@ -273,34 +275,6 @@ extension DetailViewController: SmallPlayerViewControllerDelegate {
    }
 }
 
-//MARK: - DownloadServiceDelegate
-extension DetailViewController: DownloadServiceDelegate {
-   
-   func updateDownloadInformation(_ downloadService: DownloadService, entity: DownloadServiceType) {
-//      episodeTableView.update(with: entity)
-   }
-   
-   func didEndDownloading(_ downloadService: DownloadService, entity: DownloadServiceType) {
-//      episodeTableView.update(with: entity)
-   }
-   
-   func didPauseDownload(_ downloadService: DownloadService, entity: DownloadServiceType) {
-//      episodeTableView.update(with: entity)
-   }
-   
-   func didContinueDownload(_ downloadService: DownloadService, entity: DownloadServiceType) {
-//      episodeTableView.update(with: entity)
-   }
-   
-   func didStartDownload(_ downloadService: DownloadService, entity: DownloadServiceType) {
-//      episodeTableView.update(with: entity)
-   }
-   
-   func didRemoveEntity(_ downloadService: DownloadService, entity: DownloadServiceType) {
-//      episodeTableView.update(with: entity)
-   }
-}
-
 //MARK: - BigPlayerViewControllerDelegate
 extension DetailViewController: BigPlayerViewControllerDelegate {
    
@@ -317,56 +291,17 @@ extension DetailViewController: BigPlayerViewControllerDelegate {
 //MARK: - PlayerDelegate
 extension DetailViewController: PlayerDelegate {
    
-   func playerDidEndPlay(_ player: Player, with track: OutputPlayerProtocol) {
-//      episodeTableView.update(with: track)
-   }
+   func playerDidEndPlay(_ player: Player, with track: any OutputPlayerProtocol) {}
    
-   func playerStartLoading(_ player: Player, with track: OutputPlayerProtocol) {
+   func playerStartLoading(_ player: Player, with track: any OutputPlayerProtocol) {
       presentSmallPlayer(with: track)
-//      episodeTableView.update(with: track)
    }
    
-   func playerDidEndLoading(_ player: Player, with track: OutputPlayerProtocol) {
-//      episodeTableView.update(with: track)
-   }
+   func playerDidEndLoading(_ player: Player, with track: any OutputPlayerProtocol) {}
    
-   func playerUpdatePlayingInformation(_ player: Player, with track: OutputPlayerProtocol) {
-      presentSmallPlayer(with: track)
-//      episodeTableView.update(with: track)
-   }
+   func playerUpdatePlayingInformation(_ player: Player, with track: any OutputPlayerProtocol) {}
    
-   func playerStateDidChanged(_ player: Player, with track: OutputPlayerProtocol) {
-//      episodeTableView.update(with: track)
-   }
-}
-
-
-//MARK: - EpisodeTableViewMyDelegate
-extension DetailViewController: EpisodeTableViewMyDelegate {
-   
-   func episodeTableView(_ episodeTableView: EpisodeTableView, didSelectStar indexPath: IndexPath) {
-      let podcast = playlist[indexPath.section].rows[indexPath.row] as! Podcast
-       let isFavourite = favouriteManager.isFavourite(podcast)
-       if isFavourite {
-           favouriteManager.removeFavouritePodcast(entity: podcast)
-       } else {
-           favouriteManager.addFavouritePodcast(entity: podcast)
-       }
-   }
-   
-   func episodeTableView(_ episodeTableView: EpisodeTableView, didSelectDownLoadImage indexPath: IndexPath) {
-      let podcast = playlist[indexPath.section].rows[indexPath.row] as! Podcast
-      downloadService.conform(entity: podcast)
-   }
-   
-   func episodeTableView(_ episodeTableView: EpisodeTableView, didTouchPlayButton indexPath: IndexPath) {
-      let podcast = playlist[indexPath.section].rows[indexPath.row] as! Podcast
-      player.conform(track: podcast, trackList: podcasts)
-   }
-   
-   func episodeTableView(_ episodeTableView: EpisodeTableView, didTouchStopButton indexPath: IndexPath) {
-      player.playOrPause()
-   }
+   func playerStateDidChanged(_ player: Player, with track: any OutputPlayerProtocol) {}
 }
 
 //MARK: - UITableViewDataSource
@@ -384,15 +319,14 @@ extension DetailViewController: UITableViewDataSource {
       return playlist[section].key as? String ?? ""
    }
    
-   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-      let cell = tableView.getCell(cell: PodcastCell.self, indexPath: indexPath)
-      let podcast = playlist[indexPath.section].rows[indexPath.row] as! Podcast
-      
-      cell.addMyGestureRecognizer(self, type: .tap(), #selector(tapCell))
-       cell.viewModel = container.resolve(args: podcast)
-      
-      return cell
-   }
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.getCell(cell: PodcastCell.self, indexPath: indexPath)
+        let podcast = playlist[indexPath.section].rows[indexPath.row] as! Podcast
+        cell.addMyGestureRecognizer(self, type: .tap(), #selector(tapCell))
+        let args = PodcastCellViewModel.Arguments.init(podcast: podcast, playlist: podcasts)
+        cell.viewModel = container.resolve(args: args)
+        return cell
+    }
 }
 
 //MARK: - EpisodeTableViewControllerMyDataSource
@@ -419,23 +353,14 @@ extension DetailViewController: EpisodeTableViewMyDataSource {
 
 //MARK: - FavouriteManagerDelegate
 extension DetailViewController: FavouriteManagerDelegate {
-   
-   func favouriteManager(_ favouriteManager: FavouriteManager, didRemove favourite: FavouritePodcast) {
-      if let indexPath = playlist[favourite.podcast] {
-         episodeTableView.reloadRows(at: [indexPath], with: .automatic)
-          
-//         view.addToast(title: favourite.podcast.isFavourite ? "Add" : "Remove" + " to favourite" , smallPlayerView.isHidden ? .bottom : .bottomWithPlayer)
-      }
-   }
-   
-   func favouriteManager(_ favouriteManager: FavouriteManager, didAdd favourite: FavouritePodcast) {
-      if let indexPath = playlist[favourite.podcast]  {
-         episodeTableView.reloadRows(at: [indexPath], with: .automatic)
-//         view.addToast(title: favourite.podcast.isFavourite ? "Add" : "Remove" + " to favourite" , smallPlayerView.isHidden ? .bottom : .bottomWithPlayer)
-      }
-       
     
-   }
+    func favouriteManager(_ favouriteManager: FavouriteManager, didRemove favourite: FavouritePodcast) {
+        view.addToast(title: "Remove from favourite" , smallPlayerView.isHidden ? .bottom : .bottomWithPlayer)
+    }
+    
+    func favouriteManager(_ favouriteManager: FavouriteManager, didAdd favourite: FavouritePodcast) {
+        view.addToast(title: "Add to favourite" , smallPlayerView.isHidden ? .bottom : .bottomWithPlayer)
+    }
 }
 
 //MARK: - ++++++++++++++++

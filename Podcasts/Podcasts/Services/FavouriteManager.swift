@@ -14,6 +14,17 @@ protocol FavouriteManagerDelegate: AnyObject {
     func favouriteManager(_ favouriteManager: FavouriteManager, didAdd favourite: FavouritePodcast)
 }
 
+extension FavouriteManagerDelegate where Self: IViewModelUpdating {
+    
+    func favouriteManager(_ favouriteManager: FavouriteManager, didRemove favourite: FavouritePodcast) {
+        update(with: favourite)
+    }
+    
+    func favouriteManager(_ favouriteManager: FavouriteManager, didAdd favourite: FavouritePodcast) {
+        update(with: favourite)
+    }
+}
+
 //MARK: - Type
 
 //MARK: - Input
@@ -43,13 +54,13 @@ class FavouriteManager: MultyDelegateService<FavouriteManagerDelegate>, ISinglet
         firebaseDatabase.observe(vc: self, viewContext: viewContext, type: FavouritePodcast.self)
     }
     
-    func removeFavouritePodcast(entity: FavouritePodcast) {
-        removeFavouritePodcast(entity, removeFromFireBase: true)
+    func removeFavouritePodcast(favouritePodcast: FavouritePodcast) {
+        removeFavouritePodcast(favouritePodcast, removeFromFireBase: true)
     }
     
-    func addFavouritePodcast(entity: Podcast) {
-        if getFavourite(for: entity) == nil {
-            let favouritePodcast = FavouritePodcast(entity, viewContext: viewContext, dataStoreManager: dataStoreManager)
+    func addFavouritePodcast(podcast: Podcast) {
+        if getFavourite(for: podcast) == nil {
+            let favouritePodcast = FavouritePodcast(podcast, viewContext: viewContext, dataStoreManager: dataStoreManager)
             dataStoreManager.save()
             firebaseDatabase.add(entity: favouritePodcast)
             delegates {
@@ -72,8 +83,10 @@ class FavouriteManager: MultyDelegateService<FavouriteManagerDelegate>, ISinglet
         }
     }
     
-    func removeFavouritePodcast(entity: Podcast) {
-        
+    func removeFavouritePodcast(podcast: Podcast) {
+        if let favouritePodcast = getFavourite(for: podcast) {
+            removeFavouritePodcast(favouritePodcast: favouritePodcast)
+        }
     }
 }
 
@@ -93,8 +106,6 @@ extension FavouriteManager {
     }
     
     private func removeFavouritePodcast(_ favouritePodcast: FavouritePodcast, removeFromFireBase: Bool = true) {
-        
-        guard favouritePodcast.managedObjectContext != nil else { return }
         
         let abstractFavourite = dataStoreManager.initAbstractObject(for: favouritePodcast)
         dataStoreManager.removeFromCoreData(entity: favouritePodcast)

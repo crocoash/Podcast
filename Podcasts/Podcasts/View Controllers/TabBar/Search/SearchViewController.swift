@@ -21,9 +21,9 @@ typealias PlaylistByNewest  = [(key: String, podcasts: [Podcast])]
 typealias PlayListByOldest = PlaylistByNewest
 typealias PlayListByGenre = PlaylistByNewest
 
-class SearchViewController : UIViewController, IPerRequest {
+class SearchViewController : UIViewController, IHaveStoryBoard {
 
-    typealias Arguments = SearchViewControllerDelegate
+    typealias Args = SearchViewControllerDelegate
     
     private let apiService: ApiService
     
@@ -69,9 +69,11 @@ class SearchViewController : UIViewController, IPerRequest {
     private var isPodcast: Bool { searchSegmentalControl.selectedSegmentIndex == 0 }
     
     //MARK: init
-    required init(container: IContainer, args: Arguments) {
+    
+    required init?(container: IContainer, args: (args: Args, coder: NSCoder)) {
         self.apiService = container.resolve()
-        super.init(nibName: Self.identifier, bundle: nil)
+        self.delegate = args.args
+        super.init(coder: args.coder)
     }
     
     required init?(coder: NSCoder) {

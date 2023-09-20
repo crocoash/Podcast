@@ -7,27 +7,20 @@
 
 import UIKit
 
-//MARK: - Delegate
-protocol PodcastCellDelegate: AnyObject {
-    func podcastCellDidSelectStar         (_ podcastCell: PodcastCell)
-    func podcastCellDidSelectDownLoadImage(_ podcastCell: PodcastCell)
-    func podcastCellDidTouchPlayButton    (_ podcastCell: PodcastCell)
-    func podcastCellDidTouchStopButton    (_ podcastCell: PodcastCell)
-}
-
-
-
 //MARK: - PodcastCell
 class PodcastCell: UITableViewCell, IHaveViewModel {
+    
+  
+    typealias ViewModel = PodcastCellViewModel
     
     func viewModelChanged(_ viewModel: PodcastCellViewModel) {
         
     }
     
-    typealias ViewModel = PodcastCellViewModel
-    
     func viewModelChanged() {
         updateCell()
+        configureGestures()
+        self.heightOfImageView.constant = (frame.height - dateLabel.frame.height) - 10
     }
     
     @IBOutlet private weak var podcastImage:             UIImageView!
@@ -58,7 +51,6 @@ class PodcastCell: UITableViewCell, IHaveViewModel {
     private let isFavouriteImage = UIImage(named: "star5")!
     private let isNotFavouriteImage = UIImage(named: "star1")!
     
-    weak var delegate: PodcastCellDelegate?
     
     var moreThanThreeLines: Bool {
         return podcastDescription.maxNumberOfLines > 3
@@ -71,32 +63,19 @@ class PodcastCell: UITableViewCell, IHaveViewModel {
             updateSelectState()
         }
     }
-    
-    func configureCell(_ delegate: PodcastCellDelegate?, with podcast: Podcast) {
-        self.delegate = delegate
-        
-        self.heightOfImageView.constant = (frame.height - dateLabel.frame.height) - 10
-        
-        configureGestures()
-        updateCell()
-        
-        //TODO: 
-        DataProvider.shared.downloadImage(string: viewModel.imageForPodcastCell) { [weak self] image in
-            self?.podcastImage.image = image
-        }
-    }
+
     
     //MARK: Actions
     @objc func handlerTapFavouriteStar(_ sender: UITapGestureRecognizer) {
-        delegate?.podcastCellDidSelectStar(self)
+        viewModel.addOrRemoveFromFavourite()
     }
     
     @objc func tapPlayPauseButton(_ sender: UITapGestureRecognizer) {
-        delegate?.podcastCellDidTouchPlayButton(self)
+        viewModel.playOrPause()
     }
     
     @objc func handlerTapDownloadImage(_ sender: UITapGestureRecognizer) {
-        delegate?.podcastCellDidSelectDownLoadImage(self)
+        viewModel.download()
     }
 }
 
@@ -122,11 +101,6 @@ extension PodcastCell {
         favouriteStarImageView.image = viewModel.isFavourite ? isFavouriteImage : isNotFavouriteImage
         updateDownloadUI()
     }
-    
-//    func updateFavouriteStar(with value: Bool) {
-//        .isFavourite = value
-//        updateFavouriteStar()
-//    }
     
     func updatePlayerUI() {
         playStopButton.image = viewModel.isPlaying ? pauseImage : playImage
@@ -181,7 +155,7 @@ extension PodcastCell {
         trackDuration.text = viewModel.trackDuration
         podcastDescription.text = viewModel.descriptionMy
         podcastName.text = viewModel.trackName
-        
+        podcastImage.image = viewModel.imageForPodcastCell
         updateOpenDescriptionInfo()
         updateSelectState()
         updatePlayerUI()

@@ -9,16 +9,7 @@ import UIKit
 import CoreData
 
 @objc protocol EpisodeTableViewMyDataSource: AnyObject {
-    
     func episodeTableViewDidChangeHeightTableView(_ episodeTableView: EpisodeTableView, height: CGFloat, withLastCell isLastCell: Bool)
-}
-
-@objc protocol EpisodeTableViewMyDelegate: AnyObject {
-    
-    func episodeTableView(_ episodeTableView: EpisodeTableView, didSelectStar indexPath: IndexPath)
-    func episodeTableView(_ episodeTableView: EpisodeTableView, didSelectDownLoadImage indexPath: IndexPath)
-    func episodeTableView(_ episodeTableView: EpisodeTableView, didTouchPlayButton indexPath: IndexPath)
-    func episodeTableView(_ episodeTableView: EpisodeTableView, didTouchStopButton indexPath: IndexPath)
 }
 
 class EpisodeTableView: UITableView {
@@ -29,7 +20,6 @@ class EpisodeTableView: UITableView {
     private var paddingBetweenSections = CGFloat(0)
     
     @IBOutlet weak var myDataSource: EpisodeTableViewMyDataSource?
-    @IBOutlet weak var myDelegate: EpisodeTableViewMyDelegate?
     
     //MARK: - PublicMethods
     func openCell(at indexPath: IndexPath) {
@@ -69,30 +59,6 @@ class EpisodeTableView: UITableView {
         }
         
         delegate = self
-    }
-}
-
-//MARK: - PodcastCellDelegate
-extension EpisodeTableView: PodcastCellDelegate {
-    
-    func podcastCellDidSelectStar(_ podcastCell: PodcastCell) {
-        guard let indexPath = indexPath(for: podcastCell) else { return }
-        myDelegate?.episodeTableView(self, didSelectStar: indexPath)
-    }
-    
-    func podcastCellDidSelectDownLoadImage(_ podcastCell: PodcastCell) {
-        guard let indexPath = indexPath(for: podcastCell) else { return }
-        myDelegate?.episodeTableView(self, didSelectDownLoadImage: indexPath)
-    }
-    
-    func podcastCellDidTouchPlayButton(_ podcastCell: PodcastCell) {
-        guard let indexPath = indexPath(for: podcastCell) else { return }
-        myDelegate?.episodeTableView(self, didTouchPlayButton: indexPath)
-    }
-    
-    func podcastCellDidTouchStopButton(_ podcastCell: PodcastCell) {
-        guard let indexPath = indexPath(for: podcastCell) else { return }
-        myDelegate?.episodeTableView(self, didTouchStopButton: indexPath)
     }
 }
 

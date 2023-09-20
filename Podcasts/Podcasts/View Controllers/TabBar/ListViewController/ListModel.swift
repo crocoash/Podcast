@@ -152,7 +152,11 @@ struct SectionDocument {
         }
         
         mutating func insertRow(row: NSManagedObject, at index: Int) {
-            rows.insert(row, at: index)
+            if rows.count - 1 < index {
+                rows.insert(row, at: index)
+            } else {
+                rows.append(row)
+            }
         }
     }
 }

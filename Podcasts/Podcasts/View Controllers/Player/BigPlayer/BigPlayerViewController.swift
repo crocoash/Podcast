@@ -13,45 +13,7 @@ protocol BigPlayerViewControllerDelegate: AnyObject {
     func bigPlayerViewControllerDidTouchPodcastNameLabel(_ bigPlayerViewController: BigPlayerViewController, entity: NSManagedObject)
 }
 
-protocol BigPlayerPlayableProtocol {
-    
-    var isGoingPlaying: Bool { get }
-    var isLast: Bool { get }
-    var isFirst: Bool { get }
-    var isPlaying: Bool { get }
-    var currentTime: Float? { get }
-    var duration: Double? { get }
-    var listeningProgress: Double? { get }
-}
-
-class BigPlayerViewModel: BigPlayerPlayableProtocol, IPerRequest {
-    typealias Arguments = Podcast
-    
-    var isGoingPlaying: Bool = false
-    var isLast: Bool = true
-    var isFirst: Bool = true
-    var isPlaying: Bool = false
-    var trackName: String?
-    var imageForBigPlayer: String?
-    var currentTime: Float?
-    var duration: Double?
-    var listeningProgress: Double?
-    
-    required init(container: IContainer, args: Podcast) {
-        self.trackName = args.trackName
-        self.imageForBigPlayer = args.artworkUrl600
-        self.currentTime = args.currentTime
-        self.duration = args.duration
-        self.listeningProgress = args.listeningProgress
-    }
-}
-
-class BigPlayerViewController: UIViewController, IHaveViewModel, IPerRequest {
-    
-    
-    func viewModelChanged(_ viewModel: BigPlayerViewModel) {
-        
-    }
+class BigPlayerViewController: UIViewController, IHaveViewModel, IHaveXib {
     
     typealias Arguments = BigPlayerViewControllerDelegate
     typealias ViewModel = BigPlayerViewModel
@@ -59,8 +21,12 @@ class BigPlayerViewController: UIViewController, IHaveViewModel, IPerRequest {
     func viewModelChanged() {
         
     }
-
     
+    func viewModelChanged(_ viewModel: BigPlayerViewModel) {
+        guard podcastImageView != nil else { return }
+        updateUI()
+    }
+
     @IBOutlet private weak var podcastImageView:      UIImageView!
     
     @IBOutlet private weak var podcastNameLabel:      UILabel!
@@ -86,48 +52,27 @@ class BigPlayerViewController: UIViewController, IHaveViewModel, IPerRequest {
     private var playImage = UIImage(systemName: "play.fill")!
     
     //MARK: init
-    required init(container: IContainer, args: Arguments) {
+    required init?(container: IContainer, args vc: Arguments) {
         self.player = container.resolve()
         self.likeManager = container.resolve()
-        self.delegate = args
+        
+        self.delegate = vc
+      
         super.init(nibName: Self.identifier, bundle: nil)
     }
-       
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    //MARK: - PublicMethods
-    
-    private func configure() {
-        progressSlider.maximumValue = Float(viewModel.duration ?? 0)
-        progressSlider.value = Float(viewModel.currentTime ?? 0)
-        
-        currentTimeLabel  .text = viewModel.currentTime?.formatted
-        durationTrackLabel.text = viewModel.duration?.formatted
-        podcastNameLabel  .text = viewModel.trackName
-        
-        activityIndicator.isHidden = !viewModel.isGoingPlaying
-        
-        DataProvider.shared.downloadImage(string: viewModel.imageForBigPlayer) { [weak self] image in
-            self?.podcastImageView.image = image
-        }
-        
-        likedButton          .isEnabled = !viewModel.isGoingPlaying
-        previousPodcastButton.isEnabled = !viewModel.isFirst
-        nextPodcastButton    .isEnabled = !viewModel.isLast
-        
-        playPauseButton.setImage(viewModel.isPlaying || viewModel.isGoingPlaying ? pauseImage : playImage, for: .normal)
     }
     
     //MARK: View Methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        player.delegate = self
+        updateUI()
+        player.delegate = viewModel
         configureGestures()
         progressSlider.addTarget(self, action: #selector(sliderValueChangedBegin), for: .editingDidBegin)
         progressSlider.addTarget(self, action: #selector(progressSliderValueChanged(slider:event:)), for: .valueChanged)
-        configure()
     }
     
     //MARK:  Actions
@@ -181,8 +126,7 @@ class BigPlayerViewController: UIViewController, IHaveViewModel, IPerRequest {
     }
     
     @IBAction func likedButton(_ sender: UIButton) {
-        let moment = Double(progressSlider.value)
-//        likeManager.addToLikedMoments(entity: viewModel.inputType, moment: moment)
+        viewModel.addLikeMoment()
     }
     
     @IBAction func dissmisButtonTouchUpInside(_ sender: UIButton) {
@@ -192,6 +136,24 @@ class BigPlayerViewController: UIViewController, IHaveViewModel, IPerRequest {
 
 //MARK: - PrivateMethods
 extension BigPlayerViewController {
+    
+    private func updateUI() {
+        progressSlider.maximumValue = Float(viewModel.duration ?? 0)
+        progressSlider.value = Float(viewModel.currentTime ?? 0)
+        
+        currentTimeLabel  .text = viewModel.currentTime?.formatted
+        durationTrackLabel.text = viewModel.duration?.formatted
+        podcastNameLabel  .text = viewModel.trackName
+        
+        activityIndicator.isHidden = !viewModel.isGoingPlaying
+
+        podcastImageView.image = viewModel.imageForBigPlayer
+        likedButton          .isEnabled = !viewModel.isGoingPlaying
+        previousPodcastButton.isEnabled = !viewModel.isFirst
+        nextPodcastButton    .isEnabled = !viewModel.isLast
+        
+        playPauseButton.setImage(viewModel.isPlaying || viewModel.isGoingPlaying ? pauseImage : playImage, for: .normal)
+    }
     
     private func configureGestures() {
         addMyGestureRecognizer(self, type: .swipe(directions: [.down]), #selector(dismissBigPlayer))
@@ -214,27 +176,4 @@ extension BigPlayerViewController {
 //        likedButton.isEnabled = false
 //    }
 }
- 
-//MARK: - PlayerEventNotification
-extension BigPlayerViewController: PlayerDelegate {
-    
-    func playerDidEndPlay(_ player: Player, with track: OutputPlayerProtocol) {
-//        viewModel.update(track)
-    }
-    
-    func playerStartLoading(_ player: Player, with track: OutputPlayerProtocol) {
-//        viewModel.update(track)
-    }
-    
-    func playerDidEndLoading(_ player: Player, with track: OutputPlayerProtocol) {
-//        viewModel.update(track)
-    }
-    
-    func playerUpdatePlayingInformation(_ player: Player, with track: OutputPlayerProtocol) {
-//        viewModel.update(track)
-    }
-    
-    func playerStateDidChanged(_ player: Player, with track: OutputPlayerProtocol) {
-//        viewModel.update(track)
-    }
-}
+

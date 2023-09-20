@@ -3,10 +3,10 @@
 import UIKit
 import CoreData
 
-class TabBarViewController: UITabBarController, IPerRequest {
-   
-    typealias Arguments = Void
+class TabBarViewController: UITabBarController, IHaveStoryBoard {
     
+    
+    typealias Args = Void
     
     // MARK: - variables
     private var trailConstraint: NSLayoutConstraint?
@@ -35,32 +35,31 @@ class TabBarViewController: UITabBarController, IPerRequest {
     
     lazy private var ListVC: ListViewController = {
         
-        let vc: ListViewController = container.resolve(args: self)
+        let vc: ListViewController = container.resolveWithModel(args: self)
         vc.transitioningDelegate = self
         vc.modalPresentationStyle = .custom
         return createTabBar(vc, title: "Playlist", imageName: "folder.fill")
     }()
     
-    lazy private var searchVC: SearchViewController = SearchViewController.create { [weak self] coder in
-        guard let self = self else { fatalError() }
+    lazy private var searchVC: SearchViewController = {
         let vc: SearchViewController = container.resolve(args: self)
         vc.transitioningDelegate = self
         modalPresentationStyle = .custom
         
         return createTabBar(vc, title: "Search", imageName: "magnifyingglass")
-    }
+    }()
     
-    lazy private var settingsVC: SettingsTableViewController =  SettingsTableViewController.create { [weak self] coder in
-        guard let self = self else { fatalError() }
+    lazy private var settingsVC: SettingsTableViewController = {
         let vc: SettingsTableViewController = container.resolve()
         vc.transitioningDelegate = self
         modalPresentationStyle = .custom
         
         return createTabBar(vc, title: "Settings", imageName: "gear")
-    }
+    }()
 
    //MARK: init
-    required init(container: IContainer, args: Void) {
+    required init?(container: IContainer, args: (args: Args, coder: NSCoder)) {
+     
         self.userViewModel = container.resolve()
         self.firestorageDatabase = container.resolve()
         self.player = container.resolve()
@@ -72,9 +71,10 @@ class TabBarViewController: UITabBarController, IPerRequest {
         self.dataStoreManager = container.resolve()
         self.listeningManager = container.resolve()
         self.container = container
-        
-        super.init(nibName: Self.identifier, bundle: nil)
+
+        super.init(coder: args.coder)
     }
+
     
     required init?(coder: NSCoder) {
         fatalError()
@@ -110,7 +110,8 @@ extension TabBarViewController {
     
     private func configureDetailViewController(podcast: Podcast, playList: [Podcast]) -> DetailViewController {
         
-        let detailViewController: DetailViewController = container.resolve(args: podcast)
+        let argument = DetailViewController.Args(podcast: podcast, podcasts: playList)
+        let detailViewController: DetailViewController = container.resolve(args: argument)
         
         detailViewController.modalPresentationStyle = .custom
         detailViewController.transitioningDelegate = self
@@ -200,7 +201,9 @@ extension TabBarViewController: SmallPlayerViewControllerDelegate {
     
     func smallPlayerViewControllerSwipeOrTouch(_ smallPlayerViewController: SmallPlayerView) {
         guard let track = player.currentTrack?.track else { return }
-        let bigPlayerViewController: BigPlayerViewController = container.resolve(args: self)
+        let argsVM: BigPlayerViewModel.Arguments = track
+        let args: BigPlayerViewController.Arguments = self
+        let bigPlayerViewController: BigPlayerViewController = container.resolveWithModel(args: args, argsVM: argsVM)
         bigPlayerViewController.modalPresentationStyle = .fullScreen
         self.present(bigPlayerViewController, animated: true)
     }
@@ -233,19 +236,19 @@ extension TabBarViewController: UIViewControllerTransitioningDelegate {
 //MARK: - PlayerEventNotification
 extension TabBarViewController: PlayerDelegate {
     
-    func playerDidEndPlay(_ player: Player, with track: OutputPlayerProtocol) {}
+    func playerDidEndPlay(_ player: Player, with track: any OutputPlayerProtocol) {}
     
-    func playerStartLoading(_ player: Player, with track: OutputPlayerProtocol) {
+    func playerStartLoading(_ player: Player, with track: any OutputPlayerProtocol) {
         presentSmallPlayer(with: track)
     }
     
-    func playerDidEndLoading(_ player: Player, with track: OutputPlayerProtocol) {}
+    func playerDidEndLoading(_ player: Player, with track: any OutputPlayerProtocol) {}
     
-    func playerUpdatePlayingInformation(_ player: Player, with track: OutputPlayerProtocol) {
+    func playerUpdatePlayingInformation(_ player: Player, with track: any OutputPlayerProtocol) {
         
     }
     
-    func playerStateDidChanged(_ player: Player, with track: OutputPlayerProtocol) {}
+    func playerStateDidChanged(_ player: Player, with track: any OutputPlayerProtocol) {}
 }
 
 //MARK: - ListViewControllerDelegate

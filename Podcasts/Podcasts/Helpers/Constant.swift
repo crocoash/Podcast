@@ -16,7 +16,7 @@ enum DynamicLinkManager {
     var url: String {
         switch self {
         case .podcastSearch(let string):
-            return "https://itunes.apple.com/search?term=\(string)&entity=podcast"
+            return "https://itunes.apple.com/search?term=\(string)&entity=podcastEpisode"
         case .authors(let string):
             return "https://itunes.apple.com/search?term=\(string)&media=podcast&entity=podcastAuthor"
         case .podcastEpisodeById(let string):

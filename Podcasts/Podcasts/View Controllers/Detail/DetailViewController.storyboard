@@ -243,7 +243,6 @@
                                                 <connections>
                                                     <outlet property="dataSource" destination="sQZ-Of-rko" id="GN6-Se-qeD"/>
                                                     <outlet property="myDataSource" destination="sQZ-Of-rko" id="nKh-Fj-IRA"/>
-                                                    <outlet property="myDelegate" destination="sQZ-Of-rko" id="lqJ-q2-buK"/>
                                                 </connections>
                                             </tableView>
                                         </subviews>

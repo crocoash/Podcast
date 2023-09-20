@@ -65,6 +65,13 @@ extension NSManagedObject {
         }
         return self
     }
+    
+    func setValue(value: NSManagedObject) {
+        guard self.managedObjectContext == nil else { return }
+        if let key =  self.entity.relationships(forDestination: value.entity).first?.name {
+            setObject(value, for: key)
+        }
+    }
 }
 
 //MARK: - Private Methods
@@ -73,7 +80,7 @@ extension NSManagedObject {
     private func set(value: Any, for key: String, withRelationShip: Bool) {
         if let object = value as? NSManagedObject {
             if withRelationShip {
-                setObject(by: object, for: key)
+                setObject(object, for: key)
             }
         } else if let objects = value as? Set<NSManagedObject> {
             if withRelationShip {
@@ -83,17 +90,17 @@ extension NSManagedObject {
             setValue(value, forKey: key)
         }
     }
-    
-    
-    private func setObject( by object: NSManagedObject, for key: String) {
+
+    private func setObject(_ object: NSManagedObject, for key: String) {
         
         if let viewContext = self.managedObjectContext {
             
             if object.managedObjectContext != nil {
                 self.setValue(object, forKey: key)
             } else {
-                let value = self.updateObject(by: object, withRelationShip: false)
-                self.setValue(value, forKey: key)
+                let object = self.updateObject(by: object, withRelationShip: false)
+//                let object = NSManagedObject.init(object, viewContext: viewContext, withRelationShip: false)
+                self.setValue(object, forKey: key)
             }
         } else {
             if object.managedObjectContext == nil {

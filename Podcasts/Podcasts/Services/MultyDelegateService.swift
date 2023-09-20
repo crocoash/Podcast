@@ -31,7 +31,7 @@ class MultyDelegateService<T>: NSObject, MultyDelegateServiceInput {
         if let delegate = delegate as? T {
             delegates.add(delegate as AnyObject)
         } else {
-            fatalError("delegate must be like \(T.self)")
+            fatalError("delegate \(C.self) must be like \(T.self)")
         }
     }
     
