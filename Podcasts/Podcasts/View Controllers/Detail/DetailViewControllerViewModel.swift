@@ -9,17 +9,18 @@ import Foundation
 
 class DetailViewControllerViewModel: IPerRequest, INotifyOnChanged {
     
+    typealias Arguments = Input
     struct Input {
         var podcast: Podcast
         var podcasts: [Podcast]
     }
+    
     var podcast: Podcast
     var podcasts: [Podcast]
     
     var viewModelEpisodeTableView: EpisodeTableView.ViewModel
-    
-    typealias Arguments = Input
-    
+   
+    //MARK: init
     required init?(container: IContainer, args input: Input) {
         self.podcast = input.podcast
         self.podcasts = input.podcasts

@@ -91,6 +91,7 @@
 		3A43AF612ABF45ED00624EFC /* BaseSectionData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A43AF602ABF45ED00624EFC /* BaseSectionData.swift */; };
 		3A43AF632ABF46B800624EFC /* ViewModelUpdating.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A43AF622ABF46B800624EFC /* ViewModelUpdating.swift */; };
 		3A43AF652AC040DB00624EFC /* DetailViewControllerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A43AF642AC040DB00624EFC /* DetailViewControllerViewModel.swift */; };
+		3A43AF672AC075DF00624EFC /* IDiffableTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A43AF662AC075DF00624EFC /* IDiffableTableView.swift */; };
 		3A4A3757280164DC000C80E4 /* PodcastData+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4A3755280164DC000C80E4 /* PodcastData+CoreDataClass.swift */; };
 		3A4A3758280164DC000C80E4 /* PodcastData+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4A3756280164DC000C80E4 /* PodcastData+CoreDataProperties.swift */; };
 		3A5022532A6BD7CE00600422 /* FavouriteManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A5022522A6BD7CE00600422 /* FavouriteManager.swift */; };
@@ -227,6 +228,7 @@
 		3A43AF602ABF45ED00624EFC /* BaseSectionData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseSectionData.swift; sourceTree = "<group>"; };
 		3A43AF622ABF46B800624EFC /* ViewModelUpdating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModelUpdating.swift; sourceTree = "<group>"; };
 		3A43AF642AC040DB00624EFC /* DetailViewControllerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewControllerViewModel.swift; sourceTree = "<group>"; };
+		3A43AF662AC075DF00624EFC /* IDiffableTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IDiffableTableView.swift; sourceTree = "<group>"; };
 		3A4A3755280164DC000C80E4 /* PodcastData+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PodcastData+CoreDataClass.swift"; sourceTree = "<group>"; };
 		3A4A3756280164DC000C80E4 /* PodcastData+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PodcastData+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		3A5022522A6BD7CE00600422 /* FavouriteManager.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = FavouriteManager.swift; sourceTree = "<group>"; tabWidth = 4; };
@@ -320,6 +322,7 @@
 				3A049C4A2AB1DE4400887161 /* IViewModelUpdating.swift */,
 				3A43AF602ABF45ED00624EFC /* BaseSectionData.swift */,
 				3A43AF622ABF46B800624EFC /* ViewModelUpdating.swift */,
+				3A43AF662AC075DF00624EFC /* IDiffableTableView.swift */,
 				184CE19027271D9D0088044C /* Resourses */,
 				184CE19127271DAE0088044C /* Helpers */,
 				3A73D0BC2A9776F100947893 /* Storage */,
@@ -1067,6 +1070,7 @@
 				189C1FAA272D336500A8480E /* UITableView + register.swift in Sources */,
 				3A63266528211CD0005FFB08 /* FavouritePodcast+CoreDataClass.swift in Sources */,
 				3A56445B2A822EFB007B24ED /* ListData+CoreDataProperties.swift in Sources */,
+				3A43AF672AC075DF00624EFC /* IDiffableTableView.swift in Sources */,
 				3AA82D1E29EAB5CC00557A94 /* NsNumber + minute.swift in Sources */,
 				3ABC9DFA2A0BAAA200109A9C /* UICollectionView + register.swift in Sources */,
 				3A1928772970A5590087A2C9 /* NetworkMonitor.swift in Sources */,
