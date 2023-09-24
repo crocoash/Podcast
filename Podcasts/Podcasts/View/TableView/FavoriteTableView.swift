@@ -21,10 +21,10 @@ import CoreData
 //MARK: - DataSource
 @objc protocol FavouriteTableDataSource: AnyObject {
     
-    func favouriteTableView(_ favouriteTableView: FavouriteTableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell
-    func favouriteTableView(_ favouriteTableView: FavouriteTableView, nameOfSectionFor index: Int) -> String
-    func favouriteTableViewCountOfSections(_ favouriteTableView: FavouriteTableView) -> Int
-    func favouriteTableView(_ favouriteTableView: FavouriteTableView, countOfRowsInSection index: Int) -> Int
+    func favouriteTableView               (_ favouriteTableView: FavouriteTableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell
+    func favouriteTableView               (_ favouriteTableView: FavouriteTableView, nameOfSectionFor index: Int)       -> String
+    func favouriteTableViewCountOfSections(_ favouriteTableView: FavouriteTableView)                                    -> Int
+    func favouriteTableView               (_ favouriteTableView: FavouriteTableView, countOfRowsInSection index: Int)   -> Int
 }
 
 class FavouriteTableView: UITableView {

@@ -7,6 +7,8 @@
 
 import CoreData
 
+//extension NSManagedObject: Identifiable { }
+
 extension NSManagedObject {
     
     static var entityName: String { String(describing: Self.self)  }

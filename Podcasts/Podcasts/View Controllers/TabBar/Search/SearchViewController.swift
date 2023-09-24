@@ -9,23 +9,28 @@ import UIKit
 import CoreData
 import SwiftUI
 
-//MARK: - Delegate
-protocol SearchViewControllerDelegate: AnyObject {
-//    func searchViewController                      (_ searchViewController: SearchViewController,_ playlist: [TrackProtocol], track: TrackProtocol)
-//    func searchViewControllerDidSelectDownLoadImage(_ searchViewController: SearchViewController, entity: DownloadType, completion: @escaping () -> Void)
-//    func searchViewControllerDidSelectFavouriteStar (_ searchViewController: SearchViewController, podcast: Podcast)
-    func searchViewControllerDidSelectCell (_ searchViewController: SearchViewController, podcast: Podcast)
-}
 
 typealias PlaylistByNewest  = [(key: String, podcasts: [Podcast])]
 typealias PlayListByOldest = PlaylistByNewest
 typealias PlayListByGenre = PlaylistByNewest
 
-class SearchViewController : UIViewController, IHaveStoryBoard {
 
-    typealias Args = SearchViewControllerDelegate
+class SearchViewController: UIViewController, IHaveStoryBoard, IHaveViewModel {
+    
+    typealias ViewModel = SearchViewControllerViewModel
+    
+    func viewModelChanged() {
+        
+    }
+    
+    func viewModelChanged(_ viewModel: SearchViewControllerViewModel) {
+        
+    }
+
+    typealias Args = Void
     
     private let apiService: ApiService
+    private let container: IContainer
     
     @IBOutlet private weak var searchBar: UISearchBar!
     @IBOutlet private weak var searchCollectionView: SearchCollectionView!
@@ -41,17 +46,7 @@ class SearchViewController : UIViewController, IHaveStoryBoard {
 
     private var alert = Alert()
     
-    private var podcasts = Array<Podcast>() {
-        didSet {
-            self.playList = podcasts.sortPodcastsByGenre
-        }
-    }
-    
-    private var playList: [(key: String, rows: [Podcast])] = []
-   
     private var authors = Array<Author>()
-    
-    weak var delegate: SearchViewControllerDelegate?
     
     //MARK: - Methods
     private var playerIsSHidden = true {
@@ -72,7 +67,8 @@ class SearchViewController : UIViewController, IHaveStoryBoard {
     
     required init?(container: IContainer, args: (args: Args, coder: NSCoder)) {
         self.apiService = container.resolve()
-        self.delegate = args.args
+        self.container = container
+        
         super.init(coder: args.coder)
     }
     
@@ -84,11 +80,12 @@ class SearchViewController : UIViewController, IHaveStoryBoard {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         showEmptyImage()
-        if podcasts.isEmpty { searchBar.becomeFirstResponder() }
+        if viewModel.sectionsIsEmpty { searchBar.becomeFirstResponder() }
     }
   
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         configureUI()
         configureGesture()
         showEmptyImage()
@@ -102,8 +99,8 @@ class SearchViewController : UIViewController, IHaveStoryBoard {
     
     //MARK: - Actions
     func tapCell(atIndexPath indexPath: IndexPath) {
-        let podcast = playList[indexPath]
-        delegate?.searchViewControllerDidSelectCell(self, podcast: podcast)
+        let podcast = viewModel.getRow(forIndexPath: indexPath)
+//        delegate?.searchViewControllerDidSelectCell(self, podcast: podcast)
     }
     
     @objc func cancelSearch(sender: UITapGestureRecognizer) {
@@ -166,12 +163,12 @@ extension SearchViewController {
     
     private func cancelSearchAction() {
         searchBar.text?.removeAll()
-        podcasts.removeAll()
+        viewModel.removeAll()
         showEmptyImage()
     }
     
     private func showEmptyImage() {
-        let podcastsIsEmpty = podcasts.isEmpty
+        let podcastsIsEmpty = viewModel.sectionsIsEmpty
         let authorsIsEmpty = authors.isEmpty
         let selectedFirstSegmentalControl = searchSegmentalControl?.selectedSegmentIndex == 0
         let selectedSecondSegmentalControl = searchSegmentalControl?.selectedSegmentIndex == 1
@@ -224,8 +221,11 @@ extension SearchViewController {
             case .success(result: let podcastData) :
                 guard let podcasts = podcastData.results.allObjects as? [Podcast] else { return }
                 
-                self?.processResults(result: podcasts) {
-                    self?.podcasts = $0
+                self?.processResults(result: podcasts) { [weak self] podcasts in
+                    guard let self = self else { return }
+//                    if let viewModel = SearchViewControllerViewModel(container: container, args: podcasts) {
+                        self.viewModel = SearchViewControllerViewModel(container: container, args: podcasts)
+//                    }
                 }
             case .failure(error: let error) :
                 error.showAlert(vc: self)
@@ -308,19 +308,19 @@ extension SearchViewController: SearchCollectionViewDelegate {
 extension SearchViewController: SearchCollectionViewDataSource {
     
     func searchCollectionViewNumbersOfSections(_ searchCollectionView: SearchCollectionView) -> Int {
-        return playList.count
+        return viewModel.numbersOfSections
     }
     
     func searchCollectionView(_ searchCollectionView: SearchCollectionView, nameOfSectionForIndex index: Int) -> String {
-        return playList[index].key
+        return viewModel.getInputSection(sectionIndex: index)
     }
     
     func searchCollectionView(_ searchCollectionView: SearchCollectionView, numbersOfRowsInSection index: Int) -> Int {
-        return playList[index].rows.count
+        return viewModel.numbersOfRowsInSection(section: index)
     }
     
     func searchCollectionView(_ searchCollectionView: SearchCollectionView, rowForIndexPath indexPath: IndexPath) -> SearchCollectionView.Row {
-        let podcast = playList[indexPath]
+        let podcast = viewModel.getRow(forIndexPath: indexPath)
         let row = SearchCollectionView.Row(podcast: podcast)
         return row
     }

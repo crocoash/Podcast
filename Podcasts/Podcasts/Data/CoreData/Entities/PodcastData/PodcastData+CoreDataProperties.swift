@@ -38,7 +38,7 @@ extension PodcastData {
 
 }
 
-extension PodcastData : Identifiable {
+extension PodcastData {
     var podcasts: [Podcast] {
         self.results.allObjects as? [Podcast] ?? []
     }

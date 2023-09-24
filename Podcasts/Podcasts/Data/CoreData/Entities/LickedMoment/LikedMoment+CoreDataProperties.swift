@@ -21,7 +21,3 @@ extension LikedMoment {
     @NSManaged public var podcast: Podcast
 
 }
-
-extension LikedMoment : Identifiable {
-
-}

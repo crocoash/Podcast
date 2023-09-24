@@ -23,7 +23,3 @@ extension Author {
     @NSManaged public var authorData: AuthorData?
 
 }
-
-extension Author : Identifiable {
-
-}

@@ -53,7 +53,7 @@ class BigPlayerViewModel: IPerRequest, IViewModelUpdating, INotifyOnChanged {
     }
     
     func addLikeMoment() {
-//        likeManager.addToLikedMoments(entity: track, moment: podcast.listeningProgress ?? 0)
+        likeManager.addToLikedMoments(entity: track.inputType, moment: track.listeningProgress ?? 0)
     }
 }
 

@@ -109,7 +109,9 @@ public final class Event<Args> {
         // Получаем список обработчиоков с живыми подписчиками
         let aliveHandlers = handlers.filter { $0.key.isAlive }
         // Для всех живых подписчиков выполняем код обработчиков событий
-        aliveHandlers.forEach { $0.value(args) }
+        aliveHandlers.forEach {
+            $0.value(args)
+        }
     }
 }
 

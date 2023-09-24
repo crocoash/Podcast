@@ -36,7 +36,3 @@ extension ListData {
     @NSManaged public func removeFromListSections(_ values: NSSet)
 
 }
-
-extension ListData : Identifiable {
-
-}

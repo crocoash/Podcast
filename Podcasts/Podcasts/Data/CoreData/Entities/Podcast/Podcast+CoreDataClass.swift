@@ -298,68 +298,7 @@ extension Podcast {
     }
 }
 
-//MARK: - extension Collection
-extension Collection where Element == Podcast {
-    
-    var sortPodcastsByGenre: [(key: String, rows: [Podcast])] {
-        var array = [(key: String, rows: [Podcast])]()
-        
-        for podcast in self {
-            if let genres = podcast.genres?.allObjects as? [Genre] {
-            loop: for genre in genres {
-                if let genreName = genre.name {
-                    if genreName == "Podcasts" {
-                        continue loop
-                    }
-                        
-                    if array.isEmpty {
-                        array.append((key: genreName, rows: [podcast]))
-                        continue loop
-                    }
-                    for (index,value) in array.enumerated() {
-                        if value.key == genreName {
-                            array[index].rows.append(podcast)
-                            continue loop
-                        }
-                    }
-                    array.append((key: genreName, rows: [podcast]))
-                }
-            }
-            }
-        }
-        let filteredArray = array.filter { !$0.rows.isEmpty }
-        let sortedArray = filteredArray.map { (key: $0.key, rows: $0.rows.sorted { $0.releaseDateInformation < $1.releaseDateInformation })}
-        return sortedArray
-        
-    }
-    
-    var sortPodcastsByNewest: [(key: String, rows: [Podcast])] {
-        let array = self.sorted { $0.releaseDateInformation > $1.releaseDateInformation }
-        return array.conform
-    }
-    
-    var sortPodcastsByOldest: [(key: String, rows: [Podcast])] {
-        let array = self.sorted { $0.releaseDateInformation < $1.releaseDateInformation }
-        return array.conform
-    }
-    
-    private var conform: [(key: String, rows: [Podcast])] {
-        var array = [(key: String, rows: [Podcast])]()
-        loop: for element in self {
-            let date = element.formattedDate(dateFormat: "d MMM YYY")
-            if array.isEmpty {
-                array.append((key: date, rows: [element]))
-                continue
-            }
-            for value in array.enumerated() where value.element.key == date  {
-                array[value.offset].rows.append(element)
-                continue loop
-            }
-            array.append((key: date, rows: [element]))
-        }
-        return array
-    }
-}
+
 
 extension Collection where Element == (key: String, rows: [Podcast]) {
     

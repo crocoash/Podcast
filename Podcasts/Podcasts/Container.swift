@@ -72,6 +72,12 @@ extension IContainer {
         return vc
     }
     
+    func resolveWithModel<T: IHaveStoryBoard & IHaveViewModel>(argsVM: T.ViewModel.Arguments) -> T where T.ViewModel: IResolvable, T.Args == Void {
+        let vc: T = resolve(args: ())
+        vc.viewModel = resolve(args: argsVM)
+        return vc
+    }
+    
     func resolveWithModel<T: IHaveStoryBoard & IHaveViewModel>(args: T.Args) -> T where T.ViewModel: IResolvable, T.ViewModel.Arguments == Void {
         let vc: T = resolve(args: args)
         vc.viewModel = resolve(args: ())

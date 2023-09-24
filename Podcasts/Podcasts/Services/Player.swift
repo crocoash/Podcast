@@ -119,6 +119,7 @@ extension PlayerDelegate where Self: IViewModelUpdating {
 }
 
 class Player: MultyDelegateService<PlayerDelegate>, ISingleton {
+    
     required init(container: IContainer, args: ()) {
         super.init()
         addObserverForEndTrack()
