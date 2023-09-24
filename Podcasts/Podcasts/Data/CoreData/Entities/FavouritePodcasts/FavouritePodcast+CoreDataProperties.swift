@@ -21,7 +21,3 @@ extension FavouritePodcast {
     @NSManaged public var podcast: Podcast
 
 }
-
-extension FavouritePodcast : Identifiable {
-
-}

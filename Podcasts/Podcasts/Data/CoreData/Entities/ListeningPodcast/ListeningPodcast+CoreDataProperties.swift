@@ -23,7 +23,3 @@ extension ListeningPodcast {
     @NSManaged public var podcast: Podcast
 
 }
-
-extension ListeningPodcast : Identifiable {
-
-}

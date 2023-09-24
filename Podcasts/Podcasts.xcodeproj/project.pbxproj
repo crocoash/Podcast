@@ -85,6 +85,13 @@
 		3A41942A29881A0300D59AA4 /* MyError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A41942929881A0300D59AA4 /* MyError.swift */; };
 		3A43AF552AB9B5B100624EFC /* BigPlayerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A43AF542AB9B5B100624EFC /* BigPlayerViewModel.swift */; };
 		3A43AF572AB9D06900624EFC /* SmallPlayerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A43AF562AB9D06900624EFC /* SmallPlayerViewModel.swift */; };
+		3A43AF592ABB116D00624EFC /* EpisodeTableViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A43AF582ABB116D00624EFC /* EpisodeTableViewModel.swift */; };
+		3A43AF5D2ABDED2A00624EFC /* ListViewModel + SectionData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A43AF5C2ABDED2A00624EFC /* ListViewModel + SectionData.swift */; };
+		3A43AF5F2ABF408200624EFC /* SearchViewControllerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A43AF5E2ABF408200624EFC /* SearchViewControllerViewModel.swift */; };
+		3A43AF612ABF45ED00624EFC /* BaseSectionData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A43AF602ABF45ED00624EFC /* BaseSectionData.swift */; };
+		3A43AF632ABF46B800624EFC /* ViewModelUpdating.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A43AF622ABF46B800624EFC /* ViewModelUpdating.swift */; };
+		3A43AF652AC040DB00624EFC /* DetailViewControllerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A43AF642AC040DB00624EFC /* DetailViewControllerViewModel.swift */; };
+		3A43AF672AC075DF00624EFC /* IDiffableTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A43AF662AC075DF00624EFC /* IDiffableTableView.swift */; };
 		3A4A3757280164DC000C80E4 /* PodcastData+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4A3755280164DC000C80E4 /* PodcastData+CoreDataClass.swift */; };
 		3A4A3758280164DC000C80E4 /* PodcastData+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4A3756280164DC000C80E4 /* PodcastData+CoreDataProperties.swift */; };
 		3A5022532A6BD7CE00600422 /* FavouriteManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A5022522A6BD7CE00600422 /* FavouriteManager.swift */; };
@@ -151,7 +158,7 @@
 		049D47E92726E05F00B6DA3C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		049D47EF2726EAE600B6DA3C /* TabBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarViewController.swift; sourceTree = "<group>"; };
 		049D480027286D3900B6DA3C /* ListViewController.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = ListViewController.swift; sourceTree = "<group>"; tabWidth = 4; };
-		049D480227286D5900B6DA3C /* DetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
+		049D480227286D5900B6DA3C /* DetailViewController.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; tabWidth = 3; };
 		181F5BB927E623D300AC27EB /* CoreData.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CoreData.xcdatamodel; sourceTree = "<group>"; };
 		181F5BC327E6718A00AC27EB /* DataStoreManager.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = DataStoreManager.swift; sourceTree = "<group>"; tabWidth = 4; };
 		181F5BD527E6850500AC27EB /* Author+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Author+CoreDataProperties.swift"; path = "/Users/anton/Documents/Xcode/Nix/Podcast/Podcast/Podcasts/Podcasts/Data/CoreData/Entities/Author/Author+CoreDataProperties.swift"; sourceTree = "<absolute>"; };
@@ -215,6 +222,13 @@
 		3A41942929881A0300D59AA4 /* MyError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyError.swift; sourceTree = "<group>"; };
 		3A43AF542AB9B5B100624EFC /* BigPlayerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BigPlayerViewModel.swift; sourceTree = "<group>"; };
 		3A43AF562AB9D06900624EFC /* SmallPlayerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmallPlayerViewModel.swift; sourceTree = "<group>"; };
+		3A43AF582ABB116D00624EFC /* EpisodeTableViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EpisodeTableViewModel.swift; sourceTree = "<group>"; };
+		3A43AF5C2ABDED2A00624EFC /* ListViewModel + SectionData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ListViewModel + SectionData.swift"; sourceTree = "<group>"; };
+		3A43AF5E2ABF408200624EFC /* SearchViewControllerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewControllerViewModel.swift; sourceTree = "<group>"; };
+		3A43AF602ABF45ED00624EFC /* BaseSectionData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseSectionData.swift; sourceTree = "<group>"; };
+		3A43AF622ABF46B800624EFC /* ViewModelUpdating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModelUpdating.swift; sourceTree = "<group>"; };
+		3A43AF642AC040DB00624EFC /* DetailViewControllerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewControllerViewModel.swift; sourceTree = "<group>"; };
+		3A43AF662AC075DF00624EFC /* IDiffableTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IDiffableTableView.swift; sourceTree = "<group>"; };
 		3A4A3755280164DC000C80E4 /* PodcastData+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PodcastData+CoreDataClass.swift"; sourceTree = "<group>"; };
 		3A4A3756280164DC000C80E4 /* PodcastData+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PodcastData+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		3A5022522A6BD7CE00600422 /* FavouriteManager.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = FavouriteManager.swift; sourceTree = "<group>"; tabWidth = 4; };
@@ -306,6 +320,9 @@
 				3A049C3E2AAB2C5800887161 /* Container.swift */,
 				3A049C402AAD988300887161 /* File.swift */,
 				3A049C4A2AB1DE4400887161 /* IViewModelUpdating.swift */,
+				3A43AF602ABF45ED00624EFC /* BaseSectionData.swift */,
+				3A43AF622ABF46B800624EFC /* ViewModelUpdating.swift */,
+				3A43AF662AC075DF00624EFC /* IDiffableTableView.swift */,
 				184CE19027271D9D0088044C /* Resourses */,
 				184CE19127271DAE0088044C /* Helpers */,
 				3A73D0BC2A9776F100947893 /* Storage */,
@@ -517,6 +534,7 @@
 		18CA6D8E2735E43600F32CE5 /* Search */ = {
 			isa = PBXGroup;
 			children = (
+				3A43AF5E2ABF408200624EFC /* SearchViewControllerViewModel.swift */,
 				049D47DF2726E05B00B6DA3C /* SearchViewController.swift */,
 				18FFCA4D27D549D60078CB3F /* SearchViewController.storyboard */,
 			);
@@ -527,6 +545,7 @@
 			isa = PBXGroup;
 			children = (
 				3A049C3C2AAA0B8200887161 /* ListModel.swift */,
+				3A43AF5C2ABDED2A00624EFC /* ListViewModel + SectionData.swift */,
 				3A3BD86B2A86370E00674042 /* ListViewModel.swift */,
 				049D480027286D3900B6DA3C /* ListViewController.swift */,
 				3A049C3A2AA9FB1500887161 /* ListView.swift */,
@@ -547,6 +566,7 @@
 		18CA6D912735E45A00F32CE5 /* Detail */ = {
 			isa = PBXGroup;
 			children = (
+				3A43AF642AC040DB00624EFC /* DetailViewControllerViewModel.swift */,
 				049D480227286D5900B6DA3C /* DetailViewController.swift */,
 				3ACF4E3A2A68110300AD7309 /* DetailViewController.storyboard */,
 			);
@@ -787,6 +807,7 @@
 		3ABC9DF52A07A5EC00109A9C /* TableView */ = {
 			isa = PBXGroup;
 			children = (
+				3A43AF582ABB116D00624EFC /* EpisodeTableViewModel.swift */,
 				3AECF77429FBFFBE00553DF7 /* EpisodeTableView.swift */,
 				3A50225B2A6E474200600422 /* FavoriteTableView.swift */,
 				3FBCF1BF272847E400B70522 /* Cells */,
@@ -961,9 +982,12 @@
 				3A1FB251280A067B00C3091C /* LikedMoment+CoreDataClass.swift in Sources */,
 				18D13DDC273C407A00495C97 /* UserModel.swift in Sources */,
 				3A049C472AAE399500887161 /* AlertSortViewModel.swift in Sources */,
+				3A43AF5D2ABDED2A00624EFC /* ListViewModel + SectionData.swift in Sources */,
 				18D0EAA227F0FF8900941A0D /* Author+CoreDataClass.swift in Sources */,
 				3A43AF572AB9D06900624EFC /* SmallPlayerViewModel.swift in Sources */,
 				3A69EA0128B2557500241414 /* UserDefaults.swift in Sources */,
+				3A43AF5F2ABF408200624EFC /* SearchViewControllerViewModel.swift in Sources */,
+				3A43AF592ABB116D00624EFC /* EpisodeTableViewModel.swift in Sources */,
 				3A4A3758280164DC000C80E4 /* PodcastData+CoreDataProperties.swift in Sources */,
 				3AA59DC528142C0D00FF2D19 /* FirebaseDataBase.swift in Sources */,
 				3A5644542A812AC4007B24ED /* ListSection+CoreDataClass.swift in Sources */,
@@ -990,6 +1014,7 @@
 				184CE18927270C8D0088044C /* ApiService.swift in Sources */,
 				3A049C492AAEFE0100887161 /* PresentService.swift in Sources */,
 				3A5644552A812AC4007B24ED /* ListSection+CoreDataProperties.swift in Sources */,
+				3A43AF652AC040DB00624EFC /* DetailViewControllerViewModel.swift in Sources */,
 				1828F9BB2738798F00761CD5 /* DataProvider.swift in Sources */,
 				3A73D0BB2A973B9300947893 /* ListDataManager.swift in Sources */,
 				3A50225C2A6E474200600422 /* FavoriteTableView.swift in Sources */,
@@ -1002,6 +1027,8 @@
 				3A049C412AAD988300887161 /* File.swift in Sources */,
 				3A123CDC2A27557600A237AE /* LikedPodcastTableViewCell.swift in Sources */,
 				049D47F02726EAE600B6DA3C /* TabBarViewController.swift in Sources */,
+				3A43AF612ABF45ED00624EFC /* BaseSectionData.swift in Sources */,
+				3A43AF632ABF46B800624EFC /* ViewModelUpdating.swift in Sources */,
 				185A7B1E27F0EB390096E094 /* Podcast+CoreDataProperties.swift in Sources */,
 				04425A8A273012DA00E897FA /* BigPlayerViewController.swift in Sources */,
 				3A63266628211CD0005FFB08 /* FavouritePodcast+CoreDataProperties.swift in Sources */,
@@ -1043,6 +1070,7 @@
 				189C1FAA272D336500A8480E /* UITableView + register.swift in Sources */,
 				3A63266528211CD0005FFB08 /* FavouritePodcast+CoreDataClass.swift in Sources */,
 				3A56445B2A822EFB007B24ED /* ListData+CoreDataProperties.swift in Sources */,
+				3A43AF672AC075DF00624EFC /* IDiffableTableView.swift in Sources */,
 				3AA82D1E29EAB5CC00557A94 /* NsNumber + minute.swift in Sources */,
 				3ABC9DFA2A0BAAA200109A9C /* UICollectionView + register.swift in Sources */,
 				3A1928772970A5590087A2C9 /* NetworkMonitor.swift in Sources */,

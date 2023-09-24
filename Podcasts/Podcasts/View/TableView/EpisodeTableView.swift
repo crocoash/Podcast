@@ -12,7 +12,21 @@ import CoreData
     func episodeTableViewDidChangeHeightTableView(_ episodeTableView: EpisodeTableView, height: CGFloat, withLastCell isLastCell: Bool)
 }
 
-class EpisodeTableView: UITableView {
+class EpisodeTableView: UITableView, IHaveViewModel {
+    
+    func viewModelChanged() {
+        
+    }
+    
+//    func changeViewModel(with viewModelArguments: ViewModel.Arguments) {
+//        observeViewModel()
+//    }
+    
+    func viewModelChanged(_ viewModel: EpisodeTableViewModel) {
+        observeViewModel()
+    }
+    
+    typealias ViewModel = EpisodeTableViewModel
    
     lazy private(set) var defaultRowHeight = CGFloat(100)//frame.width / 3.5
     lazy private(set) var defaultSectionHeight = CGFloat(40)
@@ -41,6 +55,11 @@ class EpisodeTableView: UITableView {
         return numberOfSections - 1 == indexPath.section && numberOfRows(inSection: indexPath.section) - 1 == indexPath.row
     }
     
+    func changeTypeOfSort(_ sort: ViewModel.TypeSortOfTableView) {
+        viewModel.typeOfSort = sort
+        
+    }
+    
     var height: CGFloat {
         return (0..<numberOfSections ).reduce(into: 0) { $0 += (rect(forSection: $1).height + paddingBetweenSections) }
     }
@@ -49,16 +68,59 @@ class EpisodeTableView: UITableView {
     func getYPositionYFor(indexPath: IndexPath) -> CGFloat {
         return rectForRow(at: indexPath).origin.y
     }
-    
-    //MARK: - inits
+
+    //MARK: init
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         
         if #available(iOS 15.0, *) {
             sectionHeaderTopPadding = paddingBetweenSections
         }
-        
+
         delegate = self
+        dataSource = self
+    }
+    
+    //MARK: Public Methods
+    @objc func tapCell(sender: UITapGestureRecognizer) {
+       guard let cell = sender.view as? PodcastCell,
+             cell.moreThanThreeLines,
+             let indexPath = indexPath(for: cell)
+       else { return }
+       
+       openCell(at: indexPath)
+    }
+}
+
+//MARK: - Private Methods
+extension EpisodeTableView {
+    
+    private func observeViewModel() {
+        viewModel.removeSection { [weak self] index in
+            guard let self = self else { return }
+            deleteSections(IndexSet(integer: index), with: .automatic)
+//            myDataSource?.episodeTableViewDidChangeHeightTableView(self, height: height, withLastCell: <#T##Bool#>)
+        }
+        
+        viewModel.removeRow { [weak self] indexPath in
+            guard let self = self else { return }
+            deleteRows(at: [indexPath], with: .automatic)
+        }
+        
+        viewModel.insertRow { [weak self] row, indexPath in
+            guard let self = self else { return }
+            insertRows(at: [indexPath], with: .automatic)
+        }
+        
+        viewModel.insertSection { [weak self] section, index in
+            guard let self = self else { return }
+            insertSections(IndexSet(integer: index), with: .automatic)
+        }
+        
+        viewModel.moveSection { [weak self] index, newIndex in
+            guard let self = self else { return }
+
+        }
     }
 }
 
@@ -85,5 +147,32 @@ extension EpisodeTableView: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, estimatedHeightForHeaderInSection section: Int) -> CGFloat {
         return defaultSectionHeight
+    }
+}
+
+//MARK: - UITableViewDataSource
+extension EpisodeTableView: UITableViewDataSource {
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return viewModel.numbersOfSections
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return viewModel.numbersOfRowsInSection(section: section)
+    }
+    
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return viewModel.getInputSection(sectionIndex: section)
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.getCell(cell: PodcastCell.self, indexPath: indexPath)
+        let podcast = viewModel.getRow(forIndexPath: indexPath)
+        cell.addMyGestureRecognizer(self, type: .tap(), #selector(tapCell))
+        
+        let podcasts = viewModel.getRows(atSection: indexPath.section)
+        let args = PodcastCellViewModel.Arguments.init(podcast: podcast, playlist: podcasts)
+        cell.viewModel = viewModel.container.resolve(args: args)
+        return cell
     }
 }

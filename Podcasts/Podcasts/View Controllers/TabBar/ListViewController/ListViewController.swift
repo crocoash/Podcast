@@ -122,14 +122,14 @@ class ListViewController: UIViewController, IHaveViewModel, IHaveStoryBoard {
         
         guard let cell = sender.view as? UITableViewCell,
               let indexPath = favouriteTableView.indexPath(for: cell),
-              let favouritePodcast = viewModel.getObjectInSection(for: indexPath) as? FavouritePodcast else { return }
+              let favouritePodcast = viewModel.getRow(forIndexPath: indexPath) as? FavouritePodcast else { return }
         delegate?.listViewController(self, didSelect: favouritePodcast.podcast)
     }
     
     @objc private func removeListeningPodcast(sender: UILongPressGestureRecognizer) {
         guard let cell = sender.view as? UITableViewCell,
               let indexPath = favouriteTableView.indexPath(for: cell),
-              let listeningPodcast = viewModel.getObjectInSection(for: indexPath) as? ListeningPodcast else { return }
+              let listeningPodcast = viewModel.getRow(forIndexPath: indexPath) as? ListeningPodcast else { return }
         
         listeningManager.removeListeningPodcast(listeningPodcast)
     }
@@ -163,8 +163,8 @@ extension ListViewController {
     }
     
     private func configureScopeBar() {
-        if viewModel.nameForScopeBar.count != 0 {
-            searchController.searchBar.scopeButtonTitles = viewModel.nameForScopeBar
+        if viewModel.sections.count != 0 {
+            searchController.searchBar.scopeButtonTitles = viewModel.sections
             searchController.searchBar.scopeButtonTitles?.insert("All", at: .zero)
         } else {
             searchController.searchBar.scopeButtonTitles = nil
@@ -186,7 +186,7 @@ extension ListViewController {
     
     private func configureCell(for tableView: UITableView, at indexPath: IndexPath) -> UITableViewCell {
         
-        let item = viewModel.getObjectInSection(for: indexPath)
+        let item = viewModel.getRow(forIndexPath: indexPath)
         let playlist = viewModel.getPlaylist(for: indexPath.section)
         
         if let podcast = (item as? FavouritePodcast)?.podcast {
@@ -196,8 +196,10 @@ extension ListViewController {
             cell.addMyGestureRecognizer(self, type: .tap(), #selector(tapFavouritePodcastCell(sender:)))
             
             return cell
-        } else if let item = item as? LikedMoment {
+        } else if let likedMoment = item as? LikedMoment {
             let cell = tableView.getCell(cell: LikedPodcastTableViewCell.self, indexPath: indexPath)
+            let model = LikedPodcastTableViewCellModel(likedMoment: likedMoment)
+            cell.configureCell(with: model)
             return cell
         } else if let item = item as? ListeningPodcast {
             let cell = tableView.getCell(cell: ListeningPodcastCell.self, indexPath: indexPath)
@@ -252,12 +254,12 @@ extension ListViewController {
             updateUI()
         }
         
-        viewModel.removeItem { [weak self] indexPath in
+        viewModel.removeRow { [weak self] indexPath in
             guard let self = self else { return }
             favouriteTableView.deleteItem(at: indexPath)
         }
         
-        viewModel.insertItem { [weak self] item, indexPath in
+        viewModel.insertRow { [weak self] item, indexPath in
             guard let self = self else { return }
             favouriteTableView.insertCell(at: indexPath)
             
@@ -295,10 +297,9 @@ extension ListViewController: UISearchBarDelegate {
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        viewModel.performSearch (text: searchText)
+        viewModel.performSearch(text: searchText)
     }
 }
-
 
 //MARK: - FavouriteTableViewDelegate
 extension ListViewController: FavouriteTableViewDelegate {
@@ -318,15 +319,15 @@ extension ListViewController: FavouriteTableDataSource {
     }
     
     func favouriteTableViewCountOfSections(_ favouriteTableView: FavouriteTableView) -> Int {
-        return viewModel.countOfSections
+        return viewModel.numbersOfSections
     }
     
     func favouriteTableView(_ favouriteTableView: FavouriteTableView, countOfRowsInSection index: Int) -> Int {
-        return viewModel.getCountOfRowsInSection(section: index)
+        return viewModel.numbersOfRowsInSection(section: index)
     }
     
     func favouriteTableView(_ favouriteTableView: FavouriteTableView, nameOfSectionFor index: Int) -> String {
-        return viewModel.getNameOfSection(for: index)
+        return viewModel.getInputSection(sectionIndex: index)
     }
 }
 

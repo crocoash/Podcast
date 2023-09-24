@@ -23,7 +23,3 @@ extension ListSection {
     @NSManaged public var sequenceNumber: NSNumber
     @NSManaged public var listData: ListData
 }
-
-extension ListSection : Identifiable {
-
-}

@@ -42,7 +42,8 @@ class TabBarViewController: UITabBarController, IHaveStoryBoard {
     }()
     
     lazy private var searchVC: SearchViewController = {
-        let vc: SearchViewController = container.resolve(args: self)
+        let argVM: SearchViewControllerViewModel.Arguments = []
+        let vc: SearchViewController = container.resolveWithModel(argsVM: argVM)
         vc.transitioningDelegate = self
         modalPresentationStyle = .custom
         
@@ -110,8 +111,8 @@ extension TabBarViewController {
     
     private func configureDetailViewController(podcast: Podcast, playList: [Podcast]) -> DetailViewController {
         
-        let argument = DetailViewController.Args(podcast: podcast, podcasts: playList)
-        let detailViewController: DetailViewController = container.resolve(args: argument)
+        let args = DetailViewController.Args(podcast: podcast, podcasts: playList)
+        let detailViewController: DetailViewController = container.resolve(args: args)
         
         detailViewController.modalPresentationStyle = .custom
         detailViewController.transitioningDelegate = self
@@ -122,10 +123,10 @@ extension TabBarViewController {
     private func presentDetailViewController(podcast: Podcast, completion: ((DetailViewController) -> Void)? = nil) {
         /// don't present new detail vc if it already present ( big player vc )
         
-        if let detailViewController = presentedViewController as? DetailViewController, detailViewController.podcast == podcast {
-            self.present(detailViewController, animated: true)
-            completion?(detailViewController)
-        } else {
+//        if let detailViewController = presentedViewController as? DetailViewController, detailViewController.podcast == podcast {
+//            self.present(detailViewController, animated: true)
+//            completion?(detailViewController)
+//        } else {
             guard let id = podcast.collectionId?.stringValue else { return }
             self.view.showActivityIndicator()
             
@@ -141,7 +142,7 @@ extension TabBarViewController {
                     self.present(detailViewController, animated: true)
                     completion?(detailViewController)
                 }
-            }
+//            }
         }
     }
     
@@ -171,14 +172,6 @@ extension TabBarViewController {
     private func configureView() {
         configureTabBar()
         configureImageDarkMode()
-    }
-}
-
-// MARK: - SearchViewControllerDelegate
-extension TabBarViewController: SearchViewControllerDelegate {
-  
-    func searchViewControllerDidSelectCell(_ searchViewController: SearchViewController, podcast: Podcast) {
-        presentDetailViewController(podcast: podcast)
     }
 }
 

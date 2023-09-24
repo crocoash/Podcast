@@ -50,7 +50,3 @@ extension Podcast {
     @NSManaged public func removeFromLikedMoment(_ values: NSSet)
 
 }
-
-extension Podcast : Identifiable {
-
-}

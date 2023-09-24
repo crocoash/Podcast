@@ -8,11 +8,16 @@
 import Foundation
 import CoreData
 
-class ListViewModel: NSObject, IPerRequest {
+class ListViewModel: NSObject, IPerRequest, ITableViewDinamicUpdating {
   
    typealias Arguments = Void
-   typealias Section = SectionDocument.Section
    
+   var insertSectionOnView: ((SectionData, Int) -> ()) = { _, _ in }
+   var insertItemOnView:    ((Row, IndexPath) -> ())   = { _, _ in }
+   var removeRowOnView:    ((IndexPath) -> ())        = {    _ in }
+   var removeSectionOnView: ((Int) -> ())              = {    _ in }
+   var moveSectionOnView:   ((Int, Int) -> ())         = { _, _ in }
+
    private let dataStoreManager: DataStoreManager
    private var searchedText = ""
    
@@ -23,14 +28,20 @@ class ListViewModel: NSObject, IPerRequest {
    lazy private(set) var listSectionFRC = dataStoreManager.conFigureFRC(for: ListSection.self,
                                                                         with: [NSSortDescriptor(key: #keyPath(ListSection.sequenceNumber), ascending: true)],
                                                                         predicates: [NSPredicate(format: "isActive = %d", true)])
-   
-   private var sectionsDocument: SectionDocument = SectionDocument()
+   var searchedSection: String?
+
+   var dataSourceForView: [SectionData] = []
+   var dataSourceAll: [SectionData] = [] {
+      didSet {
+         dataSourceForView = configureDataSourceOutput()
+      }
+   }
    
    //MARK: Init
    required init(container: IContainer, args: Arguments) {
       
       self.dataStoreManager = container.resolve()
-  
+      self.dataSourceAll = []
       super.init()
       
       favouriteFRC.delegate = self
@@ -38,80 +49,36 @@ class ListViewModel: NSObject, IPerRequest {
       listeningFRC.delegate = self
       listSectionFRC.delegate = self
       
-      let sections = configureSections()
-      sectionsDocument.setNewSections(sections)
+      self.dataSourceAll = configureDataSource()
+      self.dataSourceForView = configureDataSourceOutput()
    }
-   
-   private var removeSection: ((_ index: Int) -> ()) = { _ in }
-   private var removeItem: ((_ indexPath: IndexPath) -> ()) = { _ in }
-   private var insertSection: ((_ section: Section, _ index: Int) -> ()) = { section, index in }
-   private var insertItem: ((_ item: NSManagedObject, _ indexPath: IndexPath) -> ()) = { item, indexPath in }
-   private var moveSection: ((_ index: Int, _ newIndex: Int) -> ()) = { index, newIndex in }
-   
-   
-   func removeSection(_ completion: @escaping (_ index: Int) -> ()) {
-      removeSection = completion
-   }
-   
-   func removeItem(_ completion: @escaping ((_ indexPath: IndexPath) -> ())) {
-      removeItem = completion
-   }
-   
-   func insertSection(_ completion: @escaping ((_ section: Section, _ index: Int) -> ())) {
-      insertSection = completion
-   }
-   
-   func insertItem(_ completion: @escaping (_ item: NSManagedObject,_ indexPath: IndexPath) -> ()) {
-      insertItem = completion
-   }
-   
-   func moveSection(_ completion: @escaping ((_ index: Int, _ newIndex: Int) -> ())) {
-      moveSection = completion
-   }
-   
    
    lazy var sectionCountChanged: (() -> (Int)) = { [weak self] in
       guard let self = self else { return 0 }
-      return sectionsDocument.activeSections.count
-   }
-   
-  
-   
-   var sectionsIsEmpty: Bool {
-      return sectionsDocument.activeSections.count == 0
+      return numbersOfSections
    }
    
    var isSearching: Bool {
       return searchedText != ""
    }
    
-   var nameForScopeBar: [String] {
-      return sectionsDocument.nameOfActiveSections.map { $0.components(separatedBy: " ").first ?? "" }
-   }
-   
+//   var nameForScopeBar: [String] {
+//      return sectionsDocument.nameOfActiveSections.map { $0.components(separatedBy: " ").first ?? "" }
+//   }
+
    func changeSearchedSection(searchedSection index: Int?) {
-      sectionsDocument.changeSearchedSection(searchedSection: index)
+//      searchedSection = nil
+      guard let index = index, !sectionsIsEmpty else { return }
+//      let sections = sections.filter { !$0.rows.isEmpty }
+      searchedSection = getInputSection(sectionIndex: index)
    }
    
    func performSearch(text: String?) {
       performSearch(text)
    }
    
-   ///active
-   var countOfSections: Int {
-      return sectionsDocument.activeSections.count
-   }
-   
-   func getObjectInSection(for indexPath: IndexPath) -> NSManagedObject {
-      return sectionsDocument.getRow(forIndexPath: indexPath, typeOfSection: .active)
-   }
-   
-   func getObjectsInSections(for section: Int) -> [NSManagedObject] {
-      return sectionsDocument.getRows(in: section, typeOfSection: .active)
-   }
-   
    func getPlaylist(for section: Int) -> [Podcast] {
-      let objects = getObjectsInSections(for: section)
+      let objects = getRows(atSection: section)
       switch objects {
       case let favourites as [FavouritePodcast]:
          return favourites.map { $0.podcast }
@@ -124,13 +91,9 @@ class ListViewModel: NSObject, IPerRequest {
       }
    }
    
-   func getNameOfSection(for index: Int) -> String {
-      return sectionsDocument.getSection(for: index, typeOfSection: .active).sectionName
-   }
-   
-   func getCountOfRowsInSection(section index: Int) -> Int {
-      return sectionsDocument.getRows(in: index, typeOfSection: .active).count
-   }
+//   func getNameOfSection(for index: Int) -> String {
+//      return getSectionData(forIndex: index).section
+//   }
 }
 
 //MARK: - Private Methods
@@ -150,95 +113,21 @@ extension ListViewModel {
       fatalError()
    }
    
-   private func configureSections() -> [Section] {
-      var sections = (listSectionFRC.fetchedObjects ?? []).map {
+   private func configureDataSourceOutput() -> [SectionData] {
+      return dataSourceAll.filter { sectionIsActive($0) }
+   }
+   
+   private func sectionIsActive(_ sectionData: SectionData) -> Bool {
+      sectionData.isActiveAndNotEmpty && searchedSection == nil ? true : sectionData.section == searchedSection
+   }
+   
+   private func configureDataSource() -> [SectionData] {
+      var sectionData = listSectionFRC.fetchedObjects?.map {
          let entities = getRowsFor(entityName: $0.nameOfEntity)
-         return Section(entities: entities, listSection: $0)
-         
+         return SectionData(listSection: $0, rows: entities)
       }
-      sections.sort { $0.sequenceNumber < $1.sequenceNumber }
-      return sections
-   }
-   
-   private func append(_ object: Any, at newIndexPath: IndexPath?) {
-      
-      guard let indexPath = newIndexPath else { return }
-      
-      ///Section
-      if let listSection = object as? ListSection {
-         let index = indexPath.row
-         let rows = getRowsFor(entityName: listSection.nameOfEntity)
-         let section = Section(entities: rows, listSection: listSection)
-         //TODO: -
-//         if sections.count - 1 < indexPath.row {
-//            sectionsDocument.append(section)
-//         } else {
-            sectionsDocument.insert(section, at: index)
-//         }
-         
-         guard let newIndex = sectionsDocument.activeSections.firstIndex(where: { $0 == section }) else { return }
-         insertSection(section, newIndex)
-         
-         if sectionsDocument.sectionIsActive(section) {
-            rows.enumerated { indexRow, row in
-               let indexPath = IndexPath(row: index, section: indexRow)
-               append(row, at: indexPath)
-            }
-         }
-         
-         /// row
-      } else  {
-         guard let object = object as? NSManagedObject else { return }
-         let indexSection = sectionsDocument.getIndexSection(by:  object.entityName, typeOfSection: .all)
-         guard let indexSection = indexSection else { return }
-         
-         let section = sectionsDocument.getSection(for: indexSection, typeOfSection: .all)
-         var indexPathInAll = IndexPath(row: indexPath.row, section: indexSection)
-         
-         let isFirstElementInSection = section.rows.isEmpty
-         
-         sectionsDocument.insertRow(row: object, at: indexPathInAll)
-         
-         let activeSectionIndex = sectionsDocument.activeSections.firstIndex { $0 == section }
-         guard let activeSectionIndex = activeSectionIndex else { fatalError() }
-         
-         if isFirstElementInSection && section.isActive {
-            insertSection(section, indexPath.section)
-         }
-         let indexPathInAсtive = sectionsDocument.getIndexPath(forRow: object, typeOfSection: .active)
-         guard let indexPathInAсtive = indexPathInAсtive else { return }
-         insertItem(object, indexPathInAсtive)
-      }
-   }
-   
-   private func remove(_ object: Any) {
-      
-      if let listSection = object as? ListSection {
-         ///Section
-         guard let index = sectionsDocument.activeSections.firstIndex(where: { $0.sectionName == listSection.nameOfSection }) else { return }
-         let section = sectionsDocument.activeSections[index]
-         if sectionsDocument.sectionIsActive(section) {
-            removeSection(index)
-         }
-         sectionsDocument.remove(at: index)
-      } else {
-         guard let object = object as? NSManagedObject,
-               let indexPath = sectionsDocument.getIndexPath(forRow: object, typeOfSection: .all) else { return }
-         
-         var section: Section { sectionsDocument.getSection(for: indexPath.section, typeOfSection: .all) }
-
-         if sectionsDocument.sectionIsActive(section) {
-            guard let indexPath = sectionsDocument.getIndexPath(forRow: object, typeOfSection: .active) else { return }
-            removeItem(indexPath)
-         }
-         //TODO: -
-         guard let index = sectionsDocument.activeSections.firstIndex(where: { $0 == section }) else { return }
-         sectionsDocument.removeRow(at: indexPath)
-         
-         if !sectionsDocument.sectionIsActive(section) {
-            removeSection(index)
-         }
-      }
+      sectionData?.sort { $0.sequenceNumber < $1.sequenceNumber }
+      return sectionData ?? []
    }
    
    private func performSearch(_ text: String?) {
@@ -263,75 +152,14 @@ extension ListViewModel {
          print(error)
       }
       
-      let newSections = configureSections().filter { sectionsDocument.sectionIsActive($0) }
-      
-      /// remove
-      for section in sectionsDocument.activeSections {
-         let rows = section.rows
-         for row in rows {
-            
-            if newSections.isEmpty || !newSections.contains(section) {
-               remove(row)
-            } else {
-               for newSection in newSections {
-                  if newSection == section  {
-                     let newRows = newSection.rows
-                     
-                     if !newRows.contains(row) {
-                        remove(row)
-                     }
-                  }
-               }
-            }
-         }
-      }
-      
-      /// append
-      newSections.enumerated { indexNewSection, newSection in
-         let newRows = newSection.rows
-         newRows.enumerated { indexNewRow, newRow in
-            
-            if sectionsDocument.activeSections.isEmpty || !sectionsDocument.activeSections.contains(newSection) {
-               append(newRow, at: IndexPath(row: indexNewRow, section: indexNewSection))
-            } else {
-               for section in sectionsDocument.activeSections {
-                  if newSection == section {
-                     let rows = section.rows
-                     if !rows.contains(newRow) {
-                        append(newRow, at: IndexPath(row: indexNewRow, section: indexNewSection))
-                     }
-                  }
-               }
-            }
-         }
-      }
-   }
-   
-   private func moveSection(_ object: Any, from index: Int, to newIndex: Int) {
-      
-      if object is ListSection {
-         let section = sectionsDocument.getSection(for: index, typeOfSection: .all)
-         let activeIndex = sectionsDocument.activeSections.firstIndex { $0 == section }
-         
-         sectionsDocument.remove(at: index)
-         sectionsDocument.insert(section, at: newIndex)
-         
-         let activeNewIndex = sectionsDocument.activeSections.firstIndex { $0 == section }
-         
-         let sectionIsActive = sectionsDocument.sectionIsActive(section)
-         
-         if let activeIndex = activeIndex, let activeNewIndex = activeNewIndex {
-            if sectionIsActive, activeIndex != activeNewIndex {
-               moveSection(activeIndex, activeNewIndex)
-            }
-         }
-      }
+      let newSections = configureDataSource().filter { sectionIsActive($0) }
+      update(by: newSections)
    }
    
    private func update(with object: Any, reloadIndexPath: ([IndexPath]) -> ()) {
       if let podcast = (object as? ListeningPodcast)?.podcast {
          var indexPath: [IndexPath] = []
-         sectionsDocument.activeSections.enumerated { indexSection, section in
+         dataSourceForView.enumerated { indexSection, section in
             section.rows.enumerated { indexRow, row in
                switch row {
                case let favoritePodcast as FavouritePodcast:
@@ -354,6 +182,19 @@ extension ListViewModel {
          reloadIndexPath(indexPath)
       }
    }
+   
+   private func getSectionData(forListSection listSection: ListSection) -> SectionData? {
+      dataSourceAll.first { $0.section == listSection.nameOfSection }
+   }
+   
+   private func getIndexSection(forRow row: Row) -> Int? {
+      for (indexSection, sectionData) in dataSourceAll.enumerated() {
+         if row.entityName == sectionData.nameOfEntity {
+           return indexSection
+         }
+      }
+      return nil
+   }
 }
 
 
@@ -365,14 +206,32 @@ extension ListViewModel: NSFetchedResultsControllerDelegate {
         switch type {
             
         case .delete:
-           remove(anObject)
+           if let listSection = anObject as? ListSection {
+              guard let sectionData = getSectionData(forListSection: listSection) else { return }
+              removeSection(sectionData)
+           } else if let row = anObject as? Row {
+              removeRow(row)
+           }
         case .insert:
-           append(anObject, at: newIndexPath)
+           if let listSection = anObject as? ListSection {
+              let rows = getRowsFor(entityName: listSection.entityName)
+              let section = SectionData(listSection: listSection, rows: rows)
+              guard let index = indexPath?.row else { return }
+              insertSectionData(section, atNewIndex: index)
+           } else if let row = anObject as? Row {
+              if var newIndexPath = newIndexPath, let indexSection = getIndexSection(forRow: row) {
+                 newIndexPath.section = indexSection
+                 appendRow(row, at: newIndexPath)
+              }
+           }
         case .move:
            guard let index = indexPath?.row,
-                 let newIndex = newIndexPath?.row  else { return }
+                 let newIndex = newIndexPath?.row else { return }
+           if let listSection = anObject as? ListSection {
+              guard let sectionData = getSectionData(forListSection: listSection) else { return }
+              moveSectionData(sectionData, from: index, to: newIndex)
+           }
            
-           moveSection(anObject, from: index, to: newIndex)
         case .update:
             update(with: anObject) { indexPaths in
 //                todo

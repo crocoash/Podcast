@@ -12,16 +12,24 @@ protocol LikedPodcastTableViewCellType {
     var nameLabel: String? { get }
 }
 
+class LikedPodcastTableViewCellModel {
+    
+    var image: String?
+    var nameLabel: String?
+    
+    init(likedMoment: LikedMoment) {
+        self.image = likedMoment.podcast.image600
+        self.nameLabel = likedMoment.podcast.trackName
+    }
+}
+ 
 class LikedPodcastTableViewCell: UITableViewCell {
 
     @IBOutlet private weak var collectionImageView: UIImageView!
     @IBOutlet private weak var nameLabel: UILabel!
-    
-    private(set) var favouritePodcastTableViewCellType: LikedPodcastTableViewCellType!
-    
-    func configureCell(with entity: LikedPodcastTableViewCellType) {
-        self.favouritePodcastTableViewCellType = entity
-        DataProvider.shared.downloadImage(string: entity.mainImageForFavouritePodcastTableViewCellType) {
+  
+    func configureCell(with entity: LikedPodcastTableViewCellModel) {
+        DataProvider.shared.downloadImage(string: entity.image) {
             self.collectionImageView.image = $0
         }
         self.nameLabel.text = entity.nameLabel

@@ -43,7 +43,7 @@ protocol DataStoreManagerInput{
 }
 
 //MARK: - Type
-protocol CoreDataProtocol where Self: NSManagedObject & Hashable & Identifiable & Codable {
+protocol CoreDataProtocol where Self: NSManagedObject & Hashable & Identifiable & Codable & AnyObject {
     var id: String { get }
     static var defaultSortDescription: [NSSortDescriptor] { get }
     

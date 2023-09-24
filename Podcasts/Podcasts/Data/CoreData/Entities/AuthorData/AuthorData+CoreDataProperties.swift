@@ -37,7 +37,3 @@ extension AuthorData {
     @NSManaged public func removeFromResults(_ values: NSSet)
 
 }
-
-extension AuthorData : Identifiable {
-
-}

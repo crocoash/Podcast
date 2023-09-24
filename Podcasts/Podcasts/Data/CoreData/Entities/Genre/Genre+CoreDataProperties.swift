@@ -38,7 +38,3 @@ extension Genre {
     @NSManaged public func removeFromPodcasts(_ values: NSSet)
 
 }
-
-extension Genre : Identifiable {
-
-}
