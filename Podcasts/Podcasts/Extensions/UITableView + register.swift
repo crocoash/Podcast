@@ -41,5 +41,4 @@ extension UITableView {
         }
         return cells
     }
-
 }

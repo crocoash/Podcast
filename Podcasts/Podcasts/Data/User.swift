@@ -8,8 +8,9 @@
 import Foundation
 
 struct User: Codable {
-    var userName: String?
-    var isAuthorization = true
+    var userName: String
+    var userId: String
+    var isAuthorization: Bool = false
     var userInterfaceStyleIsDark = true
 }
 

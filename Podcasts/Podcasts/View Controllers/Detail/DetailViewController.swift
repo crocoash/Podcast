@@ -60,7 +60,6 @@ class DetailViewController: UIViewController, IHaveStoryBoard, IHaveViewModel {
     //MARK: View Methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         setupView()
                
         if let track = player.currentTrack?.track {
@@ -80,8 +79,9 @@ class DetailViewController: UIViewController, IHaveStoryBoard, IHaveViewModel {
         super.init(coder: input.coder)
         
         self.favouriteManager.delegate = self
-        
-        let argVM = ViewModel.Arguments.init(podcast: input.args.podcast, podcasts: input.args.podcasts)
+        let podcast = input.args.podcast
+        let podcasts = input.args.podcasts
+        let argVM = ViewModel.Arguments(podcast: input.args.podcast, podcasts: podcasts)
         self.viewModel = container.resolve(args: argVM)
     }
     
@@ -177,12 +177,13 @@ extension DetailViewController {
     
     private func configureEpisodeTableView() {
         episodeTableView.translatesAutoresizingMaskIntoConstraints = false
-        episodeTableView.viewModel = viewModel.viewModelEpisodeTableView
+        episodeTableView.viewModel = viewModel.episodeTableViewModel
         let height = episodeTableView.height
         reloadTableViewHeightConstraint(newHeight: height)
     }
     
     private func setupView() {
+       
         episodeImage.image = nil
         configureEpisodeTableView()
         configureSortMenu()
@@ -239,8 +240,6 @@ extension DetailViewController: PlayerDelegate {
     
     func playerStateDidChanged(_ player: Player, with track: any OutputPlayerProtocol) {}
 }
-
-
 
 //MARK: - EpisodeTableViewControllerMyDataSource
 extension DetailViewController: EpisodeTableViewMyDataSource {

@@ -17,7 +17,7 @@ class AlertSortListView: UIView, IHaveViewModel, IHaveXib {
         
     }
     
-    func viewModelChanged(_ viewModel: AlertSortListViewModel) {
+    func viewModelChanged(_ viewModel: ViewModel) {
         setupUI()
     }
     
@@ -180,7 +180,7 @@ extension AlertSortListView: UITableViewDelegate {
    
    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
       let item = viewModel.listSections[indexPath.row]
-      return item.isActive ? .delete : .insert
+       return item.isActive ? .delete : .insert
    }
    
    func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
@@ -190,13 +190,13 @@ extension AlertSortListView: UITableViewDelegate {
    
    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
        viewModel.changeActiveState(for: indexPath)
-      tableView.reloadRows(at: [indexPath], with: .automatic)
+       tableView.reloadRows(at: [indexPath], with: .automatic)
    }
 
    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
        viewModel.changeActiveState(for: indexPath)
-      tableView.reloadRows(at: [indexPath], with: .automatic)
-      return []
+       tableView.reloadRows(at: [indexPath], with: .automatic)
+       return []
    }
 }
 

@@ -8,9 +8,9 @@
 import UIKit
 import FirebaseAuth
 
-class RegistrationViewController: UIViewController, IPerRequest {
+class RegistrationViewController: UIViewController, IHaveStoryBoard {
     
-    typealias Arguments = Void
+    typealias Args = Void
     
     @IBOutlet private weak var iconImageView: UIImageView!
     @IBOutlet private weak var segmentedControl: UISegmentedControl!
@@ -24,42 +24,20 @@ class RegistrationViewController: UIViewController, IPerRequest {
     @IBOutlet private weak var backGroundView: UIView!
     
     private let userViewModel: UserViewModel
-    private let favouriteManager: FavouriteManager
-    private let likeManager: LikeManager
-    private let firebaseDataBase: FirebaseDatabase
-    private let player: Player
-    private let apiService: ApiService
-    private let downloadService: DownloadService
-    private let dataStoreManager: DataStoreManager
-    private let listeningManager: ListeningManager
+    private let container: IContainer
     
-    lazy private var tabBarVc = TabBarViewController.create { [weak self] coder in
-        guard let self = self else { fatalError() }
-        
-        let tabBar = TabBarViewController(coder: coder)
-        
-        guard let tabBar = tabBar else { fatalError() }
-        
-        tabBar.transitioningDelegate = self
-        tabBar.modalPresentationStyle = .custom
-        
-        return tabBar
-    }
-    
-    //MARK: init
-    required init(container: IContainer, args: Void) {
-        
+    lazy private var tabBarVc: TabBarViewController = {
+        let tabBarViewController: TabBarViewController = container.resolve()
+        tabBarViewController.modalPresentationStyle = .custom
+        tabBarViewController.transitioningDelegate = self
+        return tabBarViewController
+    }()
+
+    required init?(container: IContainer, args: (args: Args, coder: NSCoder)) {
         self.userViewModel = container.resolve()
-        self.favouriteManager = container.resolve()
-        self.likeManager = container.resolve()
-        self.player = container.resolve()
-        self.firebaseDataBase = container.resolve()
-        self.apiService = container.resolve()
-        self.downloadService = container.resolve()
-        self.dataStoreManager = container.resolve()
-        self.listeningManager = container.resolve()
-        
-        super.init(nibName: Self.identifier, bundle: nil)
+        self.container = container
+        self.authManger = container.resolve()
+        super.init(coder: args.coder)
     }
     
     required init?(coder: NSCoder) {
@@ -80,7 +58,7 @@ class RegistrationViewController: UIViewController, IPerRequest {
     private var firstSegmentedControl: Bool {
         segmentedControl.selectedSegmentIndex == 0
     }
-    private let authManger = AuthService()
+    private let authManger: AuthService
     private let alert = Alert()
     
     //MARK: - Settings
@@ -210,36 +188,30 @@ extension RegistrationViewController {
             
             //signInWithEmail
             if firstSegmentedControl {
-                authManger.signInWithEmail(email: email, password: password) { [weak self] (result, err) in
-                    self?.signInOrUp(err: err, result: result)
+                authManger.signInWithEmail(user: email, password: password) { [weak self] result in
+                    guard let self = self else { return }
+                    signInOrUp(result: result)
                 }
             //signUpWithEmail
-            } else  {
-                authManger.signUpWithEmail(email: email, password: password) { [weak self] (result, err) in
-                    self?.signInOrUp(err: err, result: result)
+            } else {
+                authManger.signUpWithEmail(email: email, password: password) { [weak self] result in
+                    guard let self = self else { return }
+                    signInOrUp(result: result)
                 }
             }
         }
     }
     
-    private func signInOrUp(err: String, result: Bool) {
+    private func signInOrUp(result: Result<User>) {
         activityIndicator.stopAnimating()
-
-        let timeInterval: TimeInterval = 2
+//        let timeInterval: TimeInterval = 2
         
-        if !result {
-            
-            alert.create(vc: self, title: err.debugDescription, withTimeIntervalToDismiss: timeInterval)
-            
-            Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: false) { [weak self] _ in
-                if err.contains("email") {
-                    self?.emailTextField.becomeFirstResponder()
-                } else if err.contains("password") {
-                    self?.passwordTextField.becomeFirstResponder()
-                }
-            }
-        } else {
-            userViewModel.changeUserName(newName: email)
+        switch result {
+        case .failure(let error):
+            error.showAlert(vc: self)
+        case .success(result: let user):
+            userViewModel.changeUserName(newName: user.userName)
+            userViewModel.changeUserId(newUserId: user.userId)
             present(tabBarVc, animated: true)
         }
     }
@@ -252,14 +224,15 @@ extension RegistrationViewController {
                 [
                     UIAlertAction(title: "Send Password", style: .default, handler: { [weak self] _ in
                         guard let self = self else { return }
-                        self.authManger.forgotPassword(with: text) { error in
+                        authManger.forgotPassword(with: text) { [weak self] error in
+                            guard let self = self else { return }
                             
                             if let error = error {
-                                self.alert.create(vc: self, title: error.localizedDescription, withTimeIntervalToDismiss: 2)
+                                alert.create(vc: self, title: error.localizedDescription, withTimeIntervalToDismiss: 2)
                             } else {
-                                self.alert.create(vc: self, title: "email will be send to \(self.email)", withTimeIntervalToDismiss: 2)
-                                self.email = self.emailTextField.text!
-                                self.forgotPasswordAlert(with: self.email)
+                                alert.create(vc: self, title: "email will be send to \(self.email)", withTimeIntervalToDismiss: 2)
+                                email = emailTextField.text!
+                                forgotPasswordAlert(with: email)
                             }
                         }
                     }),

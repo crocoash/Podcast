@@ -9,25 +9,23 @@ import UIKit
 
 public class PresenterService: ISingleton {
     
-    private unowned let container: IContainer
     
     private var topViewController: UIViewController? {
         let keyWindow = UIApplication.shared.windows.first { $0.isKeyWindow }
         return findTopViewController(in: keyWindow?.rootViewController)
     }
     
-    required init(container: IContainer, args: Void) {
-        self.container = container
-    }
+    required init(container: IContainer, args: Void) {}
     
-    func present<VC: UIViewController & IHaveViewModel>( _ viewController: VC.Type,  args: VC.ViewModel.Arguments) where VC.ViewModel: IResolvable {
-        
-        let vc = VC.create { coder in
-            VC(coder: coder)
+    func present( _ viewController: UIViewController, modalPresentationStyle: UIModalPresentationStyle)  {
+        viewController.modalPresentationStyle = modalPresentationStyle
+        guard let topViewController = topViewController else { return }
+        if modalPresentationStyle == .custom {
+            if let topVc = topViewController as? UIViewControllerTransitioningDelegate {
+                viewController.transitioningDelegate = topVc
+            }
         }
-        vc.viewModel = container.resolve(args: args)
-        
-        topViewController?.present(vc, animated: true)
+        topViewController.present(viewController, animated: true)
     }
     
     func present<VC: UIViewController>( _ viewController: VC.Type) {

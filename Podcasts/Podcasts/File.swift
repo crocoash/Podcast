@@ -5,7 +5,6 @@
 //  Created by Anton on 10.09.2023.
 //
 
-
 import Foundation
 
 protocol IHaveViewModel: AnyObject {
@@ -26,20 +25,24 @@ extension IHaveViewModel {
         }
         set {
             (anyViewModel as? INotifyOnChanged)?.changed.unsubscribe(self)
-            let viewModel = newValue as? ViewModel
+            let viewModel1 = newValue as? ViewModel
             
-            objc_setAssociatedObject(self, &viewModelKey, viewModel, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            objc_setAssociatedObject(self, &viewModelKey, viewModel1, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
             
-            viewModelChanged()
-            if let viewModel = viewModel {
-                viewModelChanged(viewModel)
-            }
-            
-            (viewModel as? INotifyOnChanged)?.changed.subscribe(self) { this in
-                this.viewModelChanged()
-                if let viewModel = viewModel {
+//            if let viewModel = viewModel {
+//                viewModelChanged(viewModel)
+//            }
+//            
+//            (viewModel as? INotifyOnChanged)?.changed.subscribe(self) { this in
+//                
+//            }
+            viewModelChanged(viewModel)
+            (viewModel as? any INotifyOnChanged)?.changed.subscribe(self) { [weak self] this, _ in
+                guard let self = self else { fatalError() }
+//                if let viewModel = viewModel {
                     this.viewModelChanged(viewModel)
-                }
+//                    viewModelChanged(viewModel)
+//                }
             }
         }
     }
@@ -50,11 +53,6 @@ extension IHaveViewModel {
         }
         set {
             anyViewModel = newValue
-            (newValue as? any INotifyOnChanged)?.changed.subscribe(self) { [weak self] this, _ in
-                guard let self = self else { return }
-                this.viewModelChanged()
-                this.viewModelChanged(viewModel)
-            }
         }
     }
 }

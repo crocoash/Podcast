@@ -7,7 +7,6 @@
 
 import Foundation
 import FirebaseDatabase
-import FirebaseAuth
 import CoreData
 
 
@@ -47,9 +46,13 @@ protocol FirebaseDatabaseDelegate: AnyObject {
 
 class FirebaseDatabase: ISingleton {
    
-   required init(container: IContainer, args: ()) {}
+   required init(container: IContainer, args: ()) {
+      let userViewModel: UserViewModel = container.resolve()
+      //TODO: 
+      self.userID = userViewModel.userDocument.user.userId 
+   }
    
-   private let userID = Auth.auth().currentUser!.uid
+   private let userID: String
    
    private var ref = Database.database(url: "https://podcast-app-8fcd2-default-rtdb.europe-west1.firebasedatabase.app").reference()
    lazy private var userStorage = ref.child(userID)

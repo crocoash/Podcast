@@ -221,7 +221,7 @@
                                                 </constraints>
                                                 <sections/>
                                                 <connections>
-                                                    <outlet property="delegate" destination="sQZ-Of-rko" id="O6U-kS-HUg"/>
+                                                    <outlet property="myDataSource" destination="sQZ-Of-rko" id="KdB-9g-isT"/>
                                                 </connections>
                                             </tableView>
                                         </subviews>

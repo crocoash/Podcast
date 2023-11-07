@@ -14,13 +14,13 @@ class PodcastCell: UITableViewCell, IHaveViewModel {
     typealias ViewModel = PodcastCellViewModel
     
     func viewModelChanged(_ viewModel: PodcastCellViewModel) {
-        
+        configureGestures()
+        self.heightOfImageView.constant = (frame.height - dateLabel.frame.height) - 10
+        updateCell()
     }
     
     func viewModelChanged() {
-        updateCell()
-        configureGestures()
-        self.heightOfImageView.constant = (frame.height - dateLabel.frame.height) - 10
+        
     }
     
     @IBOutlet private weak var podcastImage:             UIImageView!
@@ -51,21 +51,17 @@ class PodcastCell: UITableViewCell, IHaveViewModel {
     private let isFavouriteImage = UIImage(named: "star5")!
     private let isNotFavouriteImage = UIImage(named: "star1")!
     
-    
     var moreThanThreeLines: Bool {
         return podcastDescription.maxNumberOfLines > 3
     }
-    
-    private var defaultHeight: CGFloat = 50
     
     override var isSelected: Bool {
         didSet {
             updateSelectState()
         }
     }
-
     
-    //MARK: Actions
+     //MARK: Actions
     @objc func handlerTapFavouriteStar(_ sender: UITapGestureRecognizer) {
         viewModel.addOrRemoveFromFavourite()
     }
@@ -93,16 +89,16 @@ extension PodcastCell {
         return imageArray
     }
     
-    func updateSelectState() {
+    private func updateSelectState() {
         openDescriptionImageView.image = isSelected ? downImage : upImage
     }
     
-    func updateFavouriteStar() {
+    private func updateFavouriteStar() {
         favouriteStarImageView.image = viewModel.isFavourite ? isFavouriteImage : isNotFavouriteImage
         updateDownloadUI()
     }
     
-    func updatePlayerUI() {
+    private func updatePlayerUI() {
         playStopButton.image = viewModel.isPlaying ? pauseImage : playImage
         playStopButton.isHidden = viewModel.isGoingPlaying
         listeningProgressView.progress = Float(viewModel.listeningProgress ?? 0)
@@ -117,7 +113,7 @@ extension PodcastCell {
         playerActivityIndicator.isHidden = !viewModel.isGoingPlaying
     }
     
-    func updateDownloadUI() {
+    private func updateDownloadUI() {
         
         let isFavourite = viewModel.isFavourite
         
@@ -156,15 +152,14 @@ extension PodcastCell {
         podcastDescription.text = viewModel.descriptionMy
         podcastName.text = viewModel.trackName
         podcastImage.image = viewModel.imageForPodcastCell
-        updateOpenDescriptionInfo()
         updateSelectState()
         updatePlayerUI()
         updateFavouriteStar()
         updateDownloadUI()
     }
 
-    private func updateOpenDescriptionInfo() {
-        podcastDescription.numberOfLines = podcastDescription.maxNumberOfLines
+     func updateOpenDescriptionInfo() {
+//        podcastDescription.numberOfLines = podcastDescription.maxNumberOfLines
         openDescriptionImageView.isHidden = !moreThanThreeLines
     }
     

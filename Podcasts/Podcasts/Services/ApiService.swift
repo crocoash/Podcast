@@ -26,7 +26,6 @@ class ApiService: ISingleton {
     func getData<T: Decodable>(for request: String, completion: @escaping (Result<T>) -> Void) {
         
         guard let url = URL(string: request.encodeUrl) else { fatalError() }
-                
         URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
             
             guard let self = self else { return }
@@ -40,18 +39,21 @@ class ApiService: ISingleton {
             }
             
             if let error = error {
-                result = .failure(.apiService(.error(error.localizedDescription)))
+                let alertData: MyError.AlertData = (title: error.localizedDescription, message: "", actions: nil)
+                result = .failure(.apiService(.error(alertData)))
                 return
             }
             
             if let response = response as? HTTPURLResponse {
                 if response.statusCode != 200 {
-                    result = .failure(.apiService(.error("\(response.statusCode)")))
+                    let alertData: MyError.AlertData = (title: "\(response.statusCode)", message: "", actions: nil)
+                    result = .failure(.apiService(.error(alertData)))
                 }
             }
             
             guard let data = data else {
-                result = .failure(.apiService(.noData))
+                let alertData: MyError.AlertData = (title: "NoData", message: "", actions: nil)
+                result = .failure(.apiService(.noData(alertData)))
                 return
             }
             
@@ -62,7 +64,8 @@ class ApiService: ISingleton {
                 
             } catch let error {
                 print(error)
-                result = .failure(.apiService(.error(error.localizedDescription.debugDescription)))
+                let alertData: MyError.AlertData = (title: error.localizedDescription.debugDescription, message: "", actions: nil)
+                result = .failure(.apiService(.error(alertData)))
             }
         }.resume()
     }

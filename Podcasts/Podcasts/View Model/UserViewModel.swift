@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import FirebaseAuth
 
 class UserViewModel: ISingleton {
     
@@ -16,11 +17,7 @@ class UserViewModel: ISingleton {
     }
     
     var userIsLogin: Bool {
-        return userDocument.user.isAuthorization
-    }
-    
-    var userInterfaceStyleIsDark: Bool {
-        return userDocument.user.userInterfaceStyleIsDark
+        return userDocument.user.isAuthorization && userDocument.user.userId != ""
     }
     
     private(set) var userDocument: UserModel {
@@ -31,13 +28,24 @@ class UserViewModel: ISingleton {
     
     //MARK: init
     required init(container: IContainer, args: Void) {
-        userDocument = UserModel(json: UserDefaults.standard.data(forKey: String(describing: Self.self))) ?? UserModel()
+        self.userDocument  = UserModel(json: UserDefaults.standard.data(forKey: String(describing: Self.self))) ?? UserModel(userName: "", userId: "")
     }
-
     
     func changeUserName(newName: String) {
         if userDocument.user.userName != newName {
             userDocument.changeUserName(newName: newName)
+        }
+    }
+    
+    func changeUserId(newUserId: String) {
+        if userDocument.user.userId != newUserId {
+            userDocument.chageUserId(newUserId: newUserId)
+        }
+    }
+    
+    func changeUserName(userId: String) {
+        if userDocument.user.userId != userId {
+            userDocument.chageUserId(newUserId: userId)
         }
     }
     

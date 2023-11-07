@@ -20,17 +20,8 @@ class TabBarViewController: UITabBarController, IHaveStoryBoard {
     }(UIImageView())
     
     private var smallPlayer: SmallPlayerView?
-    
-    private let userViewModel: UserViewModel
-    private let firestorageDatabase: FirestorageDatabase
     private var player: Player
-    private let downloadService: DownloadService
-    private let favouriteManager: FavouriteManager
-    private let likeManager: LikeManager
-    private let firebaseDataBase: FirebaseDatabase
     private let apiService: ApiService
-    private let dataStoreManager: DataStoreManager
-    private let listeningManager: ListeningManager
     private let container: IContainer
     
     lazy private var ListVC: ListViewController = {
@@ -42,8 +33,7 @@ class TabBarViewController: UITabBarController, IHaveStoryBoard {
     }()
     
     lazy private var searchVC: SearchViewController = {
-        let argVM: SearchViewControllerViewModel.Arguments = []
-        let vc: SearchViewController = container.resolveWithModel(argsVM: argVM)
+        let vc: SearchViewController = container.resolve()
         vc.transitioningDelegate = self
         modalPresentationStyle = .custom
         
@@ -60,23 +50,12 @@ class TabBarViewController: UITabBarController, IHaveStoryBoard {
 
    //MARK: init
     required init?(container: IContainer, args: (args: Args, coder: NSCoder)) {
-     
-        self.userViewModel = container.resolve()
-        self.firestorageDatabase = container.resolve()
         self.player = container.resolve()
-        self.downloadService = container.resolve()
-        self.favouriteManager = container.resolve()
-        self.likeManager = container.resolve()
-        self.firebaseDataBase = container.resolve()
         self.apiService = container.resolve()
-        self.dataStoreManager = container.resolve()
-        self.listeningManager = container.resolve()
         self.container = container
-
         super.init(coder: args.coder)
     }
 
-    
     required init?(coder: NSCoder) {
         fatalError()
     }
@@ -107,43 +86,6 @@ extension TabBarViewController {
         
         ListVC.updateConstraintForTableView(playerIsPresent: true)
         searchVC.updateConstraintForTableView(playerIsPresent: true)
-    }
-    
-    private func configureDetailViewController(podcast: Podcast, playList: [Podcast]) -> DetailViewController {
-        
-        let args = DetailViewController.Args(podcast: podcast, podcasts: playList)
-        let detailViewController: DetailViewController = container.resolve(args: args)
-        
-        detailViewController.modalPresentationStyle = .custom
-        detailViewController.transitioningDelegate = self
-        
-        return detailViewController
-    }
-    
-    private func presentDetailViewController(podcast: Podcast, completion: ((DetailViewController) -> Void)? = nil) {
-        /// don't present new detail vc if it already present ( big player vc )
-        
-//        if let detailViewController = presentedViewController as? DetailViewController, detailViewController.podcast == podcast {
-//            self.present(detailViewController, animated: true)
-//            completion?(detailViewController)
-//        } else {
-            guard let id = podcast.collectionId?.stringValue else { return }
-            self.view.showActivityIndicator()
-            
-            apiService.getData(for: DynamicLinkManager.podcastEpisodeById(id).url) { [weak self] (result : Result<PodcastData>) in
-                guard let self = self else { return }
-                view.hideActivityIndicator()
-                switch result {
-                case .failure(let error):
-                    error.showAlert(vc: self)
-                case .success(result: let podcastData) :
-                    let podcasts = podcastData.podcasts.filter { $0.wrapperType == "podcastEpisode"}
-                    let detailViewController = configureDetailViewController(podcast: podcast, playList: podcasts)
-                    self.present(detailViewController, animated: true)
-                    completion?(detailViewController)
-                }
-//            }
-        }
     }
     
     //MARK: configureView
@@ -208,9 +150,6 @@ extension TabBarViewController: BigPlayerViewControllerDelegate {
     func bigPlayerViewControllerDidTouchPodcastNameLabel(_ bigPlayerViewController: BigPlayerViewController, entity: NSManagedObject) {
         guard let podcast = entity as? Podcast else { return }
         presentedViewController?.dismiss(animated: true)
-        presentDetailViewController(podcast: podcast) { detail in
-            detail.scrollToCell(podcast: podcast)
-        }
     }
 }
 
@@ -248,6 +187,6 @@ extension TabBarViewController: PlayerDelegate {
 extension TabBarViewController: ListViewControllerDelegate {
     
     func listViewController(_ listViewController: ListViewController, didSelect podcast: Podcast) {
-        presentDetailViewController(podcast: podcast)
+      
     }
 }

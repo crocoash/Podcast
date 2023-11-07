@@ -13,9 +13,9 @@ protocol SettingsTableViewControllerDelegate: AnyObject {
     func settingsTableViewControllerDidDisappear(_ settingsTableViewController: SettingsTableViewController)
 }
 
-class SettingsTableViewController: UITableViewController, IPerRequest {
-    
-    typealias Arguments = Void
+class SettingsTableViewController: UITableViewController, IHaveStoryBoard {
+
+    typealias Args = Void
     
     private var userViewModel: UserViewModel
     private let firestorageDatabase: FirestorageDatabase
@@ -47,13 +47,13 @@ class SettingsTableViewController: UITableViewController, IPerRequest {
     }(UIImagePickerController())
     
     //MARK: init
-    required init(container: IContainer, args: Void) {
+    required init?(container: IContainer, args: (args: Args, coder: NSCoder)) {
         
         self.userViewModel = container.resolve()
         self.firestorageDatabase = container.resolve()
         self.apiService = container.resolve()
         
-        super.init(nibName: nil, bundle: nil)
+        super.init(coder: args.coder)
     }
     
     required init(coder: NSCoder) {

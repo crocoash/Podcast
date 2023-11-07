@@ -5,9 +5,11 @@
 //  Created by Anton on 20.09.2023.
 //
 
-import Foundation
+import UIKit
 
 class EpisodeTableViewModel: IPerRequest, INotifyOnChanged, ITableViewDinamicUpdating, ITableViewSorting {
+   
+    
     
     typealias SectionData = BaseSectionData<Podcast, String>
     
@@ -21,11 +23,12 @@ class EpisodeTableViewModel: IPerRequest, INotifyOnChanged, ITableViewDinamicUpd
     var dataSourceAll: [SectionData] = []
     var dataSourceForView: [SectionData] { dataSourceAll }
     
-    var insertSectionOnView: ((SectionData, Int) -> ()) = { _, _ in }
+    var insertSectionOnView: ((Section, Int) -> ()) = { _, _ in }
     var insertItemOnView:    ((Row, IndexPath  ) -> ()) = { _, _ in }
-    var removeRowOnView:    ((IndexPath       ) -> ()) = {    _ in }
+    var removeRowOnView:    ((IndexPath        ) -> ()) = {    _ in }
     var removeSectionOnView: ((Int             ) -> ()) = {    _ in }
     var moveSectionOnView:   ((Int, Int        ) -> ()) = { _, _ in }
+    var reloadSection: ((Int) -> ())                    = { _    in }
     
     let container: IContainer
     private var podcasts: [Podcast]
@@ -50,12 +53,29 @@ class EpisodeTableViewModel: IPerRequest, INotifyOnChanged, ITableViewDinamicUpd
             configurePlaylist(withPodcast: podcasts)
         }
     }
+    
+    //MARK: Public Methods
+    @objc func tapCell(sender: MyTapGestureRecognizer) {
+        guard let cell = sender.info as? UITableViewCell else { return }
+        cell.isSelected.toggle()
+    }
+    
+    func getCell(_ tableView: UITableView, for indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.getCell(cell: PodcastCell.self, indexPath: indexPath)
+        let podcast = getRow(forIndexPath: indexPath)
+        cell.addMyGestureRecognizer(self, type: .tap(), #selector(tapCell), info: cell)
+        
+        let podcasts = getRows(atSection: indexPath.section)
+        let args = PodcastCellViewModel.Arguments.init(podcast: podcast, playlist: podcasts)
+        cell.viewModel = container.resolve(args: args)
+        return cell
+    }
 }
 
 //MARK: - Private Methods
 extension EpisodeTableViewModel {
     
-    private func configurePlaylist(withPodcast newPodcast: [Podcast]) {
+    func configurePlaylist(withPodcast newPodcast: [Podcast]) {
         
         var newPlaylist = dataSourceAll
         

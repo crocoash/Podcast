@@ -9,7 +9,6 @@ import UIKit
 import CoreData
 import SwiftUI
 
-
 typealias PlaylistByNewest  = [(key: String, podcasts: [Podcast])]
 typealias PlayListByOldest = PlaylistByNewest
 typealias PlayListByGenre = PlaylistByNewest
@@ -17,6 +16,7 @@ typealias PlayListByGenre = PlaylistByNewest
 
 class SearchViewController: UIViewController, IHaveStoryBoard, IHaveViewModel {
     
+    typealias Args = Void
     typealias ViewModel = SearchViewControllerViewModel
     
     func viewModelChanged() {
@@ -24,10 +24,10 @@ class SearchViewController: UIViewController, IHaveStoryBoard, IHaveViewModel {
     }
     
     func viewModelChanged(_ viewModel: SearchViewControllerViewModel) {
-        
+        if searchCollectionView != nil {
+            updateUI()
+        }
     }
-
-    typealias Args = Void
     
     private let apiService: ApiService
     private let container: IContainer
@@ -37,8 +37,7 @@ class SearchViewController: UIViewController, IHaveStoryBoard, IHaveViewModel {
     @IBOutlet private weak var cancelLabel: UILabel!
     @IBOutlet private weak var searchSegmentalControl: UISegmentedControl!
     
-    @IBOutlet weak var tableViewBottomConstraint: NSLayoutConstraint!
-    
+    @IBOutlet private weak var tableViewBottomConstraint: NSLayoutConstraint!
     @IBOutlet private weak var emptyTableImageView: UIImageView!
     
     private var tableViewBottomConstraintConstant = CGFloat(0)
@@ -64,12 +63,12 @@ class SearchViewController: UIViewController, IHaveStoryBoard, IHaveViewModel {
     private var isPodcast: Bool { searchSegmentalControl.selectedSegmentIndex == 0 }
     
     //MARK: init
-    
     required init?(container: IContainer, args: (args: Args, coder: NSCoder)) {
         self.apiService = container.resolve()
         self.container = container
         
         super.init(coder: args.coder)
+        self.viewModel = container.resolve(args: ())
     }
     
     required init?(coder: NSCoder) {
@@ -79,17 +78,16 @@ class SearchViewController: UIViewController, IHaveStoryBoard, IHaveViewModel {
     // MARK: - View Methods
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        showEmptyImage()
-        if viewModel.sectionsIsEmpty { searchBar.becomeFirstResponder() }
+//        showEmptyImage()
+        if viewModel.isEmpty { searchBar.becomeFirstResponder() }
     }
   
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        configureUI()
         configureGesture()
-        showEmptyImage()
         tableViewBottomConstraint.constant = tableViewBottomConstraintConstant
+        configureUI()
+        updateUI()
     }
 
     override func motionBegan(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
@@ -99,8 +97,7 @@ class SearchViewController: UIViewController, IHaveStoryBoard, IHaveViewModel {
     
     //MARK: - Actions
     func tapCell(atIndexPath indexPath: IndexPath) {
-        let podcast = viewModel.getRow(forIndexPath: indexPath)
-//        delegate?.searchViewControllerDidSelectCell(self, podcast: podcast)
+        viewModel.presentDetailVM(forIndexPath: indexPath)
     }
     
     @objc func cancelSearch(sender: UITapGestureRecognizer) {
@@ -108,12 +105,12 @@ class SearchViewController: UIViewController, IHaveStoryBoard, IHaveViewModel {
     }
     
     @objc func refresh() {
-        getData()
+//        getData()
         refreshControl.endRefreshing()
     }
     
     @objc func changeTypeOfSearch(sender: UISegmentedControl) {
-        getData()
+//        getData()
     }
     
     @objc func handlerSwipe(sender: UISwipeGestureRecognizer) {
@@ -122,18 +119,27 @@ class SearchViewController: UIViewController, IHaveStoryBoard, IHaveViewModel {
         case .right: searchSegmentalControl.selectedSegmentIndex -= 1
         default: break
         }
-        getData()
+//        getData()
     }
 }
 
 //MARK: - Private configure UI Methods
 extension SearchViewController {
     
+    private func updateUI() {
+        if viewModel.isLoading {
+            view.showActivityIndicator()
+        } else {
+            view.hideActivityIndicator()
+            searchCollectionView.reloadData()
+        }
+        showEmptyImage()
+    }
+    
     private func configureUI() {
         configureCancelLabel()
         configureSegmentalControl()
         configureAlert()
-//        configureActivityIndicator()
     }
     
     private func configureGesture() {
@@ -168,7 +174,7 @@ extension SearchViewController {
     }
     
     private func showEmptyImage() {
-        let podcastsIsEmpty = viewModel.sectionsIsEmpty
+        let podcastsIsEmpty = viewModel.isEmpty
         let authorsIsEmpty = authors.isEmpty
         let selectedFirstSegmentalControl = searchSegmentalControl?.selectedSegmentIndex == 0
         let selectedSecondSegmentalControl = searchSegmentalControl?.selectedSegmentIndex == 1
@@ -194,61 +200,7 @@ extension SearchViewController {
 //MARK: - Private methods
 extension SearchViewController {
     
-    private func processResults<T>(result: [T]?, completion: (([T]) -> Void)? = nil) {
-        if let result = result, !result.isEmpty {
-            completion?(result)
-        } else {
-            self.alert.create(vc: self, title: "Ooops nothing search", withTimeIntervalToDismiss: 2)
-        }
-        self.showEmptyImage()
-        searchCollectionView.reloadData()
-    }
-    
-    private func getData() {
-        searchCollectionView.setContentOffset(.zero, animated: true)
-        guard let request = searchBar.text?.conform, !request.isEmpty else { showEmptyImage(); return }
-        view.showActivityIndicator()
-        if searchSegmentalControl.selectedSegmentIndex == 0 {
-            getPodcasts(request: DynamicLinkManager.podcastSearch(request).url)
-        } else {
-            getAuthors(request: DynamicLinkManager.authors(request).url)
-        }
-    }
-    
-    private func getPodcasts(request: String) {
-        apiService.getData(for: request) { [weak self] (result: Result<PodcastData>) in
-            switch result {
-            case .success(result: let podcastData) :
-                guard let podcasts = podcastData.results.allObjects as? [Podcast] else { return }
-                
-                self?.processResults(result: podcasts) { [weak self] podcasts in
-                    guard let self = self else { return }
-//                    if let viewModel = SearchViewControllerViewModel(container: container, args: podcasts) {
-                        self.viewModel = SearchViewControllerViewModel(container: container, args: podcasts)
-//                    }
-                }
-            case .failure(error: let error) :
-                error.showAlert(vc: self)
-            }
-            self?.view.hideActivityIndicator()
-        }
-    }
-    
-    private func getAuthors(request: String) {
-        apiService.getData(for: request) { [weak self] (result: Result<AuthorData>) in
-            switch result {
-            case .success(result: let authorData) :
-                let authors = authorData.results?.allObjects as? [Author]
-                self?.processResults(result: authors) {
-                    self?.authors = $0
-                }
-            case .failure(error: let error) :
-                error.showAlert(vc: self)
-            }
-//            self?.activityIndicator.stopAnimating()
-            self?.view.hideActivityIndicator()
-        }
-    }
+   
     
 //    private func updateCell(for podcast: Podcast) {
 //        if isPodcast, let index = podcasts.firstIndex(matching: podcast) {
@@ -275,7 +227,18 @@ extension SearchViewController: UISearchBarDelegate {
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         guard let text = searchBar.text, !text.isEmpty else { return }
-        getData()
+        searchCollectionView.setContentOffset(.zero, animated: true)
+        guard let request = searchBar.text?.conform, !request.isEmpty else { showEmptyImage(); return }
+        view.showActivityIndicator()
+        
+        if searchSegmentalControl.selectedSegmentIndex == 0 {
+            let request = DynamicLinkManager.podcastSearch(request).url
+            viewModel.getPodcasts(with: request)
+        } else {
+            let request = DynamicLinkManager.authors(request).url
+            viewModel.getAuthors(with: request)
+        }
+        
         view.endEditing(true)
     }
     
@@ -312,7 +275,7 @@ extension SearchViewController: SearchCollectionViewDataSource {
     }
     
     func searchCollectionView(_ searchCollectionView: SearchCollectionView, nameOfSectionForIndex index: Int) -> String {
-        return viewModel.getInputSection(sectionIndex: index)
+        return viewModel.getSection(sectionIndex: index)
     }
     
     func searchCollectionView(_ searchCollectionView: SearchCollectionView, numbersOfRowsInSection index: Int) -> Int {
@@ -323,5 +286,17 @@ extension SearchViewController: SearchCollectionViewDataSource {
         let podcast = viewModel.getRow(forIndexPath: indexPath)
         let row = SearchCollectionView.Row(podcast: podcast)
         return row
+    }
+}
+
+//MARK: - UIViewControllerTransitioningDelegate
+extension SearchViewController: UIViewControllerTransitioningDelegate {
+    
+    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        return PresentTransition()
+    }
+    
+    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        return DismissTransition()
     }
 }
