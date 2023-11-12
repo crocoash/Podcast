@@ -13,16 +13,14 @@ import CoreData
     func favouriteTableView(_ favouriteTableView: FavouriteTableView, didRefreshed refreshControl: UIRefreshControl)
 }
 
-class FavouriteTableView: UITableView, IDiffableTableView, IHaveViewModel {
+class FavouriteTableView: UITableView, IDiffableTableViewWithModel, IHaveViewModel {
     
+    typealias Row = ViewModel.Row
+    typealias Section = ViewModel.Section
     typealias ViewModel = FavouriteTableViewModel
     
     var mySnapShot: SnapShot!
     var diffableDataSource: DiffableDataSource!
-    
-    func viewModelChanged() {
-        
-    }
     
     func viewModelChanged(_ viewModel: FavouriteTableViewModel) {
         updateUI()

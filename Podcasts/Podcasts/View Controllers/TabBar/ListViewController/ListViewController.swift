@@ -15,11 +15,11 @@ protocol ListViewControllerDelegate: AnyObject {
 
 class ListViewController: UIViewController, IHaveViewModel, IHaveStoryBoard {
     
-    typealias Args = ListViewControllerDelegate
+    typealias Args = Input
     typealias ViewModel = ListViewModel
     
-    func viewModelChanged() {
-        updateUI()
+    struct Input {
+        var delegate: ListViewControllerDelegate
     }
     
     func viewModelChanged(_ viewModel: ListViewModel) {
@@ -58,9 +58,10 @@ class ListViewController: UIViewController, IHaveViewModel, IHaveStoryBoard {
         self.likeManager = container.resolve()
         
         self.container = container
-        self.delegate = args.args
-        
+        self.delegate = args.args.delegate
         super.init(coder: args.coder)
+        
+        self.viewModel = container.resolve()
     }
     
     required init?(coder: NSCoder) {
@@ -104,8 +105,9 @@ class ListViewController: UIViewController, IHaveViewModel, IHaveStoryBoard {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureAlertSortListView()
-        favouriteTableView.viewModel = container.resolve()
+        favouriteTableView.viewModel = viewModel.favouriteTableViewVM
         favouriteTableView.reloadDataSource()
+        updateUI()
     }
 }
 
@@ -137,6 +139,7 @@ extension ListViewController {
     }
     
     private func configureScopeBar() {
+        guard viewModel.favouriteTableViewVM.searchedSectionData == nil else { return }
         if !viewModel.favouriteTableViewVM.isEmpty {
             searchController.searchBar.scopeButtonTitles = viewModel.favouriteTableViewVM.sections
             searchController.searchBar.scopeButtonTitles?.insert("All", at: .zero)
@@ -153,7 +156,9 @@ extension ListViewController {
     
     private func configureAlertSortListView() {
         guard let tabBarController = tabBarController else { fatalError() }
-        let vc: AlertSortListView = container.resolveWithModel(args: self)
+        let args = AlertSortListView.Arguments.init(vc: tabBarController)
+        let vc: AlertSortListView = container.resolve(args: args)
+        vc.viewModel = container.resolve(args: ())
         tabBarController.view.superview?.addSubview(vc)
         alertSortListView = vc
     }

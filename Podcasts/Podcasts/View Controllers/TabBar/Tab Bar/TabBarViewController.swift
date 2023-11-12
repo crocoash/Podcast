@@ -25,8 +25,8 @@ class TabBarViewController: UITabBarController, IHaveStoryBoard {
     private let container: IContainer
     
     lazy private var ListVC: ListViewController = {
-        
-        let vc: ListViewController = container.resolveWithModel(args: self)
+        let args = ListViewController.Args.init(delegate: self)
+        let vc: ListViewController = container.resolve(args: args)
         vc.transitioningDelegate = self
         vc.modalPresentationStyle = .custom
         return createTabBar(vc, title: "Playlist", imageName: "folder.fill")
@@ -53,6 +53,8 @@ class TabBarViewController: UITabBarController, IHaveStoryBoard {
         self.player = container.resolve()
         self.apiService = container.resolve()
         self.container = container
+        
+        let _: ListDataManager = container.resolve()
         super.init(coder: args.coder)
     }
 
@@ -136,9 +138,9 @@ extension TabBarViewController: SmallPlayerViewControllerDelegate {
     
     func smallPlayerViewControllerSwipeOrTouch(_ smallPlayerViewController: SmallPlayerView) {
         guard let track = player.currentTrack?.track else { return }
-        let argsVM: BigPlayerViewModel.Arguments = track
-        let args: BigPlayerViewController.Arguments = self
-        let bigPlayerViewController: BigPlayerViewController = container.resolveWithModel(args: args, argsVM: argsVM)
+        let argsVM = BigPlayerViewController.ViewModel.Arguments.init(track: track)
+        let args = BigPlayerViewController.Arguments.init(delegate: self, modelInput: argsVM)
+        let bigPlayerViewController: BigPlayerViewController = container.resolve(args: args)
         bigPlayerViewController.modalPresentationStyle = .fullScreen
         self.present(bigPlayerViewController, animated: true)
     }
@@ -148,7 +150,7 @@ extension TabBarViewController: SmallPlayerViewControllerDelegate {
 extension TabBarViewController: BigPlayerViewControllerDelegate {
     
     func bigPlayerViewControllerDidTouchPodcastNameLabel(_ bigPlayerViewController: BigPlayerViewController, entity: NSManagedObject) {
-        guard let podcast = entity as? Podcast else { return }
+        guard let _ = entity as? Podcast else { return }
         presentedViewController?.dismiss(animated: true)
     }
 }

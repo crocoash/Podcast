@@ -10,7 +10,7 @@ import CoreData
 //MARK: - SectionData
 extension FavouriteTableViewModel {
     
-    class SectionData: ISectionData {
+    class SectionData: ISearchedSectionData {
         
         typealias Row = NSManagedObject
         typealias Section = String
@@ -18,7 +18,8 @@ extension FavouriteTableViewModel {
         var section: String
         var rows: [NSManagedObject]
         var isActive: Bool
-       
+        var isSearched: Bool?
+        
         var nameOfEntity: String
         var sequenceNumber: Int
         

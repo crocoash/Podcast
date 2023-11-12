@@ -11,15 +11,17 @@ protocol ISectionData: Equatable {
     associatedtype Row: Hashable
     associatedtype Section: Hashable
     
-    var section: Section { get set }
-    var rows: [Row]      { get set }
-    var isActive: Bool   { get }
+    var section: Section  { get set }
+    var rows: [Row]       { get set }
+    var isActive: Bool    { get set }
 }
 
 
 extension ISectionData {
     var isEmpty: Bool { rows.isEmpty }
-    var isActiveAndNotEmpty: Bool { !isEmpty && isActive }
+    var isAvailable: Bool {
+        return !isEmpty && isActive
+    }
 }
 
 class BaseSectionData<Row, Section>: ISectionData {
@@ -27,13 +29,21 @@ class BaseSectionData<Row, Section>: ISectionData {
     static func == (lhs: BaseSectionData<Row, Section>, rhs: BaseSectionData<Row, Section>) -> Bool {
         lhs.rows == rhs.rows
     }
-  
-    var section: String
-    var rows: [Podcast]
-    var isActive: Bool = true
+    
+     var isSearched: Bool?
+     var section: String
+     var rows: [Podcast]
+     var isActive: Bool = true
     
     init(section: String, rows: [Podcast]) {
         self.section = section
         self.rows = rows
     }
+}
+
+extension Collection where Element == any ISectionData {
+    
+    
+    
+    
 }

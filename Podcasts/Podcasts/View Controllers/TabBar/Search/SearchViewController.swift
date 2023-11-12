@@ -18,14 +18,11 @@ class SearchViewController: UIViewController, IHaveStoryBoard, IHaveViewModel {
     
     typealias Args = Void
     typealias ViewModel = SearchViewControllerViewModel
-    
-    func viewModelChanged() {
-        
-    }
-    
+
     func viewModelChanged(_ viewModel: SearchViewControllerViewModel) {
         if searchCollectionView != nil {
             updateUI()
+            observeViewModel() 
         }
     }
     
@@ -131,7 +128,6 @@ extension SearchViewController {
             view.showActivityIndicator()
         } else {
             view.hideActivityIndicator()
-            searchCollectionView.reloadData()
         }
         showEmptyImage()
     }
@@ -195,6 +191,34 @@ extension SearchViewController {
         feedbackGenerator.prepare()
         feedbackGenerator.impactOccurred()
     }
+    
+    private func observeViewModel() {
+         
+         viewModel.removeSection { [weak self] index in
+             guard let self = self else { return }
+             searchCollectionView.deleteSections(IndexSet(integer: index))
+         }
+         
+         viewModel.removeRow { [weak self] indexPath in
+             guard let self = self else { return }
+             searchCollectionView.deleteItems(at: [indexPath])
+         }
+         
+         viewModel.insertRow { [weak self] row, indexPath in
+             guard let self = self else { return }
+             searchCollectionView.insertItems(at: [indexPath])
+         }
+         
+         viewModel.insertSection { [weak self] section, index in
+             guard let self = self else { return }
+             searchCollectionView.insertSections(IndexSet(integer: index))
+         }
+         
+         viewModel.moveSection { [weak self] index, newIndex in
+             guard let self = self else { return }
+
+         }
+     }
 }
 
 //MARK: - Private methods
@@ -275,7 +299,7 @@ extension SearchViewController: SearchCollectionViewDataSource {
     }
     
     func searchCollectionView(_ searchCollectionView: SearchCollectionView, nameOfSectionForIndex index: Int) -> String {
-        return viewModel.getSection(sectionIndex: index)
+        return viewModel.getSectionForView(sectionIndex: index)
     }
     
     func searchCollectionView(_ searchCollectionView: SearchCollectionView, numbersOfRowsInSection index: Int) -> Int {
@@ -283,7 +307,7 @@ extension SearchViewController: SearchCollectionViewDataSource {
     }
     
     func searchCollectionView(_ searchCollectionView: SearchCollectionView, rowForIndexPath indexPath: IndexPath) -> SearchCollectionView.Row {
-        let podcast = viewModel.getRow(forIndexPath: indexPath)
+        let podcast = viewModel.getRowForView(forIndexPath: indexPath)
         let row = SearchCollectionView.Row(podcast: podcast)
         return row
     }

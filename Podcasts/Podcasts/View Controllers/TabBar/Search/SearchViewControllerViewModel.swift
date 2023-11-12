@@ -9,7 +9,17 @@ import UIKit
 
 
 //MARK: - ViewModel
-class SearchViewControllerViewModel: IPerRequest, ITableViewModel, ITableViewDinamicUpdating, INotifyOnChanged {    
+class SearchViewControllerViewModel: IPerRequest, ITableViewModel, IViewModelDinamicUpdating, INotifyOnChanged {
+    
+    
+    func configureDataSourceForView() {
+        dataSourceForView = dataSourceAll
+    }
+    
+    func configureDataSource() {
+        
+    }
+    
     
     private let router: PresenterService
     private let apiService: ApiService
@@ -25,12 +35,14 @@ class SearchViewControllerViewModel: IPerRequest, ITableViewModel, ITableViewDin
     var moveSectionOnView:   ((Int, Int) -> ())         = { _, _ in }
     var reloadSection:       ((Int) -> ())              = { _    in }
     
-    var dataSourceForView: [SectionData] { return dataSourceAll }
-    var dataSourceAll: [SectionData] = [] {
+    var dataSourceForView: [SectionData] {
         didSet {
             changed.raise()
         }
     }
+    
+    var dataSourceAll: [SectionData] = []
+    
     private(set) var isLoading: Bool = false {
         didSet {
             changed.raise()
@@ -42,10 +54,11 @@ class SearchViewControllerViewModel: IPerRequest, ITableViewModel, ITableViewDin
         self.router = container.resolve()
         self.apiService = container.resolve()
         self.container = container
+        self.dataSourceForView = []
     }
     
     func removeAll() {
-        update(by: [])
+//        update(by: [])
     }
     
     func getCell(_ tableView: UITableView, for indexPath: IndexPath) -> UITableViewCell {
@@ -80,8 +93,8 @@ class SearchViewControllerViewModel: IPerRequest, ITableViewModel, ITableViewDin
             switch result {
             case .success(result: let podcastData) :
                 guard let podcasts = podcastData.results.allObjects as? [Podcast] else { return }
-                dataSourceAll = configureSectionData(podcasts: podcasts)
-                
+                let newDataSource = configureSectionData(podcasts: podcasts)
+                update(dataSource: newDataSource)
             case .failure(error: let error) :
                 print("")
 //                error.showAlert(vc: self)

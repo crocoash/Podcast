@@ -16,6 +16,7 @@ class ListViewModel: IPerRequest, INotifyOnChanged {
    
    //MARK: Init
    required init(container: IContainer, args: Arguments) {
+      
       self.favouriteTableViewVM = container.resolve()
       
       favouriteTableViewVM.changed.subscribe(self) { this, _ in

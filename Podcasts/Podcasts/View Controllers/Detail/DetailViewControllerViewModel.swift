@@ -21,7 +21,7 @@ class DetailViewControllerViewModel: IPerRequest, INotifyOnChanged {
     var podcasts: [Podcast]
     
     lazy var episodeTableViewModel: EpisodeTableView.ViewModel = getViewModelEpisodeTableView()
-    var activeSortType: EpisodeTableViewModel.TypeSortOfTableView = .byGenre
+    var activeSortType: EpisodeTableViewModel.TypeSortOfTableView { episodeTableViewModel.typeOfSort } 
     
     //MARK: init
     required init?(container: IContainer, args input: Input) {
@@ -36,9 +36,8 @@ class DetailViewControllerViewModel: IPerRequest, INotifyOnChanged {
     
     var sortMenu: [EpisodeTableViewModel.TypeSortOfTableView] = EpisodeTableViewModel.TypeSortOfTableView.allCases
     
-    func setActiveSortType(sortType: EpisodeTableViewModel.TypeSortOfTableView) {
-        activeSortType = sortType
-        changed.raise(())
+    func changeSortType(sortType: EpisodeTableViewModel.TypeSortOfTableView) {
+        episodeTableViewModel.changeTypeOfSort(sortType)
     }
 }
 

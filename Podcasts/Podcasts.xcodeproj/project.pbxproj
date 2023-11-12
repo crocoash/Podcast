@@ -69,6 +69,8 @@
 		3A049C4B2AB1DE4400887161 /* IViewModelUpdating.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A049C4A2AB1DE4400887161 /* IViewModelUpdating.swift */; };
 		3A04BB08299A1E9600338919 /* Genre+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A04BB06299A1E9600338919 /* Genre+CoreDataClass.swift */; };
 		3A04BB09299A1E9600338919 /* Genre+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A04BB07299A1E9600338919 /* Genre+CoreDataProperties.swift */; };
+		3A10EA1A2AFCD41700EE438D /* ISearchedSectionData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A10EA192AFCD41700EE438D /* ISearchedSectionData.swift */; };
+		3A10EA1C2AFF952E00EE438D /* ITableViewDinamicUpdating.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A10EA1B2AFF952E00EE438D /* ITableViewDinamicUpdating.swift */; };
 		3A123CD62A1CF17600A237AE /* CustomActivityIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A123CD52A1CF17600A237AE /* CustomActivityIndicator.swift */; };
 		3A123CDC2A27557600A237AE /* LikedPodcastTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A123CDA2A27557600A237AE /* LikedPodcastTableViewCell.swift */; };
 		3A123CDD2A27557600A237AE /* LikedPodcastTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3A123CDB2A27557600A237AE /* LikedPodcastTableViewCell.xib */; };
@@ -91,7 +93,7 @@
 		3A43AF5D2ABDED2A00624EFC /* ListViewModel + SectionData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A43AF5C2ABDED2A00624EFC /* ListViewModel + SectionData.swift */; };
 		3A43AF5F2ABF408200624EFC /* SearchViewControllerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A43AF5E2ABF408200624EFC /* SearchViewControllerViewModel.swift */; };
 		3A43AF612ABF45ED00624EFC /* ISectionData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A43AF602ABF45ED00624EFC /* ISectionData.swift */; };
-		3A43AF632ABF46B800624EFC /* ITableViewDinamicUpdating.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A43AF622ABF46B800624EFC /* ITableViewDinamicUpdating.swift */; };
+		3A43AF632ABF46B800624EFC /* IViewModelDinamicUpdating.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A43AF622ABF46B800624EFC /* IViewModelDinamicUpdating.swift */; };
 		3A43AF652AC040DB00624EFC /* DetailViewControllerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A43AF642AC040DB00624EFC /* DetailViewControllerViewModel.swift */; };
 		3A43AF672AC075DF00624EFC /* IDiffableTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A43AF662AC075DF00624EFC /* IDiffableTableView.swift */; };
 		3A43AF692AC1BBDB00624EFC /* FavouriteViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A43AF682AC1BBDB00624EFC /* FavouriteViewModel.swift */; };
@@ -130,6 +132,7 @@
 		3AA82D2429EAC50C00557A94 /* HeaderForPodcastTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AA82D2329EAC50C00557A94 /* HeaderForPodcastTableView.swift */; };
 		3AA82D2729EAC55100557A94 /* HeaderForPodcastTableView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3AA82D2629EAC55100557A94 /* HeaderForPodcastTableView.xib */; };
 		3AB5ECEA2803650300EB445A /* String+FormaterDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AB5ECE92803650300EB445A /* String+FormaterDate.swift */; };
+		3ABAFE562B014F5000502F4A /* IDiffableCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ABAFE552B014F5000502F4A /* IDiffableCollectionView.swift */; };
 		3ABC9DF72A0AAB7600109A9C /* SearchCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ABC9DF62A0AAB7600109A9C /* SearchCollectionView.swift */; };
 		3ABC9DFA2A0BAAA200109A9C /* UICollectionView + register.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ABC9DF92A0BAAA200109A9C /* UICollectionView + register.swift */; };
 		3ABCCC3427FD71CC00862AF2 /* AuthorData+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ABCCC3327FD71CC00862AF2 /* AuthorData+CoreDataClass.swift */; };
@@ -212,6 +215,8 @@
 		3A049C4A2AB1DE4400887161 /* IViewModelUpdating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IViewModelUpdating.swift; sourceTree = "<group>"; };
 		3A04BB06299A1E9600338919 /* Genre+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Genre+CoreDataClass.swift"; sourceTree = "<group>"; };
 		3A04BB07299A1E9600338919 /* Genre+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Genre+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		3A10EA192AFCD41700EE438D /* ISearchedSectionData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ISearchedSectionData.swift; sourceTree = "<group>"; };
+		3A10EA1B2AFF952E00EE438D /* ITableViewDinamicUpdating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ITableViewDinamicUpdating.swift; sourceTree = "<group>"; };
 		3A123CD52A1CF17600A237AE /* CustomActivityIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomActivityIndicator.swift; sourceTree = "<group>"; };
 		3A123CDA2A27557600A237AE /* LikedPodcastTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LikedPodcastTableViewCell.swift; sourceTree = "<group>"; };
 		3A123CDB2A27557600A237AE /* LikedPodcastTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LikedPodcastTableViewCell.xib; sourceTree = "<group>"; };
@@ -233,7 +238,7 @@
 		3A43AF5C2ABDED2A00624EFC /* ListViewModel + SectionData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ListViewModel + SectionData.swift"; sourceTree = "<group>"; };
 		3A43AF5E2ABF408200624EFC /* SearchViewControllerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewControllerViewModel.swift; sourceTree = "<group>"; };
 		3A43AF602ABF45ED00624EFC /* ISectionData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ISectionData.swift; sourceTree = "<group>"; };
-		3A43AF622ABF46B800624EFC /* ITableViewDinamicUpdating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ITableViewDinamicUpdating.swift; sourceTree = "<group>"; };
+		3A43AF622ABF46B800624EFC /* IViewModelDinamicUpdating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IViewModelDinamicUpdating.swift; sourceTree = "<group>"; };
 		3A43AF642AC040DB00624EFC /* DetailViewControllerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewControllerViewModel.swift; sourceTree = "<group>"; };
 		3A43AF662AC075DF00624EFC /* IDiffableTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IDiffableTableView.swift; sourceTree = "<group>"; };
 		3A43AF682AC1BBDB00624EFC /* FavouriteViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavouriteViewModel.swift; sourceTree = "<group>"; };
@@ -272,6 +277,7 @@
 		3AA82D2329EAC50C00557A94 /* HeaderForPodcastTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderForPodcastTableView.swift; sourceTree = "<group>"; };
 		3AA82D2629EAC55100557A94 /* HeaderForPodcastTableView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = HeaderForPodcastTableView.xib; sourceTree = "<group>"; };
 		3AB5ECE92803650300EB445A /* String+FormaterDate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+FormaterDate.swift"; sourceTree = "<group>"; };
+		3ABAFE552B014F5000502F4A /* IDiffableCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IDiffableCollectionView.swift; sourceTree = "<group>"; };
 		3ABC9DF62A0AAB7600109A9C /* SearchCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchCollectionView.swift; sourceTree = "<group>"; };
 		3ABC9DF92A0BAAA200109A9C /* UICollectionView + register.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UICollectionView + register.swift"; sourceTree = "<group>"; };
 		3ABCCC3327FD71CC00862AF2 /* AuthorData+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AuthorData+CoreDataClass.swift"; sourceTree = "<group>"; };
@@ -331,11 +337,14 @@
 				3A049C402AAD988300887161 /* File.swift */,
 				3A049C4A2AB1DE4400887161 /* IViewModelUpdating.swift */,
 				3A43AF602ABF45ED00624EFC /* ISectionData.swift */,
-				3A43AF622ABF46B800624EFC /* ITableViewDinamicUpdating.swift */,
+				3A10EA192AFCD41700EE438D /* ISearchedSectionData.swift */,
+				3A43AF622ABF46B800624EFC /* IViewModelDinamicUpdating.swift */,
 				3A27F47B2AF9216E004E208A /* ITableViewModel.swift */,
 				3A43AF662AC075DF00624EFC /* IDiffableTableView.swift */,
+				3ABAFE552B014F5000502F4A /* IDiffableCollectionView.swift */,
 				3A27F47D2AF921CC004E208A /* ITableViewSearched.swift */,
 				3AED5E232AFAB07100B192AD /* ITableViewSorting.swift */,
+				3A10EA1B2AFF952E00EE438D /* ITableViewDinamicUpdating.swift */,
 				184CE19027271D9D0088044C /* Resourses */,
 				184CE19127271DAE0088044C /* Helpers */,
 				3A73D0BC2A9776F100947893 /* Storage */,
@@ -1042,8 +1051,9 @@
 				3A049C412AAD988300887161 /* File.swift in Sources */,
 				3A123CDC2A27557600A237AE /* LikedPodcastTableViewCell.swift in Sources */,
 				049D47F02726EAE600B6DA3C /* TabBarViewController.swift in Sources */,
+				3ABAFE562B014F5000502F4A /* IDiffableCollectionView.swift in Sources */,
 				3A43AF612ABF45ED00624EFC /* ISectionData.swift in Sources */,
-				3A43AF632ABF46B800624EFC /* ITableViewDinamicUpdating.swift in Sources */,
+				3A43AF632ABF46B800624EFC /* IViewModelDinamicUpdating.swift in Sources */,
 				185A7B1E27F0EB390096E094 /* Podcast+CoreDataProperties.swift in Sources */,
 				04425A8A273012DA00E897FA /* BigPlayerViewController.swift in Sources */,
 				3A63266628211CD0005FFB08 /* FavouritePodcast+CoreDataProperties.swift in Sources */,
@@ -1084,6 +1094,7 @@
 				3A43AF692AC1BBDB00624EFC /* FavouriteViewModel.swift in Sources */,
 				3A25DB0A2A0BADC90000CAE0 /* SearchCollectionViewCell.swift in Sources */,
 				3ABC9DF72A0AAB7600109A9C /* SearchCollectionView.swift in Sources */,
+				3A10EA1C2AFF952E00EE438D /* ITableViewDinamicUpdating.swift in Sources */,
 				1831DEDB2731944600EC09E2 /* DismissTransition.swift in Sources */,
 				189C1FAA272D336500A8480E /* UITableView + register.swift in Sources */,
 				3A63266528211CD0005FFB08 /* FavouritePodcast+CoreDataClass.swift in Sources */,
@@ -1104,6 +1115,7 @@
 				187B2B4227345F6200C3EFFF /* Constant.swift in Sources */,
 				3AA82D2229EABEFA00557A94 /* Int.swift in Sources */,
 				045628252732EA370044878C /* String + conform.swift in Sources */,
+				3A10EA1A2AFCD41700EE438D /* ISearchedSectionData.swift in Sources */,
 				3A56445A2A822EFB007B24ED /* ListData+CoreDataClass.swift in Sources */,
 				3A6104362997C8CD0096EDE2 /* ListeningPodcast+CoreDataClass.swift in Sources */,
 				18478129272C8B460036B89E /* MyActionSheet.swift in Sources */,

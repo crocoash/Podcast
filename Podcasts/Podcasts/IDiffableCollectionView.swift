@@ -1,22 +1,22 @@
 //
-//  File.swift
+//  IDiffableCollectionView.swift
 //  Podcasts
 //
-//  Created by Anton on 24.09.2023.
+//  Created by Anton on 12.11.2023.
 //
 
 import Foundation
 import UIKit
 
-protocol IDiffableTableView: AnyObject {
+protocol IDiffableCollectionView: AnyObject {
     
     associatedtype Row: Hashable
     associatedtype Section: Hashable
     
     typealias SnapShot = NSDiffableDataSourceSnapshot<Section,Row>
-    typealias DiffableDataSource = UITableViewDiffableDataSource<Section, Row>
+    typealias DiffableDataSource = UICollectionViewDiffableDataSource<Section, Row>
     
-    var mySnapShot: SnapShot!  { get set }
+    var snapShot: SnapShot!  { get set }
     var diffableDataSource: DiffableDataSource! { get set }
     
     var countOfSections: Int { get }
@@ -37,23 +37,23 @@ protocol IDiffableTableView: AnyObject {
 
 
 
-extension IDiffableTableView {
+extension IDiffableCollectionView {
     
     func insertSection(section: Section, at index: Int) {
         
-        let isLastSection = mySnapShot.numberOfSections < index + 1
+        let isLastSection = snapShot.numberOfSections < index + 1
         if isLastSection {
-            mySnapShot.appendSections([section])
+            snapShot.appendSections([section])
         } else {
-            let beforeSection = mySnapShot.sectionIdentifiers[index]
-            mySnapShot.insertSections([section], beforeSection: beforeSection)
+            let beforeSection = snapShot.sectionIdentifiers[index]
+            snapShot.insertSections([section], beforeSection: beforeSection)
         }
-        diffableDataSource.apply(mySnapShot)
+        diffableDataSource.apply(snapShot)
     }
     
     func reloadTableView() {
     
-        mySnapShot = SnapShot()
+        snapShot = SnapShot()
         
         guard countOfSections != 0 else { return }
         for indexSection in 0..<countOfSections {
@@ -64,16 +64,16 @@ extension IDiffableTableView {
     func insertRow(at indexPath: IndexPath) {
 
         let cell = cellForRowAt(indexPath: indexPath)
-        let section = mySnapShot.sectionIdentifiers[indexPath.section]
-        let count = mySnapShot.itemIdentifiers(inSection: section).count
+        let section = snapShot.sectionIdentifiers[indexPath.section]
+        let count = snapShot.itemIdentifiers(inSection: section).count
 
         if count < indexPath.row + 1 {
-            mySnapShot.appendItems([cell], toSection: section)
+            snapShot.appendItems([cell], toSection: section)
         } else {
             guard let beforeItem = diffableDataSource.itemIdentifier(for: indexPath) else { return }
-            mySnapShot.insertItems([cell], beforeItem: beforeItem)
+            snapShot.insertItems([cell], beforeItem: beforeItem)
         }
-        diffableDataSource.apply(mySnapShot)
+        diffableDataSource.apply(snapShot)
     }
     
     func reloadSection(indexSection index: Int) {
@@ -89,38 +89,39 @@ extension IDiffableTableView {
         }
         
         let section = sectionFor(index: index)
-        mySnapShot.appendSections([section])
-        mySnapShot.appendItems(cells)
-        diffableDataSource.apply(mySnapShot)
+        snapShot.appendSections([section])
+        snapShot.appendItems(cells)
+        diffableDataSource.apply(snapShot)
     }
     
     func deleteSection(at index: Int) {
-        let section = mySnapShot.sectionIdentifiers[index]
-        mySnapShot.deleteSections([section])
-        diffableDataSource.apply(mySnapShot)
+        let section = snapShot.sectionIdentifiers[index]
+        snapShot.deleteSections([section])
+        diffableDataSource.apply(snapShot)
     }
     
     func deleteRow(at indexPath: IndexPath) {
         guard let item = diffableDataSource.itemIdentifier(for: indexPath) else { return }
-        mySnapShot.deleteItems([item])
-        diffableDataSource.apply(mySnapShot)
+        snapShot.deleteItems([item])
+        diffableDataSource.apply(snapShot)
     }
 }
 
 
-protocol IDiffableTableViewWithDataSource: IDiffableTableView {
-}
-
-extension IDiffableTableViewWithDataSource {
-}
-
-
-protocol IDiffableTableViewWithModel: IHaveViewModel, IDiffableTableView where ViewModel: ITableViewModel, Row == ViewModel.Row, Section == ViewModel.Section {
+protocol IDiffableCollectionViewWithDataSource: IDiffableCollectionView {
     
+}
+
+extension IDiffableCollectionViewWithDataSource {
+    
+}
+
+
+protocol IDiffableCollectionViewWithModel: IHaveViewModel, IDiffableCollectionView where ViewModel: ITableViewModel, Row == ViewModel.Row, Section == ViewModel.Section {
     func observeViewModel()
 }
 
-extension IDiffableTableViewWithModel {
+extension IDiffableCollectionViewWithModel {
     
     func observeViewModel() {
         if let viewModel = viewModel as? any IViewModelDinamicUpdating {
@@ -163,23 +164,23 @@ extension IDiffableTableViewWithModel {
     
     func moveSection(from oldIndex: Int, to newIndex: Int) {
         
-        let countOfSections = mySnapShot.sectionIdentifiers.count - 1
+        let countOfSections = snapShot.sectionIdentifiers.count - 1
         let isFirstSection = newIndex == 0
         let isLastSection = newIndex == countOfSections
         
-        let section = mySnapShot.sectionIdentifiers[oldIndex]
+        let section = snapShot.sectionIdentifiers[oldIndex]
         
         if isFirstSection {
-            let firstSection = mySnapShot.sectionIdentifiers[0]
-            mySnapShot.moveSection(section, beforeSection: firstSection)
+            let firstSection = snapShot.sectionIdentifiers[0]
+            snapShot.moveSection(section, beforeSection: firstSection)
         } else if isLastSection {
-            let lastSection = mySnapShot.sectionIdentifiers[countOfSections]
-            mySnapShot.moveSection(section, afterSection: lastSection)
+            let lastSection = snapShot.sectionIdentifiers[countOfSections]
+            snapShot.moveSection(section, afterSection: lastSection)
         } else {
-            let beforeSection = mySnapShot.sectionIdentifiers[newIndex]
-            mySnapShot.moveSection(section, beforeSection: beforeSection)
+            let beforeSection = snapShot.sectionIdentifiers[newIndex]
+            snapShot.moveSection(section, beforeSection: beforeSection)
         }
-        diffableDataSource.apply(mySnapShot)
+        diffableDataSource.apply(snapShot)
     }
         
     func sectionFor(index: Int) -> Section {

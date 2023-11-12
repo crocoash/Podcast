@@ -48,8 +48,8 @@ class FirebaseDatabase: ISingleton {
    
    required init(container: IContainer, args: ()) {
       let userViewModel: UserViewModel = container.resolve()
-      //TODO: 
-      self.userID = userViewModel.userDocument.user.userId 
+
+      self.userID = userViewModel.userDocument.user.userId
    }
    
    private let userID: String

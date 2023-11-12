@@ -11,7 +11,6 @@ protocol IHaveViewModel: AnyObject {
     associatedtype ViewModel
     
     var viewModel: ViewModel { get set }
-    func viewModelChanged()
     func viewModelChanged(_ viewModel: ViewModel)
 }
 
@@ -36,7 +35,7 @@ extension IHaveViewModel {
 //            (viewModel as? INotifyOnChanged)?.changed.subscribe(self) { this in
 //                
 //            }
-            viewModelChanged(viewModel)
+//            viewModelChanged(viewModel)
             (viewModel as? any INotifyOnChanged)?.changed.subscribe(self) { [weak self] this, _ in
                 guard let self = self else { fatalError() }
 //                if let viewModel = viewModel {

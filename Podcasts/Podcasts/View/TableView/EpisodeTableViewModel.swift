@@ -7,8 +7,8 @@
 
 import UIKit
 
-class EpisodeTableViewModel: IPerRequest, INotifyOnChanged, ITableViewDinamicUpdating, ITableViewSorting {
-   
+class EpisodeTableViewModel: IPerRequest, INotifyOnChanged, IViewModelDinamicUpdating, ITableViewSorting {
+    var test: Bool = false
     
     
     typealias SectionData = BaseSectionData<Podcast, String>
@@ -21,14 +21,14 @@ class EpisodeTableViewModel: IPerRequest, INotifyOnChanged, ITableViewDinamicUpd
     typealias Arguments = Input
     
     var dataSourceAll: [SectionData] = []
-    var dataSourceForView: [SectionData] { dataSourceAll }
+    var dataSourceForView: [SectionData] = []
     
-    var insertSectionOnView: ((Section, Int) -> ()) = { _, _ in }
-    var insertItemOnView:    ((Row, IndexPath  ) -> ()) = { _, _ in }
-    var removeRowOnView:    ((IndexPath        ) -> ()) = {    _ in }
-    var removeSectionOnView: ((Int             ) -> ()) = {    _ in }
-    var moveSectionOnView:   ((Int, Int        ) -> ()) = { _, _ in }
-    var reloadSection: ((Int) -> ())                    = { _    in }
+    var insertSectionOnView: ((Section  , Int      ) -> ()) = { _, _ in }
+    var insertItemOnView:    ((Row      , IndexPath) -> ()) = { _, _ in }
+    var removeRowOnView:     ((IndexPath           ) -> ()) = {    _ in }
+    var removeSectionOnView: ((Int                 ) -> ()) = {    _ in }
+    var moveSectionOnView:   ((Int      , Int      ) -> ()) = { _, _ in }
+    var reloadSection:       ((Int                 ) -> ()) = { _    in }
     
     let container: IContainer
     private var podcasts: [Podcast]
@@ -39,6 +39,14 @@ class EpisodeTableViewModel: IPerRequest, INotifyOnChanged, ITableViewDinamicUpd
         self.podcasts = input.podcasts
         self.typeOfSort = input.typeOfSort
         
+        configurePlaylist(withPodcast: podcasts)
+    }
+    
+    func configureDataSource() {
+//        configurePlaylist(withPodcast newPodcast: [Podcast])
+    }
+        
+    func configureDataSourceForView() {
         configurePlaylist(withPodcast: podcasts)
     }
     
@@ -62,10 +70,10 @@ class EpisodeTableViewModel: IPerRequest, INotifyOnChanged, ITableViewDinamicUpd
     
     func getCell(_ tableView: UITableView, for indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.getCell(cell: PodcastCell.self, indexPath: indexPath)
-        let podcast = getRow(forIndexPath: indexPath)
+        let podcast = getRowForView(forIndexPath: indexPath)
         cell.addMyGestureRecognizer(self, type: .tap(), #selector(tapCell), info: cell)
         
-        let podcasts = getRows(atSection: indexPath.section)
+        let podcasts = getRowsForView(atSection: indexPath.section)
         let args = PodcastCellViewModel.Arguments.init(podcast: podcast, playlist: podcasts)
         cell.viewModel = container.resolve(args: args)
         return cell

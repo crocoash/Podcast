@@ -10,6 +10,7 @@ import Firebase
 import AVFoundation
 
 @main
+
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var backgroundSessionCompletionHandler: (() -> Void)?

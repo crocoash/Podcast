@@ -9,14 +9,12 @@ import UIKit
 import CoreData
 
 
-class FavouriteTableViewModel: NSObject, IPerRequest, INotifyOnChanged, ITableViewModel, ITableViewDinamicUpdating, ITableViewSearched {
+class FavouriteTableViewModel: NSObject, IPerRequest, INotifyOnChanged, ITableViewModel, IViewModelDinamicUpdating, ITableViewSearched {
    
-    
-    
+    typealias Arguments = Void
+
     var searchedSectionData: SectionData?
     var searchedText: String?
-    
-    typealias Arguments = Void
     
     var isSearching: Bool {
        return searchedText != nil
@@ -27,18 +25,14 @@ class FavouriteTableViewModel: NSObject, IPerRequest, INotifyOnChanged, ITableVi
             changed.raise()
         }
     }
-    
-    var dataSourceAll: [SectionData] = [] {
-        didSet {    
-            dataSourceForView = configureDataSourceOutput()
-        }
-    }
+    var dataSourceAll: [SectionData] = []
     
     let container: IContainer
     let listeningManager: ListeningManager
     let dataStoreManager: DataStoreManager
     
-    var insertSectionOnView: ((Section, Int) -> ()) = { _, _ in }
+    var test: Bool = false
+    var insertSectionOnView: ((Section, Int) -> ())     = { _, _ in }
     var insertItemOnView:    ((Row, IndexPath) -> ())   = { _, _ in }
     var removeRowOnView:     ((IndexPath) -> ())        = {    _ in }
     var removeSectionOnView: ((Int) -> ())              = {    _ in }
@@ -65,13 +59,13 @@ class FavouriteTableViewModel: NSObject, IPerRequest, INotifyOnChanged, ITableVi
         listeningFRC.delegate = self
         listSectionFRC.delegate = self
         
-        self.dataSourceAll = configureDataSource()
-        self.dataSourceForView = configureDataSourceOutput()
+        configureDataSource()
+        configureDataSourceForView()
     }
     
     @objc private func removeListeningPodcast(sender: MyLongPressGestureRecognizer) {
         guard let indexPath = sender.info as? IndexPath,
-              let listeningPodcast = getRow(forIndexPath: indexPath) as? ListeningPodcast else { return }
+              let listeningPodcast = getRowForView(forIndexPath: indexPath) as? ListeningPodcast else { return }
         listeningManager.removeListeningPodcast(listeningPodcast)
     }
     
@@ -82,7 +76,8 @@ class FavouriteTableViewModel: NSObject, IPerRequest, INotifyOnChanged, ITableVi
     }
     
     func performSearch(_ text: String?) {
-        self.searchedText = text ?? ""
+        guard searchedText != text else { return }
+        searchedText = text ?? ""
         
         if let searchText = text, searchText != "" {
             let predicate = NSPredicate(format: "podcast.trackName CONTAINS [c] %@", "\(searchText)")
@@ -103,13 +98,12 @@ class FavouriteTableViewModel: NSObject, IPerRequest, INotifyOnChanged, ITableVi
             print(error)
         }
         
-        let newSections = configureDataSource().filter { sectionIsActive($0) }
-        update(by: newSections)
+         configureDataSource()
     }
     
     func getCell(_ tableView: UITableView, for indexPath: IndexPath) -> UITableViewCell {
-        let row = getRow(forIndexPath: indexPath)
-        let rows = getRows(atSection: indexPath.section)
+        let row = getRowForView(forIndexPath: indexPath)
+        let rows = getRowsForView(atSection: indexPath.section)
         
         switch (row, rows) {
         case (let favouritePodcast as FavouritePodcast, let playlist as [FavouritePodcast]) :
@@ -182,21 +176,21 @@ extension FavouriteTableViewModel {
        return nil
     }
     
-    private func configureDataSourceOutput() -> [SectionData] {
-       return dataSourceAll.filter { sectionIsActive($0) }
+    func configureDataSourceForView() {
+        dataSourceForView = dataSourceAll.filter { $0.isAvailable }
     }
     
-    private func sectionIsActive(_ sectionData: SectionData) -> Bool {
-       sectionData.isActiveAndNotEmpty && searchedSectionData == nil ? true : sectionData == searchedSectionData
-    }
+//    private func sectionIsActive(_ sectionData: SectionData) -> Bool {
+//       sectionData.isActiveAndNotEmpty && searchedSectionData == nil ? true : sectionData == searchedSectionData
+//    }
     
-    private func configureDataSource() -> [SectionData] {
+    func configureDataSource() {
        var sectionData = listSectionFRC.fetchedObjects?.map {
           let entities = getRowsFor(entityName: $0.nameOfEntity)
           return SectionData(listSection: $0, rows: entities)
        }
        sectionData?.sort { $0.sequenceNumber < $1.sequenceNumber }
-       return sectionData ?? []
+        update(by: sectionData ?? [])
     }
     
     private func getRowsFor(entityName: String) -> [NSManagedObject] {
@@ -245,15 +239,9 @@ extension FavouriteTableViewModel: NSFetchedResultsControllerDelegate {
                       listSection.isActive != sectionData.isActive else { return }
                 
                 if !listSection.isActive {
-                    guard let sectionData = getSectionData(forListSection: listSection) else { return }
-                    sectionData.isActive = false
                     deactivateSectionData(sectionData)
-                    self.dataSourceForView = configureDataSourceOutput()
                 } else {
-                    guard let index = getIndexSection(forSection: sectionData.section) else { return }
-                    sectionData.isActive = true
-                    self.dataSourceForView = configureDataSourceOutput()
-                    activateSectionData(sectionData, atNewIndex: index)
+                    activateSectionData(sectionData)
                 }
             }
         default:

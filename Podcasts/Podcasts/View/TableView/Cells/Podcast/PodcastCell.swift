@@ -18,11 +18,7 @@ class PodcastCell: UITableViewCell, IHaveViewModel {
         self.heightOfImageView.constant = (frame.height - dateLabel.frame.height) - 10
         updateCell()
     }
-    
-    func viewModelChanged() {
-        
-    }
-    
+
     @IBOutlet private weak var podcastImage:             UIImageView!
     @IBOutlet private weak var favouriteStarImageView:    UIImageView!
     @IBOutlet private weak var downLoadImageView:        UIImageView!

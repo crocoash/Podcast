@@ -3,8 +3,7 @@
 //  Podcasts
 //
 //  Created by Anton on 09.05.2023.
-//
-
+//1
 import UIKit
 
 @objc protocol SearchCollectionViewDelegate: AnyObject {
@@ -18,23 +17,39 @@ import UIKit
    func searchCollectionView(_ searchCollectionView: SearchCollectionView, rowForIndexPath indexPath: IndexPath) -> SearchCollectionView.Row
 }
 
-class SearchCollectionView: UICollectionView {
-   
+class SearchCollectionView: UICollectionView, IDiffableCollectionViewWithDataSource {
+
+    typealias Section = String
+    class Row: NSObject {
+       let podcast: Podcast
+       let identifier = UUID()
+       
+       init(podcast: Podcast) {
+          self.podcast = podcast
+       }
+    }
+    
+    var snapShot: SnapShot!
+    var diffableDataSource: DiffableDataSource!
+    
+    func sectionFor(index: Int) -> String {
+        return myDataSource?.searchCollectionView(self, nameOfSectionForIndex: index) ?? ""
+    }
+    
+    var countOfSections: Int { return  myDataSource?.searchCollectionViewNumbersOfSections(self) ?? 0 }
+    
+    func countOfRowsInSection(index: Int) -> Int {
+        return myDataSource?.searchCollectionView(self, numbersOfRowsInSection: index) ?? 0
+    }
+    
+    func cellForRowAt(indexPath: IndexPath) -> Row {
+        guard let myDataSource = myDataSource else { fatalError() }
+        return myDataSource.searchCollectionView(self, rowForIndexPath: indexPath)
+    }
+    
    @IBOutlet weak var myDelegate: SearchCollectionViewDelegate?
    @IBOutlet weak var myDataSource: SearchCollectionViewDataSource?
    
-   var diffableDataSource: UICollectionViewDiffableDataSource<String, Row>! = nil
-   var snapShot = NSDiffableDataSourceSnapshot<String, Row>()
-   
-   
-   class Row: NSObject {
-      let podcast: Podcast
-      let identifier = UUID()
-      
-      init(podcast: Podcast) {
-         self.podcast = podcast
-      }
-   }
    
    required init?(coder: NSCoder) {
       super.init(coder: coder)
@@ -44,7 +59,7 @@ class SearchCollectionView: UICollectionView {
    
    override func reloadData() {
       super.reloadData()
-      reloadTableViewData()
+       reloadTableView()
    }
    
    //    override func supplementaryView(forElementKind elementKind: String, at indexPath: IndexPath) -> UICollectionReusableView? {
@@ -63,32 +78,6 @@ class SearchCollectionView: UICollectionView {
 //MARK: - Private Methods
 extension SearchCollectionView {
    
-   private func reloadTableViewData() {
-      snapShot = NSDiffableDataSourceSnapshot<String, Row>()
-      let numbersOfSections = myDataSource?.searchCollectionViewNumbersOfSections(self) ?? 0
-      
-      (0..<numbersOfSections).forEach { indexSection in
-         
-         let numbersOfRows = myDataSource?.searchCollectionView(self, numbersOfRowsInSection: indexSection) ?? 0
-         
-         if let section = myDataSource?.searchCollectionView(self, nameOfSectionForIndex: indexSection) {
-            var rows = [Row]()
-            (0..<numbersOfRows).forEach { indexRow in
-               
-               let row = myDataSource?.searchCollectionView(self, rowForIndexPath: IndexPath(row: indexRow, section: indexSection))
-               if let row = row {
-                  rows.append(row)
-               }
-            }
-            snapShot.appendSections([section])
-            snapShot.appendItems(rows)
-         }
-      }
-      
-      self.diffableDataSource.apply(snapShot)
-   }
-   
-   
    private func register() {
       
       let cellRegistration = UICollectionView.CellRegistration<SearchCollectionViewCell, Podcast> { cell, indexPath, podcast in
@@ -96,7 +85,7 @@ extension SearchCollectionView {
          cell.addMyGestureRecognizer(self, type: .tap(), #selector(self.selectCell))
       }
       
-      self.diffableDataSource = UICollectionViewDiffableDataSource<String, Row>(collectionView: self) { collectionView, indexPath, item in
+      self.diffableDataSource = UICollectionViewDiffableDataSource<Section, Row>(collectionView: self) { collectionView, indexPath, item in
          return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: item.podcast)
       }
       

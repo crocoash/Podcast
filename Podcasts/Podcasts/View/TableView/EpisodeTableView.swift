@@ -12,12 +12,8 @@ import CoreData
     func episodeTableViewDidChangeHeightTableView(_ episodeTableView: EpisodeTableView, height: CGFloat, withLastCell isLastCell: Bool)
 }
 
-class EpisodeTableView: UITableView, IHaveViewModel {
-    
-    func viewModelChanged() {
-        
-    }
-    
+class EpisodeTableView: UITableView, IHaveViewModel, ITableViewDinamicUpdating {
+
     func viewModelChanged(_ viewModel: EpisodeTableViewModel) {
         observeViewModel()
     }
@@ -33,10 +29,6 @@ class EpisodeTableView: UITableView, IHaveViewModel {
     
     func isLastSectionAndRow(indexPath: IndexPath) -> Bool {
         return numberOfSections - 1 == indexPath.section && numberOfRows(inSection: indexPath.section) - 1 == indexPath.row
-    }
-    
-    func changeTypeOfSort(_ sort: ViewModel.TypeSortOfTableView) {
-        viewModel.typeOfSort = sort
     }
     
     var height: CGFloat {
@@ -66,39 +58,6 @@ class EpisodeTableView: UITableView, IHaveViewModel {
 
         delegate = self
         dataSource = self
-    }
-}
-
-//MARK: - Private Methods
-extension EpisodeTableView {
-    
-    private func observeViewModel() {
-        
-        viewModel.removeSection { [weak self] index in
-            guard let self = self else { return }
-            deleteSections(IndexSet(integer: index), with: .automatic)
-//            myDataSource?.episodeTableViewDidChangeHeightTableView(self, height: height, withLastCell: <#T##Bool#>)
-        }
-        
-        viewModel.removeRow { [weak self] indexPath in
-            guard let self = self else { return }
-            deleteRows(at: [indexPath], with: .automatic)
-        }
-        
-        viewModel.insertRow { [weak self] row, indexPath in
-            guard let self = self else { return }
-            insertRows(at: [indexPath], with: .automatic)
-        }
-        
-        viewModel.insertSection { [weak self] section, index in
-            guard let self = self else { return }
-            insertSections(IndexSet(integer: index), with: .automatic)
-        }
-        
-        viewModel.moveSection { [weak self] index, newIndex in
-            guard let self = self else { return }
-
-        }
     }
 }
 
@@ -154,7 +113,7 @@ extension EpisodeTableView: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return viewModel.getSection(sectionIndex: section)
+        return viewModel.getSectionForView(sectionIndex: section)
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

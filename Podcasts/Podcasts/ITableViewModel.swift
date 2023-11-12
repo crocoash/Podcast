@@ -14,12 +14,16 @@ protocol ITableViewModel: AnyObject {
     typealias Row = SectionData.Row
     typealias Section = SectionData.Section
     
-    var dataSourceForView: [SectionData] { get }
-    
+    var dataSourceForView: [SectionData] { get set }
+    func update(dataSource: [SectionData])
     func getCell(_ tableView: UITableView, for indexPath: IndexPath) -> UITableViewCell
 }
 
 extension ITableViewModel {
+    
+    func update(dataSource: [SectionData]) {
+        dataSourceForView = dataSource
+    }
     
     var numbersOfSections: Int {
         return dataSourceForView.count
@@ -37,23 +41,23 @@ extension ITableViewModel {
         return dataSourceForView[index].rows.count
     }
     
-    func getSection(sectionIndex index: Int) -> Section {
+    func getSectionForView(sectionIndex index: Int) -> Section {
         return dataSourceForView[index].section
     }
    
-    func getRows(atSection index: Int) -> [Row] {
+    func getRowsForView(atSection index: Int) -> [Row] {
         return dataSourceForView[index].rows
     }
 
-    func getRow(forIndexPath indexPath: IndexPath) -> Row {
-        return getRows(atSection: indexPath.section)[indexPath.row]
+    func getRowForView(forIndexPath indexPath: IndexPath) -> Row {
+        return getRowsForView(atSection: indexPath.section)[indexPath.row]
     }
     
     func getIndexSectionForView(forSection section: Section) -> Int? {
         return dataSourceForView.firstIndex { $0.section == section }
     }
     
-    func getSectionData(at index: Int) -> SectionData {
+    func getSectionDataForView(at index: Int) -> SectionData {
         return dataSourceForView[index]
     }
     
