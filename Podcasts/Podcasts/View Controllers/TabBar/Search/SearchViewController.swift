@@ -196,22 +196,22 @@ extension SearchViewController {
          
          viewModel.removeSection { [weak self] index in
              guard let self = self else { return }
-             searchCollectionView.deleteSections(IndexSet(integer: index))
+             searchCollectionView.deleteSection(at: index)
          }
          
          viewModel.removeRow { [weak self] indexPath in
              guard let self = self else { return }
-             searchCollectionView.deleteItems(at: [indexPath])
+             searchCollectionView.deleteRow(at: indexPath)
          }
          
          viewModel.insertRow { [weak self] row, indexPath in
              guard let self = self else { return }
-             searchCollectionView.insertItems(at: [indexPath])
+             searchCollectionView.insertRow(at: indexPath)
          }
          
          viewModel.insertSection { [weak self] section, index in
              guard let self = self else { return }
-             searchCollectionView.insertSections(IndexSet(integer: index))
+             searchCollectionView.insertSection(section: section, at: index)
          }
          
          viewModel.moveSection { [weak self] index, newIndex in

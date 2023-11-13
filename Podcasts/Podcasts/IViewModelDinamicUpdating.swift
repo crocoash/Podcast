@@ -107,7 +107,7 @@ extension IViewModelDinamicUpdating {
                 if !dataSourceAll.isEmpty, dataSourceAll.count != indexNewSection {
                     insertSectionData(newSectionData, atNewIndex: indexNewSection)
                 } else {
-                    appendSectionData(newSectionData)
+                    appendSectionData(newSectionData, index: dataSourceAll.count)
                 }
             } else {
                 newSectionData.rows.enumerated { indexNewRow, newRow in
@@ -184,12 +184,15 @@ extension IViewModelDinamicUpdating {
         
     }
     
-    func appendSectionData(_ sectionData: SectionData) {
+    func appendSectionData(_ sectionData: SectionData, index indexSection: Int) {
         dataSourceAll.append(sectionData)
         if sectionData.isAvailable {
             dataSourceForView.append(sectionData)
         }
-        insertSectionOnView(sectionData.section, 0)
+        insertSectionOnView(sectionData.section, indexSection)
+        sectionData.rows.enumerated { (indexRow, row) in
+            appendRow(row, at: IndexPath(row: indexRow, section: indexSection))
+        }
     }
     
     func appendRow(_ row: Row, at newIndexPath: IndexPath?) {
