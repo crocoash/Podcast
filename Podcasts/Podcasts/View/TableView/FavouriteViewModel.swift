@@ -10,15 +10,13 @@ import CoreData
 
 
 class FavouriteTableViewModel: NSObject, IPerRequest, INotifyOnChanged, ITableViewModel, IViewModelDinamicUpdating, ITableViewSearched {
+    
    
     typealias Arguments = Void
 
     var searchedSectionData: SectionData?
     var searchedText: String?
-    
-    var isSearching: Bool {
-       return searchedText != nil
-    }
+    var isSearching: Bool = false
     
     var dataSourceForView: [SectionData] = [] {
         didSet {
@@ -60,7 +58,6 @@ class FavouriteTableViewModel: NSObject, IPerRequest, INotifyOnChanged, ITableVi
         listSectionFRC.delegate = self
         
         configureDataSource()
-        configureDataSourceForView()
     }
     
     @objc private func removeListeningPodcast(sender: MyLongPressGestureRecognizer) {
@@ -119,10 +116,10 @@ class FavouriteTableViewModel: NSObject, IPerRequest, INotifyOnChanged, ITableVi
             let model = LikedPodcastTableViewCellModel(likedMoment: likedMoment)
             cell.configureCell(with: model)
             return cell
-        case (let likedMoment as ListeningPodcast, let playlist as [ListeningPodcast]) :
+        case (let listeningPodcast as ListeningPodcast, let playlist as [ListeningPodcast]) :
             let cell = tableView.getCell(cell: ListeningPodcastCell.self, indexPath: indexPath)
             let playlist = playlist.map { $0.podcast }
-            let model = ListeningPodcastCellModel(likedMoment)
+            let model = ListeningPodcastCellModel(listeningPodcast)
             cell.configure(with: model)
             return cell
         default:
@@ -166,7 +163,7 @@ extension FavouriteTableViewModel {
        dataSourceAll.first { $0.section == listSection.nameOfSection }
     }
     
-    private func getIndexSection(forRow row: Row) -> Int? {
+    func getIndexSection(forRow row: Row) -> Int? {
      
        for (indexSection, sectionData) in dataSourceAll.enumerated() {
           if row.entityName == sectionData.nameOfEntity {
@@ -175,14 +172,6 @@ extension FavouriteTableViewModel {
        }
        return nil
     }
-    
-    func configureDataSourceForView() {
-        dataSourceForView = dataSourceAll.filter { $0.isAvailable }
-    }
-    
-//    private func sectionIsActive(_ sectionData: SectionData) -> Bool {
-//       sectionData.isActiveAndNotEmpty && searchedSectionData == nil ? true : sectionData == searchedSectionData
-//    }
     
     func configureDataSource() {
        var sectionData = listSectionFRC.fetchedObjects?.map {
@@ -220,12 +209,11 @@ extension FavouriteTableViewModel: NSFetchedResultsControllerDelegate {
               removeRow(row)
            }
         case .insert:
-            if let row = anObject as? Row {
-              if var newIndexPath = newIndexPath, let indexSection = getIndexSection(forRow: row) {
-                 newIndexPath.section = indexSection
-                 appendRow(row, at: newIndexPath)
-              }
-           }
+            guard let row = anObject as? Row,
+                  let indexSection = getIndexSection(forRow: row) else { return }
+            
+            let sectionData = getSectionData(forIndex: indexSection)
+            appendRow(row, toSectionData: sectionData)
         case .move:
            guard let index = indexPath?.row,
                  let newIndex = newIndexPath?.row else { return }

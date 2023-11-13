@@ -55,7 +55,6 @@ class SmallPlayerView: UIView, IHaveViewModel {
         self.player = player
         
         self.player.delegate = viewModel
-        updateView()
     }
     
     required init?(coder: NSCoder) {

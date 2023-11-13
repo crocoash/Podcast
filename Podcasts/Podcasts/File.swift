@@ -46,11 +46,7 @@ extension IHaveViewModel {
             return anyViewModel as! ViewModel
         }
         set {
-            let firstSet = anyViewModel == nil
             anyViewModel = newValue
-            if !firstSet {
-                viewModelChanged()
-            }
         }
     }
 }

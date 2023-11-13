@@ -62,7 +62,6 @@ extension IDiffableCollectionView {
     }
     
     func insertRow(at indexPath: IndexPath) {
-
         let cell = cellForRowAt(indexPath: indexPath)
         let section = snapShot.sectionIdentifiers[indexPath.section]
         let count = snapShot.itemIdentifiers(inSection: section).count
