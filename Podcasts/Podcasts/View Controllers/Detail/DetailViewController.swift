@@ -11,8 +11,6 @@ import CoreData
 
 class DetailViewController: UIViewController, IHaveStoryBoard, IHaveViewModel {
     
-    
-    
     typealias Args = ViewModel.Arguments
     typealias ViewModel = DetailViewControllerViewModel
     
@@ -21,7 +19,7 @@ class DetailViewController: UIViewController, IHaveStoryBoard, IHaveViewModel {
     }
     
     func viewModelChanged() {
-        setupView()
+        updateUI()
     }
     
     @IBOutlet private weak var scrollView: UIScrollView!
@@ -61,7 +59,7 @@ class DetailViewController: UIViewController, IHaveStoryBoard, IHaveViewModel {
     //MARK: View Methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupView()
+        updateUI()
                
         if let track = player.currentTrack?.track {
             presentSmallPlayer(with: track)
@@ -79,7 +77,9 @@ class DetailViewController: UIViewController, IHaveStoryBoard, IHaveViewModel {
         
         super.init(coder: input.coder)
         
+        self.player.delegate = self
         self.favouriteManager.delegate = self
+        
         let podcast = input.args.podcast
         let podcasts = input.args.podcasts
         let argVM = ViewModel.Arguments(podcast: input.args.podcast, podcasts: podcasts)
@@ -161,6 +161,7 @@ extension DetailViewController {
         if smallPlayerView.isHidden {
             let model = SmallPlayerViewModel(viewModel)
             self.smallPlayerView.configure(with: model, player: player)
+            smallPlayerView.delegate = self
             smallPlayerView.isHidden = false
             bottomPlayerConstraint.constant = 50
             view.layoutIfNeeded()
@@ -183,7 +184,7 @@ extension DetailViewController {
         reloadTableViewHeightConstraint(newHeight: height)
     }
     
-    private func setupView() {
+    private func updateUI() {
        
         episodeImage.image = nil
         configureEpisodeTableView()

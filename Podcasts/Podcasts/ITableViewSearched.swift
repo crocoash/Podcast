@@ -10,28 +10,13 @@ import Foundation
 //MARK: - Searched
 protocol ITableViewSearched where Self: IViewModelDinamicUpdating, SectionData: ISearchedSectionData {
     var searchedSectionData: SectionData? { get set }
-    var searchedText: String? { get set }    
+    var searchedText: String? { get set }  
+    var isSearching: Bool { get set }
     
     func performSearch(_ text: String?)
 }
 
 extension ITableViewSearched {
-    
-    private func getSectionDataForView(index: Int) -> SectionData? {
-        var searchedIndex = 0
-        for (i,value) in dataSourceAll.enumerated() {
-            
-            if value.isEmpty || !value.isActive {
-                continue
-            }
-            searchedIndex += 1
-            if value == searchedSectionData {
-                return value
-            }
-        }
-        
-        return nil
-    }
     
     func changeSearchedSection(searchedSection index: Int?) {
        
@@ -44,6 +29,7 @@ extension ITableViewSearched {
         } else {
             searchedSectionData = nil
         }
+        isSearching = searchedSectionData != nil
         
         dataSourceAll.forEach { sectionData in
             if sectionData != searchedSectionData && index != nil {
@@ -56,28 +42,37 @@ extension ITableViewSearched {
                 activateSectionData(sectionData)
             }
         }
+        if let self = self as? INotifyOnChanged {
+            self.changed.raise()
+        }
     }
     
     private func activateSectionData(_ sectionData: SectionData) {
         let section = sectionData.section
+        
         guard let index = getIndexSection(forSection: section) else { return }
         dataSourceAll[index].isSearched = true
         
         guard sectionData.isAvailable,
-              getIndexSectionForView(forSection: section) == nil else { return }
+             getIndexSectionForView(forSection: section) == nil else { return }
         
-        let indexForView = getIndexForSectionForView(sectionData: sectionData)
-        dataSourceForView.insert(sectionData, at: indexForView)
-        insertSectionOnView(sectionData.section, indexForView)
+        if dataSourceForView.isEmpty {
+            dataSourceForView.append(sectionData)
+        } else {
+            guard let availableIndex = getIndexOfActiveSectionForView(sectionData: sectionData) else { return }
+            dataSourceForView.insert(sectionData, at: availableIndex)
+        }
         
+        guard let index = getIndexSectionForView(forSection: sectionData.section) else { return }
+        
+        insertSectionOnView(sectionData.section, index)
         sectionData.rows.enumerated {
-            insertItemOnView($1, IndexPath(row: $0, section: indexForView))
+            insertItemOnView($1, IndexPath(row: $0, section: index))
         }
     }
-    
+    /// Deactivate
     private func deactivateSectionData(_ sectionData: SectionData) {
         let section = sectionData.section
-        
         guard let index = getIndexSection(forSection: section) else { return }
         dataSourceAll[index].isSearched = false
         
@@ -89,12 +84,72 @@ extension ITableViewSearched {
         dataSourceForView.remove(at: indexSection)
     }
     
-//    var searchedSectionIndex: Int? {
-//        guard let section = searchedSectionData?.section else { return nil }
-//        return getIndexSectionForView(forSection: section)
-//    }
-//    
-//    var numbersOfSectionsForSearching: Int {
+    private func getSectionDataForView(index: Int) -> SectionData? {
+        var searchedIndex = 0
+        
+        for sectionData in dataSourceAll {
+            
+            if sectionData.isEmpty || !sectionData.isActive {
+                continue
+            }
+           
+            if index == searchedIndex {
+                return sectionData
+            }
+            searchedIndex += 1
+        }
+        
+        return nil
+    }
+    
+    private func getIndexOfActiveSectionForView(sectionData: SectionData) -> Int? {
+        var searchedIndex = 0
+        
+        for sectionDataAll in dataSourceAll {
+            
+            if sectionData.isEmpty || !sectionData.isActive {
+                continue
+            }
+           
+            if sectionData == sectionDataAll {
+                return searchedIndex
+            }
+            searchedIndex += 1
+        }
+        
+        return nil
+    }
+    
+//    private func activateSectionData(_ sectionData: SectionData) {
+//        let section = sectionData.section
+//        guard let index = getIndexSection(forSection: section) else { return }
+//        dataSourceAll[index].isSearched = true
 //        
+//        guard sectionData.isAvailable,
+//              getIndexSectionForView(forSection: section) == nil else { return }
+//        
+//        let indexForView = getIndexOfActiveSectionForView(sectionData: sectionData)
+//        dataSourceForView.insert(sectionData, at: indexForView)
+//        insertSectionOnView(sectionData.section, indexForView)
+//        
+//        sectionData.rows.enumerated {
+//            insertItemOnView($1, IndexPath(row: $0, section: indexForView))
+//        }
 //    }
+    
+//    private func deactivateSectionData(_ sectionData: SectionData) {
+//        let section = sectionData.section
+//        
+//        guard let index = getIndexSection(forSection: section) else { return }
+//        dataSourceAll[index].isSearched = false
+//        
+//        guard let indexSection = getIndexSectionForView(forSection: section) else { return }
+//        sectionData.rows.indices.reversed().forEach {
+//            removeRowOnView(IndexPath(row: $0, section: indexSection))
+//        }
+//        removeSectionOnView(indexSection)
+//        dataSourceForView.remove(at: indexSection)
+//    }
+    
+
 }

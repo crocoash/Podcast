@@ -26,13 +26,10 @@ class BigPlayerViewController: UIViewController, IHaveViewModel, IHaveXib {
     }
     
     func viewModelChanged() {
-        
-    }
-    
-    func viewModelChanged(_ viewModel: BigPlayerViewModel) {
-        guard podcastImageView != nil else { return }
         updateUI()
     }
+    
+    func viewModelChanged(_ viewModel: BigPlayerViewModel) {}
 
     @IBOutlet private weak var podcastImageView:      UIImageView!
     
@@ -64,8 +61,10 @@ class BigPlayerViewController: UIViewController, IHaveViewModel, IHaveXib {
         self.likeManager = container.resolve()
         
         self.delegate = input.delegate
-      
         super.init(nibName: Self.identifier, bundle: nil)
+        
+        let argsVM: ViewModel.Arguments = ViewModel.Arguments(track: input.modelInput.track)
+        self.viewModel = container.resolve(args: argsVM)
     }
     
     required init?(coder: NSCoder) {
@@ -75,7 +74,6 @@ class BigPlayerViewController: UIViewController, IHaveViewModel, IHaveXib {
     //MARK: View Methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        updateUI()
         player.delegate = viewModel
         configureGestures()
         progressSlider.addTarget(self, action: #selector(sliderValueChangedBegin), for: .editingDidBegin)
