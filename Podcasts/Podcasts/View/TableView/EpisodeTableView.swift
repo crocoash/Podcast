@@ -18,6 +18,10 @@ class EpisodeTableView: UITableView, IHaveViewModel, ITableViewDinamicUpdating {
         observeViewModel()
     }
     
+    func viewModelChanged() {
+        
+    }
+    
     typealias ViewModel = EpisodeTableViewModel
    
     lazy private(set) var defaultRowHeight = CGFloat(100.6)//frame.width / 3.5

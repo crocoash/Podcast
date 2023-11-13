@@ -41,10 +41,6 @@ class EpisodeTableViewModel: IPerRequest, INotifyOnChanged, IViewModelDinamicUpd
         
         configurePlaylist(withPodcast: podcasts)
     }
-    
-    func configureDataSource() {
-//        configurePlaylist(withPodcast newPodcast: [Podcast])
-    }
         
     func configureDataSourceForView() {
         configurePlaylist(withPodcast: podcasts)

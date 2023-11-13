@@ -11,13 +11,17 @@ import CoreData
 
 class DetailViewController: UIViewController, IHaveStoryBoard, IHaveViewModel {
     
+    
+    
     typealias Args = ViewModel.Arguments
     typealias ViewModel = DetailViewControllerViewModel
     
     func viewModelChanged(_ viewModel: DetailViewControllerViewModel) {
-        if scrollView != nil {
-            setupView()
-        }
+
+    }
+    
+    func viewModelChanged() {
+        setupView()
     }
     
     @IBOutlet private weak var scrollView: UIScrollView!
