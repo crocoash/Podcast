@@ -73,6 +73,7 @@ class FavouriteTableViewModel: NSObject, IPerRequest, INotifyOnChanged, ITableVi
     }
     
     func performSearch(_ text: String?) {
+        isSearching = text != nil
         guard searchedText != text else { return }
         searchedText = text ?? ""
         
