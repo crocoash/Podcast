@@ -79,12 +79,13 @@ extension IViewModelDinamicUpdating {
                 removeSectionOnView(index)
                 dataSourceForView.remove(at: index)
             } else {
-                for oldRow in oldSectionData.rows {
+                for oldRow in oldSectionData.rows.reversed() {
                     newDataSource.enumerated { newIndexSection, newSection in
                         if newSection.section == oldSectionData.section {
-                            if let index = getIndexPath(forRow: oldRow)?.row {
-                                dataSourceAll[indexSection].rows.remove(at: index)
-                                removeRowOnView(IndexPath(item: index, section: indexSection))
+                            if getIndexPath(forRow: oldRow)?.row  == nil {
+                                removeRow(oldRow)
+//                                dataSourceAll[indexSection].rows.remove(at: index)
+//                                removeRowOnView(IndexPath(item: index, section: indexSection))
                             }
                         }
                     }
@@ -218,12 +219,14 @@ extension IViewModelDinamicUpdating {
         if sectionData.isActive {
             guard let indexPath = getIndexPathForView(forRow: row) else { return }
             removeRowOnView(indexPath)
+            dataSourceForView[indexPath.section].rows.remove(at: indexPath.row)
         }
-        guard let index = getIndexSectionForView(forSection: section) else { return }
         dataSourceAll[indexPath.section].rows.remove(at: indexPath.row)
         
         if !sectionData.isAvailable {
+            guard let index = getIndexSectionForView(forSection: section) else { return }
             removeSectionOnView(index)
+            dataSourceForView.remove(at: indexPath.section)
         }
     }
     
