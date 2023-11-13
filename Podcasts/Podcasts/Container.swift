@@ -66,40 +66,40 @@ extension IContainer {
         return resolve(args: ())
     }
     
-    func resolveWithModel<T: IHaveStoryBoard & IHaveViewModel>(args: T.Args, argsVM: T.ViewModel.Arguments) -> T where T.ViewModel: IResolvable {
-        let vc: T = resolve(args: args)
-        vc.viewModel = resolve(args: argsVM)
-        return vc
-    }
-    
-    func resolveWithModel<T: IHaveStoryBoard & IHaveViewModel>(argsVM: T.ViewModel.Arguments) -> T where T.ViewModel: IResolvable, T.Args == Void {
-        let vc: T = resolve(args: ())
-        vc.viewModel = resolve(args: argsVM)
-        return vc
-    }
-    
-    func resolveWithModel<T: IHaveStoryBoard & IHaveViewModel>(args: T.Args) -> T where T.ViewModel: IResolvable, T.ViewModel.Arguments == Void {
-        let vc: T = resolve(args: args)
-        vc.viewModel = resolve(args: ())
-        return vc
-    }
+//    func resolveWithModel<T: IHaveStoryBoard & IHaveViewModel>(args: T.Args, argsVM: T.ViewModel.Arguments) -> T where T.ViewModel: IResolvable {
+//        let vc: T = resolve(args: args)
+//        vc.viewModel = resolve(args: argsVM)
+//        return vc
+//    }
+//    
+//    func resolveWithModel<T: IHaveStoryBoard & IHaveViewModel>(argsVM: T.ViewModel.Arguments) -> T where T.ViewModel: IResolvable, T.Args == Void {
+//        let vc: T = resolve(args: ())
+//        vc.viewModel = resolve(args: argsVM)
+//        return vc
+//    }
+//    
+//    func resolveWithModel<T: IHaveStoryBoard & IHaveViewModel>(args: T.Args) -> T where T.ViewModel: IResolvable, T.ViewModel.Arguments == Void {
+//        let vc: T = resolve(args: args)
+//        vc.viewModel = resolve(args: ())
+//        return vc
+//    }
     
     ///xib
     func resolve<T: IHaveXib>() -> T where T.Arguments == Void {
         return resolve(args: ())
     }
     
-    func resolveWithModel<T: IHaveXib & IHaveViewModel>(args: T.Arguments, argsVM: T.ViewModel.Arguments) -> T where T.ViewModel: IResolvable {
-        let view: T = resolve(args: args)
-        view.viewModel = resolve(args: argsVM)
-        return view
-    }
-    
-    func resolveWithModel<T: IHaveXib & IHaveViewModel>(args: T.Arguments) -> T where T.ViewModel: IResolvable, T.ViewModel.Arguments == Void {
-        let view: T = resolve(args: args)
-        view.viewModel = resolve(args: ())
-        return view
-    }
+//    func resolveWithModel<T: IHaveXib & IHaveViewModel>(args: T.Arguments, argsVM: T.ViewModel.Arguments) -> T where T.ViewModel: IResolvable {
+//        let view: T = resolve(args: args)
+//        view.viewModel = resolve(args: argsVM)
+//        return view
+//    }
+//    
+//    func resolveWithModel<T: IHaveXib & IHaveViewModel>(args: T.Arguments) -> T where T.ViewModel: IResolvable, T.ViewModel.Arguments == Void {
+//        let view: T = resolve(args: args)
+//        view.viewModel = resolve(args: ())
+//        return view
+//    }
 }
 
 protocol IResolvable: AnyObject {

@@ -14,27 +14,38 @@ class DetailViewControllerViewModel: IPerRequest, INotifyOnChanged {
         var podcast: Podcast
         var podcasts: [Podcast]
     }
-    
+    let apiService: ApiService
     var podcast: Podcast
+
+    let container: IContainer
     var podcasts: [Podcast]
     
-    var viewModelEpisodeTableView: EpisodeTableView.ViewModel
-   
+    lazy var episodeTableViewModel: EpisodeTableView.ViewModel = getViewModelEpisodeTableView()
+    var activeSortType: EpisodeTableViewModel.TypeSortOfTableView { episodeTableViewModel.typeOfSort } 
+    
     //MARK: init
     required init?(container: IContainer, args input: Input) {
+        
+        self.apiService = container.resolve()
         self.podcast = input.podcast
         self.podcasts = input.podcasts
-        let argsForEpisodeTableViewModel = EpisodeTableViewModel.Input.init(podcasts: input.podcasts, typeOfSort: .byNewest)
-        self.viewModelEpisodeTableView = container.resolve(args: argsForEpisodeTableViewModel)
+        self.container = container
+        
+        episodeTableViewModel.configurePlaylist(withPodcast: podcasts)
     }
-    
-    lazy var activeSortType = viewModelEpisodeTableView.typeOfSort
     
     var sortMenu: [EpisodeTableViewModel.TypeSortOfTableView] = EpisodeTableViewModel.TypeSortOfTableView.allCases
     
-    func setActiveSortType(sortType: EpisodeTableViewModel.TypeSortOfTableView) {
-        activeSortType = sortType
-        viewModelEpisodeTableView.typeOfSort = sortType
-        changed.raise(())
+    func changeSortType(sortType: EpisodeTableViewModel.TypeSortOfTableView) {
+        episodeTableViewModel.changeTypeOfSort(sortType)
     }
 }
+
+extension DetailViewControllerViewModel {
+    
+    private func getViewModelEpisodeTableView() ->  EpisodeTableView.ViewModel {
+        let argsForEpisodeTableViewModel = EpisodeTableViewModel.Input.init(podcasts: podcasts, typeOfSort: .byNewest)
+        return container.resolve(args: argsForEpisodeTableViewModel)
+    }
+}
+

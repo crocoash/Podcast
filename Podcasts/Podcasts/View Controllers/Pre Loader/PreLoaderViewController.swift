@@ -12,15 +12,6 @@ class PreLoaderViewController: UIViewController, IHaveStoryBoard {
     typealias Args = Void
     
     private let userViewModel: UserViewModel
-    private let likeManager: LikeManager
-    private let favouriteManager: FavouriteManager
-    private let firestorageDatabase: FirestorageDatabase
-    private let player: Player
-    private let downloadService: DownloadService
-    private let firebaseDataBase: FirebaseDatabase
-    private let apiService: ApiService
-    private let dataStoreManager: DataStoreManager
-    private let listeningManager: ListeningManager
     private let container: IContainer
     
     @IBOutlet private weak var logoImageView: UIImageView!
@@ -37,26 +28,17 @@ class PreLoaderViewController: UIViewController, IHaveStoryBoard {
         return tabBarViewController
     }()
     
-    lazy private var registrationVC = RegistrationViewController.storyboard.instantiateViewController(identifier: RegistrationViewController.identifier) { [weak self] coder in
-        guard let self = self else { fatalError() }
-        
+    lazy private var registrationVC: RegistrationViewController = {
         let registrationVC: RegistrationViewController = container.resolve()
         registrationVC.modalPresentationStyle = .custom
         registrationVC.transitioningDelegate = self
         return registrationVC
-    }
+    }()
     
+    //MARK: init
     required init?(container: IContainer, args: (args: Args, coder: NSCoder)) {
-        self.favouriteManager = container.resolve()
-        self.likeManager = container.resolve()
+
         self.userViewModel = container.resolve()
-        self.player = container.resolve()
-        self.downloadService = container.resolve()
-        self.firestorageDatabase = container.resolve()
-        self.firebaseDataBase = container.resolve()
-        self.apiService = container.resolve()
-        self.dataStoreManager = container.resolve()
-        self.listeningManager = container.resolve()
         self.container = container
 
         super.init(coder: args.coder)
@@ -66,6 +48,7 @@ class PreLoaderViewController: UIViewController, IHaveStoryBoard {
         fatalError("init(coder:) has not been implemented")
     }
     
+    //MARK: View Methods
     override func viewDidLoad() {
         super.viewDidLoad()
         horizontalCenterConstraint.isActive = false
@@ -77,17 +60,21 @@ class PreLoaderViewController: UIViewController, IHaveStoryBoard {
         super.viewDidAppear(animated)
         
         if userViewModel.userIsLogin {
-            Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { _ in
-                self.present(self.tabBarVC, animated: true)
-                self.view.isHidden = true
+            Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { [weak self] _ in
+                guard let self = self else { return }
+                present(tabBarVC, animated: true)
+                view.isHidden = true
             }
             
         } else {
             heightConstraint?.constant = 120
-            UIView.animate(withDuration: 0.5, animations: { self.view.layoutIfNeeded() }) { [weak self] _ in
+            UIView.animate(withDuration: 0.5, animations: { [weak self] in
                 guard let self = self else { return }
-                self.present(self.registrationVC, animated: false)
-                self.view.isHidden = true
+                view.layoutIfNeeded()
+            }) { [weak self] _ in
+                guard let self = self else { return }
+                present(registrationVC, animated: false)
+                view.isHidden = true
             }
         }
     }

@@ -8,14 +8,11 @@
 import UIKit
 import CoreData
 
+
 class DetailViewController: UIViewController, IHaveStoryBoard, IHaveViewModel {
     
     typealias Args = ViewModel.Arguments
     typealias ViewModel = DetailViewControllerViewModel
-    
-    func viewModelChanged() {
-        
-    }
     
     func viewModelChanged(_ viewModel: DetailViewControllerViewModel) {
         if scrollView != nil {
@@ -60,7 +57,6 @@ class DetailViewController: UIViewController, IHaveStoryBoard, IHaveViewModel {
     //MARK: View Methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         setupView()
                
         if let track = player.currentTrack?.track {
@@ -80,8 +76,9 @@ class DetailViewController: UIViewController, IHaveStoryBoard, IHaveViewModel {
         super.init(coder: input.coder)
         
         self.favouriteManager.delegate = self
-        
-        let argVM = ViewModel.Arguments.init(podcast: input.args.podcast, podcasts: input.args.podcasts)
+        let podcast = input.args.podcast
+        let podcasts = input.args.podcasts
+        let argVM = ViewModel.Arguments(podcast: input.args.podcast, podcasts: podcasts)
         self.viewModel = container.resolve(args: argVM)
     }
     
@@ -124,11 +121,11 @@ extension DetailViewController {
     private func configureSortMenu() {
         let title = viewModel.activeSortType.rawValue
         
-        let childrens: [UIAction] = viewModel.sortMenu.map { item in
-            let state: UIAction.State = viewModel.activeSortType == item ? .on : .off
-            return UIAction(title: item.rawValue, state: state) { [weak self] action in
+        let childrens: [UIAction] = viewModel.sortMenu.map { sortType in
+            let state: UIAction.State = viewModel.activeSortType == sortType ? .on : .off
+            return UIAction(title: sortType.rawValue, state: state) { [weak self] action in
                 guard let self = self else { return }
-                viewModel.setActiveSortType(sortType: item)
+                viewModel.changeSortType(sortType: sortType)
                 configureSortMenu()
             }
         }
@@ -167,9 +164,9 @@ extension DetailViewController {
     }
     
     private func presentBigPlayer(with track: Track) {
-        let argsVM: BigPlayerViewModel.Arguments = track
-        let args: BigPlayerViewController.Arguments = self
-        let bigPlayerViewController: BigPlayerViewController = container.resolveWithModel(args: args, argsVM: argsVM)
+        let argsVM: BigPlayerViewController.ViewModel.Arguments = BigPlayerViewController.ViewModel.Arguments.init(track: track)
+        let args: BigPlayerViewController.Arguments = BigPlayerViewController.Arguments.init(delegate: self, modelInput: argsVM)
+        let bigPlayerViewController: BigPlayerViewController = container.resolve(args: args)
         self.bigPlayerViewController = bigPlayerViewController
         bigPlayerViewController.modalPresentationStyle = .fullScreen
         self.present(bigPlayerViewController, animated: true)
@@ -177,12 +174,13 @@ extension DetailViewController {
     
     private func configureEpisodeTableView() {
         episodeTableView.translatesAutoresizingMaskIntoConstraints = false
-        episodeTableView.viewModel = viewModel.viewModelEpisodeTableView
+        episodeTableView.viewModel = viewModel.episodeTableViewModel
         let height = episodeTableView.height
         reloadTableViewHeightConstraint(newHeight: height)
     }
     
     private func setupView() {
+       
         episodeImage.image = nil
         configureEpisodeTableView()
         configureSortMenu()
@@ -239,8 +237,6 @@ extension DetailViewController: PlayerDelegate {
     
     func playerStateDidChanged(_ player: Player, with track: any OutputPlayerProtocol) {}
 }
-
-
 
 //MARK: - EpisodeTableViewControllerMyDataSource
 extension DetailViewController: EpisodeTableViewMyDataSource {

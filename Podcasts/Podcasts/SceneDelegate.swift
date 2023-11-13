@@ -17,7 +17,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var videoViewController: Player? = nil
     private var avPlayerSavedReference: AVPlayer? = nil
     
-    
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let scene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: scene)
@@ -42,6 +41,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     private func preLoaderViewController() -> UIViewController {
         let container = Container()
+
         let vc: PreLoaderViewController = container.resolve()
         return vc
     }

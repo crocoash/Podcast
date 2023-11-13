@@ -14,29 +14,25 @@ protocol ListViewControllerDelegate: AnyObject {
 }
 
 class ListViewController: UIViewController, IHaveViewModel, IHaveStoryBoard {
-   
-    typealias Args = ListViewControllerDelegate
+    
+    typealias Args = Input
     typealias ViewModel = ListViewModel
     
-    func viewModelChanged() {
-        
+    struct Input {
+        var delegate: ListViewControllerDelegate
     }
     
     func viewModelChanged(_ viewModel: ListViewModel) {
         updateUI()
     }
-  
+    
     //MARK: services
-    private var downloadService:  DownloadService
-    private var player:           Player
-    private let firebaseDataBase: FirebaseDatabase
     private let favouriteManager: FavouriteManager
     private let dataStoreManager: DataStoreManager
     private let listeningManager: ListeningManager
     private let likeManager:      LikeManager
-    private var listDataManager: ListDataManager
     
-   weak var delegate: ListViewControllerDelegate?
+    weak var delegate: ListViewControllerDelegate?
     
     private let refreshControl = UIRefreshControl()
     private var alertTopConstraint: NSLayoutConstraint?
@@ -46,8 +42,8 @@ class ListViewController: UIViewController, IHaveViewModel, IHaveStoryBoard {
     lazy private var heightTabBarItem = tabBarController?.tabBar.frame.height ?? 0
     
     //MARK: Outlets
-   @IBOutlet private weak var listView: ListView!
-
+    @IBOutlet private weak var listView: ListView!
+    
     @IBOutlet private weak var favouriteTableView: FavouriteTableView!
     @IBOutlet private weak var bottomTableViewConstraint: NSLayoutConstraint!
     
@@ -56,21 +52,16 @@ class ListViewController: UIViewController, IHaveViewModel, IHaveStoryBoard {
     
     //MARK: init
     required init?(container: IContainer, args: (args: Args, coder: NSCoder)) {
-
-        self.downloadService = container.resolve()
-        self.player = container.resolve()
-        self.listDataManager = container.resolve()
-        self.firebaseDataBase = container.resolve()
         self.favouriteManager = container.resolve()
         self.dataStoreManager = container.resolve()
         self.listeningManager = container.resolve()
         self.likeManager = container.resolve()
-
+        
         self.container = container
-
-        self.delegate = args.args
-
+        self.delegate = args.args.delegate
         super.init(coder: args.coder)
+        
+        self.viewModel = container.resolve()
     }
     
     required init?(coder: NSCoder) {
@@ -113,25 +104,10 @@ class ListViewController: UIViewController, IHaveViewModel, IHaveStoryBoard {
     //MARK: View Methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        observeViewModel()
         configureAlertSortListView()
-    }
-    
-    //MARK: Actions
-    @objc private func tapFavouritePodcastCell(sender: UITapGestureRecognizer) {
-        
-        guard let cell = sender.view as? UITableViewCell,
-              let indexPath = favouriteTableView.indexPath(for: cell),
-              let favouritePodcast = viewModel.getRow(forIndexPath: indexPath) as? FavouritePodcast else { return }
-        delegate?.listViewController(self, didSelect: favouritePodcast.podcast)
-    }
-    
-    @objc private func removeListeningPodcast(sender: UILongPressGestureRecognizer) {
-        guard let cell = sender.view as? UITableViewCell,
-              let indexPath = favouriteTableView.indexPath(for: cell),
-              let listeningPodcast = viewModel.getRow(forIndexPath: indexPath) as? ListeningPodcast else { return }
-        
-        listeningManager.removeListeningPodcast(listeningPodcast)
+        favouriteTableView.viewModel = viewModel.favouriteTableViewVM
+        favouriteTableView.reloadDataSource()
+        updateUI()
     }
 }
 
@@ -150,21 +126,22 @@ extension ListViewController {
     }
     
     private func configureNavigationItem() {
-        let isEmpty = viewModel.sectionsIsEmpty && !viewModel.isSearching
+        let isEmpty = viewModel.favouriteTableViewVM.isEmpty && !viewModel.favouriteTableViewVM.isSearching
         
         navigationItem.rightBarButtonItem = isEmpty ? nil : removeAllButton
-        navigationItem.leftBarButtonItem = isEmpty ? nil : editButton
+        navigationItem.leftBarButtonItem = editButton
         navigationItem.title = "List"
         navigationItem.hidesSearchBarWhenScrolling = false
     }
     
     private func setSearchController() {
-        navigationItem.searchController = (viewModel.sectionsIsEmpty && !viewModel.isSearching) ? nil : searchController
+        navigationItem.searchController = (viewModel.favouriteTableViewVM.isEmpty && !viewModel.favouriteTableViewVM.isSearching) ? nil : searchController
     }
     
     private func configureScopeBar() {
-        if viewModel.sections.count != 0 {
-            searchController.searchBar.scopeButtonTitles = viewModel.sections
+        guard viewModel.favouriteTableViewVM.searchedSectionData == nil else { return }
+        if !viewModel.favouriteTableViewVM.isEmpty {
+            searchController.searchBar.scopeButtonTitles = viewModel.favouriteTableViewVM.sections
             searchController.searchBar.scopeButtonTitles?.insert("All", at: .zero)
         } else {
             searchController.searchBar.scopeButtonTitles = nil
@@ -179,108 +156,47 @@ extension ListViewController {
     
     private func configureAlertSortListView() {
         guard let tabBarController = tabBarController else { fatalError() }
-        let vc: AlertSortListView = container.resolveWithModel(args: self)
+        let args = AlertSortListView.Arguments.init(vc: tabBarController)
+        let vc: AlertSortListView = container.resolve(args: args)
+        vc.viewModel = container.resolve(args: ())
         tabBarController.view.superview?.addSubview(vc)
         alertSortListView = vc
-    }
-    
-    private func configureCell(for tableView: UITableView, at indexPath: IndexPath) -> UITableViewCell {
-        
-        let item = viewModel.getRow(forIndexPath: indexPath)
-        let playlist = viewModel.getPlaylist(for: indexPath.section)
-        
-        if let podcast = (item as? FavouritePodcast)?.podcast {
-            let cell = tableView.getCell(cell: PodcastCell.self, indexPath: indexPath)
-            let args = PodcastCellViewModel.Arguments.init(podcast: podcast, playlist: playlist)
-            cell.viewModel = container.resolve(args: args)
-            cell.addMyGestureRecognizer(self, type: .tap(), #selector(tapFavouritePodcastCell(sender:)))
-            
-            return cell
-        } else if let likedMoment = item as? LikedMoment {
-            let cell = tableView.getCell(cell: LikedPodcastTableViewCell.self, indexPath: indexPath)
-            let model = LikedPodcastTableViewCellModel(likedMoment: likedMoment)
-            cell.configureCell(with: model)
-            return cell
-        } else if let item = item as? ListeningPodcast {
-            let cell = tableView.getCell(cell: ListeningPodcastCell.self, indexPath: indexPath)
-            cell.addMyGestureRecognizer(self, type: .longPressGesture(minimumPressDuration: 1), #selector(removeListeningPodcast(sender:)))
-            let model = ListeningPodcastCellModel(item)
-            cell.configure(with: model)
-            return cell
-        }
-        fatalError()
     }
     
     private func refreshTableView(completion: @escaping () -> ()) {
         let _ = dataStoreManager.viewContext
         
-//        firebaseDataBase.update(viewContext: viewContext) { [weak self] (result: FavouritePodcast.ResultType) in
-//            guard let self = self else { return }
-//
-//            switch result {
-//            case .failure(error: let error) :
-//                error.showAlert(vc: self)
-//            default: break
-//            }
-//
-//            firebaseDataBase.update(viewContext: viewContext) { [weak self] (result: ListeningPodcast.ResultType) in
-//
-//                guard let self = self else { return }
-//
-//                switch result {
-//                case .failure(error: let error) :
-//                    error.showAlert(vc: self) {
-//                    }
-//                default: break
-//                }
-//
-//                completion()
-//            }
-//        }
+        //        firebaseDataBase.update(viewContext: viewContext) { [weak self] (result: FavouritePodcast.ResultType) in
+        //            guard let self = self else { return }
+        //
+        //            switch result {
+        //            case .failure(error: let error) :
+        //                error.showAlert(vc: self)
+        //            default: break
+        //            }
+        //
+        //            firebaseDataBase.update(viewContext: viewContext) { [weak self] (result: ListeningPodcast.ResultType) in
+        //
+        //                guard let self = self else { return }
+        //
+        //                switch result {
+        //                case .failure(error: let error) :
+        //                    error.showAlert(vc: self) {
+        //                    }
+        //                default: break
+        //                }
+        //
+        //                completion()
+        //            }
+        //        }
     }
     
     private func showAlert() {
-//        if let favouritePodcast = object as? FavouritePodcast {
-//            let name = favouritePodcast.podcast.trackName ?? ""
-//            let title = "\(name) podcast is added to playlist"
-//            addToast(title: title, (playerIsSHidden ? .bottom : .bottomWithPlayer))
-//        }
-    }
-    
-    private func observeViewModel() {
-        viewModel.removeSection { [weak self] index in
-            guard let self = self else { return }
-            favouriteTableView.deleteSection(at: index)
-            updateUI()
-        }
-        
-        viewModel.removeRow { [weak self] indexPath in
-            guard let self = self else { return }
-            favouriteTableView.deleteItem(at: indexPath)
-        }
-        
-        viewModel.insertRow { [weak self] item, indexPath in
-            guard let self = self else { return }
-            favouriteTableView.insertCell(at: indexPath)
-            
-            if let favouritePodcast = item as? FavouritePodcast {
-                let name = favouritePodcast.podcast.trackName ?? ""
-                let title = "\(name) podcast is added to playlist"
-                addToast(title: title, (playerIsSHidden ? .bottom : .bottomWithPlayer))
-            }
-        }
-        
-        viewModel.insertSection { [weak self] section, index in
-            guard let self = self else { return }
-            favouriteTableView.insertSection(at: index)
-            updateUI()
-        }
-        
-        viewModel.moveSection { [weak self] index, newIndex in
-            guard let self = self else { return }
-            favouriteTableView.moveSection(from: index, to: newIndex)
-            updateUI()
-        }
+        //        if let favouritePodcast = object as? FavouritePodcast {
+        //            let name = favouritePodcast.podcast.trackName ?? ""
+        //            let title = "\(name) podcast is added to playlist"
+        //            addToast(title: title, (playerIsSHidden ? .bottom : .bottomWithPlayer))
+        //        }
     }
 }
 
@@ -288,8 +204,7 @@ extension ListViewController {
 extension ListViewController: UISearchBarDelegate {
     
     func searchBar(_ searchBar: UISearchBar, selectedScopeButtonIndexDidChange selectedScope: Int) {
-        viewModel.changeSearchedSection(searchedSection: selectedScope == 0 ? nil : selectedScope - 1)
-        favouriteTableView.reloadData()
+        viewModel.favouriteTableViewVM.changeSearchedSection(searchedSection: selectedScope == 0 ? nil : selectedScope - 1)
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
@@ -308,26 +223,6 @@ extension ListViewController: FavouriteTableViewDelegate {
         refreshTableView {
             refreshControl.endRefreshing()
         }
-    }
-}
-
-//MARK: - FavouriteTableDataSource
-extension ListViewController: FavouriteTableDataSource {
-    
-    func favouriteTableView(_ favouriteTableView: FavouriteTableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        return configureCell(for: favouriteTableView, at: indexPath)
-    }
-    
-    func favouriteTableViewCountOfSections(_ favouriteTableView: FavouriteTableView) -> Int {
-        return viewModel.numbersOfSections
-    }
-    
-    func favouriteTableView(_ favouriteTableView: FavouriteTableView, countOfRowsInSection index: Int) -> Int {
-        return viewModel.numbersOfRowsInSection(section: index)
-    }
-    
-    func favouriteTableView(_ favouriteTableView: FavouriteTableView, nameOfSectionFor index: Int) -> String {
-        return viewModel.getInputSection(sectionIndex: index)
     }
 }
 

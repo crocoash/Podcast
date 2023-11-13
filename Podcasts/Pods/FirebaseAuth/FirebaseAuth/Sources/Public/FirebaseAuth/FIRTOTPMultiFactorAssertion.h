@@ -1,11 +1,11 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,16 +16,18 @@
 
 #import <Foundation/Foundation.h>
 
+#import "FIRMultiFactorAssertion.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol FIRAppCheckTokenResultInterop <NSObject>
-
-/// App Check token in the case of success or a dummy token in the case of a failure.
-/// In general, the value of the token should always be set to the request header.
-@property(nonatomic, readonly) NSString *token;
-
-/// A token fetch error in the case of a failure or `nil` in the case of success.
-@property(nonatomic, readonly, nullable) NSError *error;
+/**
+ @class TOTPMultiFactorAssertion
+ @brief The subclass of base class MultiFactorAssertion, used to assert ownership of a TOTP
+ (Time-based One Time Password) second factor.
+ This class is available on iOS only.
+ */
+NS_SWIFT_NAME(TOTPMultiFactorAssertion) API_UNAVAILABLE(macos, tvos, watchos)
+    @interface FIRTOTPMultiFactorAssertion : FIRMultiFactorAssertion
 
 @end
 

@@ -9,11 +9,16 @@ import UIKit
 
 
 class BigPlayerViewModel: IPerRequest, IViewModelUpdating, INotifyOnChanged {
+  
+    typealias Arguments = Input
+
+    struct Input {
+        var track: Track
+    }
     
     private let likeManager: LikeManager
     private let player: Player
     
-    typealias Arguments = Track
     
     var track: Track
     
@@ -29,11 +34,11 @@ class BigPlayerViewModel: IPerRequest, IViewModelUpdating, INotifyOnChanged {
     var duration: Double? { track.duration }
     var listeningProgress: Double? { track.listeningProgress }
     
-    required init(container: IContainer, args track: Arguments) {
+    required init(container: IContainer, args input: Arguments) {
         self.player = container.resolve()
         self.likeManager = container.resolve()
         
-        self.track = track
+        self.track = input.track
         
         DataProvider.shared.downloadImage(string: track.imageForBigPlayer) { [weak self] image in
             guard let self = self else { return }

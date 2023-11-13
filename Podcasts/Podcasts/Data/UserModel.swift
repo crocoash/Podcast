@@ -9,11 +9,14 @@ import Foundation
 
 struct UserModel: Codable {
     
-    var user = User()
+    init(userName: String, userId: String) {
+        self.user = User(userName: userName, userId: userId)
+    }
+    
+    var user: User
     
     var json: Data? { try? JSONEncoder().encode(self) }
 
-    init() {}
     init? (json: Data?) {
         guard let json = json,
               let userDocument = try? JSONDecoder().decode(UserModel.self, from: json) else { return nil }
@@ -23,6 +26,10 @@ struct UserModel: Codable {
     
     mutating func changeUserName(newName: String) {
         user.userName = newName
+    }
+    
+    mutating func chageUserId(newUserId: String) {
+        user.userId = newUserId
     }
     
     mutating func changeAuthorization(value: Bool) {

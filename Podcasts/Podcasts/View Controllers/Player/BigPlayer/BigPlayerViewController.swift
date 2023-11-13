@@ -15,11 +15,12 @@ protocol BigPlayerViewControllerDelegate: AnyObject {
 
 class BigPlayerViewController: UIViewController, IHaveViewModel, IHaveXib {
     
-    typealias Arguments = BigPlayerViewControllerDelegate
+    typealias Arguments = Input
     typealias ViewModel = BigPlayerViewModel
-    
-    func viewModelChanged() {
-        
+
+    struct Input {
+        var delegate: BigPlayerViewControllerDelegate
+        var modelInput: ViewModel.Arguments
     }
     
     func viewModelChanged(_ viewModel: BigPlayerViewModel) {
@@ -52,11 +53,11 @@ class BigPlayerViewController: UIViewController, IHaveViewModel, IHaveXib {
     private var playImage = UIImage(systemName: "play.fill")!
     
     //MARK: init
-    required init?(container: IContainer, args vc: Arguments) {
+    required init?(container: IContainer, args input: Arguments) {
         self.player = container.resolve()
         self.likeManager = container.resolve()
         
-        self.delegate = vc
+        self.delegate = input.delegate
       
         super.init(nibName: Self.identifier, bundle: nil)
     }

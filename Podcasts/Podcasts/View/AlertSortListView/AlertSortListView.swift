@@ -10,18 +10,17 @@ import UIKit
 //MARK: - MyDataSource
 
 class AlertSortListView: UIView, IHaveViewModel, IHaveXib {
-        
+    
+    typealias Arguments = Input
     typealias ViewModel = AlertSortListViewModel
     
-    func viewModelChanged() {
-        
+    struct Input {
+        var vc: UIViewController
     }
     
-    func viewModelChanged(_ viewModel: AlertSortListViewModel) {
+    func viewModelChanged(_ viewModel: ViewModel) {
         setupUI()
     }
-    
-    typealias Arguments = UIViewController
    
    //MARK: Services
    private let dataStoreManager: DataStoreManager
@@ -50,30 +49,23 @@ class AlertSortListView: UIView, IHaveViewModel, IHaveXib {
    lazy private var showPositionY = vc.view.frame.height - height - margin
    lazy private var margin = (vc.view.frame.width - width) / 2
    lazy private var positionYForClosed = showPositionY + height * 0.3
-   
-   //MARK: init
-    required init(container: IContainer, args: Arguments) {
-
+    
+    //MARK: init
+    required init(container: IContainer, args input: Arguments) {
+        
         self.dataStoreManager = container.resolve()
         self.listDataManager = container.resolve()
-
+        
         super.init(frame: .zero)
         
-        self.vc = args
-        self.listDataManager.delegate = self
+        vc = input.vc
+        listDataManager.delegate = self
         configureView()
-   }
-    
-    func setupUI() {
-        [closeImageView].forEach { $0.addMyGestureRecognizer(self, type: .panGestureRecognizer, #selector(panGesture(sender:))) }
-
-        tableView.isEditing = true
-        tableView.isScrollEnabled = false
     }
     
-   required init?(coder: NSCoder) {
-      fatalError("init(coder:) has not been implemented")
-   }
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
    
    //MARK: Actions
    @objc func showOrHideAlertListView() {
@@ -81,6 +73,7 @@ class AlertSortListView: UIView, IHaveViewModel, IHaveXib {
          hide()
       } else {
          show()
+        setupUI()
       }
    }
        
@@ -133,6 +126,13 @@ extension AlertSortListView {
       self.gestureView = gestureView
    }
    
+    private func setupUI() {
+        [closeImageView].forEach { $0.addMyGestureRecognizer(self, type: .panGestureRecognizer, #selector(panGesture(sender:))) }
+
+        tableView.isEditing = true
+        tableView.isScrollEnabled = false
+    }
+    
    private func configureView() {
       frame.size.width = width
       frame.size.height = height
@@ -180,7 +180,7 @@ extension AlertSortListView: UITableViewDelegate {
    
    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
       let item = viewModel.listSections[indexPath.row]
-      return item.isActive ? .delete : .insert
+       return item.isActive ? .delete : .insert
    }
    
    func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
@@ -190,13 +190,13 @@ extension AlertSortListView: UITableViewDelegate {
    
    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
        viewModel.changeActiveState(for: indexPath)
-      tableView.reloadRows(at: [indexPath], with: .automatic)
+       tableView.reloadRows(at: [indexPath], with: .automatic)
    }
 
    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
        viewModel.changeActiveState(for: indexPath)
-      tableView.reloadRows(at: [indexPath], with: .automatic)
-      return []
+       tableView.reloadRows(at: [indexPath], with: .automatic)
+       return []
    }
 }
 

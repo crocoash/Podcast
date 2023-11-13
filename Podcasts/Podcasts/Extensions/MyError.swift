@@ -15,10 +15,12 @@ enum Result<T> {
 
 enum MyError {
     
+    typealias AlertData = (title: String, message: String, actions: ((String) -> [UIAlertAction])?)
+    
     case apiService(ApiService)
     case downloadService(DownloadService)
     case firebaseDatabase(FirebaseDatabase)
-    
+    case auth(Auth)
     
     func showAlert(vc: UIViewController?, completion: (() -> Void)? = nil) {
         
@@ -32,14 +34,34 @@ enum MyError {
 
         case .firebaseDatabase(let firebaseDatabase):
             firebaseDatabase.showAlert(vc: vc, completion: completion)
+            
+        case .auth(let alertData):
+            switch alertData {
+            case .error(let alertData):
+                showAlert1(vc: vc, alertData: alertData, completion: completion)
+            case .errorEmail(let alertData):
+                showAlert1(vc: vc, alertData: alertData, completion: completion)
+            case .errorPassword(let alertData):
+                showAlert1(vc: vc, alertData: alertData, completion: completion)
+            }
         }
     }
+    
+    private func showAlert1(vc: UIViewController?, alertData: AlertData, completion: (() -> Void)? = nil) {
+        guard let vc = vc else { return }
+        Alert().create(for: vc, title: alertData.title, message: alertData.message, actions: alertData.actions)
+    }
 
+    enum Auth {
+        case error(AlertData)
+        case errorEmail(AlertData)
+        case errorPassword(AlertData)
+    }
     
     enum ApiService {
         
-        case noData
-        case error(String)
+        case noData(AlertData)
+        case error(AlertData)
         
         func showAlert(vc: UIViewController?, completion: (() -> Void)? = nil) {
             
@@ -53,7 +75,7 @@ enum MyError {
                 }
                 
             case .error(let error) :
-                Alert().create(for: vc, title: "ApiService error", message: error) { _ in
+                Alert().create(for: vc, title: "ApiService error", message: error.message) { _ in
                     return [UIAlertAction(title: "Ok", style: .cancel) { _ in
                         completion?()
                     } ]

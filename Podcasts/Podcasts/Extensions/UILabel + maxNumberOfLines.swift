@@ -28,16 +28,16 @@ extension UILabel {
     }
     
     var maxNumberOfLines: Int {
-        return Int(ceil(textHeight / lineHeight))
+        return Int(round(textHeight / lineHeight))
     }
     
     var textHeight: CGFloat {
         let maxSize = CGSize(width: self.frame.size.width, height: CGFloat(MAXFLOAT))
         let text = (self.text ?? "") as NSString
         
-//        self.textRect(forBounds: CGRect(origin: .zero, size: CGSize(width:  self.frame.size.width, height: <#T##CGFloat#>)),limitedToNumberOfLines: 0)
+        return self.textRect(forBounds: CGRect(origin: .zero, size: CGSize(width:  self.frame.size.width, height: CGFloat(MAXFLOAT))),limitedToNumberOfLines: 0).height
         
-        let textHeight = text.boundingRect(with: maxSize, options: .usesLineFragmentOrigin, attributes: [.font: self.font as Any ], context: nil).height
-        return textHeight
+//        let textHeight = text.boundingRect(with: maxSize, options: .usesLineFragmentOrigin, attributes: [.font: self.font as Any ], context: nil).height
+//        return textHeight
     }
 }
