@@ -15,12 +15,18 @@ protocol BigPlayerViewControllerDelegate: AnyObject {
 
 class BigPlayerViewController: UIViewController, IHaveViewModel, IHaveXib {
     
+    
+    
     typealias Arguments = Input
     typealias ViewModel = BigPlayerViewModel
 
     struct Input {
         var delegate: BigPlayerViewControllerDelegate
         var modelInput: ViewModel.Arguments
+    }
+    
+    func viewModelChanged() {
+        
     }
     
     func viewModelChanged(_ viewModel: BigPlayerViewModel) {

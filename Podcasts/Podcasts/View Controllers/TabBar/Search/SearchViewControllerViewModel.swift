@@ -11,15 +11,9 @@ import UIKit
 //MARK: - ViewModel
 class SearchViewControllerViewModel: IPerRequest, ITableViewModel, IViewModelDinamicUpdating, INotifyOnChanged {
     
-    
     func configureDataSourceForView() {
         dataSourceForView = dataSourceAll
     }
-    
-    func configureDataSource() {
-        
-    }
-    
     
     private let router: PresenterService
     private let apiService: ApiService

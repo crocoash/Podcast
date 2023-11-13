@@ -33,6 +33,8 @@ protocol IDiffableTableView: AnyObject {
     func reloadTableView()
     func insertSection(section: Section, at index: Int)
     func reloadSection(indexSection index: Int)
+    
+    func configureDataSource()
 }
 
 
@@ -42,6 +44,7 @@ extension IDiffableTableView {
     func insertSection(section: Section, at index: Int) {
         
         let isLastSection = mySnapShot.numberOfSections < index + 1
+        configureDataSource()
         if isLastSection {
             mySnapShot.appendSections([section])
         } else {
@@ -63,10 +66,10 @@ extension IDiffableTableView {
     
     func insertRow(at indexPath: IndexPath) {
 
-        let cell = cellForRowAt(indexPath: indexPath)
+        let cell: Row = cellForRowAt(indexPath: indexPath)
         let section = mySnapShot.sectionIdentifiers[indexPath.section]
         let count = mySnapShot.itemIdentifiers(inSection: section).count
-
+        configureDataSource()
         if count < indexPath.row + 1 {
             mySnapShot.appendItems([cell], toSection: section)
         } else {

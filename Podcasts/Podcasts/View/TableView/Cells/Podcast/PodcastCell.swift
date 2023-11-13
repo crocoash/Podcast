@@ -10,12 +10,15 @@ import UIKit
 //MARK: - PodcastCell
 class PodcastCell: UITableViewCell, IHaveViewModel {
     
-  
+    
     typealias ViewModel = PodcastCellViewModel
     
     func viewModelChanged(_ viewModel: PodcastCellViewModel) {
         configureGestures()
         self.heightOfImageView.constant = (frame.height - dateLabel.frame.height) - 10
+    }
+    
+    func viewModelChanged() {
         updateCell()
     }
 
@@ -55,6 +58,10 @@ class PodcastCell: UITableViewCell, IHaveViewModel {
         didSet {
             updateSelectState()
         }
+    }
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
     }
     
      //MARK: Actions

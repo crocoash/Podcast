@@ -5,13 +5,14 @@
 //  Created by Anton on 10.09.2023.
 //
 
-import Foundation
+import UIKit
 
 protocol IHaveViewModel: AnyObject {
     associatedtype ViewModel
     
     var viewModel: ViewModel { get set }
     func viewModelChanged(_ viewModel: ViewModel)
+    func viewModelChanged()
 }
 
 private var viewModelKey: UInt8 = 0
@@ -27,21 +28,15 @@ extension IHaveViewModel {
             let viewModel1 = newValue as? ViewModel
             
             objc_setAssociatedObject(self, &viewModelKey, viewModel1, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        
+            viewModelChanged(viewModel)
             
-//            if let viewModel = viewModel {
-//                viewModelChanged(viewModel)
-//            }
-//            
-//            (viewModel as? INotifyOnChanged)?.changed.subscribe(self) { this in
-//                
-//            }
-//            viewModelChanged(viewModel)
-            (viewModel as? any INotifyOnChanged)?.changed.subscribe(self) { [weak self] this, _ in
-                guard let self = self else { fatalError() }
-//                if let viewModel = viewModel {
-                    this.viewModelChanged(viewModel)
-//                    viewModelChanged(viewModel)
-//                }
+            if let self = self as? UIView {
+                viewModelChanged()
+            }
+            
+            (newValue as? any INotifyOnChanged)?.changed.subscribe(self) { this, _ in
+                this.viewModelChanged()
             }
         }
     }
@@ -51,7 +46,11 @@ extension IHaveViewModel {
             return anyViewModel as! ViewModel
         }
         set {
+            let firstSet = anyViewModel == nil
             anyViewModel = newValue
+            if !firstSet {
+                viewModelChanged()
+            }
         }
     }
 }

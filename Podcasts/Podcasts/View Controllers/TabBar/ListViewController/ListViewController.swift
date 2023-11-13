@@ -23,6 +23,10 @@ class ListViewController: UIViewController, IHaveViewModel, IHaveStoryBoard {
     }
     
     func viewModelChanged(_ viewModel: ListViewModel) {
+        
+    }
+    
+    func viewModelChanged() {
         updateUI()
     }
     

@@ -11,6 +11,8 @@ import UIKit
 
 class AlertSortListView: UIView, IHaveViewModel, IHaveXib {
     
+    
+    
     typealias Arguments = Input
     typealias ViewModel = AlertSortListViewModel
     
@@ -19,6 +21,10 @@ class AlertSortListView: UIView, IHaveViewModel, IHaveXib {
     }
     
     func viewModelChanged(_ viewModel: ViewModel) {
+        
+    }
+    
+    func viewModelChanged() {
         setupUI()
     }
    
@@ -73,7 +79,6 @@ class AlertSortListView: UIView, IHaveViewModel, IHaveXib {
          hide()
       } else {
          show()
-        setupUI()
       }
    }
        

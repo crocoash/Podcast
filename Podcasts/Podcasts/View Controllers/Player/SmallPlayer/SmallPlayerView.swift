@@ -14,8 +14,11 @@ import UIKit
 @IBDesignable
 class SmallPlayerView: UIView, IHaveViewModel {
     
-
     func viewModelChanged(_ viewModel: SmallPlayerViewModel) {
+        
+    }
+    
+    func viewModelChanged() {
         updateView()
     }
     

@@ -23,6 +23,10 @@ class FavouriteTableView: UITableView, IDiffableTableViewWithModel, IHaveViewMod
     var diffableDataSource: DiffableDataSource!
     
     func viewModelChanged(_ viewModel: FavouriteTableViewModel) {
+        
+    }
+    
+    func viewModelChanged() {
         updateUI()
     }
     
@@ -64,12 +68,6 @@ class FavouriteTableView: UITableView, IDiffableTableViewWithModel, IHaveViewMod
         })
     }
     
-//    override func deleteRows(at indexPaths: [IndexPath], with animation: UITableView.RowAnimation) {
-//        let items = indexPaths.compactMap { diffableDataSource.itemIdentifier(for: $0) }
-//        mySnapShot.deleteItems(items)
-//        diffableDataSource.apply(mySnapShot)
-//    }
-    
     class DataSource: DiffableDataSource {
         
         private var titles: [Section]
@@ -110,7 +108,7 @@ extension FavouriteTableView {
         var enabled = false
         if viewModel.isEmpty {
             let heightOfCells = (0..<numberOfSections).reduce(into: 0) { $0 += rect(forSection: $1).height + 50 }
-            let enabled = heightOfCells > frame.height
+            enabled = heightOfCells > frame.height
         }
         isScrollEnabled = enabled
     }

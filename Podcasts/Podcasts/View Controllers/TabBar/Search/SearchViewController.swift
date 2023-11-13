@@ -20,10 +20,11 @@ class SearchViewController: UIViewController, IHaveStoryBoard, IHaveViewModel {
     typealias ViewModel = SearchViewControllerViewModel
 
     func viewModelChanged(_ viewModel: SearchViewControllerViewModel) {
-        if searchCollectionView != nil {
-            updateUI()
-            observeViewModel() 
-        }
+        observeViewModel()
+    }
+    
+    func viewModelChanged() {
+        updateUI()
     }
     
     private let apiService: ApiService
