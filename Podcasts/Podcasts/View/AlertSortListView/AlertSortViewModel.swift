@@ -8,10 +8,10 @@
 import Foundation
 
 class AlertSortListViewModel: IPerRequest {
+  
+    struct Arguments {}
     
-    typealias Arguments = Void
-    
-    required init?(container: IContainer, args: Void) {
+    required init?(container: IContainer, args: Arguments) {
         self.dataStoreManager = container.resolve()
         self.listDataManager = container.resolve()
     }

@@ -14,15 +14,11 @@ typealias PlayListByOldest = PlaylistByNewest
 typealias PlayListByGenre = PlaylistByNewest
 
 
-class SearchViewController: UIViewController, IHaveStoryBoard, IHaveViewModel {
+class SearchViewController: UIViewController, IHaveStoryBoardAndViewModel{
     
-    typealias Args = Void
-    typealias ViewModel = SearchViewControllerViewModel
+    struct Args {}
+    typealias ViewModel = SearchViewModel
 
-    func viewModelChanged(_ viewModel: SearchViewControllerViewModel) {
-        observeViewModel()
-    }
-    
     func viewModelChanged() {
         updateUI()
     }
@@ -66,7 +62,6 @@ class SearchViewController: UIViewController, IHaveStoryBoard, IHaveViewModel {
         self.container = container
         
         super.init(coder: args.coder)
-        self.viewModel = container.resolve(args: ())
     }
     
     required init?(coder: NSCoder) {
@@ -119,25 +114,27 @@ class SearchViewController: UIViewController, IHaveStoryBoard, IHaveViewModel {
         }
 //        getData()
     }
+    
+    func updateUI() {
+       if viewModel.isLoading {
+           view.showActivityIndicator()
+       } else {
+           view.hideActivityIndicator()
+       }
+       showEmptyImage()
+   }
+   
+    func configureUI() {
+       observeViewModel()
+       configureCancelLabel()
+       configureSegmentalControl()
+       configureAlert()
+   }
+   
 }
 
 //MARK: - Private configure UI Methods
 extension SearchViewController {
-    
-    private func updateUI() {
-        if viewModel.isLoading {
-            view.showActivityIndicator()
-        } else {
-            view.hideActivityIndicator()
-        }
-        showEmptyImage()
-    }
-    
-    private func configureUI() {
-        configureCancelLabel()
-        configureSegmentalControl()
-        configureAlert()
-    }
     
     private func configureGesture() {
 //        addMyGestureRecognizer(self, type: .swipe(directions: [.left,.right]), #selector(handlerSwipe))
@@ -311,17 +308,5 @@ extension SearchViewController: SearchCollectionViewDataSource {
         let podcast = viewModel.getRowForView(forIndexPath: indexPath)
         let row = SearchCollectionView.Row(podcast: podcast)
         return row
-    }
-}
-
-//MARK: - UIViewControllerTransitioningDelegate
-extension SearchViewController: UIViewControllerTransitioningDelegate {
-    
-    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        return PresentTransition()
-    }
-    
-    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        return DismissTransition()
     }
 }

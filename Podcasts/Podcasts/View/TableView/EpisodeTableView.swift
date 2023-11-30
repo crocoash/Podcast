@@ -13,14 +13,8 @@ import CoreData
 }
 
 class EpisodeTableView: UITableView, IHaveViewModel, ITableViewDinamicUpdating {
-
-    func viewModelChanged(_ viewModel: EpisodeTableViewModel) {
-        observeViewModel()
-    }
     
-    func viewModelChanged() {
-        
-    }
+    func viewModelChanged() {}
     
     typealias ViewModel = EpisodeTableViewModel
    
@@ -39,17 +33,24 @@ class EpisodeTableView: UITableView, IHaveViewModel, ITableViewDinamicUpdating {
         return (0..<numberOfSections ).reduce(into: 0) { $0 += (rect(forSection: $1).height + paddingBetweenSections) }
     }
     
+    func selectRowAt(indexPath: IndexPath) {
+        UIView.animate(withDuration: 0.4) { [weak self] in
+            guard let self = self,
+                  let cell = cellForRow(at: indexPath) else { return }
+            
+            cell.isSelected = !cell.isSelected
+        }
+        beginUpdates()
+        endUpdates()
+    
+        let isLastCell = isLastSectionAndRow(indexPath: indexPath)
+        myDataSource?.episodeTableViewDidChangeHeightTableView(self, height: height, withLastCell: isLastCell)
+    }
+
+    
     ///BigPlayer
     func getYPositionYFor(indexPath: IndexPath) -> CGFloat {
         return rectForRow(at: indexPath).origin.y
-    }
-    
-    func updateOpenDescriptionsImage() {
-        visibleCells.forEach {
-            if let cell = $0 as? PodcastCell {
-                cell.updateOpenDescriptionInfo()
-            }
-        }
     }
 
     //MARK: init
@@ -63,6 +64,12 @@ class EpisodeTableView: UITableView, IHaveViewModel, ITableViewDinamicUpdating {
         delegate = self
         dataSource = self
     }
+    
+    func configureUI() {
+        observeViewModel()
+    }
+    
+    func updateUI() {}
 }
 
 //MARK: - UITableViewDelegate
@@ -88,20 +95,6 @@ extension EpisodeTableView: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, estimatedHeightForHeaderInSection section: Int) -> CGFloat {
         return defaultSectionHeight
-    }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        UIView.animate(withDuration: 0.4) { [weak self] in
-            guard let self = self,
-                  let cell = cellForRow(at: indexPath) else { return }
-            
-            cell.isSelected = !cell.isSelected
-        }
-        beginUpdates()
-        endUpdates()
-     
-        let isLastCell = isLastSectionAndRow(indexPath: indexPath)
-        myDataSource?.episodeTableViewDidChangeHeightTableView(self, height: height, withLastCell: isLastCell)
     }
 }
 

@@ -14,17 +14,22 @@ protocol ISectionData: Equatable {
     var section: Section  { get set }
     var rows: [Row]       { get set }
     var isActive: Bool    { get set }
+    var isAvailable: Bool { get }
 }
 
 
 extension ISectionData {
     var isEmpty: Bool { rows.isEmpty }
-    var isAvailable: Bool {
-        return !isEmpty && isActive
-    }
+//    var isAvailable: Bool {
+//        return !isEmpty && isActive
+//    }
 }
 
 class BaseSectionData<Row, Section>: ISectionData {
+    var isAvailable: Bool {
+        return !isEmpty && isActive
+    }
+    
     
     static func == (lhs: BaseSectionData<Row, Section>, rhs: BaseSectionData<Row, Section>) -> Bool {
         lhs.rows == rhs.rows

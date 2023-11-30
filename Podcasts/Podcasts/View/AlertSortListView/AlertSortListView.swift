@@ -9,34 +9,22 @@ import UIKit
 
 //MARK: - MyDataSource
 
-class AlertSortListView: UIView, IHaveViewModel, IHaveXib {
+class AlertSortListView: UIView, IHaveXibAndViewModel {
     
-    
-    
-    typealias Arguments = Input
     typealias ViewModel = AlertSortListViewModel
     
-    struct Input {
+    struct Arguments {
         var vc: UIViewController
-    }
-    
-    func viewModelChanged(_ viewModel: ViewModel) {
-        
-    }
-    
-    func viewModelChanged() {
-        setupUI()
     }
    
    //MARK: Services
    private let dataStoreManager: DataStoreManager
    private let listDataManager: ListDataManager
    
-   
    @IBOutlet private weak var closeImageView: UIImageView!
    @IBOutlet private weak var tableView: UITableView!
    
-   weak var vc: UIViewController!
+   var vc: UIViewController!
    
    //MARK: Variables
    private var alertSortListViewIsShowing = false
@@ -61,18 +49,34 @@ class AlertSortListView: UIView, IHaveViewModel, IHaveXib {
         
         self.dataStoreManager = container.resolve()
         self.listDataManager = container.resolve()
+        self.vc = input.vc
         
-        super.init(frame: .zero)
-        
-        vc = input.vc
+        super.init(frame: CGRect(x: 0, y: 0, width: 400, height: 400))
         listDataManager.delegate = self
-        configureView()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-   
+    
+    func configureUI() {
+        frame.size.width = width
+        frame.size.height = height
+        frame.origin.y = hidePositionY
+        frame.origin.x = margin
+        layer.shadowRadius = 40
+        layer.shadowOpacity = 0.2
+  //      layer.shadowOffset = CGSize(width: 100, height: 100)
+        layer.shadowColor = UIColor.white.cgColor
+        
+        closeImageView.addMyGestureRecognizer(self, type: .panGestureRecognizer, #selector(panGesture(sender:)))
+
+        tableView.isEditing = true
+        tableView.isScrollEnabled = false
+    }
+    
+    func updateUI() {}
+    
    //MARK: Actions
    @objc func showOrHideAlertListView() {
       if alertSortListViewIsShowing {
@@ -127,28 +131,10 @@ extension AlertSortListView {
       
       let gestureView = UIView(frame: vc.view.frame)
       gestureView.addMyGestureRecognizer(self, type: .tap(), #selector(showOrHideAlertListView))
-      vc.tabBarController?.view.insertSubview(gestureView, belowSubview: self)
+      vc.view.insertSubview(gestureView, belowSubview: self)
       self.gestureView = gestureView
    }
-   
-    private func setupUI() {
-        [closeImageView].forEach { $0.addMyGestureRecognizer(self, type: .panGestureRecognizer, #selector(panGesture(sender:))) }
-
-        tableView.isEditing = true
-        tableView.isScrollEnabled = false
-    }
     
-   private func configureView() {
-      frame.size.width = width
-      frame.size.height = height
-      frame.origin.y = vc.view.frame.height
-      frame.origin.x = margin
-      layer.shadowRadius = 40
-      layer.shadowOpacity = 0.2
-//      layer.shadowOffset = CGSize(width: 100, height: 100)
-      layer.shadowColor = UIColor.white.cgColor
-   }
-   
    private func show() {
       alertSortListViewIsShowing = true
       

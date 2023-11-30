@@ -9,7 +9,9 @@ import UIKit
 
 
 //MARK: - ViewModel
-class SearchViewControllerViewModel: IPerRequest, ITableViewModel, IViewModelDinamicUpdating, INotifyOnChanged {
+class SearchViewModel: IPerRequest, ITableViewModel, IViewModelDinamicUpdating, INotifyOnChanged {
+    
+    struct Arguments {}
     
     func configureDataSourceForView() {
         dataSourceForView = dataSourceAll
@@ -18,8 +20,7 @@ class SearchViewControllerViewModel: IPerRequest, ITableViewModel, IViewModelDin
     private let router: PresenterService
     private let apiService: ApiService
     private let container: IContainer
-    
-    typealias Arguments = Void
+        
     typealias SectionData = BaseSectionData<Podcast, String>
     
     var insertSectionOnView: ((Section, Int) -> ()) =     { _, _ in }
@@ -115,7 +116,7 @@ class SearchViewControllerViewModel: IPerRequest, ITableViewModel, IViewModelDin
 }
 
 //MARK: - Private Methods
-extension SearchViewControllerViewModel {
+extension SearchViewModel {
     
     private func configureSectionData(podcasts: [Podcast]) -> [SectionData] {
         return podcasts.sortPodcastsByGenre

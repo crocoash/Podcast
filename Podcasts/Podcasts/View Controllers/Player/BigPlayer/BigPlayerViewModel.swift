@@ -7,60 +7,83 @@
 
 import UIKit
 
+//protocol BigPlayerPlayableProtocol {
+// 
+//
+//}
+
+protocol BigPlayerInputType {
+    var id: String { get }
+    var trackName: String? { get }
+    var imageForBigPlayer: String? { get }
+    var currentTime: Float? { get }
+    var duration: Double? { get }
+    var listeningProgress: Double? { get }
+    var isGoingPlaying: Bool { get }
+    var isLast: Bool { get }
+    var isFirst: Bool { get }
+    var isPlaying: Bool { get }
+}
 
 class BigPlayerViewModel: IPerRequest, IViewModelUpdating, INotifyOnChanged {
-  
-    typealias Arguments = Input
 
-    struct Input {
-        var track: Track
+    struct Arguments {
+        var input: BigPlayerInputType
     }
     
+    /// Servisices
     private let likeManager: LikeManager
     private let player: Player
+    private let listeningManager: ListeningManager
     
+    var input: any BigPlayerInputType
     
-    var track: Track
-    
-    var isGoingPlaying: Bool { track.isGoingPlaying }
-    var isLast: Bool { track.isLast }
-    var isFirst: Bool  { track.isFirst }
-    var isPlaying: Bool { track.isPlaying }
-    
-    var id: String { track.id }
-    var trackName: String? { track.trackName }
+    ///Track
+    var isGoingPlaying: Bool { input.isGoingPlaying }
+    var isLast: Bool { input.isLast }
+    var isFirst: Bool { input.isFirst }
+    var isPlaying: Bool { input.isPlaying }
+    var id: String { input.id }
+    var trackName: String? { input.trackName }
     var imageForBigPlayer: UIImage?
-    var currentTime: Float? { track.currentTime }
-    var duration: Double? { track.duration }
-    var listeningProgress: Double? { track.listeningProgress }
+    var currentTime: Float? { input.currentTime }
+    var duration: Double? { input.duration }
+    var listeningProgress: Double? { input.listeningProgress }
     
-    required init(container: IContainer, args input: Arguments) {
+    required init(container: IContainer, args: Arguments) {
         self.player = container.resolve()
         self.likeManager = container.resolve()
+        self.input = args.input
+        self.listeningManager = container.resolve()
         
-        self.track = input.track
-        
-        DataProvider.shared.downloadImage(string: track.imageForBigPlayer) { [weak self] image in
+        DataProvider.shared.downloadImage(string: args.input.imageForBigPlayer) { [weak self] image in
             guard let self = self else { return }
             imageForBigPlayer = image
         }
+        
+        player.delegate = self
+        listeningManager.delegate = self
     }
     
     func update(with input: Any) {
-        
+    
         switch input {
-        case let track as Track:
-            self.track = track
+        case let track as BigPlayerInputType:
+            guard track.id == id else { return }
+            self.input = track
+            changed.raise()
+        case let listeningPodcast as ListeningPodcast:
+            guard listeningPodcast.podcast.id == id else { return }
+            
+            changed.raise()
         default:
             return
         }
-        changed.raise()
-    }
-    
-    func addLikeMoment() {
-        likeManager.addToLikedMoments(entity: track.inputType, moment: track.listeningProgress ?? 0)
+        
     }
 }
 
+//extension List
+
 //MARK: - PlayerEventNotification
-extension BigPlayerViewModel: PlayerDelegate {}
+extension BigPlayerViewModel: PlayerDelegate, ListeningManagerDelegate {}

@@ -58,7 +58,7 @@ extension IViewModelDinamicUpdating {
         let oldDataSource = dataSourceAll
         
         ///remove
-        oldDataSource.forEach { oldSectionData in
+        oldDataSource.reversed().forEach { oldSectionData in
                 
             if !newDataSource.contains(oldSectionData) {
                 removeSectionData(oldSectionData)
@@ -208,8 +208,8 @@ extension IViewModelDinamicUpdating {
             insertSectionOnView(sectionData.section, sectionIndex)
         }
          
-        dataSourceForView[indexSection].rows.insert(row, at: indexRow)
-        let indexPath = IndexPath(row: indexRow, section: indexSection)
+        dataSourceForView[sectionIndex].rows.insert(row, at: indexRow)
+        let indexPath = IndexPath(row: indexRow, section: sectionIndex)
         insertItemOnView(row, indexPath)
     }
     

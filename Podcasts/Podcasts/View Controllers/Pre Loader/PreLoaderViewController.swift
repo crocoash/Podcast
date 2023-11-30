@@ -9,10 +9,11 @@ import UIKit
 
 class PreLoaderViewController: UIViewController, IHaveStoryBoard {
     
-    typealias Args = Void
+    struct Args {}
     
     private let userViewModel: UserViewModel
     private let container: IContainer
+    let router: PresenterService
     
     @IBOutlet private weak var logoImageView: UIImageView!
     @IBOutlet private weak var horizontalCenterConstraint: NSLayoutConstraint!
@@ -20,27 +21,13 @@ class PreLoaderViewController: UIViewController, IHaveStoryBoard {
     private var heightConstraint: NSLayoutConstraint?
     
     lazy private var topAnchorConst = view.frame.height / 2 - logoImageView.frame.height / 2
-    
-    lazy private var tabBarVC: TabBarViewController = {
-        let tabBarViewController: TabBarViewController = container.resolve()
-        tabBarViewController.modalPresentationStyle = .custom
-        tabBarViewController.transitioningDelegate = self
-        return tabBarViewController
-    }()
-    
-    lazy private var registrationVC: RegistrationViewController = {
-        let registrationVC: RegistrationViewController = container.resolve()
-        registrationVC.modalPresentationStyle = .custom
-        registrationVC.transitioningDelegate = self
-        return registrationVC
-    }()
-    
+
     //MARK: init
     required init?(container: IContainer, args: (args: Args, coder: NSCoder)) {
 
         self.userViewModel = container.resolve()
         self.container = container
-
+        self.router = container.resolve()
         super.init(coder: args.coder)
     }
     
@@ -62,7 +49,10 @@ class PreLoaderViewController: UIViewController, IHaveStoryBoard {
         if userViewModel.userIsLogin {
             Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { [weak self] _ in
                 guard let self = self else { return }
-                present(tabBarVC, animated: true)
+                let args = TabBarViewController.Args.init()
+                let argsVM = TabBarViewModel.Arguments.init()
+                let vc: TabBarViewController = container.resolve(args: args, argsVM: argsVM)
+                router.present(vc, modalPresentationStyle: .custom)
                 view.isHidden = true
             }
             
@@ -73,7 +63,9 @@ class PreLoaderViewController: UIViewController, IHaveStoryBoard {
                 view.layoutIfNeeded()
             }) { [weak self] _ in
                 guard let self = self else { return }
-                present(registrationVC, animated: false)
+                let args = RegistrationViewController.Args.init()
+                let vc: RegistrationViewController = container.resolve(args: args)
+                router.present(vc, modalPresentationStyle: .custom)
                 view.isHidden = true
             }
         }

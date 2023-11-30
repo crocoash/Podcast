@@ -88,7 +88,9 @@ extension CoreDataProtocol {
 
 final class DataStoreManager: ISingleton {
     
-    init(container: IContainer, args: ()) {}
+    typealias Arguments = Void
+    
+    init(container: IContainer, args: Arguments) {}
     
     lazy var viewContext = persistentContainer.viewContext
     lazy var backgroundContext = persistentContainer.newBackgroundContext()
@@ -241,7 +243,7 @@ extension DataStoreManager: DataStoreManagerInput {
     }
     
     func updateCoreData<T: CoreDataProtocol>(entity: T) {
-        updateCoreData(entity: entity, withRelationShip: false)
+        updateCoreData(entity: entity, withRelationShip: false) 
     }
     
     func updateCoreData<T: CoreDataProtocol>(entity: T, withRelationShip: Bool) {

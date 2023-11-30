@@ -8,104 +8,45 @@
 import Foundation
 import UIKit
 
-enum InstanceScope {
-    case perRequest
-    case singleton
-    case storyBoard
-    case xib
-}
-
-protocol ISingleton: IResolvable where Arguments == Void {
-    init(container: IContainer, args: Arguments)
-}
-extension ISingleton {
-    static var instanceScope: InstanceScope {
-        return .singleton
-    }
-}
-
-protocol IPerRequest: IResolvable {}
-extension IPerRequest {
-    static var instanceScope: InstanceScope {
-        return .perRequest
-    }
-}
-
-protocol IHaveStoryBoard: UIViewController & IResolvable where Arguments == (args: Args, coder: NSCoder) {
-    associatedtype Args
-}
-extension IHaveStoryBoard {
-    static var instanceScope: InstanceScope {
-        return .storyBoard
-    }
-}
-
-protocol IHaveXib: IResolvable {}
-extension IHaveXib {
-    static var instanceScope: InstanceScope {
-        return .xib
-    }
-}
-
-
-//MARK: - IContainer
-protocol IContainer: AnyObject {
-    
-    func resolve<T: IResolvable>(args: T.Arguments) -> T
-    func resolve<T: IHaveStoryBoard>(args: T.Args) -> T
-}
-
-extension IContainer {
-    
-    func resolve<T: IResolvable>() -> T where T.Arguments == Void {
-        return resolve(args: ())
-    }
-    
-    ///IHaveStoryBoard
-    func resolve<T: IHaveStoryBoard>() -> T where T.Args == Void {
-        return resolve(args: ())
-    }
-    
-//    func resolveWithModel<T: IHaveStoryBoard & IHaveViewModel>(args: T.Args, argsVM: T.ViewModel.Arguments) -> T where T.ViewModel: IResolvable {
-//        let vc: T = resolve(args: args)
-//        vc.viewModel = resolve(args: argsVM)
-//        return vc
-//    }
-//    
-//    func resolveWithModel<T: IHaveStoryBoard & IHaveViewModel>(argsVM: T.ViewModel.Arguments) -> T where T.ViewModel: IResolvable, T.Args == Void {
-//        let vc: T = resolve(args: ())
-//        vc.viewModel = resolve(args: argsVM)
-//        return vc
-//    }
-//    
-//    func resolveWithModel<T: IHaveStoryBoard & IHaveViewModel>(args: T.Args) -> T where T.ViewModel: IResolvable, T.ViewModel.Arguments == Void {
-//        let vc: T = resolve(args: args)
-//        vc.viewModel = resolve(args: ())
-//        return vc
-//    }
-    
-    ///xib
-    func resolve<T: IHaveXib>() -> T where T.Arguments == Void {
-        return resolve(args: ())
-    }
-    
-//    func resolveWithModel<T: IHaveXib & IHaveViewModel>(args: T.Arguments, argsVM: T.ViewModel.Arguments) -> T where T.ViewModel: IResolvable {
-//        let view: T = resolve(args: args)
-//        view.viewModel = resolve(args: argsVM)
-//        return view
-//    }
-//    
-//    func resolveWithModel<T: IHaveXib & IHaveViewModel>(args: T.Arguments) -> T where T.ViewModel: IResolvable, T.ViewModel.Arguments == Void {
-//        let view: T = resolve(args: args)
-//        view.viewModel = resolve(args: ())
-//        return view
-//    }
-}
-
 protocol IResolvable: AnyObject {
     associatedtype Arguments
     init?(container: IContainer, args: Arguments)
-    static var instanceScope: InstanceScope { get }
+}
+
+protocol ISingleton: IResolvable {
+    init(container: IContainer, args: Arguments)
+}
+
+protocol IPerRequest: IResolvable {}
+
+/// StoryBoard
+protocol IHaveStoryBoard: UIViewController & IResolvable where Arguments == (args: Args, coder: NSCoder) {
+    associatedtype Args
+}
+protocol IHaveStoryBoardAndViewModel: UIViewController & IResolvable & IHaveViewModel where ViewModel: IPerRequest, Arguments == (args: Args, coder: NSCoder) {
+    associatedtype Args
+}
+protocol IHaveXib: AnyObject, IResolvable {}
+protocol IHaveXibAndViewModel: AnyObject, IResolvable, IHaveViewModel where ViewModel: IPerRequest {}
+
+//MARK: - IContainer
+protocol IContainer: AnyObject {
+    func resolve<T: ISingleton>(args: T.Arguments) -> T
+    func resolve<T: IPerRequest>(args: T.Arguments) -> T
+    func resolve<T: IHaveXib>(args: T.Arguments) -> T
+    func resolve<T: IHaveXibAndViewModel>(args: T.Arguments, argsVM: T.ViewModel.Arguments) -> T
+    func resolve<T: IHaveStoryBoard>(args: T.Args) -> T
+    func resolve<T: IHaveStoryBoardAndViewModel>(args: T.Args, argsVM: T.ViewModel.Arguments) -> T
+}
+
+extension IContainer {
+    func resolve<T: ISingleton>() -> T where T.Arguments == Void {
+        return resolve(args: ())
+    }
+    
+//    func resolve<T: IPerRequest>() -> T where T.Arguments == Void {
+//        return resolve(args: ())
+//    }
 }
 
 //MARK: - Container
@@ -113,45 +54,81 @@ final class Container {
     private var singletons: [ObjectIdentifier: AnyObject] = [:]
     
     func makeInstance<T: IResolvable>(args: T.Arguments) -> T {
-        return T(container: self, args: args)!
+        return T(container: self, args: args) ?? fatalError() as! T
     }
 }
 
 extension Container: IContainer {
-    
-     func resolve<T: IResolvable>(args: T.Arguments) -> T {
-        switch T.instanceScope {
-        case .perRequest:
-            return makeInstance(args: args)
-        case .singleton:
-            let key = ObjectIdentifier(T.self)
-            if let cached = singletons[key], let instance = cached as? T {
-                return instance
-            } else {
-                let instance: T = makeInstance(args: args)
-                singletons[key] = instance
-                return instance
-            }
-        case .xib:
-            let ui: T = makeInstance(args: args)
-            if let ui = ui as? any IHaveXib {
-                if let view = ui as? UIView {
-                     view.loadFromXib()
-                } else if let vc = ui as? UIViewController {
-                    
-                }
-            }
-            return ui
-        case .storyBoard:
-            fatalError("user another resolve")
+   
+    func resolve<T: ISingleton>(args: T.Arguments) -> T {
+        let key = ObjectIdentifier(T.self)
+        if let cached = singletons[key], let instance = cached as? T {
+            return instance
+        } else {
+            let instance: T = makeInstance(args: args)
+            singletons[key] = instance
+            return instance
         }
     }
+    
+    func resolve<T: IPerRequest>(args: T.Arguments) -> T {
+        return makeInstance(args: args)
+    }
 
-    //MARK: IHaveStoryBoard
+    func resolve<T: IHaveXib>(args: T.Arguments) -> T {
+        let instance: T = makeInstance(args: args)
+        
+        switch instance {
+        case let view as UIView:
+            view.loadFromXib()
+        case let vc as UIViewController:
+            print()
+        default:
+            break
+        }
+        
+        guard !(instance is any IHaveViewModel) else { fatalError("use IHaveXibAndViewModel protocol ")  }
+        return instance
+    }
+    
+    func resolve<T: IHaveXibAndViewModel>(args: T.Arguments, argsVM: T.ViewModel.Arguments) -> T {
+        var instance: T = makeInstance(args: args)
+        switch instance {
+        case let view as UIView:
+            view.loadFromXib()
+            instance.viewModel = makeInstance(args: argsVM)
+            instance.configureUI()
+            instance.updateUI()
+        case let vc as UIViewController:
+            instance.viewModel = makeInstance(args: argsVM)
+        default:
+            break
+        }
+        return instance
+    }
+
+    //MARK: IHaveStoryBoard
     func resolve<T: IHaveStoryBoard>(args: T.Args) -> T {
         let vc: T = T.create { [weak self] coder in
-            guard let self = self,
-                  let vc: T = T(container: self, args: (args: args, coder: coder)) else { fatalError() }
+            guard let self = self else { fatalError() }
+            
+            let vc: T = makeInstance(args: (args: args, coder: coder))
+            if let vc1 = vc as? any IHaveViewModel {
+                guard vc1.anyViewModel != nil else { fatalError("Please use IHaveStoryBoardAndViewModel protocol for viewcontroller") }
+            }
+            
+            return vc
+        }
+        return vc
+    }
+    
+    func resolve<T: IHaveStoryBoardAndViewModel>(args: T.Args, argsVM: T.ViewModel.Arguments) -> T {
+        let vc: T = T.create { [weak self] coder in
+            guard let self = self else { fatalError()}
+                   /*T(container: self, args: ) */
+            let vc: T = makeInstance(args: (args: args, coder: coder))
+            
+            vc.viewModel = makeInstance(args: argsVM)
             return vc
         }
         return vc

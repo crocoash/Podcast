@@ -9,6 +9,13 @@ import UIKit
 
 //MARK: - PodcastCell
 class PodcastCell: UITableViewCell, IHaveViewModel {
+    func configureUI() {
+        
+    }
+    
+    func updateUI() {
+        
+    }
     
     
     typealias ViewModel = PodcastCellViewModel
@@ -23,7 +30,7 @@ class PodcastCell: UITableViewCell, IHaveViewModel {
     }
 
     @IBOutlet private weak var podcastImage:             UIImageView!
-    @IBOutlet private weak var favouriteStarImageView:    UIImageView!
+    @IBOutlet private weak var favouriteStarImageView:   UIImageView!
     @IBOutlet private weak var downLoadImageView:        UIImageView!
     @IBOutlet private weak var playStopButton:           UIImageView!
     @IBOutlet private weak var openDescriptionImageView: UIImageView!
@@ -58,10 +65,6 @@ class PodcastCell: UITableViewCell, IHaveViewModel {
         didSet {
             updateSelectState()
         }
-    }
-    
-    override func awakeFromNib() {
-        super.awakeFromNib()
     }
     
      //MARK: Actions
@@ -159,10 +162,10 @@ extension PodcastCell {
         updatePlayerUI()
         updateFavouriteStar()
         updateDownloadUI()
+        updateOpenDescriptionInfo()
     }
 
-     func updateOpenDescriptionInfo() {
-//        podcastDescription.numberOfLines = podcastDescription.maxNumberOfLines
+    private func updateOpenDescriptionInfo() {
         openDescriptionImageView.isHidden = !moreThanThreeLines
     }
     

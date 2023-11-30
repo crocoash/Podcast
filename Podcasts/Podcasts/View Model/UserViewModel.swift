@@ -27,7 +27,7 @@ class UserViewModel: ISingleton {
     }
     
     //MARK: init
-    required init(container: IContainer, args: Void) {
+    required init(container: IContainer, args: Arguments) {
         self.userDocument  = UserModel(json: UserDefaults.standard.data(forKey: String(describing: Self.self))) ?? UserModel(userName: "", userId: "")
     }
     

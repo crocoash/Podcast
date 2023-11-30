@@ -12,9 +12,7 @@ import FirebaseAuth
 
 class AuthService: ISingleton {
     
-    required init(container: IContainer, args: ()) {
-       
-    }
+    required init(container: IContainer, args: ()) {}
     
     func signInWithEmail (user email: String, password: String, completion: @escaping (Result<User>) -> Void) {
         Auth.auth().signIn(withEmail: email, password: password) { (result, err) in

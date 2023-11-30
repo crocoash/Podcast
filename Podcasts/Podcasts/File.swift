@@ -13,6 +13,13 @@ protocol IHaveViewModel: AnyObject {
     var viewModel: ViewModel { get set }
     func viewModelChanged(_ viewModel: ViewModel)
     func viewModelChanged()
+    func configureUI()
+    func updateUI()
+}
+
+extension IHaveViewModel {
+    func viewModelChanged(_ viewModel: ViewModel) {}
+    func viewModelChanged() {}
 }
 
 private var viewModelKey: UInt8 = 0
@@ -30,8 +37,8 @@ extension IHaveViewModel {
             objc_setAssociatedObject(self, &viewModelKey, viewModel1, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         
             viewModelChanged(viewModel)
-            
-            if let self = self as? UIView {
+        
+            if self is UIView || !(self is any IResolvable) {
                 viewModelChanged()
             }
             

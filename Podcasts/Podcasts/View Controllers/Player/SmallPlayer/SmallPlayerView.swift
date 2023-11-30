@@ -7,29 +7,30 @@
 
 import UIKit
 
-@objc protocol SmallPlayerViewControllerDelegate: AnyObject {
+@objc protocol SmallPlayerViewDelegate: AnyObject {
     func smallPlayerViewControllerSwipeOrTouch(_ smallPlayerView: SmallPlayerView)
 }
 
 @IBDesignable
-class SmallPlayerView: UIView, IHaveViewModel {
+class SmallPlayerView: UIView, IHaveXibAndViewModel {
     
-    func viewModelChanged(_ viewModel: SmallPlayerViewModel) {
-        
+    typealias ViewModel = SmallPlayerViewModel
+    
+    struct Arguments {
+        var delegate: SmallPlayerViewDelegate
+        var argsVM: ViewModel.Arguments
     }
     
     func viewModelChanged() {
-        updateView()
+        updateUI()
     }
-    
-    typealias ViewModel = SmallPlayerViewModel
     
     @IBOutlet private weak var playPauseButton: UIButton!
     @IBOutlet private weak var trackImageView: UIImageView!
     @IBOutlet private weak var trackNameLabel: UILabel!
     @IBOutlet private weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet private weak var progressView: UIProgressView!
-    @IBOutlet weak var delegate: SmallPlayerViewControllerDelegate!
+    @IBOutlet weak var delegate: SmallPlayerViewDelegate!
     
     //MARK: Settings
     private var pauseImage = UIImage(systemName: "pause.fill")!
@@ -38,50 +39,29 @@ class SmallPlayerView: UIView, IHaveViewModel {
     private var player: Player!
     
     // MARK: - Init
-    init<T: SmallPlayerViewControllerDelegate>(vc: T, frame: CGRect = .zero, model: SmallPlayerViewModel, player: Player) {
-        self.player = player
-        self.delegate = vc
+    required init(container: IContainer, args input: Arguments) {
+        self.player = container.resolve()
+        self.delegate = input.delegate
         
-        super.init(frame: frame)
-       
-        initial()
-        viewModel = model
-        player.delegate = model
-    }
-    
-    func configure(with model: SmallPlayerPlayableProtocol, player: Player) {
-        let model = SmallPlayerViewModel(model)
-        self.viewModel = model
-        self.player = player
-        
-        self.player.delegate = viewModel
+        super.init(frame: .zero)
     }
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        initial()
-    }
-   
-    private func initial() {
         loadFromXib()
-        configureView()
-        configureGesture()
+        configureUI()
     }
     
     // MARK: - Actions
     @IBAction func playOrPause() {
-        player.playOrPause()
+        viewModel.player.playOrPause()
     }
     
     @objc func respondToSwipeOrTouch(gesture: UIGestureRecognizer) {
         delegate?.smallPlayerViewControllerSwipeOrTouch(self)
     }
-}
-
-//MARK: - Private methods
-extension SmallPlayerView {
     
-    private func configureView() {
+    func configureUI() {
         layer.borderColor = UIColor.gray.cgColor
         layer.borderWidth = 0.3
         layer.shadowRadius = 3
@@ -89,9 +69,11 @@ extension SmallPlayerView {
         layer.shadowOpacity = 1
         layer.shadowOffset = .zero
         translatesAutoresizingMaskIntoConstraints = false
+        
+        configureGesture()
     }
     
-    private func updateView() {
+    func updateUI() {
         if viewModel.listeningProgress == 0 {
             progressView.progress = 1
         } else {
@@ -113,6 +95,10 @@ extension SmallPlayerView {
             self?.trackImageView.image = image
         }
     }
+}
+
+//MARK: - Private methods
+extension SmallPlayerView {
     
     private func configureGesture() {
         addMyGestureRecognizer(self, type: [.swipe(directions: [.up]),.tap()], #selector(respondToSwipeOrTouch))

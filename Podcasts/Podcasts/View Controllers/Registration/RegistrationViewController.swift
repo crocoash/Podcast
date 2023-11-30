@@ -10,7 +10,7 @@ import FirebaseAuth
 
 class RegistrationViewController: UIViewController, IHaveStoryBoard {
     
-    typealias Args = Void
+    struct Args {}
     
     @IBOutlet private weak var iconImageView: UIImageView!
     @IBOutlet private weak var segmentedControl: UISegmentedControl!
@@ -25,18 +25,15 @@ class RegistrationViewController: UIViewController, IHaveStoryBoard {
     
     private let userViewModel: UserViewModel
     private let container: IContainer
-    
-    lazy private var tabBarVc: TabBarViewController = {
-        let tabBarViewController: TabBarViewController = container.resolve()
-        tabBarViewController.modalPresentationStyle = .custom
-        tabBarViewController.transitioningDelegate = self
-        return tabBarViewController
-    }()
+    private let router: PresenterService
 
+    //MARK: init
     required init?(container: IContainer, args: (args: Args, coder: NSCoder)) {
         self.userViewModel = container.resolve()
         self.container = container
         self.authManger = container.resolve()
+        self.router = container.resolve()
+        
         super.init(coder: args.coder)
     }
     
@@ -49,9 +46,6 @@ class RegistrationViewController: UIViewController, IHaveStoryBoard {
         super.viewDidLoad()
         configureGestures()
         configureView()
-        
-        self.modalPresentationStyle = .custom
-        self.transitioningDelegate = self
     }
     
     //MARK: - Varibels
@@ -212,7 +206,10 @@ extension RegistrationViewController {
         case .success(result: let user):
             userViewModel.changeUserName(newName: user.userName)
             userViewModel.changeUserId(newUserId: user.userId)
-            present(tabBarVc, animated: true)
+            let args = TabBarViewController.Args.init()
+            let argsVM = TabBarViewModel.Arguments.init()
+            let vc: TabBarViewController = container.resolve(args: args, argsVM: argsVM)
+            router.present(vc, modalPresentationStyle: .custom)
         }
     }
     
@@ -308,18 +305,6 @@ extension RegistrationViewController: AlertDelegate {
     
     func alertShouldShow(_ alert: Alert, alertController: UIAlertController) {
         present(alertController, animated: true)
-    }
-}
-
-// MARK: - UIViewControllerTransitioningDelegate
-extension RegistrationViewController: UIViewControllerTransitioningDelegate {
-
-    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        return PresentTransition()
-    }
-
-    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        return DismissTransition()
     }
 }
 

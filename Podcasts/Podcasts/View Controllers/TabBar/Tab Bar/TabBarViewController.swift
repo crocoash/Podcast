@@ -3,10 +3,14 @@
 import UIKit
 import CoreData
 
-class TabBarViewController: UITabBarController, IHaveStoryBoard {
+class TabBarViewController: UITabBarController, IHaveStoryBoardAndViewModel {
     
+    func configureUI() { }
+    func updateUI() { }
     
-    typealias Args = Void
+    struct Args {}
+    typealias ViewModel = TabBarViewModel
+    
     
     // MARK: - variables
     private var trailConstraint: NSLayoutConstraint?
@@ -24,30 +28,6 @@ class TabBarViewController: UITabBarController, IHaveStoryBoard {
     private let apiService: ApiService
     private let container: IContainer
     
-    lazy private var ListVC: ListViewController = {
-        let args = ListViewController.Args.init(delegate: self)
-        let vc: ListViewController = container.resolve(args: args)
-        vc.transitioningDelegate = self
-        vc.modalPresentationStyle = .custom
-        return createTabBar(vc, title: "Playlist", imageName: "folder.fill")
-    }()
-    
-    lazy private var searchVC: SearchViewController = {
-        let vc: SearchViewController = container.resolve()
-        vc.transitioningDelegate = self
-        modalPresentationStyle = .custom
-        
-        return createTabBar(vc, title: "Search", imageName: "magnifyingglass")
-    }()
-    
-    lazy private var settingsVC: SettingsTableViewController = {
-        let vc: SettingsTableViewController = container.resolve()
-        vc.transitioningDelegate = self
-        modalPresentationStyle = .custom
-        
-        return createTabBar(vc, title: "Settings", imageName: "gear")
-    }()
-
    //MARK: init
     required init?(container: IContainer, args: (args: Args, coder: NSCoder)) {
         self.player = container.resolve()
@@ -76,8 +56,8 @@ extension TabBarViewController {
     
     private func presentSmallPlayer(with track: (any OutputPlayerProtocol)) {
         guard smallPlayer == nil else { return }
-        let model = SmallPlayerViewModel(track)
-        let smallPlayer = SmallPlayerView(vc: self, model: model, player: player)
+        
+        let smallPlayer = viewModel.getSmallPlayer(item: track)
         view.addSubview(smallPlayer)
         smallPlayer.isHidden = false
         self.smallPlayer = smallPlayer
@@ -85,24 +65,13 @@ extension TabBarViewController {
         smallPlayer.bottomAnchor.constraint(equalTo: tabBar.topAnchor).isActive = true
         smallPlayer.heightAnchor.constraint(equalToConstant: 50).isActive = true
         smallPlayer.widthAnchor.constraint(equalTo: tabBar.widthAnchor).isActive = true
-        
-        ListVC.updateConstraintForTableView(playerIsPresent: true)
-        searchVC.updateConstraintForTableView(playerIsPresent: true)
     }
     
     //MARK: configureView
     private func configureTabBar() {
-        let navigationController = UINavigationController(rootViewController: ListVC)
-        self.viewControllers = [navigationController, searchVC, settingsVC]
+        self.viewControllers = viewModel.getViewControllers()
     }
-    
-    private func createTabBar<T: UIViewController>(_ vc: T, title: String, imageName: String) -> T {
-        vc.tabBarItem.title = title
-        vc.tabBarItem.image = UIImage(systemName: imageName)
-        
-        return vc
-    }
-    
+ 
     private func configureImageDarkMode() {
         view.addSubview(imageView)
         imageView.heightAnchor.constraint(equalToConstant: 200).isActive = true
@@ -133,62 +102,26 @@ extension TabBarViewController: SettingsTableViewControllerDelegate {
     }
 }
 
-//MARK: - SmallPlayerViewControllerDelegate
-extension TabBarViewController: SmallPlayerViewControllerDelegate {
+//MARK: - PlayerEventNotification
+extension TabBarViewController: PlayerDelegate {
     
-    func smallPlayerViewControllerSwipeOrTouch(_ smallPlayerViewController: SmallPlayerView) {
-        guard let track = player.currentTrack?.track else { return }
-        let argsVM = BigPlayerViewController.ViewModel.Arguments.init(track: track)
-        let args = BigPlayerViewController.Arguments.init(delegate: self, modelInput: argsVM)
-        let bigPlayerViewController: BigPlayerViewController = container.resolve(args: args)
-        bigPlayerViewController.modalPresentationStyle = .fullScreen
-        self.present(bigPlayerViewController, animated: true)
+    func playerStartLoading(_ player: Player, with track: any OutputPlayerProtocol) {
+        presentSmallPlayer(with: track)
     }
-}
-
-//MARK: - BigPlayerViewControllerDelegate
-extension TabBarViewController: BigPlayerViewControllerDelegate {
     
-    func bigPlayerViewControllerDidTouchPodcastNameLabel(_ bigPlayerViewController: BigPlayerViewController, entity: NSManagedObject) {
-        guard let _ = entity as? Podcast else { return }
-        presentedViewController?.dismiss(animated: true)
-    }
+    func playerDidEndPlay(_ player: Player, with track: any OutputPlayerProtocol) {}
+    func playerDidEndLoading(_ player: Player, with track: any OutputPlayerProtocol) {}
+    func playerUpdatePlayingInformation(_ player: Player, with track: any OutputPlayerProtocol) {}
+    func playerStateDidChanged(_ player: Player, with track: any OutputPlayerProtocol) {}
 }
 
 //MARK: - UIViewControllerTransitioningDelegate
 extension TabBarViewController: UIViewControllerTransitioningDelegate {
-    
     func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         return PresentTransition()
     }
     
     func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         return DismissTransition()
-    }
-}
-
-//MARK: - PlayerEventNotification
-extension TabBarViewController: PlayerDelegate {
-    
-    func playerDidEndPlay(_ player: Player, with track: any OutputPlayerProtocol) {}
-    
-    func playerStartLoading(_ player: Player, with track: any OutputPlayerProtocol) {
-        presentSmallPlayer(with: track)
-    }
-    
-    func playerDidEndLoading(_ player: Player, with track: any OutputPlayerProtocol) {}
-    
-    func playerUpdatePlayingInformation(_ player: Player, with track: any OutputPlayerProtocol) {
-        
-    }
-    
-    func playerStateDidChanged(_ player: Player, with track: any OutputPlayerProtocol) {}
-}
-
-//MARK: - ListViewControllerDelegate
-extension TabBarViewController: ListViewControllerDelegate {
-    
-    func listViewController(_ listViewController: ListViewController, didSelect podcast: Podcast) {
-      
     }
 }

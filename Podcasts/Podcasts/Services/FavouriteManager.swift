@@ -39,11 +39,13 @@ protocol FavouriteManagerInput: MultyDelegateServiceInput {
 
 class FavouriteManager: MultyDelegateService<FavouriteManagerDelegate>, ISingleton {
 
+    typealias Arguments = Void
+    
     private let dataStoreManager: DataStoreManager
     private let firebaseDatabase: FirebaseDatabase
     lazy private var viewContext = dataStoreManager.viewContext
     
-    required init(container: IContainer, args: ()) {
+    required init(container: IContainer, args: Arguments) {
         
         self.firebaseDatabase = container.resolve()
         self.dataStoreManager = container.resolve()

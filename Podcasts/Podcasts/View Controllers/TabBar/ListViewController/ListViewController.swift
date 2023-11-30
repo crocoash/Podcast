@@ -8,46 +8,23 @@
 import UIKit
 import CoreData
 
-//MARK: - Delegate
-protocol ListViewControllerDelegate: AnyObject {
-    func listViewController(_ listViewController: ListViewController, didSelect podcast: Podcast)
-}
-
-class ListViewController: UIViewController, IHaveViewModel, IHaveStoryBoard {
+class ListViewController: UIViewController, IHaveStoryBoardAndViewModel {
     
-    typealias Args = Input
     typealias ViewModel = ListViewModel
-    
-    struct Input {
-        var delegate: ListViewControllerDelegate
-    }
-    
-    func viewModelChanged(_ viewModel: ListViewModel) {
-        
-    }
+    struct Args {}
     
     func viewModelChanged() {
         updateUI()
     }
     
-    //MARK: services
-    private let favouriteManager: FavouriteManager
-    private let dataStoreManager: DataStoreManager
-    private let listeningManager: ListeningManager
-    private let likeManager:      LikeManager
-    
-    weak var delegate: ListViewControllerDelegate?
-    
     private let refreshControl = UIRefreshControl()
-    private var alertTopConstraint: NSLayoutConstraint?
+//    private var alertTopConstraint: NSLayoutConstraint?
     
     private var playerIsSHidden: Bool = true
     
     lazy private var heightTabBarItem = tabBarController?.tabBar.frame.height ?? 0
     
     //MARK: Outlets
-    @IBOutlet private weak var listView: ListView!
-    
     @IBOutlet private weak var favouriteTableView: FavouriteTableView!
     @IBOutlet private weak var bottomTableViewConstraint: NSLayoutConstraint!
     
@@ -56,16 +33,9 @@ class ListViewController: UIViewController, IHaveViewModel, IHaveStoryBoard {
     
     //MARK: init
     required init?(container: IContainer, args: (args: Args, coder: NSCoder)) {
-        self.favouriteManager = container.resolve()
-        self.dataStoreManager = container.resolve()
-        self.listeningManager = container.resolve()
-        self.likeManager = container.resolve()
         
         self.container = container
-        self.delegate = args.args.delegate
         super.init(coder: args.coder)
-        
-        self.viewModel = container.resolve()
     }
     
     required init?(coder: NSCoder) {
@@ -86,7 +56,7 @@ class ListViewController: UIViewController, IHaveViewModel, IHaveStoryBoard {
     lazy private var removeAllButton: UIBarButtonItem = {
         let button =  UIBarButtonItem(title: "Remova All", primaryAction: UIAction { [weak self] _ in
             guard let self = self else { return }
-            removeAllAction()
+            viewModel.removeAll()
         })
         return button
     }()
@@ -108,91 +78,60 @@ class ListViewController: UIViewController, IHaveViewModel, IHaveStoryBoard {
     //MARK: View Methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        configureAlertSortListView()
-        favouriteTableView.viewModel = viewModel.favouriteTableViewVM
-        favouriteTableView.reloadDataSource()
+        configureUI()
         updateUI()
     }
-}
-
-//MARK: - Private methods
-extension ListViewController {
     
+    //MARK: Actions
     private func editButtonDidTouch() {
         guard let alertSortListView = alertSortListView else { fatalError() }
         alertSortListView.showOrHideAlertListView()
     }
     
-    private func removeAllAction() {
-        favouriteManager.removeAll()
-        listeningManager.removeAll()
-        likeManager.removeAll()
-    }
+    func configureUI() {
+       configureAlertSortListView()
+       favouriteTableView.viewModel = viewModel.getViewModelForTableView()
+       navigationItem.hidesSearchBarWhenScrolling = false
+   }
     
-    private func configureNavigationItem() {
-        let isEmpty = viewModel.favouriteTableViewVM.isEmpty && !viewModel.favouriteTableViewVM.isSearching
-        
-        navigationItem.rightBarButtonItem = isEmpty ? nil : removeAllButton
-        navigationItem.leftBarButtonItem = editButton
-        navigationItem.title = "List"
-        navigationItem.hidesSearchBarWhenScrolling = false
-    }
-    
-    private func setSearchController() {
-        navigationItem.searchController = (viewModel.favouriteTableViewVM.isEmpty && !viewModel.favouriteTableViewVM.isSearching) ? nil : searchController
-    }
+   func updateUI() {
+       configureScopeBar()
+       setSearchController()
+       configureNavigationItem()
+   }
+}
+
+//MARK: - Private methods
+extension ListViewController {
     
     private func configureScopeBar() {
-        guard viewModel.favouriteTableViewVM.searchedSectionData == nil else { return }
-        if !viewModel.favouriteTableViewVM.isEmpty {
-            searchController.searchBar.scopeButtonTitles = viewModel.favouriteTableViewVM.sections
-            searchController.searchBar.scopeButtonTitles?.insert("All", at: .zero)
-        } else {
-            searchController.searchBar.scopeButtonTitles = nil
+        let dataSource = viewModel.scopeBar()
+        searchController.searchBar.scopeButtonTitles = dataSource?.titles
+        if let dataSource = dataSource {
+            searchController.searchBar.selectedScopeButtonIndex = dataSource.selectIndex
         }
     }
     
-    private func updateUI() {
-        configureScopeBar()
-        setSearchController()
-        configureNavigationItem()
+    private func setSearchController() {
+        navigationItem.searchController = viewModel.isSearchControllerIsHidden() ? nil : searchController
+    }
+    
+    private func configureNavigationItem() {
+        let isHidden = viewModel.isSearchControllerIsHidden()
+        
+        navigationItem.rightBarButtonItem = isHidden ? nil : removeAllButton
+        navigationItem.leftBarButtonItem = editButton
+        navigationItem.title = "List"
     }
     
     private func configureAlertSortListView() {
         guard let tabBarController = tabBarController else { fatalError() }
         let args = AlertSortListView.Arguments.init(vc: tabBarController)
-        let vc: AlertSortListView = container.resolve(args: args)
-        vc.viewModel = container.resolve(args: ())
-        tabBarController.view.superview?.addSubview(vc)
+        let argsVM = AlertSortListView.ViewModel.Arguments.init()
+        let vc: AlertSortListView = container.resolve(args: args, argsVM: argsVM)
+       
+        tabBarController.view.addSubview(vc)
         alertSortListView = vc
-    }
-    
-    private func refreshTableView(completion: @escaping () -> ()) {
-        let _ = dataStoreManager.viewContext
-        
-        //        firebaseDataBase.update(viewContext: viewContext) { [weak self] (result: FavouritePodcast.ResultType) in
-        //            guard let self = self else { return }
-        //
-        //            switch result {
-        //            case .failure(error: let error) :
-        //                error.showAlert(vc: self)
-        //            default: break
-        //            }
-        //
-        //            firebaseDataBase.update(viewContext: viewContext) { [weak self] (result: ListeningPodcast.ResultType) in
-        //
-        //                guard let self = self else { return }
-        //
-        //                switch result {
-        //                case .failure(error: let error) :
-        //                    error.showAlert(vc: self) {
-        //                    }
-        //                default: break
-        //                }
-        //
-        //                completion()
-        //            }
-        //        }
     }
     
     private func showAlert() {
@@ -208,11 +147,11 @@ extension ListViewController {
 extension ListViewController: UISearchBarDelegate {
     
     func searchBar(_ searchBar: UISearchBar, selectedScopeButtonIndexDidChange selectedScope: Int) {
-        viewModel.favouriteTableViewVM.changeSearchedSection(searchedSection: selectedScope == 0 ? nil : selectedScope - 1)
+        viewModel.changeSearchedSection(selectedScope: selectedScope)
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        self.searchBar(searchBar, textDidChange: "")
+        viewModel.cancelSearching()
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
@@ -220,13 +159,13 @@ extension ListViewController: UISearchBarDelegate {
     }
 }
 
-//MARK: - FavouriteTableViewDelegate
-extension ListViewController: FavouriteTableViewDelegate {
+//MARK: - UIViewControllerTransitioningDelegate
+extension ListViewController: UIViewControllerTransitioningDelegate {
+    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        return PresentTransition()
+    }
     
-    func favouriteTableView(_ favouriteTableView: FavouriteTableView, didRefreshed refreshControl: UIRefreshControl) {
-        refreshTableView {
-            refreshControl.endRefreshing()
-        }
+    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        return DismissTransition()
     }
 }
-

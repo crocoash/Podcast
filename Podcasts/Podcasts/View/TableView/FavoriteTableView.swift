@@ -8,11 +8,6 @@
 import UIKit
 import CoreData
 
-//MARK: - Delegate
-@objc protocol FavouriteTableViewDelegate: AnyObject { //
-    func favouriteTableView(_ favouriteTableView: FavouriteTableView, didRefreshed refreshControl: UIRefreshControl)
-}
-
 class FavouriteTableView: UITableView, IDiffableTableViewWithModel, IHaveViewModel {
     
     typealias Row = ViewModel.Row
@@ -21,16 +16,14 @@ class FavouriteTableView: UITableView, IDiffableTableViewWithModel, IHaveViewMod
     
     var mySnapShot: SnapShot!
     var diffableDataSource: DiffableDataSource!
-    
+       
     func viewModelChanged(_ viewModel: FavouriteTableViewModel) {
-        
+        configureUI()
     }
     
     func viewModelChanged() {
         updateUI()
     }
-    
-    @IBOutlet weak var myDelegate: FavouriteTableViewDelegate?
     
     private let emptyTableImageView: UIImageView = {
         $0.image = UIImage(systemName: "folder")
@@ -43,21 +36,24 @@ class FavouriteTableView: UITableView, IDiffableTableViewWithModel, IHaveViewMod
     func reloadDataSource() {
         configureDataSource()
         reloadTableView()
-        observeViewModel()
-        diffableDataSource.defaultRowAnimation = .fade
-        updateUI()
     }
     
-    //MARK: init
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
+    func configureUI() {
         configureTableView()
+        observeViewModel()
+        reloadDataSource()
+        diffableDataSource.defaultRowAnimation = .left
+    }
+    
+    func updateUI() {
+        setScrollEnabled()
+        showEmptyImage()
     }
     
     //MARK: Actions
     @objc func refreshed() {
         guard let refreshControl = refreshControl else { return }
-        myDelegate?.favouriteTableView(self, didRefreshed: refreshControl)
+        viewModel.refresh(refreshControl: refreshControl)
     }
     
     func configureDataSource() {
@@ -87,11 +83,6 @@ class FavouriteTableView: UITableView, IDiffableTableViewWithModel, IHaveViewMod
 //MARK: - Private Methods
 extension FavouriteTableView {
     
-    private func updateUI() {
-        setScrollEnabled()
-        showEmptyImage()
-    }
-    
     private func showEmptyImage() {
         backgroundView?.isHidden = !viewModel.isEmpty
     }
@@ -106,7 +97,7 @@ extension FavouriteTableView {
     
     private func setScrollEnabled() {
         var enabled = false
-        if viewModel.isEmpty {
+        if !viewModel.isEmpty {
             let heightOfCells = (0..<numberOfSections).reduce(into: 0) { $0 += rect(forSection: $1).height + 50 }
             enabled = heightOfCells > frame.height
         }

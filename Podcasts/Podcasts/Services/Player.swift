@@ -9,53 +9,28 @@ import Foundation
 import MediaPlayer
 import CoreData
 
-//MARK: - Input
-//protocol PlayerInput: MultyDelegateServiceInput {
-//    
-//    var currentTrack: (track: Track, index: Int)? { get }
-//    
-//    var isPlaying: Bool { get }
-//    
-//    func pause()
-//    func play()
-//    
-//    func playOrPause()
-//    func playPreviewsTrack()
-//    func playNextPodcast()
-//    func update(with listening: ListeningPodcast)
-//    
-//    func playerSeek(to seconds: Double)
-//    
-//    func playerRewindSeek(to seconds: Double)
-//    func conform(track: any TrackProtocol, trackList: [any TrackProtocol])
-//}
-
 //MARK: Type
 protocol TrackProtocol: NSManagedObject {
     var url: URL?                      { get }
     var imageForMpPlayer: String?      { get }
-    var imageForBigPlayer: String?     { get }
-    var imageForSmallPlayer: String?   { get }
     var trackName: String?             { get }
     var descriptionMy: String?         { get }
     var id: String                     { get }
     var listeningProgress: Double?     { get }
     var currentTime: Float?            { get }
+    var imageForSmallPlayer: String    { get }
+    var imageForBigPlayer: String      { get }
 }
 
 struct Track: Equatable, OutputPlayerProtocol {
-    
+   
     static func == (lhs: Track, rhs: Track) -> Bool {
         lhs.id == rhs.id
     }
     
     var inputType: TrackProtocol
     
-    var imageForBigPlayer: String?
-    var imageForSmallPlayer: String?
-    
     var duration: Double?
-    var trackImageForBigPlayer: String?
     var currentTime: Float?
     var listeningProgress: Double?
     var isPlaying: Bool = false
@@ -66,7 +41,8 @@ struct Track: Equatable, OutputPlayerProtocol {
     var url: URL?
     var isLast: Bool
     var isFirst: Bool = false
-  
+    var imageForBigPlayer: String?
+    var imageForSmallPlayer: String
     
     init(input: any TrackProtocol, isLast: Bool, isFirst: Bool) {
         self.currentTime = input.currentTime
@@ -78,13 +54,13 @@ struct Track: Equatable, OutputPlayerProtocol {
         self.inputType = input
         self.isLast = isLast
         self.isFirst = isFirst
-        self.imageForSmallPlayer = input.imageForSmallPlayer
         self.imageForBigPlayer = input.imageForBigPlayer
+        self.imageForSmallPlayer = input.imageForSmallPlayer
     }
 }
 
 //MARK: - OutPut
-protocol OutputPlayerProtocol: PodcastCellPlayableProtocol, SmallPlayerPlayableProtocol, ListeningPodcastCellPlayableProtocol {}
+protocol OutputPlayerProtocol: PodcastCellPlayableProtocol, ListeningPodcastCellPlayableProtocol, BigPlayerInputType, SmallPlayerInputType {}
 
 protocol PlayerDelegate {
     
@@ -125,7 +101,6 @@ class Player: MultyDelegateService<PlayerDelegate>, ISingleton {
         addObserverForEndTrack()
         configureMPRemoteCommandCenter()
     }
-    
     
    private let defaultIsPlaying = false
    private let defauisLoading = false
