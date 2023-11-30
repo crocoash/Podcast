@@ -41,8 +41,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     private func preLoaderViewController() -> UIViewController {
         let container = Container()
-
-        let vc: PreLoaderViewController = container.resolve()
+        let args = PreLoaderViewController.Args.init()
+        let vc: PreLoaderViewController = container.resolve(args: args)
         return vc
     }
 }

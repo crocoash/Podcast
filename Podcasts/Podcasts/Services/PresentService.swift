@@ -9,13 +9,14 @@ import UIKit
 
 public class PresenterService: ISingleton {
     
+    typealias Arguments = Void
     
-    private var topViewController: UIViewController? {
+    required init(container: IContainer, args: Arguments) {}
+    
+    var topViewController: UIViewController? {
         let keyWindow = UIApplication.shared.windows.first { $0.isKeyWindow }
         return findTopViewController(in: keyWindow?.rootViewController)
     }
-    
-    required init(container: IContainer, args: Void) {}
     
     func present( _ viewController: UIViewController, modalPresentationStyle: UIModalPresentationStyle)  {
         viewController.modalPresentationStyle = modalPresentationStyle

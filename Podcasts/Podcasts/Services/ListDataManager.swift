@@ -22,7 +22,7 @@ protocol ListDataManagerDelegate: AnyObject {
 class ListDataManager: MultyDelegateService<ListDataManagerDelegate>, ISingleton {
     
     //MARK: init
-    required init(container: IContainer, args: Void) {
+    required init(container: IContainer, args: ()) {
         self.dataStoreManager = container.resolve()
         self.firebaseDatabase = container.resolve()
         
@@ -64,8 +64,9 @@ extension ListDataManager {
       guard let listData = dataStoreManager.viewContext.fetchObjects(ListData.self).first else { return }
       firebaseDatabase.add(entity: listData)
    }
-   
-   private func configureListData() -> ListData {
+
+    @discardableResult
+    private func configureListData() -> ListData {
       
       let entities = dataStoreManager.viewContext.fetchObjects(ListData.self)
       
@@ -146,6 +147,9 @@ extension ListDataManager: FirebaseDatabaseDelegate {
             updateListData(with: listData)
          }
       }
+       delegates {
+           $0.listDataManagerDidUpdate(self)
+       }
    }
    
    func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didUpdate entity: (any FirebaseProtocol)) {

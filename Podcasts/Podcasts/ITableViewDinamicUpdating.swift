@@ -7,8 +7,8 @@
 
 import UIKit
 
-protocol ITableViewDinamicUpdating where Self: UITableView & IHaveViewModel {}
-extension ITableViewDinamicUpdating where ViewModel: IViewModelDinamicUpdating {
+protocol ITableViewDinamicUpdating: UITableView & IHaveViewModel where ViewModel: IViewModelDinamicUpdating  {}
+extension ITableViewDinamicUpdating {
     
     func observeViewModel() {
         

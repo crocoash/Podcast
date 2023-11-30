@@ -15,7 +15,7 @@ protocol SettingsTableViewControllerDelegate: AnyObject {
 
 class SettingsTableViewController: UITableViewController, IHaveStoryBoard {
 
-    typealias Args = Void
+    struct Args {}
     
     private var userViewModel: UserViewModel
     private let firestorageDatabase: FirestorageDatabase

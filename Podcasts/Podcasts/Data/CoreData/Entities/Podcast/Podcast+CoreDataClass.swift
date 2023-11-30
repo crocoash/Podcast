@@ -227,6 +227,14 @@ extension Podcast: CoreDataProtocol {
 
 //MARK: - PlayerInputProtocol
 extension Podcast: TrackProtocol {
+   
+    var imageForSmallPlayer: String {
+        return artworkUrl160 ?? ""
+    }
+    
+    var imageForBigPlayer: String {
+        return artworkUrl600 ?? ""
+    }
     
     var listeningProgress: Double? {
         return listeningPodcast?.progress
@@ -244,8 +252,6 @@ extension Podcast: TrackProtocol {
         return id
     }
     
-    var imageForBigPlayer: String? { image600 }
-    var imageForSmallPlayer: String? { image60 }
     var imageForMpPlayer: String? { image160 }
 
     var genresString: String? { genres?.allObjects.reduce(into: "") { $0 += (($1 as? Genre)?.name ?? "") + ", " }  }
@@ -356,19 +362,19 @@ extension Collection where Element == Podcast {
     private var conform: [SectionData] {
         
         var array = [SectionData]()
-        loop: for element in self {
-            let date = element.formattedDate(dateFormat: "d MMM YYY")
-            if array.isEmpty {
-                let sectionData = SectionData(section: date, rows: [element])
-                array.append(sectionData)
-                continue
-            }
-            for value in array.enumerated() where value.element.section == date  {
-                array[value.offset].rows.append(element)
-                continue loop
-            }
-            array.append(SectionData(section: date, rows: [element]))
+    loop: for element in self {
+        let date = element.formattedDate(dateFormat: "d MMM YYY")
+        if array.isEmpty {
+            let sectionData = SectionData(section: date, rows: [element])
+            array.append(sectionData)
+            continue
         }
+        for value in array.enumerated() where value.element.section == date  {
+            array[value.offset].rows.append(element)
+            continue loop
+        }
+        array.append(SectionData(section: date, rows: [element]))
+    }
         return array
     }
 }

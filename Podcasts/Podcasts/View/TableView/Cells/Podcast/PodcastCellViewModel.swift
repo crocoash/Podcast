@@ -104,7 +104,6 @@ class PodcastCellViewModel: IPerRequest, INotifyOnChanged, IPodcastCell {
             imageForPodcastCell = image
             changed.raise()
         }
-        
         confiureDelegates()
     }
     
@@ -133,36 +132,33 @@ extension PodcastCellViewModel {
                 
         switch input {
         case let favouritePodcast as FavouritePodcast:
-            if favouritePodcast.podcast.id == podcast.id {
-                isFavourite = favouritePodcast.podcast.favouritePodcast != nil
-            }
+            guard favouritePodcast.podcast.id == podcast.id else { return }
+            isFavourite = favouritePodcast.podcast.favouritePodcast != nil
+            changed.raise()
             /// PodcastCellPlayableProtocol
         case let player as any PodcastCellPlayableProtocol:
-            
-            if player.id == id {
-                isPlaying = player.isPlaying
-                isGoingPlaying = player.isGoingPlaying
-            }
+            guard player.id == id else { return }
+            isPlaying = player.isPlaying
+            isGoingPlaying = player.isGoingPlaying
+            changed.raise()
             /// PodcastCellDownloadProtocol
         case let download as any PodcastCellDownloadProtocol:
             
-            if download.id == id {
-                isDownloaded = download.isDownloaded
-                isDownloading  = download.isDownloading
-                isGoingDownload = download.isGoingDownload
-                downloadingProgress = download.downloadingProgress
-                downloadTotalSize = download.downloadTotalSize
-            }
+            guard download.id == id else { return }
+            isDownloaded = download.isDownloaded
+            isDownloading  = download.isDownloading
+            isGoingDownload = download.isGoingDownload
+            downloadingProgress = download.downloadingProgress
+            downloadTotalSize = download.downloadTotalSize
+            changed.raise()
             /// ListeningPodcast
-        case var listeningPodcast as ListeningPodcast:
-            
-            if listeningPodcast.podcast.id == id {
-                podcast.setValue(value: listeningPodcast)
-            }
+        case let listeningPodcast as ListeningPodcast:
+            guard listeningPodcast.podcast.id == id else { return }
+            podcast.setValue(value: listeningPodcast)
+            changed.raise()
         default:
             return
         }
-        changed.raise()
     }
     
     private func confiureDelegates() {

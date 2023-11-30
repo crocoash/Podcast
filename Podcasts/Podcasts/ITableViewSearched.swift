@@ -10,26 +10,56 @@ import Foundation
 //MARK: - Searched
 protocol ITableViewSearched where Self: IViewModelDinamicUpdating, SectionData: ISearchedSectionData {
     var searchedSectionData: SectionData? { get set }
-    var searchedText: String? { get set }  
-    var isSearching: Bool { get set }
+    var searchedText: String? { get set } 
     
     func performSearch(_ text: String?)
 }
 
 extension ITableViewSearched {
     
+    func cancelSearching() {
+        if let searchedSectionData = searchedSectionData {
+            changeSearchedSection(searchedSection: nil)
+        }
+        if let searchedText = searchedText {
+            performSearch(nil)
+        }
+    }
+    
+    var searchedSectionIndex: Int? {
+        guard let searchedSectionData = searchedSectionData else { return nil }
+        return searchedSections.firstIndex { $0 == searchedSectionData.section }
+    }
+    
+    var searchedSections: [Section] {
+        return dataSourceAll.filter {
+            if isSearching {
+               !($0.isEmpty || !$0.isActive)
+            } else {
+                $0.isAvailable
+            }
+        }.map { $0.section }
+    }
+    
+    var isSearchingSection: Bool {
+       return searchedSectionData != nil
+    }
+
+    var isSearching: Bool {
+        return isSearchingText || isSearchingSection
+    }
+    
+    var isSearchingText: Bool {
+        return searchedText != "" && searchedText != nil
+    }
+
     func changeSearchedSection(searchedSection index: Int?) {
        
         if let index = index {
-            if searchedSectionData == nil {
-                searchedSectionData = getSectionDataForView(at: index)
-            } else {
-                searchedSectionData = getSectionDataForView(index: index) ?? nil
-            }
+            searchedSectionData = getSectionDataForView(index: index)
         } else {
             searchedSectionData = nil
         }
-        isSearching = searchedSectionData != nil
         
         dataSourceAll.forEach { sectionData in
             if sectionData != searchedSectionData && index != nil {
@@ -54,7 +84,7 @@ extension ITableViewSearched {
         dataSourceAll[index].isSearched = true
         
         guard sectionData.isAvailable,
-             getIndexSectionForView(forSection: section) == nil else { return }
+              getIndexSectionForView(forSection: section) == nil else { return }
         
         if dataSourceForView.isEmpty {
             dataSourceForView.append(sectionData)
@@ -107,7 +137,7 @@ extension ITableViewSearched {
         
         for sectionDataAll in dataSourceAll {
             
-            if sectionData.isEmpty || !sectionData.isActive {
+            if !sectionDataAll.isAvailable {
                 continue
             }
            

@@ -46,7 +46,10 @@ protocol FirebaseDatabaseDelegate: AnyObject {
 
 class FirebaseDatabase: ISingleton {
    
-   required init(container: IContainer, args: ()) {
+   typealias Arguments = Void
+   
+   required init(container: IContainer, args: Arguments) {
+
       let userViewModel: UserViewModel = container.resolve()
 
       self.userID = userViewModel.userDocument.user.userId

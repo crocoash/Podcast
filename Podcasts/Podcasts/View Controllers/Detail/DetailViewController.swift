@@ -12,11 +12,7 @@ import CoreData
 class DetailViewController: UIViewController, IHaveStoryBoard, IHaveViewModel {
     
     typealias Args = ViewModel.Arguments
-    typealias ViewModel = DetailViewControllerViewModel
-    
-    func viewModelChanged(_ viewModel: DetailViewControllerViewModel) {
-
-    }
+    typealias ViewModel = DetailViewModel
     
     func viewModelChanged() {
         updateUI()
@@ -48,41 +44,27 @@ class DetailViewController: UIViewController, IHaveStoryBoard, IHaveViewModel {
     @IBOutlet private weak var heightTableViewConstraint: NSLayoutConstraint!
     @IBOutlet private weak var bottomPlayerConstraint:NSLayoutConstraint!
     
-    private var player: Player
-    private var downloadService: DownloadService
     private var bigPlayerViewController: BigPlayerViewController?
-    private var likeManager: LikeManager
-    private var favouriteManager: FavouriteManager
     let container: IContainer
-    
     
     //MARK: View Methods
     override func viewDidLoad() {
         super.viewDidLoad()
         updateUI()
-               
-        if let track = player.currentTrack?.track {
-            presentSmallPlayer(with: track)
-        }
+        smallPlayerView.isHidden = viewModel.playerIsHidden
+        bottomPlayerConstraint.constant = viewModel.playerIsHidden ? 0 : 50
+        view.layoutIfNeeded()
     }
     
     //MARK: Public Methods
     required init?(container: IContainer, args input: (args: Args, coder: NSCoder)) {
         
-        self.player = container.resolve()
-        self.downloadService = container.resolve()
-        self.likeManager = container.resolve()
-        self.favouriteManager = container.resolve()
         self.container = container
-        
         super.init(coder: input.coder)
-        
-        self.player.delegate = self
-        self.favouriteManager.delegate = self
-        
+                
         let podcast = input.args.podcast
         let podcasts = input.args.podcasts
-        let argVM = ViewModel.Arguments(podcast: input.args.podcast, podcasts: podcasts)
+        let argVM = ViewModel.Arguments(podcast: podcast, podcasts: podcasts)
         self.viewModel = container.resolve(args: argVM)
     }
     
@@ -91,21 +73,21 @@ class DetailViewController: UIViewController, IHaveStoryBoard, IHaveViewModel {
     }
     
     //MARK: Public Methods
-    func scrollToCell(podcast: Podcast) {
-        
-//        guard let index = podcasts.firstIndex(matching: podcast) else { fatalError() }
-//        let indexPath = IndexPath(row: index, section: 0)
-//        let positionOfCell = episodeTableView.getYPositionYFor(indexPath: indexPath)
-//        let positionOfTableView = episodeTableView.frame.origin.y
-//        let position = positionOfTableView + positionOfCell
-//        UIView.animate(withDuration: 12, animations: { [weak self] in
-//            guard let self = self else { return }
-//            scrollView.setContentOffset(CGPoint(x: .zero, y: position), animated: true)
-//        }) { [weak self] _ in
-//            guard let self = self else { return }
-//            episodeTableView.openCell(at: indexPath)
-//        }
+    func scrollToCell() {
+        guard let indexPath = viewModel.searchedIndexPath else { return }
+        let positionOfCell = episodeTableView.getYPositionYFor(indexPath: indexPath)
+        let positionOfTableView = episodeTableView.frame.origin.y
+        let position = positionOfTableView + positionOfCell
+        //TODO: - 12
+        UIView.animate(withDuration: 12, animations: { [weak self] in
+            guard let self = self else { return }
+            scrollView.setContentOffset(CGPoint(x: .zero, y: position), animated: true)
+        }) { [weak self] _ in
+            guard let self = self else { return }
+            viewModel.openCell(atIndexPath: indexPath)
+        }
     }
+    
     @IBAction private func backAction(_ sender: UITapGestureRecognizer) {
        dismiss(animated: true)
     }
@@ -113,6 +95,8 @@ class DetailViewController: UIViewController, IHaveStoryBoard, IHaveViewModel {
     @IBAction private func shareButtonOnTouch(_ sender: UITapGestureRecognizer) {
         presentActivityViewController()
     }
+    
+    func configureUI() {}
 }
 
 //MARK: - Private Methods
@@ -156,25 +140,11 @@ extension DetailViewController {
         present(shareVC, animated: true)
     }
     
-    private func presentSmallPlayer(with viewModel: any OutputPlayerProtocol) {
-        
-        if smallPlayerView.isHidden {
-            let model = SmallPlayerViewModel(viewModel)
-            self.smallPlayerView.configure(with: model, player: player)
-            smallPlayerView.delegate = self
+    private func presentSmallPlayer() {
+        if let smallPlayerViewModel = viewModel.smallPlayerViewModel, smallPlayerView.isHidden {
+            smallPlayerView.viewModel = smallPlayerViewModel
             smallPlayerView.isHidden = false
-            bottomPlayerConstraint.constant = 50
-            view.layoutIfNeeded()
         }
-    }
-    
-    private func presentBigPlayer(with track: Track) {
-        let argsVM: BigPlayerViewController.ViewModel.Arguments = BigPlayerViewController.ViewModel.Arguments.init(track: track)
-        let args: BigPlayerViewController.Arguments = BigPlayerViewController.Arguments.init(delegate: self, modelInput: argsVM)
-        let bigPlayerViewController: BigPlayerViewController = container.resolve(args: args)
-        self.bigPlayerViewController = bigPlayerViewController
-        bigPlayerViewController.modalPresentationStyle = .fullScreen
-        self.present(bigPlayerViewController, animated: true)
     }
     
     private func configureEpisodeTableView() {
@@ -184,7 +154,7 @@ extension DetailViewController {
         reloadTableViewHeightConstraint(newHeight: height)
     }
     
-    private func updateUI() {
+    internal func updateUI() {
        
         episodeImage.image = nil
         configureEpisodeTableView()
@@ -201,46 +171,10 @@ extension DetailViewController {
         advisoryRatingLabel.text = viewModel.podcast.contentAdvisoryRating
         dateLabel          .text = viewModel.podcast.releaseDateInformation.formattedDate(dateFormat: "d MMM YYY")
         durationLabel      .text = viewModel.podcast.trackTimeMillis?.minute
+        
+        scrollToCell()
+        presentSmallPlayer()
     }
-}
-
-
-//MARK: - SmallPlayerViewControllerDelegate
-extension DetailViewController: SmallPlayerViewControllerDelegate {
-    
-    func smallPlayerViewControllerSwipeOrTouch(_ smallPlayerViewController: SmallPlayerView) {
-        guard let track = player.currentTrack?.track else { return }
-        presentBigPlayer(with: track)
-    }
-}
-
-//MARK: - BigPlayerViewControllerDelegate
-extension DetailViewController: BigPlayerViewControllerDelegate {
-    
-    func bigPlayerViewControllerDidTouchPodcastNameLabel(_ bigPlayerViewController: BigPlayerViewController, entity: NSManagedObject) {
-        bigPlayerViewController.dismiss(animated: true, completion: { [weak self] in
-            guard let self = self,
-                  let podcast = entity as? Podcast else { return }
-            
-            scrollToCell(podcast: podcast)
-        })
-    }
-}
-
-//MARK: - PlayerDelegate
-extension DetailViewController: PlayerDelegate {
-    
-    func playerDidEndPlay(_ player: Player, with track: any OutputPlayerProtocol) {}
-    
-    func playerStartLoading(_ player: Player, with track: any OutputPlayerProtocol) {
-        presentSmallPlayer(with: track)
-    }
-    
-    func playerDidEndLoading(_ player: Player, with track: any OutputPlayerProtocol) {}
-    
-    func playerUpdatePlayingInformation(_ player: Player, with track: any OutputPlayerProtocol) {}
-    
-    func playerStateDidChanged(_ player: Player, with track: any OutputPlayerProtocol) {}
 }
 
 //MARK: - EpisodeTableViewControllerMyDataSource
@@ -251,7 +185,6 @@ extension DetailViewController: EpisodeTableViewMyDataSource {
             UIView.animate(withDuration: 0.3) { [weak self] in
                 guard let self = self, let view = view else { return }
                 reloadTableViewHeightConstraint(newHeight: height)
-                
                 let heightOfSmallPlayer = smallPlayerView.isHidden ? 0 : smallPlayerView.frame.height
                 let y = episodeTableView.frame.maxY - (view.bounds.height - view.safeAreaInsets.top - view.safeAreaInsets.bottom) + heightOfSmallPlayer
                 scrollView.setContentOffset(CGPoint(x: .zero, y: y), animated: true)
@@ -265,16 +198,25 @@ extension DetailViewController: EpisodeTableViewMyDataSource {
     }
 }
 
-//MARK: - FavouriteManagerDelegate
-extension DetailViewController: FavouriteManagerDelegate {
+
+
+////MARK: - FavouriteManagerDelegate
+//extension DetailViewController: FavouriteManagerDelegate {
+//    //MARK: - SmallPlayerViewDelegate
+extension DetailViewController: SmallPlayerViewDelegate {
     
-    func favouriteManager(_ favouriteManager: FavouriteManager, didRemove favourite: FavouritePodcast) {
-        view.addToast(title: "Remove from favourite" , smallPlayerView.isHidden ? .bottom : .bottomWithPlayer)
-    }
-    
-    func favouriteManager(_ favouriteManager: FavouriteManager, didAdd favourite: FavouritePodcast) {
-        view.addToast(title: "Add to favourite" , smallPlayerView.isHidden ? .bottom : .bottomWithPlayer)
+    func smallPlayerViewControllerSwipeOrTouch(_ smallPlayerView: SmallPlayerView) {
+        viewModel.presentBigPlayer()
     }
 }
 
+//    func favouriteManager(_ favouriteManager: FavouriteManager, didRemove favourite: FavouritePodcast) {
+//        view.addToast(title: "Remove from favourite" , smallPlayerView.isHidden ? .bottom : .bottomWithPlayer)
+//    }
+//    
+//    func favouriteManager(_ favouriteManager: FavouriteManager, didAdd favourite: FavouritePodcast) {
+//        view.addToast(title: "Add to favourite" , smallPlayerView.isHidden ? .bottom : .bottomWithPlayer)
+//    }
+//}
+//
 

@@ -19,9 +19,11 @@ extension ListeningManagerDelegate where Self: IViewModelUpdating {
     func listeningManager(_ listeningManager: ListeningManager, didSave listeningPodcast : ListeningPodcast) {
         update(with: listeningPodcast)
     }
+    
     func listeningManager(_ listeningManager: ListeningManager, didRemove listeningPodcast: ListeningPodcast) {
         update(with: listeningPodcast)
     }
+    
     func listeningManager(_ listeningManager: ListeningManager, didUpdate listeningPodcast: ListeningPodcast) {
         update(with: listeningPodcast)
     }
@@ -61,9 +63,9 @@ class ListeningManager: MultyDelegateService<ListeningManagerDelegate>, ISinglet
                 
                 firebaseDatabase.update(entity: listeningPodcast)
                 
-                delegates {
-                    $0.listeningManager(self, didUpdate: listeningPodcast)
-                }
+//                delegates {
+//                    $0.listeningManager(self, didUpdate: listeningPodcast)
+//                }
                 
             } else {
                 
@@ -72,9 +74,9 @@ class ListeningManager: MultyDelegateService<ListeningManagerDelegate>, ISinglet
                 
                 firebaseDatabase.add(entity: listenigPodcast)
                 
-                delegates {
-                    $0.listeningManager(self, didSave: listenigPodcast)
-                }
+//                delegates {
+//                    $0.listeningManager(self, didSave: listenigPodcast)
+//                }
             }
         }
     }

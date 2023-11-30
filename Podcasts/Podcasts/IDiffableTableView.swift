@@ -37,8 +37,6 @@ protocol IDiffableTableView: AnyObject {
     func configureDataSource()
 }
 
-
-
 extension IDiffableTableView {
     
     func insertSection(section: Section, at index: Int) {
@@ -110,12 +108,9 @@ extension IDiffableTableView {
     }
 }
 
+protocol IDiffableTableViewWithDataSource: IDiffableTableView {}
 
-protocol IDiffableTableViewWithDataSource: IDiffableTableView {
-}
-
-extension IDiffableTableViewWithDataSource {
-}
+extension IDiffableTableViewWithDataSource {}
 
 
 protocol IDiffableTableViewWithModel: IHaveViewModel, IDiffableTableView where ViewModel: ITableViewModel, Row == ViewModel.Row, Section == ViewModel.Section {

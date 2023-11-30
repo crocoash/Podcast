@@ -29,14 +29,6 @@
                                                     <constraint firstAttribute="width" secondItem="BRV-am-zIV" secondAttribute="height" multiplier="3:3" id="M7b-yg-iVI"/>
                                                 </constraints>
                                             </imageView>
-                                            <imageView clipsSubviews="YES" contentMode="scaleAspectFit" image="arrowshape.left.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="kuD-aR-e20">
-                                                <rect key="frame" x="5" y="6" width="39" height="45.5"/>
-                                                <color key="tintColor" systemColor="placeholderTextColor"/>
-                                                <gestureRecognizers/>
-                                                <connections>
-                                                    <outletCollection property="gestureRecognizers" destination="9Ci-gY-5eF" appends="YES" id="V8c-Mv-GWW"/>
-                                                </connections>
-                                            </imageView>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Episode Name" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8pd-2s-Xre">
                                                 <rect key="frame" x="16" y="320" width="288" height="35"/>
                                                 <constraints>
@@ -213,7 +205,7 @@
                                                     </button>
                                                 </subviews>
                                             </stackView>
-                                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" scrollEnabled="NO" dataMode="prototypes" style="plain" separatorStyle="default" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="bAS-ET-t7V" customClass="EpisodeTableView" customModule="Podcasts" customModuleProvider="target">
+                                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" scrollEnabled="NO" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="bAS-ET-t7V" customClass="EpisodeTableView" customModule="Podcasts" customModuleProvider="target">
                                                 <rect key="frame" x="2" y="722" width="316" height="533"/>
                                                 <color key="backgroundColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <constraints>
@@ -221,12 +213,19 @@
                                                 </constraints>
                                                 <sections/>
                                                 <connections>
-                                                    <outlet property="myDataSource" destination="sQZ-Of-rko" id="KdB-9g-isT"/>
+                                                    <outlet property="myDataSource" destination="sQZ-Of-rko" id="fcd-jA-0vj"/>
                                                 </connections>
                                             </tableView>
+                                            <imageView clipsSubviews="YES" contentMode="scaleAspectFit" image="arrowshape.left.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="kuD-aR-e20">
+                                                <rect key="frame" x="5" y="6" width="39" height="45.5"/>
+                                                <color key="tintColor" systemColor="placeholderTextColor"/>
+                                                <gestureRecognizers/>
+                                                <connections>
+                                                    <outletCollection property="gestureRecognizers" destination="9Ci-gY-5eF" appends="YES" id="V8c-Mv-GWW"/>
+                                                </connections>
+                                            </imageView>
                                         </subviews>
                                         <constraints>
-                                            <constraint firstItem="kuD-aR-e20" firstAttribute="top" secondItem="vpM-jf-L40" secondAttribute="top" constant="5" id="1Iu-Df-Jo8"/>
                                             <constraint firstItem="uAj-Sw-HoT" firstAttribute="leading" secondItem="4l7-gz-wHM" secondAttribute="leading" id="1kd-P4-W4Z"/>
                                             <constraint firstItem="qgc-fg-dJM" firstAttribute="top" secondItem="TzV-kI-k6u" secondAttribute="bottom" constant="15" id="2F9-Lb-Aat"/>
                                             <constraint firstItem="kJ6-q1-wGy" firstAttribute="leading" secondItem="kFE-vk-jJC" secondAttribute="leading" id="5CK-zB-oiH"/>
@@ -258,7 +257,6 @@
                                             <constraint firstItem="hMl-6K-ePn" firstAttribute="centerX" secondItem="vpM-jf-L40" secondAttribute="centerX" id="glA-Uf-RSN"/>
                                             <constraint firstItem="evs-ie-cOk" firstAttribute="height" secondItem="8pd-2s-Xre" secondAttribute="height" id="hGa-Ou-n1r"/>
                                             <constraint firstAttribute="bottom" secondItem="bAS-ET-t7V" secondAttribute="bottom" id="hkm-aw-3w0"/>
-                                            <constraint firstItem="kuD-aR-e20" firstAttribute="leading" secondItem="vpM-jf-L40" secondAttribute="leading" constant="5" id="iQc-T4-T0h"/>
                                             <constraint firstItem="BRV-am-zIV" firstAttribute="top" secondItem="vpM-jf-L40" secondAttribute="top" id="ivT-Vs-XLc"/>
                                             <constraint firstItem="tro-bF-JxU" firstAttribute="top" secondItem="cEr-fK-8Pw" secondAttribute="bottom" constant="15" id="jdm-hb-4Up"/>
                                             <constraint firstItem="8pd-2s-Xre" firstAttribute="leading" secondItem="vpM-jf-L40" secondAttribute="leading" constant="16" id="mLO-s0-nZX"/>
@@ -298,8 +296,10 @@
                         <viewLayoutGuide key="safeArea" id="clg-OB-ibQ"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
+                            <constraint firstItem="kuD-aR-e20" firstAttribute="top" secondItem="clg-OB-ibQ" secondAttribute="top" constant="5" id="0kd-6D-9wK"/>
                             <constraint firstItem="clg-OB-ibQ" firstAttribute="trailing" secondItem="Vma-81-gU9" secondAttribute="trailing" id="3oy-1D-ugh"/>
                             <constraint firstItem="wBV-HU-qSH" firstAttribute="top" secondItem="clg-OB-ibQ" secondAttribute="top" id="Az8-Td-VlS"/>
+                            <constraint firstItem="kuD-aR-e20" firstAttribute="leading" secondItem="clg-OB-ibQ" secondAttribute="leading" constant="5" id="Y4s-74-EZR"/>
                             <constraint firstItem="wBV-HU-qSH" firstAttribute="trailing" secondItem="clg-OB-ibQ" secondAttribute="trailing" id="bB7-UL-QNY"/>
                             <constraint firstItem="clg-OB-ibQ" firstAttribute="bottom" secondItem="Vma-81-gU9" secondAttribute="bottom" id="dN6-7m-umS"/>
                             <constraint firstItem="wBV-HU-qSH" firstAttribute="width" secondItem="7nH-xf-EeU" secondAttribute="width" id="e7m-Ok-VmP"/>

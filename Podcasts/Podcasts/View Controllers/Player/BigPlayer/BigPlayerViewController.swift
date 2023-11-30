@@ -10,19 +10,18 @@ import AVFoundation
 import CoreData
 
 protocol BigPlayerViewControllerDelegate: AnyObject {
-    func bigPlayerViewControllerDidTouchPodcastNameLabel(_ bigPlayerViewController: BigPlayerViewController, entity: NSManagedObject)
+    func bigPlayerViewControllerDidTouchPodcastNameLabel(_ bigPlayerViewController: BigPlayerViewController)
 }
 
-class BigPlayerViewController: UIViewController, IHaveViewModel, IHaveXib {
+class BigPlayerViewController: UIViewController, IHaveXibAndViewModel {
+    func configureUI() {
+        
+    }
     
-    
-    
-    typealias Arguments = Input
     typealias ViewModel = BigPlayerViewModel
 
-    struct Input {
+    struct Arguments {
         var delegate: BigPlayerViewControllerDelegate
-        var modelInput: ViewModel.Arguments
     }
     
     func viewModelChanged() {
@@ -57,14 +56,12 @@ class BigPlayerViewController: UIViewController, IHaveViewModel, IHaveXib {
     
     //MARK: init
     required init?(container: IContainer, args input: Arguments) {
+        
         self.player = container.resolve()
         self.likeManager = container.resolve()
         
         self.delegate = input.delegate
         super.init(nibName: Self.identifier, bundle: nil)
-        
-        let argsVM: ViewModel.Arguments = ViewModel.Arguments(track: input.modelInput.track)
-        self.viewModel = container.resolve(args: argsVM)
     }
     
     required init?(coder: NSCoder) {
@@ -74,7 +71,7 @@ class BigPlayerViewController: UIViewController, IHaveViewModel, IHaveXib {
     //MARK: View Methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        player.delegate = viewModel
+        updateUI()
         configureGestures()
         progressSlider.addTarget(self, action: #selector(sliderValueChangedBegin), for: .editingDidBegin)
         progressSlider.addTarget(self, action: #selector(progressSliderValueChanged(slider:event:)), for: .valueChanged)
@@ -90,7 +87,7 @@ class BigPlayerViewController: UIViewController, IHaveViewModel, IHaveXib {
     }
     
     @objc func tapPodcastNameLabel(sender: UITapGestureRecognizer) {
-//        delegate?.bigPlayerViewControllerDidTouchPodcastNameLabel(self, entity: viewModel.inputType)
+        delegate?.bigPlayerViewControllerDidTouchPodcastNameLabel(self)
     }
     
     @objc func progressSliderValueChanged(slider: UISlider, event: UIEvent) {
@@ -131,7 +128,8 @@ class BigPlayerViewController: UIViewController, IHaveViewModel, IHaveXib {
     }
     
     @IBAction func likedButton(_ sender: UIButton) {
-        viewModel.addLikeMoment()
+        //TODO: 
+//        viewModel.addLikeMoment()
     }
     
     @IBAction func dissmisButtonTouchUpInside(_ sender: UIButton) {
@@ -142,7 +140,7 @@ class BigPlayerViewController: UIViewController, IHaveViewModel, IHaveXib {
 //MARK: - PrivateMethods
 extension BigPlayerViewController {
     
-    private func updateUI() {
+    internal func updateUI() {
         progressSlider.maximumValue = Float(viewModel.duration ?? 0)
         progressSlider.value = Float(viewModel.currentTime ?? 0)
         

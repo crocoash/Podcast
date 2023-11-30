@@ -8,17 +8,13 @@
 import UIKit
 
 class EpisodeTableViewModel: IPerRequest, INotifyOnChanged, IViewModelDinamicUpdating, ITableViewSorting {
-    var test: Bool = false
-    
     
     typealias SectionData = BaseSectionData<Podcast, String>
     
-    struct Input {
+    struct Arguments {
         var podcasts: [Podcast]
         var typeOfSort: TypeSortOfTableView
     }
-    
-    typealias Arguments = Input
     
     var dataSourceAll: [SectionData] = []
     var dataSourceForView: [SectionData] = []
@@ -34,7 +30,8 @@ class EpisodeTableViewModel: IPerRequest, INotifyOnChanged, IViewModelDinamicUpd
     private var podcasts: [Podcast]
     
     //MARK: init
-    required init?(container: IContainer, args input: Input) {
+    required init?(container: IContainer, args input: Arguments) {
+        
         self.container = container
         self.podcasts = input.podcasts
         self.typeOfSort = input.typeOfSort
@@ -60,14 +57,14 @@ class EpisodeTableViewModel: IPerRequest, INotifyOnChanged, IViewModelDinamicUpd
     
     //MARK: Public Methods
     @objc func tapCell(sender: MyTapGestureRecognizer) {
-        guard let cell = sender.info as? UITableViewCell else { return }
-        cell.isSelected.toggle()
+        guard let info = sender.info as? (tableView: EpisodeTableView, indexPath: IndexPath) else { return }
+        info.tableView.selectRowAt(indexPath: info.indexPath)
     }
     
     func getCell(_ tableView: UITableView, for indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.getCell(cell: PodcastCell.self, indexPath: indexPath)
         let podcast = getRowForView(forIndexPath: indexPath)
-        cell.addMyGestureRecognizer(self, type: .tap(), #selector(tapCell), info: cell)
+        cell.addMyGestureRecognizer(self, type: .tap(), #selector(tapCell), info: (tableView: tableView, indexPath: indexPath))
         
         let podcasts = getRowsForView(atSection: indexPath.section)
         let args = PodcastCellViewModel.Arguments.init(podcast: podcast, playlist: podcasts)

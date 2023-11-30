@@ -9,14 +9,12 @@ import UIKit
 import CoreData
 
 
-class FavouriteTableViewModel: NSObject, IPerRequest, INotifyOnChanged, ITableViewModel, IViewModelDinamicUpdating, ITableViewSearched {
+final class FavouriteTableViewModel: NSObject, IPerRequest, INotifyOnChanged, ITableViewModel, IViewModelDinamicUpdating, ITableViewSearched {
     
-   
-    typealias Arguments = Void
+    struct Arguments {}
 
     var searchedSectionData: SectionData?
     var searchedText: String?
-    var isSearching: Bool = false
     
     var dataSourceForView: [SectionData] = [] {
         didSet {
@@ -25,9 +23,14 @@ class FavouriteTableViewModel: NSObject, IPerRequest, INotifyOnChanged, ITableVi
     }
     var dataSourceAll: [SectionData] = []
     
+    ///Managers
     let container: IContainer
     let listeningManager: ListeningManager
     let dataStoreManager: DataStoreManager
+    let router: PresenterService
+    let listDataManager: ListDataManager
+    let apiService: ApiService
+    let firebaseDataBase: FirebaseDatabase
     
     var test: Bool = false
     var insertSectionOnView: ((Section, Int) -> ())     = { _, _ in }
@@ -49,6 +52,10 @@ class FavouriteTableViewModel: NSObject, IPerRequest, INotifyOnChanged, ITableVi
         self.container = container
         self.listeningManager = container.resolve()
         self.dataStoreManager = container.resolve()
+        self.listDataManager = container.resolve()
+        self.router = container.resolve()
+        self.apiService = container.resolve()
+        self.firebaseDataBase = container.resolve()
         
         super.init()
 
@@ -60,20 +67,42 @@ class FavouriteTableViewModel: NSObject, IPerRequest, INotifyOnChanged, ITableVi
         configureDataSource()
     }
     
+    //MARK: Actions
     @objc private func removeListeningPodcast(sender: MyLongPressGestureRecognizer) {
         guard let indexPath = sender.info as? IndexPath,
               let listeningPodcast = getRowForView(forIndexPath: indexPath) as? ListeningPodcast else { return }
         listeningManager.removeListeningPodcast(listeningPodcast)
     }
     
-    
     @objc private func tapFavouritePodcastCell(sender: MyTapGestureRecognizer) {
-        guard let indexPath = sender.info as? IndexPath else { return }
-//        listViewController(self, didSelect: favouritePodcast.podcast)
+        guard let podcast = sender.info as? Podcast else { return }
+        
+        guard let id = podcast.collectionId?.stringValue else { return }
+        let url = DynamicLinkManager.podcastEpisodeById(id).url
+
+        apiService.getData(for: url) { [weak self] (result : Result<PodcastData>) in
+            guard let self = self else { return }
+            switch result {
+            case .failure(let error):
+                print("")
+                //                error.showAlert(vc: self)
+            case .success(result: let podcastData) :
+                let podcasts = podcastData.podcasts.filter { $0.wrapperType == "podcastEpisode"}
+                let args = DetailViewController.Args(podcast: podcast, podcasts: podcasts)
+                let vc: DetailViewController = container.resolve(args: args)
+                router.present(vc, modalPresentationStyle: .custom)
+            }
+        }
+    }
+    
+    func refresh(refreshControl: UIRefreshControl) {
+        refreshControl.beginRefreshing()
+        update(by: [])
+        configureDataSource()
+        refreshControl.endRefreshing()
     }
     
     func performSearch(_ text: String?) {
-        isSearching = text != nil
         guard searchedText != text else { return }
         searchedText = text ?? ""
         
@@ -107,7 +136,7 @@ class FavouriteTableViewModel: NSObject, IPerRequest, INotifyOnChanged, ITableVi
         case (let favouritePodcast as FavouritePodcast, let playlist as [FavouritePodcast]) :
             let cell = tableView.getCell(cell: PodcastCell.self, indexPath: indexPath)
             let playlist = playlist.map { $0.podcast }
-            cell.addMyGestureRecognizer(self, type: .tap(), #selector(tapFavouritePodcastCell(sender:)), info: indexPath)
+            cell.addMyGestureRecognizer(self, type: .tap(), #selector(tapFavouritePodcastCell(sender:)), info: favouritePodcast.podcast)
             let args = PodcastCell.ViewModel.Arguments(podcast: favouritePodcast.podcast, playlist: playlist)
             cell.viewModel = container.resolve(args: args)
             return cell
@@ -120,8 +149,7 @@ class FavouriteTableViewModel: NSObject, IPerRequest, INotifyOnChanged, ITableVi
         case (let listeningPodcast as ListeningPodcast, let playlist as [ListeningPodcast]) :
             let cell = tableView.getCell(cell: ListeningPodcastCell.self, indexPath: indexPath)
             let playlist = playlist.map { $0.podcast }
-            let model = ListeningPodcastCellModel(listeningPodcast)
-            cell.configure(with: model)
+            cell.viewModel = container.resolve(args: listeningPodcast)
             return cell
         default:
             fatalError()
@@ -210,11 +238,21 @@ extension FavouriteTableViewModel: NSFetchedResultsControllerDelegate {
               removeRow(row)
            }
         case .insert:
-            guard let row = anObject as? Row,
-                  let indexSection = getIndexSection(forRow: row) else { return }
-            
-            let sectionData = getSectionData(forIndex: indexSection)
-            appendRow(row, toSectionData: sectionData)
+            switch anObject {
+            case let listSection as ListSection:
+                guard listSection.isActive else { return }
+                let rows = getRowsFor(entityName: listSection.nameOfEntity)
+                let sectionData = SectionData(listSection: listSection, rows: rows)
+                appendSectionData(sectionData, atNewIndex: 0)
+            case let row as Row:
+                if let indexSection = getIndexSection(forRow: row) {
+                    
+                    let sectionData = getSectionData(forIndex: indexSection)
+                    appendRow(row, toSectionData: sectionData)
+                }
+            default:
+                break
+            }
         case .move:
            guard let index = indexPath?.row,
                  let newIndex = newIndexPath?.row else { return }
@@ -238,4 +276,3 @@ extension FavouriteTableViewModel: NSFetchedResultsControllerDelegate {
         }
     }
 }
-

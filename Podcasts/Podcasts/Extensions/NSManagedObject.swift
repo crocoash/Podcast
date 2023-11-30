@@ -61,6 +61,7 @@ extension NSManagedObject {
     func updateObject(by entity: NSManagedObject, withRelationShip: Bool = false) -> NSManagedObject {
         for initProp in self.entity.propertiesByName {
             let key = initProp.key
+                    
             if let value = entity.value(forKey: key) {
                 set(value: value, for: key, withRelationShip: withRelationShip)
             }
@@ -70,7 +71,7 @@ extension NSManagedObject {
     
     func setValue(value: NSManagedObject) {
         guard self.managedObjectContext == nil else { return }
-        if let key =  self.entity.relationships(forDestination: value.entity).first?.name {
+        if let key = self.entity.relationships(forDestination: value.entity).first?.name {
             setObject(value, for: key)
         }
     }
@@ -80,6 +81,7 @@ extension NSManagedObject {
 extension NSManagedObject {
     
     private func set(value: Any, for key: String, withRelationShip: Bool) {
+        
         if let object = value as? NSManagedObject {
             if withRelationShip {
                 setObject(object, for: key)
@@ -89,20 +91,23 @@ extension NSManagedObject {
                 setObjects(by: objects, for: key)
             }
         } else {
-            setValue(value, forKey: key)
+            let oldValue = self.value(forKey: key)
+            if oldValue == nil || (oldValue != nil) && String.init(reflecting: oldValue) != String.init(reflecting: value) {
+                setValue(value, forKey: key)
+            }
         }
     }
 
     private func setObject(_ object: NSManagedObject, for key: String) {
         
-        if let viewContext = self.managedObjectContext {
+        if self.managedObjectContext != nil {
             
             if object.managedObjectContext != nil {
-                self.setValue(object, forKey: key)
+                setValue(object, forKey: key)
             } else {
-                let object = self.updateObject(by: object, withRelationShip: false)
+                let newObject = self.updateObject(by: object, withRelationShip: false)
 //                let object = NSManagedObject.init(object, viewContext: viewContext, withRelationShip: false)
-                self.setValue(object, forKey: key)
+                setValue(newObject, forKey: key)
             }
         } else {
             if object.managedObjectContext == nil {
@@ -122,7 +127,10 @@ extension NSManagedObject {
             
             ///  view context matched
             if values.first?.managedObjectContext == viewContext {
-                self.setValue(values, forKey: key)
+                guard let oldValues = value(forKey: key) as?  Set<NSManagedObject> else { fatalError() }
+                if oldValues != values {
+                    self.setValue(values, forKey: key)
+                }
             ///  by abstract entity
             } else {
                 if let oldValues = (value(forKey: key) as? Set<NSManagedObject>).map({$0}) {
@@ -135,11 +143,13 @@ extension NSManagedObject {
                             }
                             return false
                         }) {
-                            return oldValue.updateObject(by: value, withRelationShip: false)
+                                return oldValue.updateObject(by: value, withRelationShip: false)
                         }
                         return nil
                     }
-                    self.setValue(Set(updatedValues) as NSSet, forKey: key)
+                    if Set(updatedValues) != oldValues {
+                        self.setValue(Set(updatedValues) as NSSet, forKey: key)
+                    }
                 }
             }
           /// abstract
@@ -153,5 +163,24 @@ extension NSManagedObject {
                 self.setValue(Set(abstractValue) as NSSet, forKey: key)
             }
         }
+    }
+}
+
+
+extension Equatable {
+    func isEqual(_ other: any Equatable) -> Bool {
+        guard let other = other as? Self else {
+            return false
+        }
+        return self == other
+    }
+    
+    func areEqual(first: Any, second: Any) -> Bool {
+        guard
+            let equatableOne = first as? any Equatable,
+            let equatableTwo = second as? any Equatable
+        else { return false }
+        
+        return equatableOne.isEqual(equatableTwo)
     }
 }
