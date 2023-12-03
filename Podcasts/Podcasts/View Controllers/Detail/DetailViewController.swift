@@ -9,9 +9,9 @@ import UIKit
 import CoreData
 
 
-class DetailViewController: UIViewController, IHaveStoryBoard, IHaveViewModel {
+class DetailViewController: UIViewController, IHaveStoryBoardAndViewModel {
     
-    typealias Args = ViewModel.Arguments
+    struct Args {}
     typealias ViewModel = DetailViewModel
     
     func viewModelChanged() {
@@ -61,11 +61,6 @@ class DetailViewController: UIViewController, IHaveStoryBoard, IHaveViewModel {
         
         self.container = container
         super.init(coder: input.coder)
-                
-        let podcast = input.args.podcast
-        let podcasts = input.args.podcasts
-        let argVM = ViewModel.Arguments(podcast: podcast, podcasts: podcasts)
-        self.viewModel = container.resolve(args: argVM)
     }
     
     required init?(coder: NSCoder) {
@@ -97,6 +92,28 @@ class DetailViewController: UIViewController, IHaveStoryBoard, IHaveViewModel {
     }
     
     func configureUI() {}
+    
+    func updateUI() {
+       
+        episodeImage.image = nil
+        configureEpisodeTableView()
+        configureSortMenu()
+        
+        DataProvider.shared.downloadImage(string: viewModel.podcast.image600) { [weak self] image in
+            self?.episodeImage.image = image
+        }
+        episodeName        .text = viewModel.podcast.trackName
+        artistName         .text = viewModel.podcast.artistName ?? "Artist Name"
+        genresLabel        .text = viewModel.podcast.genresString
+        descriptionTextView.text = viewModel.podcast.descriptionMy
+        countryLabel       .text = viewModel.podcast.country
+        advisoryRatingLabel.text = viewModel.podcast.contentAdvisoryRating
+        dateLabel          .text = viewModel.podcast.releaseDateInformation.formattedDate(dateFormat: "d MMM YYY")
+        durationLabel      .text = viewModel.podcast.trackTimeMillis?.minute
+        
+        scrollToCell()
+        presentSmallPlayer()
+    }
 }
 
 //MARK: - Private Methods
@@ -152,28 +169,6 @@ extension DetailViewController {
         episodeTableView.viewModel = viewModel.episodeTableViewModel
         let height = episodeTableView.height
         reloadTableViewHeightConstraint(newHeight: height)
-    }
-    
-    internal func updateUI() {
-       
-        episodeImage.image = nil
-        configureEpisodeTableView()
-        configureSortMenu()
-        
-        DataProvider.shared.downloadImage(string: viewModel.podcast.image600) { [weak self] image in
-            self?.episodeImage.image = image
-        }
-        episodeName        .text = viewModel.podcast.trackName
-        artistName         .text = viewModel.podcast.artistName ?? "Artist Name"
-        genresLabel        .text = viewModel.podcast.genresString
-        descriptionTextView.text = viewModel.podcast.descriptionMy
-        countryLabel       .text = viewModel.podcast.country
-        advisoryRatingLabel.text = viewModel.podcast.contentAdvisoryRating
-        dateLabel          .text = viewModel.podcast.releaseDateInformation.formattedDate(dateFormat: "d MMM YYY")
-        durationLabel      .text = viewModel.podcast.trackTimeMillis?.minute
-        
-        scrollToCell()
-        presentSmallPlayer()
     }
 }
 

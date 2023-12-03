@@ -11,6 +11,9 @@ import UIKit
 
 class AlertSortListView: UIView, IHaveXibAndViewModel {
     
+    func viewModelChanged(_ viewModel: AlertSortListViewModel) {}
+    func viewModelChanged() {}
+    
     typealias ViewModel = AlertSortListViewModel
     
     struct Arguments {
@@ -51,7 +54,7 @@ class AlertSortListView: UIView, IHaveXibAndViewModel {
         self.listDataManager = container.resolve()
         self.vc = input.vc
         
-        super.init(frame: CGRect(x: 0, y: 0, width: 400, height: 400))
+        super.init(frame: .zero)
         listDataManager.delegate = self
     }
     

@@ -14,6 +14,7 @@ import UIKit
 @IBDesignable
 class SmallPlayerView: UIView, IHaveXibAndViewModel {
     
+    
     typealias ViewModel = SmallPlayerViewModel
     
     struct Arguments {
@@ -21,6 +22,7 @@ class SmallPlayerView: UIView, IHaveXibAndViewModel {
         var argsVM: ViewModel.Arguments
     }
     
+    func viewModelChanged(_ viewModel: SmallPlayerViewModel) {}
     func viewModelChanged() {
         updateUI()
     }

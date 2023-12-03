@@ -79,7 +79,6 @@ class FavouriteTableView: UITableView, IDiffableTableViewWithModel, IHaveViewMod
     }
 }
 
-
 //MARK: - Private Methods
 extension FavouriteTableView {
     

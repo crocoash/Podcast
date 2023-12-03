@@ -17,7 +17,7 @@ protocol IHaveViewModel: AnyObject {
     func updateUI()
 }
 
-extension IHaveViewModel {
+extension IHaveViewModel where Self: UIViewController {
     func viewModelChanged(_ viewModel: ViewModel) {}
     func viewModelChanged() {}
 }

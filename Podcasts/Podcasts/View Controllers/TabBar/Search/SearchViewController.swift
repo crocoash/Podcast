@@ -16,9 +16,11 @@ typealias PlayListByGenre = PlaylistByNewest
 
 class SearchViewController: UIViewController, IHaveStoryBoardAndViewModel{
     
+    
     struct Args {}
     typealias ViewModel = SearchViewModel
 
+    func viewModelChanged(_ viewModel: SearchViewModel) {}
     func viewModelChanged() {
         updateUI()
     }

@@ -51,7 +51,7 @@ class ListDataManager: MultyDelegateService<ListDataManagerDelegate>, ISingleton
    }
    
    func changeActiveState(for listSection: ListSection) {
-      listSection.isActive.toggle()
+      listSection.isActive.toggle() // +
       dataStoreManager.save()
       saveListData()
    }

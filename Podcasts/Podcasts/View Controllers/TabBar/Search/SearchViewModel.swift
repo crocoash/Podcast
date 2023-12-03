@@ -30,12 +30,7 @@ class SearchViewModel: IPerRequest, ITableViewModel, IViewModelDinamicUpdating, 
     var moveSectionOnView:   ((Int, Int) -> ())         = { _, _ in }
     var reloadSection:       ((Int) -> ())              = { _    in }
     
-    var dataSourceForView: [SectionData] {
-        didSet {
-            changed.raise()
-        }
-    }
-    
+    var dataSourceForView: [SectionData]
     var dataSourceAll: [SectionData] = []
     
     private(set) var isLoading: Bool = false {
@@ -73,8 +68,9 @@ class SearchViewModel: IPerRequest, ITableViewModel, IViewModelDinamicUpdating, 
                 //                error.showAlert(vc: self)
             case .success(result: let podcastData) :
                 let podcasts = podcastData.podcasts.filter { $0.wrapperType == "podcastEpisode"}
-                let args = DetailViewController.Args(podcast: podcast, podcasts: podcasts)
-                let vc: DetailViewController = container.resolve(args: args)
+                let args = DetailViewController.Args.init()
+                let argsVM = DetailViewController.ViewModel.Arguments(podcast: podcast, podcasts: podcasts)
+                let vc: DetailViewController = container.resolve(args: args, argsVM: argsVM)
                 router.present(vc, modalPresentationStyle: .custom)
             }
             isLoading = false

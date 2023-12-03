@@ -134,45 +134,29 @@ extension IViewModelDinamicUpdating {
         removeSectionOnView(indexSection)
         dataSourceForView.remove(at: indexSection)
     }
-    
-    
-   
+       
     /// -----------------------------------------------------------------------------------------------------------------------------
     /// Remove
     func removeSectionData(_ sectionData: SectionData) {
         let section = sectionData.section
+        
         guard let index = getIndexSection(forSection: section) else { return }
-        dataSourceAll.remove(at: index)
-        guard let index = getIndexSectionForView(forSection: section) else { return }
-        removeSectionOnView(index)
-        dataSourceForView.remove(at: index)
+        if let index = getIndexSectionForView(forSection: section) {
+            sectionData.rows.reversed().forEach { row in
+                removeRow(row)
+            }
+        } else {
+            dataSourceAll.remove(at: index)
+        }
     }
 
     /// Append
     func appendSectionData(_ sectionData: SectionData, atNewIndex index: Int) {
-        
-        if !dataSourceAll.contains(where: { $0 == sectionData }) {
-            if !dataSourceAll.isEmpty, dataSourceAll.count != index {
-                dataSourceAll.insert(sectionData, at: index)
-            } else {
-                dataSourceAll.append(sectionData)
-            }
-        }
-        
-        guard sectionData.isAvailable else { return }
-        let indexSection = getIndexOfActiveSectionForView(sectionData: sectionData)
-        
-        if !dataSourceForView.isEmpty, dataSourceForView.count != indexSection {
-            dataSourceForView.insert(sectionData, at: indexSection)
-        } else {
-            dataSourceForView.append(sectionData)
-        }
-        
-        insertSectionOnView(sectionData.section, indexSection)
-        sectionData.rows.enumerated { (indexRow, row) in
-            insertItemOnView(row, IndexPath(row: indexRow, section: indexSection))
+        sectionData.rows.forEach {
+            appendRow($0, toSectionData: sectionData)
         }
     }
+    
     /// Move
     func moveSectionData(_ sectionData: SectionData, from index: Int, to newIndex: Int) {
       
@@ -191,33 +175,44 @@ extension IViewModelDinamicUpdating {
     //MARK: Row
     /// -----------------------------------------------------------------------------------------------------------------------------
     func appendRow(_ row: Row, toSectionData sectionData: SectionData) {
-        let indexRow = sectionData.rows.count == 0 ? 0 : (sectionData.rows.count - 1)
+        
+        if !dataSourceAll.contains(where: { $0 == sectionData }) {
+            var sectionData1 = sectionData
+            sectionData1.rows.removeAll()
+            dataSourceAll.append(sectionData1)
+        }
+        
         guard let indexSection = getIndexSection(forSection: sectionData.section) else { return }
         
-        dataSourceAll[indexSection].rows.insert(row, at: indexRow)
+        dataSourceAll[indexSection].rows.append(row)
         
-        guard sectionData.isAvailable else { return }
-        let sectionIndex = getIndexOfActiveSectionForView(sectionData: sectionData)
+        ///check if section is actual for view
+        guard dataSourceAll[indexSection].isAvailable else { return }
+        
+        var sectionIndex = getIndexOfActiveSectionForView(sectionData: sectionData)
 
-        if !dataSourceForView.contains(where: { $0 == sectionData }) {
-            if !dataSourceForView.isEmpty, dataSourceForView.count != sectionIndex {
-                dataSourceForView.insert(sectionData, at: sectionIndex)
-            } else {
-                dataSourceForView.append(sectionData)
-            }
+        if !dataSourceForView.contains(where: { $0.section == sectionData.section }) {
+            var sectionData1 = sectionData
+            sectionData1.rows.removeAll()
+            dataSourceForView.append(sectionData1)
+            sectionIndex = dataSourceForView.count - 1
+            dataSourceForView[sectionIndex].rows.append(row)
             insertSectionOnView(sectionData.section, sectionIndex)
+        } else {
+            dataSourceForView[sectionIndex].rows.append(row)
         }
-         
-        dataSourceForView[sectionIndex].rows.insert(row, at: indexRow)
+        
+        let indexRow = dataSourceForView[sectionIndex].rows.count == 0 ? 0 : dataSourceForView[sectionIndex].rows.count - 1
         let indexPath = IndexPath(row: indexRow, section: sectionIndex)
         insertItemOnView(row, indexPath)
+        (self as? INotifyOnChanged)?.changed.raise()
     }
     
     func removeRow(_ row: Row) {
         guard let indexPath = getIndexPath(forRow: row) else { return }
         var sectionData: SectionData { getSectionData(forIndex: indexPath.section) }
         var section: Section { sectionData.section }
-//        dataSourceAll[indexPath.section].rows.remove(at: indexPath.row)
+        dataSourceAll[indexPath.section].rows.remove(at: indexPath.row)
 
         if sectionData.isActive {
             guard let indexPath = getIndexPathForView(forRow: row) else { return }
@@ -227,9 +222,11 @@ extension IViewModelDinamicUpdating {
      
         if sectionData.isEmpty {
             guard let index = getIndexSectionForView(forSection: section) else { return }
+            dataSourceAll.remove(at: indexPath.section)
             removeSectionOnView(index)
             dataSourceForView.remove(at: index)
-        } 
+            (self as? INotifyOnChanged)?.changed.raise()
+        }
     }
 }
 
@@ -262,12 +259,16 @@ extension IViewModelDinamicUpdating {
     
     func getIndexOfActiveSectionForView(sectionData: SectionData) -> Int {
         var sectionIndex = 0
+        
         for value in dataSourceAll {
             
-            if value.isAvailable && value.section != sectionData.section  {
-                sectionIndex += 1
-                continue
+            if let sectionData1 = dataSourceForView.first(where: { $0.section == sectionData.section }), sectionData1.isEmpty || value.isAvailable {
+                if value.section != sectionData.section {
+                    sectionIndex += 1
+                    continue
+                }
             }
+            
             if value.section == sectionData.section {
                 return sectionIndex
             }

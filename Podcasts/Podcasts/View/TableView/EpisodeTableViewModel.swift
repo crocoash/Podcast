@@ -11,6 +11,7 @@ class EpisodeTableViewModel: IPerRequest, INotifyOnChanged, IViewModelDinamicUpd
     
     typealias SectionData = BaseSectionData<Podcast, String>
     
+    
     struct Arguments {
         var podcasts: [Podcast]
         var typeOfSort: TypeSortOfTableView
@@ -28,7 +29,7 @@ class EpisodeTableViewModel: IPerRequest, INotifyOnChanged, IViewModelDinamicUpd
     
     let container: IContainer
     private var podcasts: [Podcast]
-    
+        
     //MARK: init
     required init?(container: IContainer, args input: Arguments) {
         

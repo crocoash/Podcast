@@ -72,7 +72,7 @@
                 <constraint firstItem="A1c-4Y-GlG" firstAttribute="leading" secondItem="3vw-cZ-C9n" secondAttribute="trailing" constant="8" symbolic="YES" id="pdh-uQ-DTG"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
-            <point key="canvasLocation" x="195.6521739130435" y="-163.39285714285714"/>
+            <point key="canvasLocation" x="191" y="-338"/>
         </view>
     </objects>
     <resources>

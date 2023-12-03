@@ -14,6 +14,10 @@ import CoreData
 
 class EpisodeTableView: UITableView, IHaveViewModel, ITableViewDinamicUpdating {
     
+    func viewModelChanged(_ viewModel: EpisodeTableViewModel) {
+        configureUI()
+    }
+    
     func viewModelChanged() {}
     
     typealias ViewModel = EpisodeTableViewModel
@@ -60,13 +64,12 @@ class EpisodeTableView: UITableView, IHaveViewModel, ITableViewDinamicUpdating {
         if #available(iOS 15.0, *) {
             sectionHeaderTopPadding = paddingBetweenSections
         }
-
-        delegate = self
-        dataSource = self
     }
     
     func configureUI() {
         observeViewModel()
+        delegate = self
+        dataSource = self
     }
     
     func updateUI() {}

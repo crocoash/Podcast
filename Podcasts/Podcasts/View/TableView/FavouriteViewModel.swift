@@ -13,14 +13,12 @@ final class FavouriteTableViewModel: NSObject, IPerRequest, INotifyOnChanged, IT
     
     struct Arguments {}
 
+    var timeInterval: TimeInterval = 0.01
+
     var searchedSectionData: SectionData?
     var searchedText: String?
     
-    var dataSourceForView: [SectionData] = [] {
-        didSet {
-            changed.raise()
-        }
-    }
+    var dataSourceForView: [SectionData] = []
     var dataSourceAll: [SectionData] = []
     
     ///Managers
@@ -63,7 +61,7 @@ final class FavouriteTableViewModel: NSObject, IPerRequest, INotifyOnChanged, IT
         likeMomentFRC.delegate = self
         listeningFRC.delegate = self
         listSectionFRC.delegate = self
-        
+                
         configureDataSource()
     }
     
@@ -88,8 +86,9 @@ final class FavouriteTableViewModel: NSObject, IPerRequest, INotifyOnChanged, IT
                 //                error.showAlert(vc: self)
             case .success(result: let podcastData) :
                 let podcasts = podcastData.podcasts.filter { $0.wrapperType == "podcastEpisode"}
-                let args = DetailViewController.Args(podcast: podcast, podcasts: podcasts)
-                let vc: DetailViewController = container.resolve(args: args)
+                let args = DetailViewController.Args.init()
+                let argsVM = DetailViewController.ViewModel.Arguments(podcast: podcast, podcasts: podcasts)
+                let vc: DetailViewController = container.resolve(args: args, argsVM: argsVM)
                 router.present(vc, modalPresentationStyle: .custom)
             }
         }
@@ -203,11 +202,12 @@ extension FavouriteTableViewModel {
     }
     
     func configureDataSource() {
-       var sectionData = listSectionFRC.fetchedObjects?.map {
-          let entities = getRowsFor(entityName: $0.nameOfEntity)
-          return SectionData(listSection: $0, rows: entities)
-       }
-       sectionData?.sort { $0.sequenceNumber < $1.sequenceNumber }
+        var sectionData = listSectionFRC.fetchedObjects?.map {
+            let entities = getRowsFor(entityName: $0.nameOfEntity)
+            let sectionData = SectionData(listSection: $0, rows: entities)
+            return sectionData
+        }
+        sectionData?.sort { $0.sequenceNumber < $1.sequenceNumber }
         update(by: sectionData ?? [])
     }
     
@@ -229,6 +229,7 @@ extension FavouriteTableViewModel {
 
 //MARK: - NSFetchedResultsControllerDelegate
 extension FavouriteTableViewModel: NSFetchedResultsControllerDelegate {
+    
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         
         switch type {
