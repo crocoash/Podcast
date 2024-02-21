@@ -8,19 +8,21 @@
 import UIKit
 import CoreData
 
-
 final class FavouriteTableViewModel: NSObject, IPerRequest, INotifyOnChanged, ITableViewModel, IViewModelDinamicUpdating, ITableViewSearched {
     
+    var queue = OperationQueue()
+    var operation: BlockOperation?
+
     struct Arguments {}
 
+    var isUpdating: Bool = false
+    var lock: NSLock = NSLock()
+    var updatingDelay: TimeInterval = 2
+    
     var searchedSectionData: SectionData?
     var searchedText: String?
     
-    var dataSourceForView: [SectionData] = [] {
-        didSet {
-            changed.raise()
-        }
-    }
+    var dataSourceForView: [SectionData] = []
     var dataSourceAll: [SectionData] = []
     
     ///Managers
@@ -33,12 +35,12 @@ final class FavouriteTableViewModel: NSObject, IPerRequest, INotifyOnChanged, IT
     let firebaseDataBase: FirebaseDatabase
     
     var test: Bool = false
-    var insertSectionOnView: ((Section, Int) -> ())     = { _, _ in }
-    var insertItemOnView:    ((Row, IndexPath) -> ())   = { _, _ in }
-    var removeRowOnView:     ((IndexPath) -> ())        = {    _ in }
-    var removeSectionOnView: ((Int) -> ())              = {    _ in }
-    var moveSectionOnView:   ((Int, Int) -> ())         = { _, _ in }
-    var reloadSection:       ((Int) -> ())              = { _    in }
+    var insertSectionOnView: ((Section, Int)  -> ())     = { _, _ in }
+    var insertItemOnView:    ((Row, IndexPath)  -> ())   = { _, _ in }
+    var removeRowOnView:     ((IndexPath)  -> ())        = {    _ in }
+    var removeSectionOnView: ((Int)  -> ())              = {    _ in }
+    var moveSectionOnView:   ((Int, Int)  -> ())         = { _, _ in }
+    var reloadSection:       ((Int)  -> ())              = { _    in }
     
     lazy private var favouriteFRC = dataStoreManager.conFigureFRC(for: FavouritePodcast.self)
     lazy private var likeMomentFRC = dataStoreManager.conFigureFRC(for: LikedMoment.self)
@@ -63,7 +65,7 @@ final class FavouriteTableViewModel: NSObject, IPerRequest, INotifyOnChanged, IT
         likeMomentFRC.delegate = self
         listeningFRC.delegate = self
         listSectionFRC.delegate = self
-        
+                
         configureDataSource()
     }
     
@@ -88,8 +90,9 @@ final class FavouriteTableViewModel: NSObject, IPerRequest, INotifyOnChanged, IT
                 //                error.showAlert(vc: self)
             case .success(result: let podcastData) :
                 let podcasts = podcastData.podcasts.filter { $0.wrapperType == "podcastEpisode"}
-                let args = DetailViewController.Args(podcast: podcast, podcasts: podcasts)
-                let vc: DetailViewController = container.resolve(args: args)
+                let args = DetailViewController.Args.init()
+                let argsVM = DetailViewController.ViewModel.Arguments(podcast: podcast, podcasts: podcasts)
+                let vc: DetailViewController = container.resolve(args: args, argsVM: argsVM)
                 router.present(vc, modalPresentationStyle: .custom)
             }
         }
@@ -97,7 +100,9 @@ final class FavouriteTableViewModel: NSObject, IPerRequest, INotifyOnChanged, IT
     
     func refresh(refreshControl: UIRefreshControl) {
         refreshControl.beginRefreshing()
-        update(by: [])
+        DispatchQueue.global().async {
+            self.update(by: [])
+        }
         configureDataSource()
         refreshControl.endRefreshing()
     }
@@ -203,11 +208,12 @@ extension FavouriteTableViewModel {
     }
     
     func configureDataSource() {
-       var sectionData = listSectionFRC.fetchedObjects?.map {
-          let entities = getRowsFor(entityName: $0.nameOfEntity)
-          return SectionData(listSection: $0, rows: entities)
-       }
-       sectionData?.sort { $0.sequenceNumber < $1.sequenceNumber }
+        var sectionData = listSectionFRC.fetchedObjects?.map {
+            let entities = getRowsFor(entityName: $0.nameOfEntity)
+            let sectionData = SectionData(listSection: $0, rows: entities)
+            return sectionData
+        }
+        sectionData?.sort { $0.sequenceNumber < $1.sequenceNumber }
         update(by: sectionData ?? [])
     }
     
@@ -229,6 +235,7 @@ extension FavouriteTableViewModel {
 
 //MARK: - NSFetchedResultsControllerDelegate
 extension FavouriteTableViewModel: NSFetchedResultsControllerDelegate {
+    
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         
         switch type {
@@ -258,7 +265,7 @@ extension FavouriteTableViewModel: NSFetchedResultsControllerDelegate {
                  let newIndex = newIndexPath?.row else { return }
            if let listSection = anObject as? ListSection {
               guard let sectionData = getSectionData(forListSection: listSection) else { return }
-              moveSectionData(sectionData, from: index, to: newIndex)
+               Task { await moveSectionData(sectionData, from: index, to: newIndex) }
            }
         case .update:
             if let listSection = anObject as? ListSection {

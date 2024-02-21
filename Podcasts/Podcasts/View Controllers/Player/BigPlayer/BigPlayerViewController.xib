@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21679"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22504"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -30,7 +30,7 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="S9q-Kg-Gm0">
-                    <rect key="frame" x="0.0" y="78.999999999999986" width="373" height="248.66666666666663"/>
+                    <rect key="frame" x="20" y="79.000000000000014" width="353" height="235.33333333333337"/>
                     <color key="backgroundColor" red="0.69553225799999996" green="0.55586313639999996" blue="0.4945483806" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <constraints>
                         <constraint firstAttribute="width" secondItem="S9q-Kg-Gm0" secondAttribute="height" multiplier="3:2" id="7jq-qa-LeH"/>
@@ -42,7 +42,7 @@
                     </userDefinedRuntimeAttributes>
                 </imageView>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0:00" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oqM-Hi-VRJ">
-                    <rect key="frame" x="20.000000000000004" y="444.33333333333331" width="41.333333333333343" height="25"/>
+                    <rect key="frame" x="20.000000000000004" y="431" width="41.333333333333343" height="25"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="25" id="HKO-pg-nY0"/>
                     </constraints>
@@ -51,10 +51,10 @@
                     <nil key="highlightedColor"/>
                 </label>
                 <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="cXA-Ai-yFn">
-                    <rect key="frame" x="18" y="474.33333333333331" width="357" height="31"/>
+                    <rect key="frame" x="18" y="461" width="357" height="31"/>
                 </slider>
                 <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="arR-z9-12W">
-                    <rect key="frame" x="20" y="529.33333333333337" width="353" height="40"/>
+                    <rect key="frame" x="20" y="516" width="353" height="40"/>
                     <subviews>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Efo-Ay-eoH">
                             <rect key="frame" x="0.0" y="0.0" width="64.333333333333329" height="40"/>
@@ -118,7 +118,7 @@
                     </subviews>
                 </stackView>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Podcast Name" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="4" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="4U4-Fn-z6L">
-                    <rect key="frame" x="0.0" y="344.33333333333331" width="373" height="90"/>
+                    <rect key="frame" x="20" y="331" width="353" height="90"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="90" id="6aA-kE-WTJ"/>
                     </constraints>
@@ -127,10 +127,10 @@
                     <nil key="highlightedColor"/>
                 </label>
                 <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" animating="YES" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="JSQ-Ks-8p4">
-                    <rect key="frame" x="186.66666666666666" y="506.33333333333326" width="20" height="20"/>
+                    <rect key="frame" x="186.66666666666666" y="493" width="20" height="20"/>
                 </activityIndicatorView>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="00:00" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YBf-Sa-DCQ">
-                    <rect key="frame" x="319.66666666666669" y="444.33333333333331" width="53.333333333333314" height="25"/>
+                    <rect key="frame" x="319.66666666666669" y="431" width="53.333333333333314" height="25"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="25" id="4JG-Kq-65J"/>
                     </constraints>
@@ -139,7 +139,7 @@
                     <nil key="highlightedColor"/>
                 </label>
                 <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="s8Y-pZ-k98">
-                    <rect key="frame" x="171.66666666666666" y="574.33333333333337" width="49.666666666666657" height="49.666666666666629"/>
+                    <rect key="frame" x="173" y="561" width="47" height="47"/>
                     <state key="normal" image="like-1"/>
                     <connections>
                         <action selector="likedButton:" destination="-1" eventType="touchUpInside" id="x9y-uK-lFd"/>
@@ -163,7 +163,7 @@
                 <constraint firstItem="4U4-Fn-z6L" firstAttribute="trailing" secondItem="S9q-Kg-Gm0" secondAttribute="trailing" id="0Qb-S2-XPR"/>
                 <constraint firstItem="YBf-Sa-DCQ" firstAttribute="top" secondItem="oqM-Hi-VRJ" secondAttribute="top" id="1Cc-nu-saV"/>
                 <constraint firstItem="cXA-Ai-yFn" firstAttribute="top" secondItem="oqM-Hi-VRJ" secondAttribute="bottom" constant="5" id="2L3-Ig-edm"/>
-                <constraint firstItem="S9q-Kg-Gm0" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" id="40m-1f-6cq"/>
+                <constraint firstItem="S9q-Kg-Gm0" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" constant="20" id="40m-1f-6cq"/>
                 <constraint firstItem="s8Y-pZ-k98" firstAttribute="height" secondItem="S9q-Kg-Gm0" secondAttribute="height" multiplier="0.200401" id="5eg-Gn-Z70"/>
                 <constraint firstItem="JSQ-Ks-8p4" firstAttribute="centerX" secondItem="fnl-2z-Ty3" secondAttribute="centerX" id="E4O-0g-EZR"/>
                 <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="YBf-Sa-DCQ" secondAttribute="trailing" constant="20" id="Eox-SO-0op"/>
@@ -196,10 +196,10 @@
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemGray2Color">
-            <color red="0.68235294117647061" green="0.68235294117647061" blue="0.69803921568627447" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.68235294120000001" green="0.68235294120000001" blue="0.69803921570000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemGray3Color">
-            <color red="0.7803921568627451" green="0.7803921568627451" blue="0.80000000000000004" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.78039215689999997" green="0.78039215689999997" blue="0.80000000000000004" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

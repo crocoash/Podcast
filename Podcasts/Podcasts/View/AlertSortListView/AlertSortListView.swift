@@ -11,27 +11,26 @@ import UIKit
 
 class AlertSortListView: UIView, IHaveXibAndViewModel {
     
+    func viewModelChanged(_ viewModel: AlertSortListViewModel) {}
+    func viewModelChanged() {}
+    
     typealias ViewModel = AlertSortListViewModel
     
     struct Arguments {
         var vc: UIViewController
     }
-   
-   //MARK: Services
-   private let dataStoreManager: DataStoreManager
-   private let listDataManager: ListDataManager
-   
+    
    @IBOutlet private weak var closeImageView: UIImageView!
    @IBOutlet private weak var tableView: UITableView!
    
-   var vc: UIViewController!
+   weak var vc: UIViewController!
    
    //MARK: Variables
    private var alertSortListViewIsShowing = false
    private var gestureView: UIView?
    private var panGestureAnchorY: CGFloat?
-   private var height: Double = 300
-   lazy private var width = vc.view.frame.width * 0.8
+   private var height: Double
+   private var width: Double
    
    private var y: Double {
       get { frame.origin.y }
@@ -39,31 +38,30 @@ class AlertSortListView: UIView, IHaveXibAndViewModel {
    }
    
    /// Positions
-   lazy private var hidePositionY = vc.view.frame.height * 2
-   lazy private var showPositionY = vc.view.frame.height - height - margin
-   lazy private var margin = (vc.view.frame.width - width) / 2
-   lazy private var positionYForClosed = showPositionY + height * 0.3
+   private var hidePositionY: CGFloat
+   private var showPositionY: CGFloat
+   private var margin: CGFloat
+   private var positionYForClosed: CGFloat
     
     //MARK: init
     required init(container: IContainer, args input: Arguments) {
-        
-        self.dataStoreManager = container.resolve()
-        self.listDataManager = container.resolve()
         self.vc = input.vc
+
+        height = 300
+        width = vc.view.frame.width * 0.8
+        margin = (vc.view.frame.width - width) / 2
+        hidePositionY = vc.view.frame.height * 2
+        showPositionY = vc.view.frame.height - height - margin
+        positionYForClosed = showPositionY + height * 0.3
         
-        super.init(frame: CGRect(x: 0, y: 0, width: 400, height: 400))
-        listDataManager.delegate = self
+        super.init(frame: CGRect(x: margin, y: hidePositionY, width: width, height: height))
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     func configureUI() {
-        frame.size.width = width
-        frame.size.height = height
-        frame.origin.y = hidePositionY
-        frame.origin.x = margin
         layer.shadowRadius = 40
         layer.shadowOpacity = 0.2
   //      layer.shadowOffset = CGSize(width: 100, height: 100)
@@ -195,25 +193,10 @@ extension AlertSortListView: UITableViewDelegate {
 extension AlertSortListView: UITableViewDataSource {
    
    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-      return viewModel.countOfRows
+       return viewModel.numbersOfRowsInSection(section: section)
    }
    
    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-      let item = viewModel.listSections[indexPath.row]
-      let cell = UITableViewCell()
-      cell.accessoryType = .checkmark
-      cell.isSelected = true
-      var content = cell.defaultContentConfiguration()
-      content.text = item.nameOfEntity
-      cell.contentConfiguration = content
-      return cell
-   }
-}
-
-//MARK: - ListDataManagerDelegate
-extension AlertSortListView: ListDataManagerDelegate {
-   
-   func listDataManagerDidUpdate(_ ListDataManager: ListDataManager) {
-      tableView.reloadData()
+       viewModel.getCell(tableView, for: indexPath)
    }
 }

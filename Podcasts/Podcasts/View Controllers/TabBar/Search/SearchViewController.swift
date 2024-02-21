@@ -19,11 +19,11 @@ class SearchViewController: UIViewController, IHaveStoryBoardAndViewModel{
     struct Args {}
     typealias ViewModel = SearchViewModel
 
+    func viewModelChanged(_ viewModel: SearchViewModel) {}
     func viewModelChanged() {
         updateUI()
     }
     
-    private let apiService: ApiService
     private let container: IContainer
     
     @IBOutlet private weak var searchBar: UISearchBar!
@@ -58,9 +58,7 @@ class SearchViewController: UIViewController, IHaveStoryBoardAndViewModel{
     
     //MARK: init
     required init?(container: IContainer, args: (args: Args, coder: NSCoder)) {
-        self.apiService = container.resolve()
         self.container = container
-        
         super.init(coder: args.coder)
     }
     
@@ -116,7 +114,7 @@ class SearchViewController: UIViewController, IHaveStoryBoardAndViewModel{
     }
     
     func updateUI() {
-       if viewModel.isLoading {
+        if viewModel.isLoading || viewModel.isUpdating {
            view.showActivityIndicator()
        } else {
            view.hideActivityIndicator()
@@ -137,7 +135,7 @@ class SearchViewController: UIViewController, IHaveStoryBoardAndViewModel{
 extension SearchViewController {
     
     private func configureGesture() {
-//        addMyGestureRecognizer(self, type: .swipe(directions: [.left,.right]), #selector(handlerSwipe))
+        //        addMyGestureRecognizer(self, type: .swipe(directions: [.left,.right]), #selector(handlerSwipe))
         refreshControl.addTarget(self, action: #selector(refresh), for: .valueChanged)
     }
     
@@ -153,13 +151,13 @@ extension SearchViewController {
         alert.delegate = self
     }
     
-//    private func configureActivityIndicator() {
-//        activityIndicator.isHidden = true
-//        activityIndicator.hidesWhenStopped = true
-//        activityIndicator.style = .large
-//        activityIndicator.center = view.center
-//        view.addSubview(activityIndicator)
-//    }
+    //    private func configureActivityIndicator() {
+    //        activityIndicator.isHidden = true
+    //        activityIndicator.hidesWhenStopped = true
+    //        activityIndicator.style = .large
+    //        activityIndicator.center = view.center
+    //        view.addSubview(activityIndicator)
+    //    }
     
     private func cancelSearchAction() {
         searchBar.text?.removeAll()
@@ -191,32 +189,34 @@ extension SearchViewController {
     }
     
     private func observeViewModel() {
-         
-         viewModel.removeSection { [weak self] index in
-             guard let self = self else { return }
-             searchCollectionView.deleteSection(at: index)
-         }
-         
-         viewModel.removeRow { [weak self] indexPath in
-             guard let self = self else { return }
-             searchCollectionView.deleteRow(at: indexPath)
-         }
-         
-         viewModel.insertRow { [weak self] row, indexPath in
-             guard let self = self else { return }
-             searchCollectionView.insertRow(at: indexPath)
-         }
-         
-         viewModel.insertSection { [weak self] section, index in
-             guard let self = self else { return }
-             searchCollectionView.insertSection(section: section, at: index)
-         }
-         
-         viewModel.moveSection { [weak self] index, newIndex in
-             guard let self = self else { return }
-
-         }
-     }
+        
+        viewModel.removeSection { [weak self] index in
+            guard let self = self else { return }
+            self.searchCollectionView.deleteSection(at: index)
+        }
+        
+        viewModel.removeRow { [weak self] indexPath in
+            guard let self = self else { return }
+            searchCollectionView.deleteRow(at: indexPath)
+        }
+        
+        
+        viewModel.insertRow { [weak self] row, indexPath in
+            guard let self = self else { return }
+            searchCollectionView.insertRow(at: indexPath)
+//            searchCollectionView.scrollToItem(at: indexPath, at: .bottom, animated: true)
+        }
+        
+        viewModel.insertSection { [weak self] section, index in
+            guard let self = self else { return }
+            searchCollectionView.insertSection(section: section, at: index)
+        }
+        
+        viewModel.moveSection { [weak self] index, newIndex in
+            guard let self = self else { return }
+            searchCollectionView.moveSection(index, toSection: newIndex)
+        }
+    }
 }
 
 //MARK: - Private methods
@@ -284,6 +284,7 @@ extension SearchViewController: AlertDelegate {
 
 //MARK: - SearchCollectionViewDelegate
 extension SearchViewController: SearchCollectionViewDelegate {
+    
     func searchCollectionView(_ searchCollectionView: SearchCollectionView, didTapAtIndexPath indexPath: IndexPath) {
         tapCell(atIndexPath: indexPath)
     }
@@ -291,6 +292,10 @@ extension SearchViewController: SearchCollectionViewDelegate {
 
 //MARK: - SearchCollectionViewDataSource
 extension SearchViewController: SearchCollectionViewDataSource {
+    
+    func searchCollectionView(_ searchCollectionView: SearchCollectionView, sizeForSection section: Int) -> CGSize {
+        return .zero
+    }
     
     func searchCollectionViewNumbersOfSections(_ searchCollectionView: SearchCollectionView) -> Int {
         return viewModel.numbersOfSections

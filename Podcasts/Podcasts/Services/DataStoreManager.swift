@@ -107,10 +107,6 @@ final class DataStoreManager: ISingleton {
     }()
     
     lazy var backgroundViewContext = persistentContainer.newBackgroundContext()
-    
-    func test() {
-        backgroundViewContext.undoManager = UndoManager()
-    }
 }
 
 extension DataStoreManager: DataStoreManagerInput {

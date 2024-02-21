@@ -18,7 +18,6 @@ class ListViewController: UIViewController, IHaveStoryBoardAndViewModel {
     }
     
     private let refreshControl = UIRefreshControl()
-//    private var alertTopConstraint: NSLayoutConstraint?
     
     private var playerIsSHidden: Bool = true
     
@@ -80,6 +79,8 @@ class ListViewController: UIViewController, IHaveStoryBoardAndViewModel {
         super.viewDidLoad()
         configureUI()
         updateUI()
+        view.frame.size.width = 400
+
     }
     
     //MARK: Actions
@@ -98,6 +99,11 @@ class ListViewController: UIViewController, IHaveStoryBoardAndViewModel {
        configureScopeBar()
        setSearchController()
        configureNavigationItem()
+       if viewModel.isLoading {
+           view.showActivityIndicator()
+       } else {
+           view.hideActivityIndicator()
+       }
    }
 }
 

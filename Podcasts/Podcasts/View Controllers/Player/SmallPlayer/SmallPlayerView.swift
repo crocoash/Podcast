@@ -21,6 +21,7 @@ class SmallPlayerView: UIView, IHaveXibAndViewModel {
         var argsVM: ViewModel.Arguments
     }
     
+    func viewModelChanged(_ viewModel: SmallPlayerViewModel) {}
     func viewModelChanged() {
         updateUI()
     }
@@ -57,8 +58,18 @@ class SmallPlayerView: UIView, IHaveXibAndViewModel {
         viewModel.player.playOrPause()
     }
     
-    @objc func respondToSwipeOrTouch(gesture: UIGestureRecognizer) {
+    @objc func respondToSwipeOrTouch() {
         delegate?.smallPlayerViewControllerSwipeOrTouch(self)
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        for touch in touches {
+            if playPauseButton.frame.contains(touch.location(in: self)) {
+                playOrPause()
+            } else {
+                respondToSwipeOrTouch()
+            }
+        }
     }
     
     func configureUI() {

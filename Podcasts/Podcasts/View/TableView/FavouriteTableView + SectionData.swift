@@ -10,16 +10,15 @@ import CoreData
 //MARK: - SectionData
 extension FavouriteTableViewModel {
     
-    class SectionData: ISearchedSectionData {
+     struct SectionData: ISearchedSectionData {
         var isAvailable: Bool {
             return isActive && !isEmpty && isSearched
         }
         
         typealias Row = NSManagedObject
         typealias Section = String
-        
         var section: String
-        var rows: [NSManagedObject]
+        var rows: [NSManagedObject] 
         var isActive: Bool
         var isSearched: Bool = true
         

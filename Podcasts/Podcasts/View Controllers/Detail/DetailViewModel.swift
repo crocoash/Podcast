@@ -10,6 +10,7 @@ import UIKit
 class DetailViewModel: IPerRequest, INotifyOnChanged {
     
     typealias Arguments = Input
+    
     struct Input {
         var podcast: Podcast
         var podcasts: [Podcast]
@@ -27,8 +28,8 @@ class DetailViewModel: IPerRequest, INotifyOnChanged {
     private(set) var podcasts: [Podcast]
     private(set) var smallPlayerViewModel: SmallPlayerViewModel?
     
-    lazy var episodeTableViewModel: EpisodeTableView.ViewModel = getViewModelEpisodeTableView()
-    var activeSortType: EpisodeTableViewModel.TypeSortOfTableView { episodeTableViewModel.typeOfSort } 
+    var episodeTableViewModel: EpisodeTableView.ViewModel
+    var activeSortType: EpisodeTableViewModel.TypeSortOfTableView { episodeTableViewModel.typeOfSort }
     
     //MARK: init
     required init?(container: IContainer, args input: Input) {
@@ -41,12 +42,16 @@ class DetailViewModel: IPerRequest, INotifyOnChanged {
         self.router = container.resolve()
         
         playerIsHidden = player.currentTrack == nil
-        player.delegate = self
-        episodeTableViewModel.configurePlaylist(withPodcast: podcasts)
+        
+        let argsVM = EpisodeTableViewModel.Arguments.init(podcasts: podcasts, typeOfSort: .byNewest)
+        self.episodeTableViewModel = container.resolve(args: argsVM)
+        
         if let track = player.currentTrack?.track {
             let argsVM = SmallPlayerViewModel.Arguments(item: track)
             self.smallPlayerViewModel = container.resolve(args: argsVM)
         }
+        
+        player.delegate = self
     }
     
     var sortMenu: [EpisodeTableViewModel.TypeSortOfTableView] = EpisodeTableViewModel.TypeSortOfTableView.allCases
@@ -91,14 +96,6 @@ extension DetailViewModel: BigPlayerViewControllerDelegate {
     }
 }
 
-//MARK: - Private Methods
-extension DetailViewModel {
-    
-    private func getViewModelEpisodeTableView() ->  EpisodeTableView.ViewModel {
-        let argsVM = EpisodeTableViewModel.Arguments.init(podcasts: podcasts, typeOfSort: .byNewest)
-        return container.resolve(args: argsVM)
-    }
-}
 
 //MARK: - PlayerDelegate
 extension DetailViewModel: PlayerDelegate {

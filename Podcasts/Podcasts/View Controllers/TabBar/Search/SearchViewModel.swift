@@ -10,7 +10,7 @@ import UIKit
 
 //MARK: - ViewModel
 class SearchViewModel: IPerRequest, ITableViewModel, IViewModelDinamicUpdating, INotifyOnChanged {
-    
+
     struct Arguments {}
     
     func configureDataSourceForView() {
@@ -23,26 +23,20 @@ class SearchViewModel: IPerRequest, ITableViewModel, IViewModelDinamicUpdating, 
         
     typealias SectionData = BaseSectionData<Podcast, String>
     
-    var insertSectionOnView: ((Section, Int) -> ()) =     { _, _ in }
+    var insertSectionOnView: ((Section, Int) -> ())     = { _, _ in }
     var insertItemOnView:    ((Row, IndexPath) -> ())   = { _, _ in }
     var removeRowOnView:     ((IndexPath) -> ())        = {    _ in }
     var removeSectionOnView: ((Int) -> ())              = {    _ in }
     var moveSectionOnView:   ((Int, Int) -> ())         = { _, _ in }
     var reloadSection:       ((Int) -> ())              = { _    in }
     
-    var dataSourceForView: [SectionData] {
-        didSet {
-            changed.raise()
-        }
-    }
-    
+    var dataSourceForView: [SectionData]
     var dataSourceAll: [SectionData] = []
     
-    private(set) var isLoading: Bool = false {
-        didSet {
-            changed.raise()
-        }
-    }
+    var updatingDelay: TimeInterval { return 0.01 }
+    var isUpdating: Bool = false
+    private(set) var isLoading: Bool = false
+    var lock: NSLock = NSLock()
     
     //MARK: init
     required init(container: IContainer, args: Arguments) {
@@ -63,6 +57,8 @@ class SearchViewModel: IPerRequest, ITableViewModel, IViewModelDinamicUpdating, 
     func presentDetailVM(forIndexPath indexPath: IndexPath) {
         let podcast = dataSourceForView[indexPath.section].rows[indexPath.row]
         isLoading = true
+        changed.raise()
+        
         guard let id = podcast.collectionId?.stringValue else { return }
         let url = DynamicLinkManager.podcastEpisodeById(id).url
         apiService.getData(for: url) { [weak self] (result : Result<PodcastData>) in
@@ -73,28 +69,28 @@ class SearchViewModel: IPerRequest, ITableViewModel, IViewModelDinamicUpdating, 
                 //                error.showAlert(vc: self)
             case .success(result: let podcastData) :
                 let podcasts = podcastData.podcasts.filter { $0.wrapperType == "podcastEpisode"}
-                let args = DetailViewController.Args(podcast: podcast, podcasts: podcasts)
-                let vc: DetailViewController = container.resolve(args: args)
+                let args = DetailViewController.Args.init()
+                let argsVM = DetailViewController.ViewModel.Arguments(podcast: podcast, podcasts: podcasts)
+                let vc: DetailViewController = container.resolve(args: args, argsVM: argsVM)
                 router.present(vc, modalPresentationStyle: .custom)
             }
+            
             isLoading = false
+            changed.raise()
         }
     }
     
     func getPodcasts(with request: String) {
-        apiService.getData(for: request) { [weak self] (result: Result<PodcastData>) in
+        
+        Task { [weak self] in
             guard let self = self else { return }
+            let podcastData: PodcastData? = await self.apiService.getData(for: request)
             
-            switch result {
-            case .success(result: let podcastData) :
+            if let podcastData = podcastData {
                 guard let podcasts = podcastData.results.allObjects as? [Podcast] else { return }
                 let newDataSource = configureSectionData(podcasts: podcasts)
-                update(dataSource: newDataSource)
-            case .failure(error: let error) :
-                print("")
-//                error.showAlert(vc: self)
+                update(dataSource: newDataSource)          
             }
-//            self?.view.hideActivityIndicator()
         }
     }
     

@@ -8,6 +8,10 @@
 import UIKit
 
 class EpisodeTableViewModel: IPerRequest, INotifyOnChanged, IViewModelDinamicUpdating, ITableViewSorting {
+
+    var updatingDelay: TimeInterval { return 0.1 }
+    var isUpdating: Bool = false
+    var lock: NSLock = NSLock()
     
     typealias SectionData = BaseSectionData<Podcast, String>
     
@@ -28,7 +32,7 @@ class EpisodeTableViewModel: IPerRequest, INotifyOnChanged, IViewModelDinamicUpd
     
     let container: IContainer
     private var podcasts: [Podcast]
-    
+        
     //MARK: init
     required init?(container: IContainer, args input: Arguments) {
         
@@ -76,7 +80,7 @@ class EpisodeTableViewModel: IPerRequest, INotifyOnChanged, IViewModelDinamicUpd
 //MARK: - Private Methods
 extension EpisodeTableViewModel {
     
-    func configurePlaylist(withPodcast newPodcast: [Podcast]) {
+    private func configurePlaylist(withPodcast newPodcast: [Podcast]) {
         
         var newPlaylist = dataSourceAll
         

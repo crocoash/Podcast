@@ -18,8 +18,7 @@ class TabBarViewModel: IPerRequest, INotifyOnChanged {
     let apiService: ApiService
    
     var smallPlayerViewModel: SmallPlayerViewModel?
-    var listViewModel: ListViewModel
-    var searchViewModel: SearchViewModel
+//    var searchViewModel: SearchViewModel?
     
     //MARK: init
     required init?(container: IContainer, args: Arguments) {
@@ -28,9 +27,6 @@ class TabBarViewModel: IPerRequest, INotifyOnChanged {
         self.apiService = container.resolve()
         
         self.container = container
-        
-        self.listViewModel = container.resolve(args: ListViewModel.Arguments.init())
-        self.searchViewModel = container.resolve(args: SearchViewModel.Arguments.init())
     }
     
     func getViewControllers() -> [UIViewController] {
@@ -104,6 +100,7 @@ extension TabBarViewModel: BigPlayerViewControllerDelegate {
         guard let podcast = player.currentTrack?.track.inputType as? Podcast else { return }
         guard let id = podcast.collectionId?.stringValue else { return }
         let url = DynamicLinkManager.podcastEpisodeById(id).url
+        
         apiService.getData(for: url) { [weak self] (result : Result<PodcastData>) in
             guard let self = self else { return }
             switch result {
@@ -112,8 +109,9 @@ extension TabBarViewModel: BigPlayerViewControllerDelegate {
                 //                error.showAlert(vc: self)
             case .success(result: let podcastData) :
                 let podcasts = podcastData.podcasts.filter { $0.wrapperType == "podcastEpisode"}
-                let args = DetailViewController.Args(podcast: podcast, podcasts: podcasts)
-                let vc: DetailViewController = container.resolve(args: args)
+                let args = DetailViewController.Args.init()
+                let argsVM = DetailViewController.ViewModel.Arguments(podcast: podcast, podcasts: podcasts)
+                let vc: DetailViewController = container.resolve(args: args, argsVM: argsVM)
                 router.present(vc, modalPresentationStyle: .custom)
                 
             }

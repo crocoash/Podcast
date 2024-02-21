@@ -21,7 +21,6 @@ extension ITableViewDinamicUpdating {
             guard let self = self else { return }
             deleteRows(at: [indexPath], with: .automatic)
         }
-        
         viewModel.insertRow { [weak self] row, indexPath in
             guard let self = self else { return }
             insertRows(at: [indexPath], with: .automatic)
@@ -34,8 +33,8 @@ extension ITableViewDinamicUpdating {
         
         viewModel.moveSection { [weak self] index, newIndex in
             guard let self = self else { return }
-
         }
+        
     }
 }
 
@@ -47,28 +46,46 @@ extension ICollectionViewDinamicUpdating where ViewModel: IViewModelDinamicUpdat
         
         viewModel.removeSection { [weak self] index in
             guard let self = self else { return }
-            deleteSections(IndexSet(integer: index))
+            DispatchQueue.main.async {
+                self.deleteSections(IndexSet(integer: index))
+            }
         }
         
-        viewModel.removeRow { [weak self] indexPath in
+        viewModel.removeRow { [weak self]  indexPath in
             guard let self = self else { return }
-            deleteItems(at: [indexPath])
+            DispatchQueue.main.async {
+                self.deleteItems(at: [indexPath])
+            }
         }
         
         viewModel.insertRow { [weak self] row, indexPath in
             guard let self = self else { return }
-            insertItems(at: [indexPath])
+            DispatchQueue.main.async {
+                self.insertItems(at: [indexPath])
+            }
         }
         
         viewModel.insertSection { [weak self] section, index in
             guard let self = self else { return }
-            insertSections(IndexSet(integer: index))
+            DispatchQueue.main.async {
+                self.insertSections(IndexSet(integer: index))
+            }
         }
+        
         
         viewModel.moveSection { [weak self] index, newIndex in
             guard let self = self else { return }
-
+            
         }
     }
+    
+}
+
+private struct Test {
+    
+}
+
+private enum Test1 {
+    case one
 }
 

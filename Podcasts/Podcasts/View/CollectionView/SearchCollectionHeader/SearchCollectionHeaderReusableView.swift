@@ -15,6 +15,8 @@ class SearchCollectionHeaderReusableView: UICollectionReusableView {
         super.init(frame: frame)
         loadFromXib()
         backgroundColor = .white
+        
+        
     }
     
     required init?(coder: NSCoder) {
