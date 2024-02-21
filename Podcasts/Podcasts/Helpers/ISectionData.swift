@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol ISectionData: Equatable {
+ protocol ISectionData: Equatable, Sendable {
     associatedtype Row: Hashable
     associatedtype Section: Hashable
     
@@ -20,12 +20,9 @@ protocol ISectionData: Equatable {
 
 extension ISectionData {
     var isEmpty: Bool { rows.isEmpty }
-//    var isAvailable: Bool {
-//        return !isEmpty && isActive
-//    }
 }
 
-struct BaseSectionData<Row, Section>: ISectionData {
+struct BaseSectionData<Row, Section>: ISectionData, @unchecked Sendable {
     var isAvailable: Bool {
         return !isEmpty && isActive
     }

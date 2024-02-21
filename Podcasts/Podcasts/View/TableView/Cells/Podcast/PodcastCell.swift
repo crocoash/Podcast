@@ -9,14 +9,9 @@ import UIKit
 
 //MARK: - PodcastCell
 class PodcastCell: UITableViewCell, IHaveViewModel {
-    func configureUI() {
-        
-    }
     
-    func updateUI() {
-        
-    }
-    
+    func configureUI() {}
+    func updateUI() {}
     
     typealias ViewModel = PodcastCellViewModel
     
@@ -59,6 +54,11 @@ class PodcastCell: UITableViewCell, IHaveViewModel {
     
     var moreThanThreeLines: Bool {
         return podcastDescription.maxNumberOfLines > 3
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+//        contentView.frame.size.width = 1000
     }
     
     override var isSelected: Bool {

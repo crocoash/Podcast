@@ -19,9 +19,13 @@ class SearchCollectionViewCell: UICollectionViewCell {
         loadFromXib()
     }
     
+    
     override func prepareForReuse() {
         super.prepareForReuse()
         podcastImageView.image = nil
+        if let entity = entity {
+            DataProvider.shared.cancelDownload(string: entity.artworkUrl160 ?? "")
+        }
     }
     
     required init?(coder: NSCoder) {
@@ -29,8 +33,9 @@ class SearchCollectionViewCell: UICollectionViewCell {
     }
     
     func setUP(podcast: Podcast) {
+        
         self.entity = podcast
-        DataProvider.shared.downloadImage(string: podcast.artworkUrl160) { [weak self] in
+        DataProvider.shared.downloadImage(string: entity.artworkUrl160) { [weak self] in
             guard let self = self else { return }
             podcastImageView.image = $0
         }

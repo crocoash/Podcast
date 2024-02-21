@@ -39,36 +39,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         //        }
     }
     
-    private func preLoaderViewController() -> UIViewController {
+    private func preLoaderViewController()  -> UIViewController {
         let container = Container()
         let args = PreLoaderViewController.Args.init()
         let vc: PreLoaderViewController = container.resolve(args: args)
-
-        
-        
-//        print("print -----")
-//        let timeInterval: TimeInterval =  30
-//        
-//        DispatchQueue.global(qos: .background).async {
-//            
-//            DispatchQueue.main.sync {
-//                DispatchQueue.global(qos: .background).sync {
-//                    Thread.sleep(forTimeInterval: timeInterval)
-//                    print("print - 1")
-//                }
-//                print("print -  2")
-//            }
-//            
-//            DispatchQueue.main.sync {
-//                DispatchQueue.global(qos: .background).async {
-//                    Thread.sleep(forTimeInterval: timeInterval)
-//                    print("print - 3")
-//                }
-//                print("print -  4")
-//            }
-//        }
-//        print("print ++++++++")
-        
         return vc
     }
 }

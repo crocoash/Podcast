@@ -23,6 +23,21 @@ class ApiService: ISingleton {
     
     private var viewContext: NSManagedObjectContext
 
+    func getData<T: Decodable>(for request: String) async -> T? {
+        guard let url = URL(string: request.encodeUrl) else { fatalError() }
+        do {
+            let response = try await URLSession.shared.data(from: url)
+            let decoder = JSONDecoder(context: viewContext)
+            let value = try decoder.decode(T.self, from: response.0)
+            return value
+            
+        } catch let error {
+            print("print \(error)")
+        }
+        return nil
+    }
+    
+    
     func getData<T: Decodable>(for request: String, completion: @escaping (Result<T>) -> Void) {
         
         guard let url = URL(string: request.encodeUrl) else { fatalError() }

@@ -29,7 +29,7 @@ public class Podcast: NSManagedObject, Codable {
     @NSManaged private(set) var episodeGuid: String?
     @NSManaged private(set) var episodeUrl: String?
     @NSManaged private(set) var feedUrl: String?
-    @NSManaged public private(set) var id: String
+    @NSManaged private(set) var id: String
     @NSManaged private(set) var kind: String?
     @NSManaged private(set) var previewUrl: String?
     @NSManaged private(set) var releaseDate: String?
@@ -157,7 +157,7 @@ public class Podcast: NSManagedObject, Codable {
         try container.encodeIfPresent(episodeUrl,                forKey: .episodeUrl)
         try container.encodeIfPresent(collectionId?.intValue,    forKey: .collectionId)
         try container.encodeIfPresent(collectionName,            forKey: .collectionName)
-        try container.encodeIfPresent(Int(id),           forKey: .id)
+        try container.encodeIfPresent(Int(id),                   forKey: .id)
         try container.encodeIfPresent(genres as? Set<Genre>,     forKey: .genres)
         try container.encodeIfPresent(trackName,                 forKey: .trackName)
         try container.encodeIfPresent(releaseDate,               forKey: .releaseDate)
@@ -193,7 +193,7 @@ public class Podcast: NSManagedObject, Codable {
         self.episodeUrl =            entity.episodeUrl
         self.collectionId =          entity.collectionId
         self.collectionName =        entity.collectionName
-        self.id =            entity.id
+        self.id =                    entity.id
 
         if let genres = entity.genres as? Set<Genre> {
             let genres = genres.compactMap { dataStoreManagerInput.getFromCoreDataIfNoSavedNew(entity: $0) }
@@ -216,6 +216,7 @@ public class Podcast: NSManagedObject, Codable {
 
     }
 }
+extension NSManagedObject: Identifiable {}
 
 //MARK: - CoreDataProtocol
 extension Podcast: CoreDataProtocol {

@@ -43,10 +43,6 @@ extension IContainer {
     func resolve<T: ISingleton>() -> T where T.Arguments == Void {
         return resolve(args: ())
     }
-    
-//    func resolve<T: IPerRequest>() -> T where T.Arguments == Void {
-//        return resolve(args: ())
-//    }
 }
 
 //MARK: - Container

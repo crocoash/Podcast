@@ -8,6 +8,9 @@
 import UIKit
 import CoreData
 
+struct Tуіе { }
+
+
 class FavouriteTableView: UITableView, IDiffableTableViewWithModel, IHaveViewModel {
     
     typealias Row = ViewModel.Row
@@ -29,6 +32,7 @@ class FavouriteTableView: UITableView, IDiffableTableViewWithModel, IHaveViewMod
         $0.image = UIImage(systemName: "folder")
         $0.contentMode = .scaleAspectFit
         $0.tintColor = .lightGray
+       
         return $0
     }(UIImageView())
     

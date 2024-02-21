@@ -13,7 +13,8 @@ import UIKit
 @objc protocol SearchCollectionViewDataSource: AnyObject {
    func searchCollectionViewNumbersOfSections(_ searchCollectionView: SearchCollectionView) -> Int
    func searchCollectionView(_ searchCollectionView: SearchCollectionView, nameOfSectionForIndex index: Int) -> String
-   func searchCollectionView(_ searchCollectionView: SearchCollectionView, numbersOfRowsInSection index: Int) -> Int
+    func searchCollectionView(_ searchCollectionView: SearchCollectionView, sizeForSection section: Int) -> CGSize
+    func searchCollectionView(_ searchCollectionView: SearchCollectionView, numbersOfRowsInSection index: Int) -> Int
    func searchCollectionView(_ searchCollectionView: SearchCollectionView, rowForIndexPath indexPath: IndexPath) -> SearchCollectionView.Row
 }
 
@@ -53,18 +54,13 @@ class SearchCollectionView: UICollectionView, IDiffableCollectionViewWithDataSou
    
    required init?(coder: NSCoder) {
       super.init(coder: coder)
-      self.collectionViewLayout = createLayout()
-      self.register()
+       self.register()
    }
    
    override func reloadData() {
       super.reloadData()
        reloadTableView()
    }
-   
-   //    override func supplementaryView(forElementKind elementKind: String, at indexPath: IndexPath) -> UICollectionReusableView? {
-   //        return nil
-   //    }
    
    //MARK: - Actions
    @objc func selectCell(sender: UITapGestureRecognizer) {
@@ -74,6 +70,38 @@ class SearchCollectionView: UICollectionView, IDiffableCollectionViewWithDataSou
       myDelegate?.searchCollectionView(self, didTapAtIndexPath: indexPath)
    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //MARK: - Private Methods
 extension SearchCollectionView {
@@ -102,30 +130,32 @@ extension SearchCollectionView {
          return view
       }
    }
-   
-   private func createLayout() -> UICollectionViewLayout {
-      let sectionProvider = { (section: Int, invarement: NSCollectionLayoutEnvironment) in
-         let itemSize = CGFloat(0.25)
-         let items = NSCollectionLayoutItem(layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(itemSize), heightDimension: .fractionalWidth(itemSize)))
-         let group = NSCollectionLayoutGroup.horizontal(layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .estimated(10)), subitems: [items])
-         
-         let section = NSCollectionLayoutSection(group: group)
-         //            section.orthogonalScrollingBehavior = .continuous
-         
-         let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
-            layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .estimated(50)),
-            elementKind: SearchCollectionHeaderReusableView.identifier, alignment: .top)
-         sectionHeader.pinToVisibleBounds = true
-         section.boundarySupplementaryItems = [sectionHeader]
-         return section
-      }
-      
-      let config = UICollectionViewCompositionalLayoutConfiguration()
-      config.interSectionSpacing = 0
-      let layout = UICollectionViewCompositionalLayout(sectionProvider: sectionProvider, configuration: config)
-      
-      return layout
-   }
+//   
+//   private func createLayout() -> UICollectionViewLayout {
+//       let sectionProvider = { [weak self] (section: Int, invarement: NSCollectionLayoutEnvironment) in
+//           guard let self = self,
+//                 let itemSize = myDataSource?.searchCollectionView(self, sizeForSection: section).width else { fatalError() }
+//           
+//           let items = NSCollectionLayoutItem(layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(itemSize), heightDimension: .fractionalWidth(itemSize)))
+//           let group = NSCollectionLayoutGroup.horizontal(layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .estimated(10)), subitems: [items])
+//           
+//           let section = NSCollectionLayoutSection(group: group)
+//           //            section.orthogonalScrollingBehavior = .continuous
+//           
+//           let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
+//            layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .estimated(50)),
+//            elementKind: SearchCollectionHeaderReusableView.identifier, alignment: .top)
+//           sectionHeader.pinToVisibleBounds = true
+//           section.boundarySupplementaryItems = [sectionHeader]
+//           return section
+//       }
+//      
+//      let config = UICollectionViewCompositionalLayoutConfiguration()
+//      config.interSectionSpacing = 0
+//      let layout = UICollectionViewCompositionalLayout(sectionProvider: sectionProvider, configuration: config)
+//      
+//      return layout
+//   }
    
 }
 

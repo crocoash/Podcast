@@ -9,19 +9,19 @@ import UIKit
 
 //MARK: - TableView model
 protocol ITableViewModel: AnyObject {
-    associatedtype SectionData: ISectionData
+    associatedtype  SectionData: ISectionData
     
     typealias Row = SectionData.Row
     typealias Section = SectionData.Section
     
-    var dataSourceForView: [SectionData] { get set }
+     var dataSourceForView: [SectionData] { get set }
     func update(dataSource: [SectionData])
     func getCell(_ tableView: UITableView, for indexPath: IndexPath) -> UITableViewCell
 }
 
 extension ITableViewModel {
     
-    func update(dataSource: [SectionData]) {
+     func update(dataSource: [SectionData]) {
         dataSourceForView = dataSource
     }
     

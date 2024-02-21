@@ -18,8 +18,8 @@ protocol IHaveViewModel: AnyObject {
 }
 
 extension IHaveViewModel where Self: UIViewController {
-    func viewModelChanged(_ viewModel: ViewModel) {}
-    func viewModelChanged() {}
+    @MainActor func viewModelChanged(_ viewModel: ViewModel) {}
+    @MainActor func viewModelChanged() {}
 }
 
 private var viewModelKey: UInt8 = 0
@@ -39,11 +39,16 @@ extension IHaveViewModel {
             viewModelChanged(viewModel)
         
             if self is UIView || !(self is any IResolvable) {
-                viewModelChanged()
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    viewModelChanged()
+                }
             }
             
             (newValue as? any INotifyOnChanged)?.changed.subscribe(self) { this, _ in
-                this.viewModelChanged()
+                DispatchQueue.main.async {
+                    this.viewModelChanged()
+                }
             }
         }
     }
@@ -115,8 +120,8 @@ public final class Event<Args> {
 }
 
 public extension Event where Args == Void {
+    
     func subscribe<Subscriber: AnyObject>( _ subscriber: Subscriber,  handler: @escaping (Subscriber) -> Void) {
-
         subscribe(subscriber) { this, _ in
             handler(this)
         }

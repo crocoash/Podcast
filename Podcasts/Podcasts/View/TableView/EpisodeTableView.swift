@@ -18,7 +18,9 @@ class EpisodeTableView: UITableView, IHaveViewModel, ITableViewDinamicUpdating {
         configureUI()
     }
     
-    func viewModelChanged() {}
+    func viewModelChanged() {
+        myDataSource?.episodeTableViewDidChangeHeightTableView(self, height: height, withLastCell: false)
+    }
     
     typealias ViewModel = EpisodeTableViewModel
    

@@ -19,7 +19,6 @@ class DetailViewController: UIViewController, IHaveStoryBoardAndViewModel {
     }
     
     @IBOutlet private weak var scrollView: UIScrollView!
-    
     @IBOutlet private weak var episodeName        : UILabel!
     @IBOutlet private weak var artistName         : UILabel!
     @IBOutlet private weak var countryLabel       : UILabel!

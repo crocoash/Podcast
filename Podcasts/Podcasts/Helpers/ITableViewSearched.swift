@@ -95,9 +95,16 @@ extension ITableViewSearched {
         
         guard let index = getIndexSectionForView(forSection: sectionData.section) else { return }
         
-        insertSectionOnView(sectionData.section, index)
-        sectionData.rows.enumerated {
-            insertItemOnView($1, IndexPath(row: $0, section: index))
+        Task { [weak self] in
+            guard let self = self else { return }
+            await insertSectionOnView(sectionData.section, index)
+        }
+        
+        sectionData.rows.enumerated { row, rowIndex in
+            Task { [weak self] in
+                guard let self = self else { return }
+                await insertItemOnView(rowIndex, IndexPath(row: row, section: index))
+            }
         }
     }
     /// Deactivate
@@ -107,10 +114,16 @@ extension ITableViewSearched {
         dataSourceAll[index].isSearched = false
         
         guard let indexSection = getIndexSectionForView(forSection: section) else { return }
-        sectionData.rows.indices.reversed().forEach {
-            removeRowOnView(IndexPath(row: $0, section: indexSection))
+        sectionData.rows.indices.reversed().forEach { row in
+            Task { [weak self] in
+                guard let self = self else { return }
+                await removeRowOnView(IndexPath(row: row, section: indexSection))
+            }
         }
-        removeSectionOnView(indexSection)
+        Task { [weak self] in
+            guard let self = self else { return }
+            await removeSectionOnView(indexSection)
+        }
         dataSourceForView.remove(at: indexSection)
     }
     

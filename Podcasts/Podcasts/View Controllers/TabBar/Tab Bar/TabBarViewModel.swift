@@ -100,6 +100,7 @@ extension TabBarViewModel: BigPlayerViewControllerDelegate {
         guard let podcast = player.currentTrack?.track.inputType as? Podcast else { return }
         guard let id = podcast.collectionId?.stringValue else { return }
         let url = DynamicLinkManager.podcastEpisodeById(id).url
+        
         apiService.getData(for: url) { [weak self] (result : Result<PodcastData>) in
             guard let self = self else { return }
             switch result {

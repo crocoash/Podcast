@@ -12,6 +12,15 @@ class TabBarViewController: UITabBarController, IHaveStoryBoardAndViewModel {
     typealias ViewModel = TabBarViewModel
     
     
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        for touch in touches {
+            let location = touch.location(in: smallPlayer)
+            if let smallPlayer = smallPlayer, smallPlayer.bounds.contains(location) {
+                smallPlayer.touchesBegan(touches, with: event)
+            }
+        }
+    }
+    
     // MARK: - variables
     private var trailConstraint: NSLayoutConstraint?
     private var leadConstraint: NSLayoutConstraint?
@@ -58,11 +67,11 @@ extension TabBarViewController {
         guard smallPlayer == nil else { return }
         
         let smallPlayer = viewModel.getSmallPlayer(item: track)
-        view.addSubview(smallPlayer)
+        tabBar.addSubview(smallPlayer)
         smallPlayer.isHidden = false
         self.smallPlayer = smallPlayer
         
-        smallPlayer.bottomAnchor.constraint(equalTo: tabBar.topAnchor).isActive = true
+        smallPlayer.bottomAnchor.constraint(equalTo: tabBar.bottomAnchor, constant: -tabBar.bounds.height).isActive = true
         smallPlayer.heightAnchor.constraint(equalToConstant: 50).isActive = true
         smallPlayer.widthAnchor.constraint(equalTo: tabBar.widthAnchor).isActive = true
     }

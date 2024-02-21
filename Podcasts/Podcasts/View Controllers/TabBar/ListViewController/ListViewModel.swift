@@ -18,6 +18,7 @@ class ListViewModel: IPerRequest, INotifyOnChanged {
    private let likeManager:      LikeManager
    
    private let favouriteTableViewVM: FavouriteTableViewModel
+   var isLoading: Bool { favouriteTableViewVM.isUpdating }
    
    //MARK: Init
    required init(container: IContainer, args: Arguments) {

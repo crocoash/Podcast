@@ -8,13 +8,17 @@
 import UIKit
 import CoreData
 
-
 final class FavouriteTableViewModel: NSObject, IPerRequest, INotifyOnChanged, ITableViewModel, IViewModelDinamicUpdating, ITableViewSearched {
     
+    var queue = OperationQueue()
+    var operation: BlockOperation?
+
     struct Arguments {}
 
-    var timeInterval: TimeInterval = 0.01
-
+    var isUpdating: Bool = false
+    var lock: NSLock = NSLock()
+    var updatingDelay: TimeInterval = 2
+    
     var searchedSectionData: SectionData?
     var searchedText: String?
     
@@ -31,12 +35,12 @@ final class FavouriteTableViewModel: NSObject, IPerRequest, INotifyOnChanged, IT
     let firebaseDataBase: FirebaseDatabase
     
     var test: Bool = false
-    var insertSectionOnView: ((Section, Int) -> ())     = { _, _ in }
-    var insertItemOnView:    ((Row, IndexPath) -> ())   = { _, _ in }
-    var removeRowOnView:     ((IndexPath) -> ())        = {    _ in }
-    var removeSectionOnView: ((Int) -> ())              = {    _ in }
-    var moveSectionOnView:   ((Int, Int) -> ())         = { _, _ in }
-    var reloadSection:       ((Int) -> ())              = { _    in }
+    var insertSectionOnView: ((Section, Int)  -> ())     = { _, _ in }
+    var insertItemOnView:    ((Row, IndexPath)  -> ())   = { _, _ in }
+    var removeRowOnView:     ((IndexPath)  -> ())        = {    _ in }
+    var removeSectionOnView: ((Int)  -> ())              = {    _ in }
+    var moveSectionOnView:   ((Int, Int)  -> ())         = { _, _ in }
+    var reloadSection:       ((Int)  -> ())              = { _    in }
     
     lazy private var favouriteFRC = dataStoreManager.conFigureFRC(for: FavouritePodcast.self)
     lazy private var likeMomentFRC = dataStoreManager.conFigureFRC(for: LikedMoment.self)
@@ -96,7 +100,9 @@ final class FavouriteTableViewModel: NSObject, IPerRequest, INotifyOnChanged, IT
     
     func refresh(refreshControl: UIRefreshControl) {
         refreshControl.beginRefreshing()
-        update(by: [])
+        DispatchQueue.global().async {
+            self.update(by: [])
+        }
         configureDataSource()
         refreshControl.endRefreshing()
     }
@@ -259,7 +265,7 @@ extension FavouriteTableViewModel: NSFetchedResultsControllerDelegate {
                  let newIndex = newIndexPath?.row else { return }
            if let listSection = anObject as? ListSection {
               guard let sectionData = getSectionData(forListSection: listSection) else { return }
-              moveSectionData(sectionData, from: index, to: newIndex)
+               Task { await moveSectionData(sectionData, from: index, to: newIndex) }
            }
         case .update:
             if let listSection = anObject as? ListSection {
