@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="22522" systemVersion="23D5033f" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Author" representedClassName=".Author" syncable="YES">
+        <attribute name="artistID" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="artistLinkURL" optional="YES" attributeType="String"/>
+        <attribute name="artistName" optional="YES" attributeType="String"/>
+        <attribute name="artistType" optional="YES" attributeType="String"/>
+        <relationship name="authorData" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="AuthorData" inverseName="results" inverseEntity="AuthorData"/>
+    </entity>
+    <entity name="AuthorData" representedClassName=".AuthorData" syncable="YES">
+        <attribute name="resultCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="results" toMany="YES" deletionRule="Deny" destinationEntity="Author" inverseName="authorData" inverseEntity="Author"/>
+    </entity>
+    <entity name="FavouritePodcast" representedClassName=".FavouritePodcast" syncable="YES">
+        <attribute name="dateAdd" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" attributeType="String"/>
+        <relationship name="podcast" maxCount="1" deletionRule="Nullify" destinationEntity="Podcast" inverseName="favouritePodcast" inverseEntity="Podcast"/>
+    </entity>
+    <entity name="Genre" representedClassName="Genre" syncable="YES">
+        <attribute name="id" attributeType="String"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <relationship name="podcasts" toMany="YES" deletionRule="Deny" destinationEntity="Podcast" inverseName="genres" inverseEntity="Podcast"/>
+    </entity>
+    <entity name="LikedMoment" representedClassName=".LikedMoment" syncable="YES">
+        <attribute name="id" attributeType="String"/>
+        <attribute name="moment" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <relationship name="podcast" maxCount="1" deletionRule="Nullify" destinationEntity="Podcast" inverseName="likedMoment" inverseEntity="Podcast"/>
+    </entity>
+    <entity name="ListData" representedClassName="ListData" syncable="YES">
+        <attribute name="id" attributeType="String"/>
+        <relationship name="listSections" toMany="YES" deletionRule="Deny" destinationEntity="ListSection" inverseName="listData" inverseEntity="ListSection"/>
+    </entity>
+    <entity name="ListeningPodcast" representedClassName="ListeningPodcast" syncable="YES">
+        <attribute name="currentTime" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="duration" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="id" attributeType="String"/>
+        <attribute name="progress" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <relationship name="podcast" maxCount="1" deletionRule="Nullify" destinationEntity="Podcast" inverseName="listeningPodcast" inverseEntity="Podcast"/>
+    </entity>
+    <entity name="ListSection" representedClassName="ListSection" syncable="YES">
+        <attribute name="id" attributeType="String"/>
+        <attribute name="isActive" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
+        <attribute name="nameOfEntity" attributeType="String"/>
+        <attribute name="nameOfSection" attributeType="String"/>
+        <attribute name="sequenceNumber" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="listData" maxCount="1" deletionRule="Nullify" destinationEntity="ListData" inverseName="listSections" inverseEntity="ListData"/>
+    </entity>
+    <entity name="Podcast" representedClassName=".Podcast" syncable="YES">
+        <attribute name="artistId" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="artistName" optional="YES" attributeType="String"/>
+        <attribute name="artworkUrl60" optional="YES" attributeType="String"/>
+        <attribute name="artworkUrl160" optional="YES" attributeType="String"/>
+        <attribute name="artworkUrl600" optional="YES" attributeType="String"/>
+        <attribute name="closedCaptioning" optional="YES" attributeType="String"/>
+        <attribute name="collectionId" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="collectionName" optional="YES" attributeType="String"/>
+        <attribute name="collectionViewUrl" optional="YES" attributeType="String"/>
+        <attribute name="contentAdvisoryRating" optional="YES" attributeType="String"/>
+        <attribute name="country" optional="YES" attributeType="String"/>
+        <attribute name="descriptionMy" optional="YES" attributeType="String"/>
+        <attribute name="episodeContentType" optional="YES" attributeType="String"/>
+        <attribute name="episodeFileExtension" optional="YES" attributeType="String"/>
+        <attribute name="episodeGuid" optional="YES" attributeType="String"/>
+        <attribute name="episodeUrl" optional="YES" attributeType="String"/>
+        <attribute name="feedUrl" optional="YES" attributeType="String"/>
+        <attribute name="id" attributeType="String"/>
+        <attribute name="kind" optional="YES" attributeType="String"/>
+        <attribute name="previewUrl" optional="YES" attributeType="String"/>
+        <attribute name="releaseDate" optional="YES" attributeType="String"/>
+        <attribute name="shortDescriptionMy" optional="YES" attributeType="String"/>
+        <attribute name="trackCount" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="NO"/>
+        <attribute name="trackName" optional="YES" attributeType="String"/>
+        <attribute name="trackTimeMillis" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="NO"/>
+        <attribute name="trackViewUrl" optional="YES" attributeType="String"/>
+        <attribute name="wrapperType" optional="YES" attributeType="String"/>
+        <relationship name="favouritePodcast" optional="YES" maxCount="1" deletionRule="Deny" destinationEntity="FavouritePodcast" inverseName="podcast" inverseEntity="FavouritePodcast"/>
+        <relationship name="genres" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Genre" inverseName="podcasts" inverseEntity="Genre"/>
+        <relationship name="likedMoment" optional="YES" toMany="YES" deletionRule="Deny" destinationEntity="LikedMoment" inverseName="podcast" inverseEntity="LikedMoment"/>
+        <relationship name="listeningPodcast" optional="YES" maxCount="1" deletionRule="Deny" destinationEntity="ListeningPodcast" inverseName="podcast" inverseEntity="ListeningPodcast"/>
+        <relationship name="podcastData" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="PodcastData" inverseName="results" inverseEntity="PodcastData"/>
+    </entity>
+    <entity name="PodcastData" representedClassName=".PodcastData" syncable="YES">
+        <attribute name="resultCount" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="results" toMany="YES" deletionRule="Nullify" destinationEntity="Podcast" inverseName="podcastData" inverseEntity="Podcast"/>
+    </entity>
+</model>

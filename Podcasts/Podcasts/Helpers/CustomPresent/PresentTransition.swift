@@ -61,7 +61,3 @@ class PresentTransition: NSObject, UIViewControllerAnimatedTransitioning {
         self.animator = nil
     }
 }
-
-
-
-

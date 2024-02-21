@@ -7,52 +7,81 @@
 
 import Foundation
 import UIKit
+import CoreData
 
-enum Result<T> {
-    case success(result: T)
-    case failure(error: Error)
+//MARK: - Input
+protocol ApiServiceInput {
+    func getData<T: Decodable>(for request: String, completion: @escaping (Result<T>) -> Void)
 }
 
-class ApiService {
+class ApiService: ISingleton {
     
-    static func getData<T: Decodable>(for string: String, completion: @escaping (T?) -> Void) {
-        getData(for: string) { (result: Result<T>) in
-            switch result {
-            case .success(let result):
-                completion(result)
-            case .failure(let error):
-                print("print mistake \(String(describing: error.localizedDescription))")
-                completion(nil)
-            }
-        }
+    required init(container: IContainer, args: ()) {
+        let dataStoreManager: DataStoreManager = container.resolve()
+        self.viewContext = dataStoreManager.viewContext
     }
     
-    private static func getData<T: Decodable>(for request: String, completion: @escaping (Result<T>) -> Void) {
-        
-        guard let url = URL(string: request.encodeUrl), UIApplication.shared.canOpenURL(url) else { fatalError() }
-        
-        URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
+    private var viewContext: NSManagedObjectContext
+
+    func getData<T: Decodable>(for request: String) async -> T? {
+        guard let url = URL(string: request.encodeUrl) else { fatalError() }
+        do {
+            let response = try await URLSession.shared.data(from: url)
+            let decoder = JSONDecoder(context: viewContext)
+            let value = try decoder.decode(T.self, from: response.0)
+            return value
             
-            var obtain: Result<T>
+        } catch let error {
+            print("print \(error)")
+        }
+        return nil
+    }
+    
+    
+    func getData<T: Decodable>(for request: String, completion: @escaping (Result<T>) -> Void) {
+        
+        guard let url = URL(string: request.encodeUrl) else { fatalError() }
+        URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
             
+            guard let self = self else { return }
+            
+            var result: Result<T>
+
             defer {
                 DispatchQueue.main.async {
-                    completion(obtain)
+                    completion(result)
                 }
             }
             
-            guard let data = data, response != nil, error == nil else {
-                obtain = .failure(error: error!)
+            if let error = error {
+                let alertData: MyError.AlertData = (title: error.localizedDescription, message: "", actions: nil)
+                result = .failure(.apiService(.error(alertData)))
+                return
+            }
+            
+            if let response = response as? HTTPURLResponse {
+                if response.statusCode != 200 {
+                    let alertData: MyError.AlertData = (title: "\(response.statusCode)", message: "", actions: nil)
+                    result = .failure(.apiService(.error(alertData)))
+                }
+            }
+            
+            guard let data = data else {
+                let alertData: MyError.AlertData = (title: "NoData", message: "", actions: nil)
+                result = .failure(.apiService(.noData(alertData)))
                 return
             }
             
             do {
-                let model = try JSONDecoder().decode(T.self, from: data)
-                obtain = .success(result: model)
+                let decoder = JSONDecoder(context: viewContext)
+                let value = try decoder.decode(T.self, from: data)
+                result = .success(result: value)
+                
             } catch let error {
-                obtain = .failure(error: error)
+                print(error)
+                let alertData: MyError.AlertData = (title: error.localizedDescription.debugDescription, message: "", actions: nil)
+                result = .failure(.apiService(.error(alertData)))
             }
-            
-        }).resume()
+        }.resume()
     }
 }

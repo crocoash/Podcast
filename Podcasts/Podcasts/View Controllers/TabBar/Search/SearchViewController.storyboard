@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="22155" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22131"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Search View Controller-->
+        <scene sceneID="bNA-9i-ru6">
+            <objects>
+                <viewController storyboardIdentifier="SearchViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="dxT-ao-o0w" customClass="SearchViewController" customModule="Podcasts" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Ham-Mo-IO0">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <searchBar contentMode="redraw" verticalHuggingPriority="252" verticalCompressionResistancePriority="751" text="" placeholder="Enter search text" translatesAutoresizingMaskIntoConstraints="NO" id="CkL-nP-p0R">
+                                <rect key="frame" x="5" y="59" width="325" height="56"/>
+                                <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="yes"/>
+                                <connections>
+                                    <outlet property="delegate" destination="dxT-ao-o0w" id="ndy-OL-Oby"/>
+                                </connections>
+                            </searchBar>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Cancel" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TAB-13-DJU">
+                                <rect key="frame" x="335" y="76.666666666666671" width="53" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="GdD-5g-WGK" customClass="SearchCollectionView" customModule="Podcasts" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="151" width="393" height="667"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="0.0" minimumInteritemSpacing="0.0" id="8LH-pD-Rqr">
+                                    <size key="itemSize" width="128" height="128"/>
+                                    <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                                    <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                                    <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                </collectionViewFlowLayout>
+                                <cells/>
+                                <connections>
+                                    <outlet property="myDataSource" destination="dxT-ao-o0w" id="YGV-II-ztq"/>
+                                    <outlet property="myDelegate" destination="dxT-ao-o0w" id="lA6-TC-xLT"/>
+                                </connections>
+                            </collectionView>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" image="doc.text.magnifyingglass" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="f1A-p3-gZv">
+                                <rect key="frame" x="0.0" y="151.33333333333337" width="393" height="668"/>
+                                <color key="tintColor" systemColor="systemGray2Color"/>
+                            </imageView>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="252" verticalCompressionResistancePriority="752" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="Myz-Yx-tUL">
+                                <rect key="frame" x="5" y="120" width="383" height="32"/>
+                                <segments>
+                                    <segment title="Podcats"/>
+                                    <segment title="Authors"/>
+                                </segments>
+                            </segmentedControl>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="q4i-Pj-N2t"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <gestureRecognizers/>
+                        <constraints>
+                            <constraint firstItem="Myz-Yx-tUL" firstAttribute="top" secondItem="CkL-nP-p0R" secondAttribute="bottom" constant="5" id="2PC-tj-4rJ"/>
+                            <constraint firstItem="f1A-p3-gZv" firstAttribute="leading" secondItem="GdD-5g-WGK" secondAttribute="leading" id="4b0-J2-dci"/>
+                            <constraint firstItem="CkL-nP-p0R" firstAttribute="leading" secondItem="q4i-Pj-N2t" secondAttribute="leading" constant="5" id="4vl-V6-QJ4"/>
+                            <constraint firstItem="Myz-Yx-tUL" firstAttribute="trailing" secondItem="TAB-13-DJU" secondAttribute="trailing" id="5vv-Yl-MD0"/>
+                            <constraint firstItem="GdD-5g-WGK" firstAttribute="leading" secondItem="q4i-Pj-N2t" secondAttribute="leading" id="7Ww-UR-aam"/>
+                            <constraint firstItem="q4i-Pj-N2t" firstAttribute="trailing" secondItem="GdD-5g-WGK" secondAttribute="trailing" id="Aka-D5-Tbt"/>
+                            <constraint firstItem="q4i-Pj-N2t" firstAttribute="bottom" secondItem="GdD-5g-WGK" secondAttribute="bottom" id="JLw-cU-vQW"/>
+                            <constraint firstItem="TAB-13-DJU" firstAttribute="leading" secondItem="CkL-nP-p0R" secondAttribute="trailing" constant="5" id="KQp-TK-xmG"/>
+                            <constraint firstItem="f1A-p3-gZv" firstAttribute="bottom" secondItem="GdD-5g-WGK" secondAttribute="bottom" id="O62-E9-ih1"/>
+                            <constraint firstItem="q4i-Pj-N2t" firstAttribute="trailing" secondItem="TAB-13-DJU" secondAttribute="trailing" constant="5" id="Zif-sR-NwC"/>
+                            <constraint firstItem="f1A-p3-gZv" firstAttribute="top" secondItem="GdD-5g-WGK" secondAttribute="top" id="a7i-0g-0Zs"/>
+                            <constraint firstItem="Myz-Yx-tUL" firstAttribute="leading" secondItem="CkL-nP-p0R" secondAttribute="leading" id="btd-pu-LBb"/>
+                            <constraint firstItem="CkL-nP-p0R" firstAttribute="top" secondItem="q4i-Pj-N2t" secondAttribute="top" id="hZR-Yk-Of6"/>
+                            <constraint firstItem="f1A-p3-gZv" firstAttribute="trailing" secondItem="GdD-5g-WGK" secondAttribute="trailing" id="o4i-VY-E3K"/>
+                            <constraint firstItem="GdD-5g-WGK" firstAttribute="top" secondItem="Myz-Yx-tUL" secondAttribute="bottom" id="oQr-p0-HiX"/>
+                            <constraint firstItem="TAB-13-DJU" firstAttribute="centerY" secondItem="CkL-nP-p0R" secondAttribute="centerY" id="qe3-MF-vV0"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="YfB-Bd-ZcC"/>
+                    <connections>
+                        <outlet property="cancelLabel" destination="TAB-13-DJU" id="Qam-EA-r9R"/>
+                        <outlet property="emptyTableImageView" destination="f1A-p3-gZv" id="U9R-m0-teg"/>
+                        <outlet property="searchBar" destination="CkL-nP-p0R" id="JWs-0P-azs"/>
+                        <outlet property="searchCollectionView" destination="GdD-5g-WGK" id="lRL-Y2-mds"/>
+                        <outlet property="searchSegmentalControl" destination="Myz-Yx-tUL" id="qKh-Qm-wZn"/>
+                        <outlet property="tableViewBottomConstraint" destination="JLw-cU-vQW" id="9Ae-mX-Yge"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="4K5-QG-aiW" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2104.5801526717555" y="176.7605633802817"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="doc.text.magnifyingglass" catalog="system" width="110" height="128"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemGray2Color">
+            <color red="0.68235294120000001" green="0.68235294120000001" blue="0.69803921570000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
+</document>

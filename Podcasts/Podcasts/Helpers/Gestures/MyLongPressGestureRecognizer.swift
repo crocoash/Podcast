@@ -7,43 +7,29 @@
 
 import UIKit
 
-struct MyLongPressGestureRecognizer {
-    private let object: Any?
-    private var minimumPressDuration: TimeInterval
+class MyLongPressGestureRecognizer: UILongPressGestureRecognizer, IGestureRecognizer {
+    var info: Any?
     
-    init(object: Any?, minimumPressDuration: TimeInterval = 0.5) {
-        self.object = object
-        self.minimumPressDuration = minimumPressDuration
+    required init(target: Any?, action: Selector?, info: Any?) {
+        self.info = info
+        
+        super.init(target: target, action: action)
+        
     }
-    
-    func createLongPressGR (action: Selector?) -> UILongPressGestureRecognizer {
-        let longPressGR = UILongPressGestureRecognizer(target: object, action: action)
-        longPressGR.minimumPressDuration = minimumPressDuration
-        return longPressGR
-    }
-    
     //For UITableViewCell
     static func createSelector<Cell: UITableViewCell>(for longPressGR: UILongPressGestureRecognizer, completion: (Cell) -> ()) {
-        guard let cell = longPressGR.view as? Cell else { return }
-        if longPressGR.state == .began {
-            completion(cell)
-            feedbackGenerator(for: longPressGR)
-        }
+        guard let cell = longPressGR.view as? Cell,
+              longPressGR.state == .began else { return }
+        
+        completion(cell)
     }
     
     //For UICollectionViewCell
     static func createSelector<Cell: UICollectionViewCell>(for longPressGR: UILongPressGestureRecognizer, completion: (Cell) -> ())   {
-        guard let cell = longPressGR.view as? Cell else { return }
-        if longPressGR.state == .began {
-            completion(cell)
-            feedbackGenerator(for: longPressGR)
-        }
-    }
-    
-    private static func feedbackGenerator(for longPressGR: UILongPressGestureRecognizer) {
-        let feedbackGenerator = UIImpactFeedbackGenerator()
-        feedbackGenerator.prepare()
-        feedbackGenerator.impactOccurred()
+        guard let cell = longPressGR.view as? Cell,
+              longPressGR.state == .began else { return }
+        
+        completion(cell)
     }
 }
 
