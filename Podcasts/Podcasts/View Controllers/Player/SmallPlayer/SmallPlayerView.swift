@@ -102,9 +102,9 @@ class SmallPlayerView: UIView, IHaveXibAndViewModel {
         playPauseButton.setImage( viewModel.isPlaying || viewModel.isGoingPlaying ? pauseImage : playImage, for: .normal)
         
         trackNameLabel.text = viewModel.trackName
-        DataProvider.shared.downloadImage(string: viewModel.imageForSmallPlayer) { [weak self] image in
-            self?.trackImageView.image = image
-        }
+//        DataProvider.shared.downloadImage(string: viewModel.imageForSmallPlayer) { [weak self] image in
+        trackImageView.image = viewModel.image
+//        }
     }
 }
 

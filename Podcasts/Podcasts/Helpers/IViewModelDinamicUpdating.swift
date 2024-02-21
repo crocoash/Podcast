@@ -189,14 +189,20 @@ extension IViewModelDinamicUpdating {
     
     /// Append
     func appendSectionData(_ sectionData: SectionData, atNewIndex index: Int) {
-        sectionData.rows.forEach {
-            appendRow($0, toSectionData: sectionData)
+        if sectionData.rows.isEmpty {
+            dataSourceAll.append(sectionData)
+        } else {
+            sectionData.rows.forEach {
+                appendRow($0, toSectionData: sectionData)
+            }
         }
     }
     
     /// Move
     func moveSectionData(_ sectionData: SectionData, from index: Int, to newIndex: Int) {
-        dataSourceAll.remove(at: index)
+        guard let index1 = getIndexSection(forSection: sectionData.section) else { return }
+        
+        dataSourceAll.remove(at: index1)
         dataSourceAll.insert(sectionData, at: newIndex)
         
         guard sectionData.isAvailable else { return }

@@ -24,22 +24,31 @@ class SmallPlayerViewModel: IPerRequest, INotifyOnChanged, IViewModelUpdating {
         var item: any SmallPlayerInputType
     }
     
-    private var item: any SmallPlayerInputType
+    private var item: any SmallPlayerInputType {
+        didSet {
+            if oldValue.imageForSmallPlayer != item.imageForSmallPlayer || image == nil {
+                DataProvider.shared.downloadImage(string: item.imageForSmallPlayer) { [weak self] image in
+                    guard let self = self else { return }
+                    self.image = image
+                    changed.raise()
+                }     
+            }
+        }
+    }
     
     ///Services
     let container: IContainer
     let player: Player
     
     ///Player
-    var isGoingPlaying: Bool = true
-    var isPlaying: Bool = false
-    lazy var listeningProgress: Double? = item.listeningProgress
+    private(set) var isGoingPlaying: Bool = true
+    private(set) var isPlaying: Bool = false
     
-    
+    var listeningProgress: Double? { item.listeningProgress }
     var imageForSmallPlayer: String? { item.imageForSmallPlayer }
-    var image: UIImage?
-    var trackName: String? { item.trackName }
+    private(set) var image: UIImage?
     
+    var trackName: String? { item.trackName }
     var id: String { item.id }
     
     //MARK: init
@@ -49,22 +58,18 @@ class SmallPlayerViewModel: IPerRequest, INotifyOnChanged, IViewModelUpdating {
         self.container = container
         
         item = input.item
-        DataProvider.shared.downloadImage(string: item.imageForSmallPlayer) { [weak self] image in
-            guard let self = self else { return }
-            self.image = image
-            changed.raise()
-        }
+        
         player.delegate = self
     }
     
     func update(with input: Any) {
         switch input {
         case let item as SmallPlayerInputType:
-            guard item.id == id else { return }
-            self.listeningProgress = item.listeningProgress
-            self.isGoingPlaying = item.isGoingPlaying
+            self.item = item
             self.isPlaying = item.isPlaying
+            self.isGoingPlaying = item.isGoingPlaying
             changed.raise()
+            
         default:
             return
         }

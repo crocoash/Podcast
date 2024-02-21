@@ -40,8 +40,11 @@
                     </constraints>
                 </imageView>
                 <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" progressViewStyle="bar" translatesAutoresizingMaskIntoConstraints="NO" id="UkG-9Q-AK5">
-                    <rect key="frame" x="108" y="108" width="306" height="1"/>
+                    <rect key="frame" x="108" y="106.5" width="306" height="2.5"/>
                     <color key="tintColor" red="0.99516242740000005" green="0.1948511004" blue="0.37298858169999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="1.5" id="vTg-7x-m6n"/>
+                    </constraints>
                 </progressView>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Podcast Name" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="A1c-4Y-GlG">
                     <rect key="frame" x="116" y="47" width="212" height="14.5"/>
@@ -61,7 +64,6 @@
                 <constraint firstItem="3vw-cZ-C9n" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="EyS-FX-sXt"/>
                 <constraint firstAttribute="bottom" secondItem="UkG-9Q-AK5" secondAttribute="bottom" id="FHR-0o-8Ms"/>
                 <constraint firstAttribute="bottom" secondItem="3vw-cZ-C9n" secondAttribute="bottom" id="Ig0-Lp-kmJ"/>
-                <constraint firstItem="UkG-9Q-AK5" firstAttribute="top" secondItem="WGq-qB-fKe" secondAttribute="bottom" id="NMh-v1-Ce4"/>
                 <constraint firstAttribute="trailing" secondItem="WGq-qB-fKe" secondAttribute="trailing" id="Q5A-lQ-UH1"/>
                 <constraint firstItem="3vw-cZ-C9n" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="Uk3-wj-ux6"/>
                 <constraint firstItem="A1c-4Y-GlG" firstAttribute="centerY" secondItem="i5M-Pr-FkT" secondAttribute="centerY" id="Whz-IT-0ky"/>

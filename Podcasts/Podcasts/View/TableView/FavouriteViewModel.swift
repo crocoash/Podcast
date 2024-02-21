@@ -12,9 +12,9 @@ final class FavouriteTableViewModel: NSObject, IPerRequest, INotifyOnChanged, IT
     
     var queue = OperationQueue()
     var operation: BlockOperation?
-
+    
     struct Arguments {}
-
+    
     var isUpdating: Bool = false
     var lock: NSLock = NSLock()
     var updatingDelay: TimeInterval = 2
@@ -60,12 +60,12 @@ final class FavouriteTableViewModel: NSObject, IPerRequest, INotifyOnChanged, IT
         self.firebaseDataBase = container.resolve()
         
         super.init()
-
+        
         favouriteFRC.delegate = self
         likeMomentFRC.delegate = self
         listeningFRC.delegate = self
         listSectionFRC.delegate = self
-                
+        
         configureDataSource()
     }
     
@@ -81,7 +81,7 @@ final class FavouriteTableViewModel: NSObject, IPerRequest, INotifyOnChanged, IT
         
         guard let id = podcast.collectionId?.stringValue else { return }
         let url = DynamicLinkManager.podcastEpisodeById(id).url
-
+        
         apiService.getData(for: url) { [weak self] (result : Result<PodcastData>) in
             guard let self = self else { return }
             switch result {
@@ -130,7 +130,7 @@ final class FavouriteTableViewModel: NSObject, IPerRequest, INotifyOnChanged, IT
             print(error)
         }
         
-         configureDataSource()
+        configureDataSource()
     }
     
     func getCell(_ tableView: UITableView, for indexPath: IndexPath) -> UITableViewCell {
@@ -147,13 +147,11 @@ final class FavouriteTableViewModel: NSObject, IPerRequest, INotifyOnChanged, IT
             return cell
         case (let likedMoment as LikedMoment, let playlist as [LikedMoment]) :
             let cell = tableView.getCell(cell: LikedPodcastTableViewCell.self, indexPath: indexPath)
-            let playlist = playlist.map { $0.podcast }
             let model = LikedPodcastTableViewCellModel(likedMoment: likedMoment)
             cell.configureCell(with: model)
             return cell
         case (let listeningPodcast as ListeningPodcast, let playlist as [ListeningPodcast]) :
             let cell = tableView.getCell(cell: ListeningPodcastCell.self, indexPath: indexPath)
-            let playlist = playlist.map { $0.podcast }
             cell.viewModel = container.resolve(args: listeningPodcast)
             return cell
         default:
@@ -167,47 +165,47 @@ final class FavouriteTableViewModel: NSObject, IPerRequest, INotifyOnChanged, IT
 extension FavouriteTableViewModel {
     
     private func update(with object: Any, reloadIndexPath: ([IndexPath]) -> ()) {
-       if let podcast = (object as? ListeningPodcast)?.podcast {
-          var indexPath: [IndexPath] = []
-          dataSourceForView.enumerated { indexSection, section in
-             section.rows.enumerated { indexRow, row in
-                switch row {
-                case let favoritePodcast as FavouritePodcast:
-                   if favoritePodcast.podcast.trackId == podcast.trackId {
-                      indexPath.append(IndexPath(row: indexRow, section: indexSection))
-                   }
-                case let listening as ListeningPodcast:
-                   if listening.podcast.trackId == podcast.trackId {
-                      indexPath.append(IndexPath(row: indexRow, section: indexSection))
-                   }
-                case let likedMoment as LikedMoment:
-                   if likedMoment.podcast.trackId == podcast.trackId {
-                      indexPath.append(IndexPath(row: indexRow, section: indexSection))
-                   }
-                default:
-                   break
+        if let podcast = (object as? ListeningPodcast)?.podcast {
+            var indexPath: [IndexPath] = []
+            dataSourceForView.enumerated { indexSection, section in
+                section.rows.enumerated { indexRow, row in
+                    switch row {
+                    case let favoritePodcast as FavouritePodcast:
+                        if favoritePodcast.podcast.trackId == podcast.trackId {
+                            indexPath.append(IndexPath(row: indexRow, section: indexSection))
+                        }
+                    case let listening as ListeningPodcast:
+                        if listening.podcast.trackId == podcast.trackId {
+                            indexPath.append(IndexPath(row: indexRow, section: indexSection))
+                        }
+                    case let likedMoment as LikedMoment:
+                        if likedMoment.podcast.trackId == podcast.trackId {
+                            indexPath.append(IndexPath(row: indexRow, section: indexSection))
+                        }
+                    default:
+                        break
+                    }
                 }
-             }
-          }
-          reloadIndexPath(indexPath)
-       }
+            }
+            reloadIndexPath(indexPath)
+        }
     }
     
     private func getSectionData(forListSection listSection: ListSection) -> SectionData? {
-       dataSourceAll.first { $0.section == listSection.nameOfSection }
+        dataSourceAll.first { $0.section == listSection.nameOfSection }
     }
     
     func getIndexSection(forRow row: Row) -> Int? {
-     
-       for (indexSection, sectionData) in dataSourceAll.enumerated() {
-          if row.entityName == sectionData.nameOfEntity {
-            return indexSection
-          }
-       }
-       return nil
+        
+        for (indexSection, sectionData) in dataSourceAll.enumerated() {
+            if row.entityName == sectionData.nameOfEntity {
+                return indexSection
+            }
+        }
+        return nil
     }
     
-    func configureDataSource() {
+    private func configureDataSource() {
         var sectionData = listSectionFRC.fetchedObjects?.map {
             let entities = getRowsFor(entityName: $0.nameOfEntity)
             let sectionData = SectionData(listSection: $0, rows: entities)
@@ -241,9 +239,9 @@ extension FavouriteTableViewModel: NSFetchedResultsControllerDelegate {
         switch type {
             
         case .delete:
-           if let row = anObject as? Row {
-              removeRow(row)
-           }
+            if let row = anObject as? Row {
+                removeRow(row)
+            }
         case .insert:
             switch anObject {
             case let listSection as ListSection:
@@ -261,14 +259,15 @@ extension FavouriteTableViewModel: NSFetchedResultsControllerDelegate {
                 break
             }
         case .move:
-           guard let index = indexPath?.row,
-                 let newIndex = newIndexPath?.row else { return }
-           if let listSection = anObject as? ListSection {
-              guard let sectionData = getSectionData(forListSection: listSection) else { return }
-               Task { await moveSectionData(sectionData, from: index, to: newIndex) }
-           }
-        case .update:
+            guard let index = indexPath?.row,
+                  let newIndex = newIndexPath?.row else { return }
             if let listSection = anObject as? ListSection {
+                guard let sectionData = getSectionData(forListSection: listSection) else { return }
+                moveSectionData(sectionData, from: index, to: newIndex)
+            }
+        case .update:
+            switch anObject {
+            case let listSection as ListSection :
                 guard let sectionData = getSectionData(forListSection: listSection),
                       listSection.isActive != sectionData.isActive else { return }
                 
@@ -277,6 +276,8 @@ extension FavouriteTableViewModel: NSFetchedResultsControllerDelegate {
                 } else {
                     activateSectionData(sectionData)
                 }
+            default:
+                break
             }
         default:
             break

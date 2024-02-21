@@ -96,8 +96,11 @@ extension PlayerDelegate where Self: IViewModelUpdating {
 
 class Player: MultyDelegateService<PlayerDelegate>, ISingleton {
     
+    private var dataStoreManager: DataStoreManager!
+    
     required init(container: IContainer, args: ()) {
         super.init()
+        self.dataStoreManager = container.resolve()
         addObserverForEndTrack()
         configureMPRemoteCommandCenter()
     }
@@ -157,12 +160,14 @@ extension Player {
     
     func pause() {
         playerAVP.pause()
+        updatePlayerState()
         isPlaying = defaultIsPlaying
         isLoading = defauisLoading
     }
     
     func play() {
         playerAVP.play()
+        updatePlayerState()
         addTimeObserve()
         isPlaying = !defaultIsPlaying
     }
@@ -259,7 +264,7 @@ extension Player {
             currentTrack?.track.currentTime = currentTime
             currentTrack?.track.listeningProgress = progress
             currentTrack?.track.duration = duration
-            
+            dataStoreManager.save()
             playerUpdatePlayingInformation(track: currentTrack?.track)
             /// ---------------
             mPNowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyPlaybackProgress] = currentTime
@@ -360,15 +365,22 @@ extension Player {
         
         guard track.id != currentTrack?.track.id else { playOrPause(); return }
         
-        let isLast = tracks.firstIndex { $0.id == track.id } ?? Int.max - 1 == tracks.count - 1
-        let isFirst = tracks.firstIndex { $0.id == track.id } ?? 1 == 0
+//        let isLast = tracks.firstIndex { $0.id == track.id } ?? Int.max - 1 == tracks.count - 1
+//        let isFirst = tracks.firstIndex { $0.id == track.id } ?? 1 == 0
         
         self.playlist = tracks.map { Track(input: $0, isLast: isLast, isFirst: isFirst) }
         let track: Track = Track(input: track, isLast: isLast, isFirst: isFirst)
+        updatePlayerState()
         
         if let index = tracks.firstIndex(where: { track.id == $0.id }) {
             startPlay(track: track, indexInPlaylist: index)
         }
+    }
+    
+    private func updatePlayerState() {
+        guard let track = currentTrack?.track else { return }
+        currentTrack?.track.isLast = playlist.firstIndex { $0.id == track.id } ?? Int.max - 1 == playlist.count - 1
+        currentTrack?.track.isFirst = playlist.firstIndex { $0.id == track.id } ?? 1 == 0
     }
 }
 
