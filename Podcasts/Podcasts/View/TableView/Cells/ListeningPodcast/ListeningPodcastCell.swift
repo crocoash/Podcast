@@ -42,8 +42,8 @@ class ListeningPodcastCellModel: IPerRequest, IViewModelUpdating, INotifyOnChang
         self.podcastName = input.podcast.trackName
         self.duration = input.duration
         self.listeningProgress = input.progress
-        
         self.id = input.id
+        
         self.listeningManager = container.resolve()
         
         listeningManager.delegate = self

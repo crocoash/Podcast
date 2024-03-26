@@ -8,6 +8,7 @@
 import UIKit
 
 class MyLongPressGestureRecognizer: UILongPressGestureRecognizer, IGestureRecognizer {
+    
     var info: Any?
     
     required init(target: Any?, action: Selector?, info: Any?) {

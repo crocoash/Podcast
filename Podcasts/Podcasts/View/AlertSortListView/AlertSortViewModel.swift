@@ -32,7 +32,6 @@ class AlertSortListViewModel: IPerRequest, INotifyOnChanged, ITableViewModel {
             return isActive
         }
     }
-  
     
     //MARK: Services
     private let listDataManager: ListDataManager

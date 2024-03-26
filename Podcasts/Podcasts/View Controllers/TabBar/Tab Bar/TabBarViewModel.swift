@@ -16,6 +16,7 @@ class TabBarViewModel: IPerRequest, INotifyOnChanged {
     let container: IContainer
     let player: Player
     let apiService: ApiService
+    let podcastManager: PodcastManager
    
     var smallPlayerViewModel: SmallPlayerViewModel?
 //    var searchViewModel: SearchViewModel?
@@ -25,14 +26,22 @@ class TabBarViewModel: IPerRequest, INotifyOnChanged {
         self.router = container.resolve()
         self.player = container.resolve()
         self.apiService = container.resolve()
+        self.podcastManager = container.resolve()
         
         self.container = container
     }
     
     func getViewControllers() -> [UIViewController] {
-        let navigationController = UINavigationController(rootViewController: listVC)
-        return [navigationController, searchVC, settingsVC]
+        let listVC = UINavigationController(rootViewController: listVC)
+        return [mainVC, listVC, searchVC, settingsVC]
     }
+    
+    lazy private var mainVC: MainViewController = {
+//        let args = SearchViewController.Args.init()
+//        let argsVM = SearchViewController.ViewModel.Arguments.init()
+        let vc: MainViewController = container.resolve(args: (), argsVM: ())
+        return createTabBar(vc, title: "Main", imageName: "magnifyingglass")
+    }()
     
     lazy private var listVC: ListViewController = {
         let args = ListViewController.Args.init()
@@ -97,23 +106,21 @@ extension TabBarViewModel: SmallPlayerViewDelegate {
 extension TabBarViewModel: BigPlayerViewControllerDelegate {
     
     func bigPlayerViewControllerDidTouchPodcastNameLabel(_ bigPlayerViewController: BigPlayerViewController) {
-        guard let podcast = player.currentTrack?.track.inputType as? Podcast else { return }
-        guard let id = podcast.collectionId?.stringValue else { return }
-        let url = DynamicLinkManager.podcastEpisodeById(id).url
-        
-        apiService.getData(for: url) { [weak self] (result : Result<PodcastData>) in
+    
+        guard let podcast = player.currentTrack?.track.inputType as? Podcast,
+              let id = podcast.collectionId?.intValue else { return }
+            
+        podcastManager.getPodcastEpisodeByCollectionId(id: id) { [weak self] result in
             guard let self = self else { return }
+            
             switch result {
             case .failure(let error):
-                print("")
-                //                error.showAlert(vc: self)
-            case .success(result: let podcastData) :
-                let podcasts = podcastData.podcasts.filter { $0.wrapperType == "podcastEpisode"}
-                let args = DetailViewController.Args.init()
-                let argsVM = DetailViewController.ViewModel.Arguments(podcast: podcast, podcasts: podcasts)
-                let vc: DetailViewController = container.resolve(args: args, argsVM: argsVM)
-                router.present(vc, modalPresentationStyle: .custom)
+                let vc = router.topViewController
+                error.showAlert(vc: vc, completion: nil)
                 
+            case .success(result: let podcasts):
+                let vc = DetailViewController.create(container: container, podcast: podcast, podcasts: podcasts)
+                router.present(vc, modalPresentationStyle: .custom)
             }
         }
     }

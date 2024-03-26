@@ -5,12 +5,11 @@ import CoreData
 
 class TabBarViewController: UITabBarController, IHaveStoryBoardAndViewModel {
     
-    func configureUI() { }
-    func updateUI() { }
+    func configureUI() {}
+    func updateUI() {}
     
     struct Args {}
     typealias ViewModel = TabBarViewModel
-    
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         for touch in touches {

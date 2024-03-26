@@ -10,7 +10,7 @@ import UIKit
 class DataProvider {
     
     static var shared = DataProvider()
-    private init() { }
+    private init() {}
     
     var imageCache = NSCache<NSString, UIImage>()
     

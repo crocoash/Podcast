@@ -82,7 +82,7 @@ extension DownloadServiceDelegate where Self: IViewModelUpdating {
 //    func cancelDownload(_ entity: InputDownloadProtocol)
 //}
 
-class DownloadService: MultyDelegateService<DownloadServiceDelegate>, ISingleton {
+class DownloadService: MultypleDelegateService<DownloadServiceDelegate>, ISingleton {
     
     typealias DownloadsSession = [URL: DownloadServiceType]
     
@@ -110,7 +110,7 @@ class DownloadService: MultyDelegateService<DownloadServiceDelegate>, ISingleton
     
     private(set) var activeDownloads: DownloadsSession = [:]
     
-    func isDownloaded(entity: DownloadProtocol) -> Bool {1
+    func isDownloaded(entity: DownloadProtocol) -> Bool {
         return entity.downloadUrl.isDownloaded
     }
     

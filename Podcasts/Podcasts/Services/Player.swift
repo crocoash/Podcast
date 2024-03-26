@@ -94,7 +94,9 @@ extension PlayerDelegate where Self: IViewModelUpdating {
     }
 }
 
-class Player: MultyDelegateService<PlayerDelegate>, ISingleton {
+
+class Player: MultypleDelegateService<PlayerDelegate>, ISingleton {
+
     
     private var dataStoreManager: DataStoreManager!
     
@@ -116,6 +118,8 @@ class Player: MultyDelegateService<PlayerDelegate>, ISingleton {
     private(set) var playerAVP: AVPlayer = AVPlayer()
     
     private var observe: Any?
+    
+    
     
     var isPlaying = false {
         didSet {
@@ -239,8 +243,10 @@ extension Player {
         let item = AVPlayerItem(url: url.isDownLoad ? url.localPath : url)
         self.playerAVP.replaceCurrentItem(with: item)
         
-        if let currentTime = track.currentTime, let duration = track.duration, currentTime != Float(duration) {
-            self.playerAVP.seek(to: CMTime(seconds: Double(currentTime), preferredTimescale: 60))
+        if let currentTime = track.currentTime {
+//            if let duration = track.duration, currentTime != Float(duration) {
+                self.playerAVP.seek(to: CMTime(seconds: Double(currentTime), preferredTimescale: 60))
+//            }
         }
        
         play()

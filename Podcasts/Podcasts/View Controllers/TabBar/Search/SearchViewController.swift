@@ -18,7 +18,7 @@ class SearchViewController: UIViewController, IHaveStoryBoardAndViewModel{
     
     struct Args {}
     typealias ViewModel = SearchViewModel
-
+    
     func viewModelChanged(_ viewModel: SearchViewModel) {}
     func viewModelChanged() {
         updateUI()
@@ -36,10 +36,8 @@ class SearchViewController: UIViewController, IHaveStoryBoardAndViewModel{
     
     private var tableViewBottomConstraintConstant = CGFloat(0)
     private let refreshControl = UIRefreshControl()
-
-    private var alert = Alert()
     
-    private var authors = Array<Author>()
+    private var alert = Alert()
     
     //MARK: - Methods
     private var playerIsSHidden = true {
@@ -69,10 +67,9 @@ class SearchViewController: UIViewController, IHaveStoryBoardAndViewModel{
     // MARK: - View Methods
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-//        showEmptyImage()
         if viewModel.isEmpty { searchBar.becomeFirstResponder() }
     }
-  
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         configureGesture()
@@ -80,7 +77,7 @@ class SearchViewController: UIViewController, IHaveStoryBoardAndViewModel{
         configureUI()
         updateUI()
     }
-
+    
     override func motionBegan(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
         cancelSearchAction()
         feedbackGenerator()
@@ -96,39 +93,45 @@ class SearchViewController: UIViewController, IHaveStoryBoardAndViewModel{
     }
     
     @objc func refresh() {
-//        getData()
+        viewModel.getPodcast()
         refreshControl.endRefreshing()
     }
     
     @objc func changeTypeOfSearch(sender: UISegmentedControl) {
-//        getData()
+        viewModel.setSelectedSegmentIndex(newValue: sender.selectedSegmentIndex)
     }
     
     @objc func handlerSwipe(sender: UISwipeGestureRecognizer) {
+        var currentSegmentalIndex = viewModel.selectedSegmentIndex
         switch sender.direction {
-        case .left: searchSegmentalControl.selectedSegmentIndex += 1
-        case .right: searchSegmentalControl.selectedSegmentIndex -= 1
+        case .left:
+            currentSegmentalIndex += 1
+        case .right:
+            currentSegmentalIndex -= 1
         default: break
         }
-//        getData()
+        viewModel.setSelectedSegmentIndex(newValue: currentSegmentalIndex )
     }
     
     func updateUI() {
-        if viewModel.isLoading || viewModel.isUpdating {
-           view.showActivityIndicator()
-       } else {
-           view.hideActivityIndicator()
-       }
-       showEmptyImage()
-   }
-   
+        guard Thread.isMainThread else { fatalError()}
+        if viewModel.isUpdating {
+            view.showActivityIndicator()
+        } else {
+            view.hideActivityIndicator()
+        }
+        showEmptyImage()
+        searchSegmentalControl.selectedSegmentIndex = viewModel.selectedSegmentIndex
+        searchBar.text = viewModel.searchText
+    }
+    
     func configureUI() {
-       observeViewModel()
-       configureCancelLabel()
-       configureSegmentalControl()
-       configureAlert()
-   }
-   
+        observeViewModel()
+        configureCancelLabel()
+        configureSegmentalControl()
+        configureAlert()
+        addMyGestureRecognizer(view, type: .tap(), #selector(UIView.endEditing(_:)))
+    }
 }
 
 //MARK: - Private configure UI Methods
@@ -151,35 +154,17 @@ extension SearchViewController {
         alert.delegate = self
     }
     
-    //    private func configureActivityIndicator() {
-    //        activityIndicator.isHidden = true
-    //        activityIndicator.hidesWhenStopped = true
-    //        activityIndicator.style = .large
-    //        activityIndicator.center = view.center
-    //        view.addSubview(activityIndicator)
-    //    }
-    
     private func cancelSearchAction() {
-        searchBar.text?.removeAll()
+        viewModel.setSearchedText(text: "")
         viewModel.removeAll()
         showEmptyImage()
     }
     
     private func showEmptyImage() {
         let podcastsIsEmpty = viewModel.isEmpty
-        let authorsIsEmpty = authors.isEmpty
-        let selectedFirstSegmentalControl = searchSegmentalControl?.selectedSegmentIndex == 0
-        let selectedSecondSegmentalControl = searchSegmentalControl?.selectedSegmentIndex == 1
         
-        if selectedFirstSegmentalControl && podcastsIsEmpty || selectedSecondSegmentalControl && authorsIsEmpty {
-            searchCollectionView.isHidden = true
-            emptyTableImageView.isHidden = false
-        }
-        
-        if selectedFirstSegmentalControl && !podcastsIsEmpty || selectedSecondSegmentalControl && !authorsIsEmpty {
-            searchCollectionView.isHidden = false
-            emptyTableImageView.isHidden = true
-        }
+        searchCollectionView.isHidden = podcastsIsEmpty
+        emptyTableImageView.isHidden = !podcastsIsEmpty
     }
     
     private func feedbackGenerator() {
@@ -192,7 +177,7 @@ extension SearchViewController {
         
         viewModel.removeSection { [weak self] index in
             guard let self = self else { return }
-            self.searchCollectionView.deleteSection(at: index)
+            searchCollectionView.deleteSection(at: index)
         }
         
         viewModel.removeRow { [weak self] indexPath in
@@ -204,7 +189,7 @@ extension SearchViewController {
         viewModel.insertRow { [weak self] row, indexPath in
             guard let self = self else { return }
             searchCollectionView.insertRow(at: indexPath)
-//            searchCollectionView.scrollToItem(at: indexPath, at: .bottom, animated: true)
+            //            searchCollectionView.scrollToItem(at: indexPath, at: .bottom, animated: true)
         }
         
         viewModel.insertSection { [weak self] section, index in
@@ -221,51 +206,20 @@ extension SearchViewController {
 
 //MARK: - Private methods
 extension SearchViewController {
-    
-   
-    
-//    private func updateCell(for podcast: Podcast) {
-//        if isPodcast, let index = podcasts.firstIndex(matching: podcast) {
-//            tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .bottom)
-//        }
-//    }
+
 }
-
-//// MARK: - TableView Data Source
-//extension SearchViewController: UITableViewDataSource {
-//
-//    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-//        return isPodcast ? podcasts.count : authors.count
-//    }
-//
-//    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-//        return isPodcast ? configurePodcastCell(indexPath, for: tableView) : configureAuthorCell(indexPath, for: tableView)
-//    }
-//}
-
 
 //MARK: - UISearchBarDelegate
 extension SearchViewController: UISearchBarDelegate {
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        guard let text = searchBar.text, !text.isEmpty else { return }
         searchCollectionView.setContentOffset(.zero, animated: true)
-        guard let request = searchBar.text?.conform, !request.isEmpty else { showEmptyImage(); return }
-        view.showActivityIndicator()
-        
-        if searchSegmentalControl.selectedSegmentIndex == 0 {
-            let request = DynamicLinkManager.podcastSearch(request).url
-            viewModel.getPodcasts(with: request)
-        } else {
-            let request = DynamicLinkManager.authors(request).url
-            viewModel.getAuthors(with: request)
-        }
-        
-        view.endEditing(true)
+        guard let text = searchBar.text?.conform, !text.isEmpty else { showEmptyImage(); return }
+        viewModel.getPodcast()
     }
     
-    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
-        addMyGestureRecognizer(view, type: .tap(), #selector(UIView.endEditing(_:)))
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        viewModel.setSearchedText(text: searchText)
     }
 }
 
@@ -294,7 +248,7 @@ extension SearchViewController: SearchCollectionViewDelegate {
 extension SearchViewController: SearchCollectionViewDataSource {
     
     func searchCollectionView(_ searchCollectionView: SearchCollectionView, sizeForSection section: Int) -> CGSize {
-        return .zero
+        return CGSize(width: 100, height: 100)
     }
     
     func searchCollectionViewNumbersOfSections(_ searchCollectionView: SearchCollectionView) -> Int {

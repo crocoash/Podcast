@@ -20,7 +20,7 @@ protocol FirebaseProtocol: CoreDataProtocol {
 
 extension FirebaseProtocol {
     
-    typealias ResultType = Result<[Self]>
+//    typealias ResultType = Result<[Self]>
     
     var firebaseKey: String { return id }
 }
@@ -90,7 +90,7 @@ class FirebaseDatabase: ISingleton {
          
          if let error = error {
             //TODO:
-            print(error)
+//            print(error)
             return
          }
 
@@ -126,28 +126,31 @@ class FirebaseDatabase: ISingleton {
             childPath.observe(.childAdded) { [weak self] snapshot in
                guard let self = self else { return }
                
-               obtain(snapshot: snapshot, viewContext: viewContext) { [weak self] (result: Result<T>) in
+               obtain(snapshot: snapshot, viewContext: viewContext) { [weak self] (result: Result<T, MyError.FirebaseDatabase>) in
                   guard let self = self else { return }
                   
                   switch result {
                   case .success(result: let entity):
                      vc.firebaseDatabase(self, didAdd: entity)
                   case .failure(error: let error):
-                     print("erorr \(error)")
+                     print()
+
+//                     print("erorr \(error)")
                   }
                }
             }
             
             ///childRemoved
             childPath.observe(.childRemoved) { [weak self] snapshot in
-               self?.obtain(snapshot: snapshot, viewContext: viewContext) { [weak self] (result: Result<T>) in
+               self?.obtain(snapshot: snapshot, viewContext: viewContext) { [weak self] (result: Result<T, MyError.FirebaseDatabase>) in
                   guard let self = self else { return }
 
                   switch result {
                   case .success(result: let entity):
                      vc.firebaseDatabase(self, didRemove: entity)
-                  case .failure(error: let error) :
-                     print("erorr \(error)")
+                  case .failure(error: let error):
+                     print()
+//                     print("erorr \(error)")
                   }
                }
             }
@@ -155,14 +158,16 @@ class FirebaseDatabase: ISingleton {
             ///childChanged
             childPath.observe(.childChanged) { [weak self] snapshot in
                
-               self?.obtain(snapshot: snapshot, viewContext: viewContext) { [weak self] (result: Result<T>) in
+               self?.obtain(snapshot: snapshot, viewContext: viewContext) { [weak self] (result: Result<T, MyError.FirebaseDatabase>) in
                   guard let self = self else { return }
                   
                   switch result {
                   case .success(result: let entity):
                      vc.firebaseDatabase(self, didUpdate: entity)
                   case .failure(error: let error) :
-                     print("erorr \(error)")
+                     print()
+
+//                     print("erorr \(error)")
                   }
                }
             }
@@ -174,14 +179,14 @@ class FirebaseDatabase: ISingleton {
 // MARK: - Private Methods
 extension FirebaseDatabase {
    
-   private func obtain<T: FirebaseProtocol>(snapshot: DataSnapshot, viewContext: NSManagedObjectContext, completion: @escaping (Result<T>) -> Void) {
+   private func obtain<T: FirebaseProtocol>(snapshot: DataSnapshot, viewContext: NSManagedObjectContext, completion: @escaping (Result<T, MyError.FirebaseDatabase>) -> Void) {
       guard let value = snapshot.value else { return }
       if let data = try? JSONSerialization.data(withJSONObject: value, options: .fragmentsAllowed) {
          do {
             let entity = try JSONDecoder(context: viewContext).decode(T.self, from: data)
             completion(.success(result: entity))
          } catch let error as NSError {
-            completion(.failure(.firebaseDatabase(.error(error))))
+            completion(.failure(.error(error)))
          }
       }
    }

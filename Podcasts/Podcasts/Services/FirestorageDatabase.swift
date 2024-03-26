@@ -5,7 +5,7 @@
 //  Created by Anton on 22.04.2022.
 //
 
-import Foundation
+import UIKit
 import FirebaseStorage
 import FirebaseAuth
 

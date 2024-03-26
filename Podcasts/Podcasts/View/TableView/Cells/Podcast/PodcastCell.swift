@@ -56,11 +56,6 @@ class PodcastCell: UITableViewCell, IHaveViewModel {
         return podcastDescription.maxNumberOfLines > 3
     }
     
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-//        contentView.frame.size.width = 1000
-    }
-    
     override var isSelected: Bool {
         didSet {
             updateSelectState()

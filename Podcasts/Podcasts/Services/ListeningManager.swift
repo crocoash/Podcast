@@ -29,7 +29,7 @@ extension ListeningManagerDelegate where Self: IViewModelUpdating {
     }
 }
 
-class ListeningManager: MultyDelegateService<ListeningManagerDelegate>, ISingleton {
+class ListeningManager: MultypleDelegateService<ListeningManagerDelegate>, ISingleton {
     
     required init(container: IContainer, args: ()) {
         
@@ -52,8 +52,7 @@ class ListeningManager: MultyDelegateService<ListeningManagerDelegate>, ISinglet
         
         if let podcast = entity.inputType as? Podcast {
             
-            let predicate = NSPredicate(format: "podcast.id == %@", podcast.id)
-            let listeningPodcast = dataStoreManager.fetchObject(entity: ListeningPodcast.self, predicates: [predicate])
+            let listeningPodcast = getListeningPodcast(podcast: podcast)
             
             if let listeningPodcast = listeningPodcast {
                 listeningPodcast.currentTime = entity.currentTime ?? 0
@@ -63,9 +62,9 @@ class ListeningManager: MultyDelegateService<ListeningManagerDelegate>, ISinglet
                 
                 firebaseDatabase.update(entity: listeningPodcast)
                 
-//                delegates {
-//                    $0.listeningManager(self, didUpdate: listeningPodcast)
-//                }
+                delegates {
+                    $0.listeningManager(self, didUpdate: listeningPodcast)
+                }
                 
             } else {
                 
@@ -74,9 +73,9 @@ class ListeningManager: MultyDelegateService<ListeningManagerDelegate>, ISinglet
                 
                 firebaseDatabase.add(entity: listenigPodcast)
                 
-//                delegates {
-//                    $0.listeningManager(self, didSave: listenigPodcast)
-//                }
+                delegates {
+                    $0.listeningManager(self, didSave: listenigPodcast)
+                }
             }
         }
     }
@@ -89,6 +88,11 @@ class ListeningManager: MultyDelegateService<ListeningManagerDelegate>, ISinglet
         dataStoreManager.allObjectsFromCoreData(type: ListeningPodcast.self).forEach {
             removeListeningPodcast($0, removeFromFireBase: true)
         }
+    }
+    
+    func getListeningPodcast(podcast: Podcast) -> ListeningPodcast? {
+        let predicate = NSPredicate(format: "podcast.id == %@", podcast.id)
+        return dataStoreManager.fetchObject(entity: ListeningPodcast.self, predicates: [predicate])
     }
 }
 
@@ -146,7 +150,7 @@ extension ListeningManager: FirebaseDatabaseDelegate {
     }
     
     func firebaseDatabase(_ firebaseDatabase: FirebaseDatabase, didAdd entities: [any FirebaseProtocol]) {
-        if let listeningPodcast = entities as? [ListeningPodcast] {
+        if entities is [ListeningPodcast] {
             dataStoreManager.updateCoreData(entities: entities)
         }
     }

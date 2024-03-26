@@ -20,7 +20,7 @@ protocol LikeManagerDelegate {
 //    func removeFromLikedMoments(entity: LikedMoment)
 //}
 
-class LikeManager: MultyDelegateService<LikeManagerDelegate>, ISingleton {
+class LikeManager: MultypleDelegateService<LikeManagerDelegate>, ISingleton {
     
     lazy private var viewContext = dataStoreManager.viewContext
     

@@ -16,7 +16,7 @@ extension Author {
         return NSFetchRequest<Author>(entityName: "Author")
     }
 
-    @NSManaged public var artistID: Int32
+    @NSManaged public var artistID: NSNumber
     @NSManaged public var artistLinkURL: String?
     @NSManaged public var artistName: String?
     @NSManaged public var artistType: String?

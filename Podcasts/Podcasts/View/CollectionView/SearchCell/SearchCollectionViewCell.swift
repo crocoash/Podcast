@@ -10,7 +10,8 @@ import UIKit
 
 class SearchCollectionViewCell: UICollectionViewCell {
     
-    @IBOutlet weak var podcastImageView: UIImageView!
+   @IBOutlet private weak var podcastName: UILabel!
+   @IBOutlet private weak var podcastImageView: UIImageView!
     
     private var entity: Podcast!
     
@@ -24,7 +25,7 @@ class SearchCollectionViewCell: UICollectionViewCell {
         super.prepareForReuse()
         podcastImageView.image = nil
         if let entity = entity {
-            DataProvider.shared.cancelDownload(string: entity.artworkUrl160 ?? "")
+            DataProvider.shared.cancelDownload(string: entity.artworkUrl600 ?? "")
         }
     }
     
@@ -35,7 +36,8 @@ class SearchCollectionViewCell: UICollectionViewCell {
     func setUP(podcast: Podcast) {
         
         self.entity = podcast
-        DataProvider.shared.downloadImage(string: entity.artworkUrl160) { [weak self] in
+       podcastName.text = podcast.wrapperType
+        DataProvider.shared.downloadImage(string: entity.artworkUrl600) { [weak self] in
             guard let self = self else { return }
             podcastImageView.image = $0
         }

@@ -38,7 +38,7 @@ class PodcastCellViewModel: IPerRequest, INotifyOnChanged, IPodcastCell {
     
     typealias Arguments = Input
     
-    let podcast: Podcast
+    private var podcast: Podcast
     let podcasts: [Podcast]
     
     //MARK: Services
@@ -55,7 +55,7 @@ class PodcastCellViewModel: IPerRequest, INotifyOnChanged, IPodcastCell {
     var imageForPodcastCell: UIImage?
     
     ///Listening
-    var listeningProgress: Double? { podcast.listeningProgress }
+    var listeningProgress: Double?
     var trackDuration: String { podcast.trackTimeMillis?.minute ?? "" }
 
     ///Favourite
@@ -98,6 +98,11 @@ class PodcastCellViewModel: IPerRequest, INotifyOnChanged, IPodcastCell {
         self.isGoingDownload = downloadService.isGoingDownload(entity: podcast)
         self.downloadingProgress = downloadService.downloadProgress(for: podcast)
         self.isDownloaded = downloadService.isDownloaded(entity: podcast)
+        if podcast.managedObjectContext == nil {
+            self.listeningProgress = listeningManager.getListeningPodcast(podcast: podcast)?.progress
+        } else {
+            self.listeningProgress = podcast.listeningProgress
+        }
         
         DataProvider.shared.downloadImage(string: podcast.artworkUrl600) { [weak self] image in
             guard let self = self else { return }
@@ -140,6 +145,7 @@ extension PodcastCellViewModel {
             guard player.id == id else { return }
             isPlaying = player.isPlaying
             isGoingPlaying = player.isGoingPlaying
+            self.listeningProgress = player.listeningProgress 
             changed.raise()
             /// PodcastCellDownloadProtocol
         case let download as any PodcastCellDownloadProtocol:

@@ -196,13 +196,13 @@ extension RegistrationViewController {
         }
     }
     
-    private func signInOrUp(result: Result<User>) {
+    private func signInOrUp(result: Result<User, MyError.Auth>) {
         activityIndicator.stopAnimating()
-//        let timeInterval: TimeInterval = 2
         
         switch result {
         case .failure(let error):
-            error.showAlert(vc: self)
+            error.showAlert(vc: self, completion: nil)
+            
         case .success(result: let user):
             userViewModel.changeUserName(newName: user.userName)
             userViewModel.changeUserId(newUserId: user.userId)

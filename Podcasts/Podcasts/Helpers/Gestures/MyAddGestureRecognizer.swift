@@ -10,13 +10,13 @@ import UIKit
 extension UIView {
     func addMyGestureRecognizer(_ target: Any?, type gesture: TypeOfGestureRecognizer,_ selector: Selector, info: Any? = nil) {
         self.isUserInteractionEnabled = true
-        // get array of GestureRecognizer then add him to the View
+        /// get array of GestureRecognizer then add him to the View
         gesture.createGestures(for: target, selector: selector, info: info).forEach { addGestureRecognizer($0) }
     }
     
     func addMyGestureRecognizer(_ target: Any?, type gestures: [TypeOfGestureRecognizer],_ selector: Selector) {
         self.isUserInteractionEnabled = true
-        // get array of GestureRecognizer then add him to the View
+        /// get array of GestureRecognizer then add him to the View
         gestures.forEach {
             $0.createGestures(for: target, selector: selector).forEach { addGestureRecognizer($0) }
 
@@ -92,51 +92,21 @@ enum TypeOfGestureRecognizer {
             return [MyPanGestureRecognizer(target: target, action: selector, info: info)]
         }
     }
-}
-
-enum Direction {
-    static var round: [UISwipeGestureRecognizer.Direction] {
-        [.down,.left,.right,.up]
+    
+    private enum Direction {
+        static var round: [UISwipeGestureRecognizer.Direction] {
+            [.down,.left,.right,.up]
+        }
     }
 }
 
-class MyPanGestureRecognizer: UIPanGestureRecognizer, IGestureRecognizer {
-    
-    var info: Any?
-    
-    required init(target: Any?, action: Selector?, info : Any?) {
-        self.info = info
-        super.init(target: target, action: action)
-    }
-}
 
-class MyScreenEdgePanGestureRecognizer: UIScreenEdgePanGestureRecognizer, IGestureRecognizer {
-    
-    var info: Any?
-    
-    required init(target: Any?, action: Selector?, info : Any?) {
-        self.info = info
-        super.init(target: target, action: action)
-    }
-}
 
-class MyTapGestureRecognizer: UITapGestureRecognizer, IGestureRecognizer {
-    
-    var info: Any?
-    
-    required init(target: Any?, action: Selector?, info : Any?) {
-        self.info = info
-        super.init(target: target, action: action)
-    }
-}
 
-class MySwipeGestureRecognizer: UISwipeGestureRecognizer, IGestureRecognizer {
-    
-    var info: Any?
-    
-    required init(target: Any?, action: Selector?, info : Any?) {
-        self.info = info
-        super.init(target: target, action: action)
-    }
-}
+
+
+
+
+
+
 

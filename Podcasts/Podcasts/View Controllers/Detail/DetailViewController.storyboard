@@ -314,6 +314,7 @@
                         <outlet property="advisoryRatingLabel" destination="HKw-si-iuH" id="Qig-lp-nF5"/>
                         <outlet property="artistName" destination="evs-ie-cOk" id="4Aa-lJ-9aS"/>
                         <outlet property="backImageView" destination="kuD-aR-e20" id="2OY-OK-b5x"/>
+                        <outlet property="bottomContentViewConstraint" destination="ez5-vi-Uzc" id="cVS-97-VIJ"/>
                         <outlet property="bottomPlayerConstraint" destination="hkm-aw-3w0" id="qV3-l1-QYV"/>
                         <outlet property="countryLabel" destination="9Rg-ac-sEf" id="61B-wv-bw5"/>
                         <outlet property="dateLabel" destination="j09-Br-vAd" id="j03-zg-Ozi"/>
@@ -356,13 +357,13 @@
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="placeholderTextColor">
-            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.29803921568627451" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.29803921570000003" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemGray2Color">
-            <color red="0.68235294117647061" green="0.68235294117647061" blue="0.69803921568627447" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.68235294120000001" green="0.68235294120000001" blue="0.69803921570000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

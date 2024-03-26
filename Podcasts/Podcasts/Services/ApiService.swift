@@ -9,11 +9,6 @@ import Foundation
 import UIKit
 import CoreData
 
-//MARK: - Input
-protocol ApiServiceInput {
-    func getData<T: Decodable>(for request: String, completion: @escaping (Result<T>) -> Void)
-}
-
 class ApiService: ISingleton {
     
     required init(container: IContainer, args: ()) {
@@ -21,31 +16,37 @@ class ApiService: ISingleton {
         self.viewContext = dataStoreManager.viewContext
     }
     
+    typealias Output<T> = (Result<T, MyError.ApiService>)
+    typealias Clouser<T> = @MainActor (Result<T, MyError.ApiService>) -> Void
+    
     private var viewContext: NSManagedObjectContext
+}
 
-    func getData<T: Decodable>(for request: String) async -> T? {
-        guard let url = URL(string: request.encodeUrl) else { fatalError() }
+
+extension ApiService {
+    
+    func getData<T: Decodable>(_ decodeType: T.Type, for request: String) async -> Output<T> {
+        
+        guard let url = URL(string: request.encodeUrl) else { return .failure(.urlError) }
         do {
             let response = try await URLSession.shared.data(from: url)
             let decoder = JSONDecoder(context: viewContext)
             let value = try decoder.decode(T.self, from: response.0)
-            return value
+            return .success(result: value)
             
         } catch let error {
-            print("print \(error)")
+            return .failure(.error(error))
         }
-        return nil
     }
     
-    
-    func getData<T: Decodable>(for request: String, completion: @escaping (Result<T>) -> Void) {
+    func getData<T: Decodable>(_ decodeType: T.Type, for request: String, completion: @escaping Clouser<T>) {
         
         guard let url = URL(string: request.encodeUrl) else { fatalError() }
         URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
             
             guard let self = self else { return }
             
-            var result: Result<T>
+            var result: Result<T,MyError.ApiService>
 
             defer {
                 DispatchQueue.main.async {
@@ -54,21 +55,18 @@ class ApiService: ISingleton {
             }
             
             if let error = error {
-                let alertData: MyError.AlertData = (title: error.localizedDescription, message: "", actions: nil)
-                result = .failure(.apiService(.error(alertData)))
+                result = .failure(.error(error))
                 return
             }
             
             if let response = response as? HTTPURLResponse {
                 if response.statusCode != 200 {
-                    let alertData: MyError.AlertData = (title: "\(response.statusCode)", message: "", actions: nil)
-                    result = .failure(.apiService(.error(alertData)))
+                    result = .failure(.responseError)
                 }
             }
             
             guard let data = data else {
-                let alertData: MyError.AlertData = (title: "NoData", message: "", actions: nil)
-                result = .failure(.apiService(.noData(alertData)))
+                result = .failure(.noData)
                 return
             }
             
@@ -78,9 +76,7 @@ class ApiService: ISingleton {
                 result = .success(result: value)
                 
             } catch let error {
-                print(error)
-                let alertData: MyError.AlertData = (title: error.localizedDescription.debugDescription, message: "", actions: nil)
-                result = .failure(.apiService(.error(alertData)))
+                result = .failure(.error(error))
             }
         }.resume()
     }

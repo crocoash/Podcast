@@ -63,12 +63,11 @@ class SettingsTableViewController: UITableViewController, IHaveStoryBoard {
     //MARK: - View Methods
     override func loadView() {
         super.loadView()
-        apiService.getData(for: URLS.api.rawValue) { [weak self] (result: Result<IpModel>) in
+        apiService.getData(IpModel.self, for: URLS.api.rawValue) { [weak self] result in
             switch result {
                 
             case .failure(let error):
-                
-                error.showAlert(vc: self)
+                error.showAlert(vc: self, completion: nil)
                 
             case .success(result: let result) :
                 self?.locationLabel.text = result.country + " " + result.city

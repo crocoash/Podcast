@@ -14,12 +14,11 @@ class AuthService: ISingleton {
     
     required init(container: IContainer, args: ()) {}
     
-    func signInWithEmail (user email: String, password: String, completion: @escaping (Result<User>) -> Void) {
+    func signInWithEmail (user email: String, password: String, completion: @escaping (Result<User, MyError.Auth>) -> Void) {
         Auth.auth().signIn(withEmail: email, password: password) { (result, err) in
             
-            if let err = err?.localizedDescription {
-                let alertData: MyError.AlertData = (title: err, message: "", actions: nil)
-                completion(.failure(.auth(.error(alertData))))
+            if let err = err {
+                completion(.failure(.error(err)))
                 return
             }
             guard let userId = Auth.auth().currentUser?.uid else { return }
@@ -28,18 +27,18 @@ class AuthService: ISingleton {
         }
     }
     
-    func signUpWithEmail (email: String, password: String, completion: @escaping (Result<User>) -> Void) {
+    func signUpWithEmail (email: String, password: String, completion: @escaping (Result<User, MyError.Auth>) -> Void) {
         Auth.auth().createUser(withEmail: email, password: password) { (result, err) in
             
-            if let err = err?.localizedDescription {
-                if err.contains("email") {
-                    let alertData: MyError.AlertData = (title: err, message: "", actions: nil)
-                    completion(.failure(.auth(.errorEmail(alertData))))
-                } else if  err.contains("password") {
-                    let alertData: MyError.AlertData = (title: "", message: "", actions: nil)
-                    completion(.failure(.auth(.errorEmail(alertData))))
+            if let err = err {
+                let discrpError = err.localizedDescription
+                
+                if discrpError.contains("email") {
+                    completion(.failure(.errorEmail(err)))
+                } else if discrpError.contains("password") {
+                    completion(.failure(.errorEmail(err)))
                 } else {
-                    completion(.failure(MyError.auth(.error((title: err, message: "", actions: nil)))))
+                    completion(.failure(.error(err)))
                 }
                 return
             }

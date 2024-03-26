@@ -58,7 +58,7 @@ class PreLoaderViewController: UIViewController, IHaveStoryBoard {
             
         } else {
             heightConstraint?.constant = 120
-            UIView.animate(withDuration: 0.5, animations: { [weak self] in
+            UIView.animate(withDuration: 1.5, animations: { [weak self] in
                 guard let self = self else { return }
                 view.layoutIfNeeded()
             }) { [weak self] _ in

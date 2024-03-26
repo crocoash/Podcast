@@ -9,7 +9,7 @@ import Foundation
 import CoreData
 
 class ListViewModel: IPerRequest, INotifyOnChanged {
-  
+   
    struct Arguments {}
    
    //MARK: services
@@ -27,19 +27,17 @@ class ListViewModel: IPerRequest, INotifyOnChanged {
       self.likeManager = container.resolve()
       self.favouriteTableViewVM = container.resolve(args: FavouriteTableViewModel.Arguments.init())
       
-      favouriteTableViewVM.changed.subscribe(self) { this, _ in
-         this.changed.raise()
+      favouriteTableViewVM.changed.subscribe(self) { `self`, _ in
+         `self`.changed.raise()
       }
    }
-   
-   lazy var sectionCountChanged: (() -> (Int)) = { [weak self] in
-      guard let self = self else { return 0 }
-      return favouriteTableViewVM.numbersOfSections
-   }
+}
+
+extension ListViewModel {
 
    func changeSearchedSection(selectedScope: Int) {
       let index = selectedScope == 0 ? nil : selectedScope - 1
-      favouriteTableViewVM.changeSearchedSection(searchedSection: index)
+      Task { await favouriteTableViewVM.changeSearchedSection(searchedSection: index) }
    }
    
    func performSearch(text: String?) {
@@ -47,7 +45,7 @@ class ListViewModel: IPerRequest, INotifyOnChanged {
    }
    
    func cancelSearching() {
-      favouriteTableViewVM.cancelSearching()
+      Task { await favouriteTableViewVM.cancelSearching() }
    }
    
    func removeAll() {
@@ -65,9 +63,8 @@ class ListViewModel: IPerRequest, INotifyOnChanged {
             selectIndex = index + 1
          }
          return (titles: titles, selectIndex: selectIndex)
-      } else {
-         return nil
       }
+      return nil
    }
 
    func isSearchControllerIsHidden() -> Bool {

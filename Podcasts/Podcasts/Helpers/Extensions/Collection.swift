@@ -40,9 +40,21 @@ extension Collection {
 
 extension Collection {
    
-   func enumerated(_ completion: (Int, Element) -> Void)  {
-      for (index, value) in self.enumerated() {
-         completion(index, value)
-      }
-   }
+    func enumerated(_ completion: (Int, Element) async -> Void) async {
+        for (index, value) in self.enumerated() {
+            await completion(index, value)
+        }
+    }
+    
+    func enumerated(_ completion: (Int, Element) -> Void) {
+        for (index, value) in self.enumerated() {
+            completion(index, value)
+        }
+    }
+    
+    func forEach(_ body:  (Element) async -> Void) async {
+        for i in self {
+           await body(i)
+        }
+    }
 }

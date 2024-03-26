@@ -80,7 +80,6 @@ class ListViewController: UIViewController, IHaveStoryBoardAndViewModel {
         configureUI()
         updateUI()
         view.frame.size.width = 400
-
     }
     
     //MARK: Actions
@@ -141,11 +140,7 @@ extension ListViewController {
     }
     
     private func showAlert() {
-        //        if let favouritePodcast = object as? FavouritePodcast {
-        //            let name = favouritePodcast.podcast.trackName ?? ""
-        //            let title = "\(name) podcast is added to playlist"
-        //            addToast(title: title, (playerIsSHidden ? .bottom : .bottomWithPlayer))
-        //        }
+
     }
 }
 

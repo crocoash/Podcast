@@ -37,7 +37,7 @@ protocol FavouriteManagerInput: MultyDelegateServiceInput {
     func removeAll()
 }
 
-class FavouriteManager: MultyDelegateService<FavouriteManagerDelegate>, ISingleton {
+class FavouriteManager: MultypleDelegateService<FavouriteManagerDelegate>, ISingleton {
 
     typealias Arguments = Void
     

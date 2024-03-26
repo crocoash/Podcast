@@ -11,14 +11,14 @@ import UIKit
 }
 
 @objc protocol SearchCollectionViewDataSource: AnyObject {
-   func searchCollectionViewNumbersOfSections(_ searchCollectionView: SearchCollectionView) -> Int
-   func searchCollectionView(_ searchCollectionView: SearchCollectionView, nameOfSectionForIndex index: Int) -> String
+    func searchCollectionViewNumbersOfSections(_ searchCollectionView: SearchCollectionView) -> Int
+    func searchCollectionView(_ searchCollectionView: SearchCollectionView, nameOfSectionForIndex index: Int) -> String
     func searchCollectionView(_ searchCollectionView: SearchCollectionView, sizeForSection section: Int) -> CGSize
     func searchCollectionView(_ searchCollectionView: SearchCollectionView, numbersOfRowsInSection index: Int) -> Int
-   func searchCollectionView(_ searchCollectionView: SearchCollectionView, rowForIndexPath indexPath: IndexPath) -> SearchCollectionView.Row
+    func searchCollectionView(_ searchCollectionView: SearchCollectionView, rowForIndexPath indexPath: IndexPath) -> SearchCollectionView.Row
 }
 
-class SearchCollectionView: UICollectionView, IDiffableCollectionViewWithDataSource {
+class SearchCollectionView: UICollectionView, IDiffableCollectionViewWithDataSource {    
 
     typealias Section = String
     class Row: NSObject {
@@ -51,10 +51,10 @@ class SearchCollectionView: UICollectionView, IDiffableCollectionViewWithDataSou
    @IBOutlet weak var myDelegate: SearchCollectionViewDelegate?
    @IBOutlet weak var myDataSource: SearchCollectionViewDataSource?
    
-   
    required init?(coder: NSCoder) {
       super.init(coder: coder)
-       self.register()
+       collectionViewLayout = createLayout()
+       register()
    }
    
    override func reloadData() {
@@ -113,7 +113,7 @@ extension SearchCollectionView {
          cell.addMyGestureRecognizer(self, type: .tap(), #selector(self.selectCell))
       }
       
-      self.diffableDataSource = UICollectionViewDiffableDataSource<Section, Row>(collectionView: self) { collectionView, indexPath, item in
+      diffableDataSource = UICollectionViewDiffableDataSource<Section, Row>(collectionView: self) { collectionView, indexPath, item in
          return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: item.podcast)
       }
       
@@ -126,36 +126,49 @@ extension SearchCollectionView {
       
       self.diffableDataSource.supplementaryViewProvider = { (view, kind, index) in
          let view = self.dequeueConfiguredReusableSupplementary(using: supplementaryRegistration, for: index)
-         view.backgroundColor = .systemBackground
+          view.backgroundColor = .systemBackground
          return view
       }
    }
-//   
-//   private func createLayout() -> UICollectionViewLayout {
-//       let sectionProvider = { [weak self] (section: Int, invarement: NSCollectionLayoutEnvironment) in
-//           guard let self = self,
-//                 let itemSize = myDataSource?.searchCollectionView(self, sizeForSection: section).width else { fatalError() }
-//           
-//           let items = NSCollectionLayoutItem(layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(itemSize), heightDimension: .fractionalWidth(itemSize)))
-//           let group = NSCollectionLayoutGroup.horizontal(layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .estimated(10)), subitems: [items])
-//           
-//           let section = NSCollectionLayoutSection(group: group)
-//           //            section.orthogonalScrollingBehavior = .continuous
-//           
-//           let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
-//            layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .estimated(50)),
-//            elementKind: SearchCollectionHeaderReusableView.identifier, alignment: .top)
-//           sectionHeader.pinToVisibleBounds = true
-//           section.boundarySupplementaryItems = [sectionHeader]
-//           return section
-//       }
-//      
-//      let config = UICollectionViewCompositionalLayoutConfiguration()
-//      config.interSectionSpacing = 0
-//      let layout = UICollectionViewCompositionalLayout(sectionProvider: sectionProvider, configuration: config)
-//      
-//      return layout
-//   }
+   
+   private func createLayout() -> UICollectionViewLayout {
+       let sectionProvider = { [weak self] (section: Int, invarement: NSCollectionLayoutEnvironment) in
+           guard let self = self,
+                 //TODO: -
+                 let _ = myDataSource?.searchCollectionView(self, sizeForSection: section).width else { fatalError() }
+           
+           let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1/3),
+                                                heightDimension: .fractionalHeight(1.0))
+           
+           let items = NSCollectionLayoutItem(layoutSize: itemSize)
+           
+           let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.9),
+                                                  heightDimension: itemSize.widthDimension)
+                                                  
+           let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [items])
+           group.interItemSpacing = .fixed(CGFloat(10))
+           
+           
+           let section = NSCollectionLayoutSection(group: group)
+           section.orthogonalScrollingBehavior = .paging
+           section.interGroupSpacing = CGFloat(10)
+           section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 10)
+
+           
+           let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
+            layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .estimated(50)),
+            elementKind: SearchCollectionHeaderReusableView.identifier, alignment: .top)
+           sectionHeader.pinToVisibleBounds = true
+           section.boundarySupplementaryItems = [sectionHeader]
+           return section
+       }
+      
+      let config = UICollectionViewCompositionalLayoutConfiguration()
+
+      let layout = UICollectionViewCompositionalLayout(sectionProvider: sectionProvider, configuration: config)
+      
+      return layout
+   }
    
 }
 

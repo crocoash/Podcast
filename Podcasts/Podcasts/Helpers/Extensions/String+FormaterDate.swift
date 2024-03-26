@@ -16,11 +16,12 @@ extension Optional where Wrapped == String {
         let dateFormatterSet = DateFormatter()
         dateFormatterSet.dateFormat = "MMM d, yyyy"
         
-        guard let self = self else {  fatalError("Invalid date in DetailViewController") }
-        
-        if let date = dateFormatterGet.date(from: self) {
-            return dateFormatterSet.string(from: date)
+        if let self = self {
+            if let date = dateFormatterGet.date(from: self) {
+                return dateFormatterSet.string(from: date)
+            }
         }
+        
         return nil
     }
 }

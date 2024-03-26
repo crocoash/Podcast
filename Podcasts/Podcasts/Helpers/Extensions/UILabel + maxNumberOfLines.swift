@@ -33,11 +33,6 @@ extension UILabel {
     
     var textHeight: CGFloat {
         let maxSize = CGSize(width: self.frame.size.width, height: CGFloat(MAXFLOAT))
-        let text = (self.text ?? "") as NSString
-        
-        return self.textRect(forBounds: CGRect(origin: .zero, size: CGSize(width:  self.frame.size.width, height: CGFloat(MAXFLOAT))),limitedToNumberOfLines: 0).height
-        
-//        let textHeight = text.boundingRect(with: maxSize, options: .usesLineFragmentOrigin, attributes: [.font: self.font as Any ], context: nil).height
-//        return textHeight
+        return self.textRect(forBounds: CGRect(origin: .zero, size: maxSize),limitedToNumberOfLines: 0).height
     }
 }

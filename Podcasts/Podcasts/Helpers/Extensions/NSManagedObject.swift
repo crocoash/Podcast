@@ -92,7 +92,9 @@ extension NSManagedObject {
             }
         } else {
             let oldValue = self.value(forKey: key)
-            if let oldValue = oldValue, String.init(reflecting: oldValue) != String.init(reflecting: value) {
+            if oldValue == nil {
+                setValue(value, forKey: key)
+            } else if let oldValue = oldValue, String.init(reflecting: oldValue) != String.init(reflecting: value) {
                 setValue(value, forKey: key)
             } 
         }

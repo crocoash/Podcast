@@ -10,6 +10,13 @@ import CoreData
 
 
 class DetailViewController: UIViewController, IHaveStoryBoardAndViewModel {
+
+    static func create(container: IContainer, podcast: Podcast, podcasts: [Podcast]) -> DetailViewController {
+        let podcasts = podcasts.filter { $0.wrapperType == "podcastEpisode"}
+        let args = DetailViewController.Args.init()
+        let argsVM = DetailViewController.ViewModel.Arguments(podcast: podcast, podcasts: podcasts)
+        return container.resolve(args: args, argsVM: argsVM)
+    }
     
     struct Args {}
     typealias ViewModel = DetailViewModel
@@ -40,6 +47,7 @@ class DetailViewController: UIViewController, IHaveStoryBoardAndViewModel {
     
     @IBOutlet private weak var episodeTableView: EpisodeTableView!
     
+    @IBOutlet private weak var bottomContentViewConstraint: NSLayoutConstraint!
     @IBOutlet private weak var heightTableViewConstraint: NSLayoutConstraint!
     @IBOutlet private weak var bottomPlayerConstraint:NSLayoutConstraint!
     
@@ -49,6 +57,7 @@ class DetailViewController: UIViewController, IHaveStoryBoardAndViewModel {
     //MARK: View Methods
     override func viewDidLoad() {
         super.viewDidLoad()
+        configureUI()
         updateUI()
         smallPlayerView.isHidden = viewModel.playerIsHidden
         bottomPlayerConstraint.constant = viewModel.playerIsHidden ? 0 : 50
@@ -64,6 +73,10 @@ class DetailViewController: UIViewController, IHaveStoryBoardAndViewModel {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    deinit {
+        
     }
     
     //MARK: Public Methods
@@ -160,6 +173,7 @@ extension DetailViewController {
         if let smallPlayerViewModel = viewModel.smallPlayerViewModel, smallPlayerView.isHidden {
             smallPlayerView.viewModel = smallPlayerViewModel
             smallPlayerView.isHidden = false
+            bottomContentViewConstraint.constant = smallPlayerView.frame.height
         }
     }
     
@@ -192,10 +206,6 @@ extension DetailViewController: EpisodeTableViewMyDataSource {
     }
 }
 
-
-
-////MARK: - FavouriteManagerDelegate
-//extension DetailViewController: FavouriteManagerDelegate {
 //    //MARK: - SmallPlayerViewDelegate
 extension DetailViewController: SmallPlayerViewDelegate {
     

@@ -10,7 +10,7 @@ import Foundation
 extension String {
   
   var conform: String {
-    return String(self.map { $0 == " " ? "-" : $0 })
+    return String(self.map { $0 == " " ? "+" : $0 })
   }
 }
 

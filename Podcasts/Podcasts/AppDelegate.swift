@@ -13,6 +13,10 @@ import AVFoundation
 
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
+   @MainActor var completion = {
+       guard Thread.isMainThread else { fatalError() }
+    }
+    
     var backgroundSessionCompletionHandler: (() -> Void)?
     
     let orientationLock = UIInterfaceOrientationMask.portrait
@@ -55,5 +59,39 @@ extension AppDelegate {
     private func initialConfigurations() {
         setupFirstMobileAllowWiFi()
         FirebaseApp.configure()
+//         main()
+    }
+    
+    func main() {
+        Task { 
+            await self.backgroundA()
+            mainFunction()
+            await self.backgroundB()
+            
+        }
+    }
+
+    func backgroundA() async {
+//        try? await Task.sleep(nanoseconds: 3_000_000_000 )
+//        print("backgroundA1")
+        //        await MainActor.run {
+//        mainFunction()
+        //        }
+        completion()
+        print("backgroundA1")
+    }
+    
+    func backgroundB() async {
+        try? await Task.sleep(nanoseconds: 0)
+        print("backgroundB")
+    }
+    
+    @MainActor
+    func mainFunction() {
+        guard Thread.isMainThread else { fatalError() }
+        print("mainFunction1")
+        Thread.sleep(forTimeInterval: 5)
+        print("mainFunction2")
+
     }
 }

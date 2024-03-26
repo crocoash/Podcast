@@ -23,7 +23,7 @@ public class Author: NSManagedObject, Decodable {
         
         let values = try decoder.container(keyedBy: CodingKeys.self)
         
-        artistID = try values.decode(Int32.self, forKey: .artistID)
+        artistID = try values.decode(Int.self, forKey: .artistID) as NSNumber
         artistLinkURL = try values.decode(String.self, forKey: .artistLinkURL)
         artistName = try values.decode(String.self, forKey: .artistName)
         artistType = try values.decode(String.self, forKey: .artistType)

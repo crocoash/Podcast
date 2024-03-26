@@ -19,7 +19,7 @@ protocol ListDataManagerDelegate: AnyObject {
 //   func changeActiveState(for listSection: ListSection)
 //}
 
-class ListDataManager: MultyDelegateService<ListDataManagerDelegate>, ISingleton {
+class ListDataManager: MultypleDelegateService<ListDataManagerDelegate>, ISingleton {
     
     //MARK: init
     required init(container: IContainer, args: ()) {

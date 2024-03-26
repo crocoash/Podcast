@@ -23,9 +23,11 @@ protocol IPerRequest: IResolvable {}
 protocol IHaveStoryBoard: UIViewController & IResolvable where Arguments == (args: Args, coder: NSCoder) {
     associatedtype Args
 }
+
 protocol IHaveStoryBoardAndViewModel: UIViewController & IResolvable & IHaveViewModel where ViewModel: IPerRequest, Arguments == (args: Args, coder: NSCoder) {
     associatedtype Args
 }
+
 protocol IHaveXib: AnyObject, IResolvable {}
 protocol IHaveXibAndViewModel: AnyObject, IResolvable, IHaveViewModel where ViewModel: IPerRequest {}
 
@@ -50,7 +52,7 @@ final class Container {
     private var singletons: [ObjectIdentifier: AnyObject] = [:]
     
     func makeInstance<T: IResolvable>(args: T.Arguments) -> T {
-        return T(container: self, args: args) ?? fatalError() as! T
+        return T(container: self, args: args)!
     }
 }
 
@@ -77,8 +79,8 @@ extension Container: IContainer {
         switch instance {
         case let view as UIView:
             view.loadFromXib()
-        case let vc as UIViewController:
-            print()
+        case _ as UIViewController:
+            break
         default:
             break
         }
@@ -88,14 +90,16 @@ extension Container: IContainer {
     }
     
     func resolve<T: IHaveXibAndViewModel>(args: T.Arguments, argsVM: T.ViewModel.Arguments) -> T {
-        var instance: T = makeInstance(args: args)
+        let instance: T = makeInstance(args: args)
         switch instance {
         case let view as UIView:
             view.loadFromXib()
             instance.viewModel = makeInstance(args: argsVM)
-            instance.configureUI()
-            instance.updateUI()
-        case let vc as UIViewController:
+            DispatchQueue.main.async {
+                instance.configureUI()
+                instance.updateUI()
+            }
+        case _ as UIViewController:
             instance.viewModel = makeInstance(args: argsVM)
         default:
             break
@@ -119,14 +123,16 @@ extension Container: IContainer {
     }
     
     func resolve<T: IHaveStoryBoardAndViewModel>(args: T.Args, argsVM: T.ViewModel.Arguments) -> T {
-        let vc: T = T.create { [weak self] coder in
+        return T.create { [weak self] coder in
             guard let self = self else { fatalError()}
-                   /*T(container: self, args: ) */
             let vc: T = makeInstance(args: (args: args, coder: coder))
-            
             vc.viewModel = makeInstance(args: argsVM)
+//            DispatchQueue.main.async {
+//                vc.configureUI()
+//                vc.updateUI()
+//            }
+            
             return vc
         }
-        return vc
     }
 }

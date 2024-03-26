@@ -11,20 +11,28 @@ enum DynamicLinkManager {
     
     case podcastSearch(String)
     case authors(String)
-    case podcastEpisodeById(String)
+    case podcastEpisodeByCollectionId(Int)
+    case podcastByAuthorId(Int)
+    case topPodcast
     
     var url: String {
-        switch self {
+        return switch self {
+        case .topPodcast:
+            "https://itunes.apple.com/us/rss/toppodcasts/limit=10/genre=1318/json"
+            
         case .podcastSearch(let string):
-            return "https://itunes.apple.com/search?term=\(string)&entity=podcastEpisode"
+             "https://itunes.apple.com/search?term=\(string)&entity=podcast&limit=200" // Episode
+//            "https://api.ios-app-developer.com/podcasts/search?term=\(string)"
+            
         case .authors(let string):
-            return "https://itunes.apple.com/search?term=\(string)&media=podcast&entity=podcastAuthor"
-        case .podcastEpisodeById(let string):
-            return "https://itunes.apple.com/lookup?id=\(string)&entity=podcastEpisode"
+             "https://itunes.apple.com/search?term=\(string)&entity=podcastAuthor&media=podcast"
+            
+        case .podcastEpisodeByCollectionId(let id):
+             "https://itunes.apple.com/lookup?id=\(id)&entity=podcastEpisode"
+        
+        case .podcastByAuthorId(let id):
+          "https://itunes.apple.com/lookup?id=\(id)&media=podcast&entity=podcast"
         }
-//    https://itunes.apple.com/lookup?id=411682463&entity=podcast ++ collection id ( 1 track )
-//    https://itunes.apple.com/lookup?id=411682463&entity=podcastEpisode + ++ collection id ( 1 episode )
-//    https://itunes.apple.com/search?term=1000014283264&entity=podcast
     }
 }
 //TODO: change name

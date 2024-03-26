@@ -35,7 +35,6 @@
 		18478129272C8B460036B89E /* MyActionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18478127272C8B460036B89E /* MyActionSheet.swift */; };
 		1847812E272C8F390036B89E /* MyAddGestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1847812C272C8F390036B89E /* MyAddGestureRecognizer.swift */; };
 		1847812F272C8F390036B89E /* MyLongPressGestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1847812D272C8F390036B89E /* MyLongPressGestureRecognizer.swift */; };
-		18478131272C8F930036B89E /* Podfile in Resources */ = {isa = PBXBuildFile; fileRef = 18478130272C8F930036B89E /* Podfile */; };
 		184CE18927270C8D0088044C /* ApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184CE18827270C8D0088044C /* ApiService.swift */; };
 		18557D642732B61D00CA08CA /* IpModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18557D632732B61D00CA08CA /* IpModel.swift */; };
 		18557D662732BF0100CA08CA /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18557D652732BF0100CA08CA /* User.swift */; };
@@ -83,7 +82,7 @@
 		3A25DB122A0CE2330000CAE0 /* SearchCollectionHeaderReusableView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3A25DB102A0CE2330000CAE0 /* SearchCollectionHeaderReusableView.xib */; };
 		3A27F47C2AF9216E004E208A /* ITableViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A27F47B2AF9216E004E208A /* ITableViewModel.swift */; };
 		3A27F47E2AF921CC004E208A /* ITableViewSearched.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A27F47D2AF921CC004E208A /* ITableViewSearched.swift */; };
-		3A3BD86A2A84244400674042 /* MultyDelegateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A3BD8692A84244400674042 /* MultyDelegateService.swift */; };
+		3A3BD86A2A84244400674042 /* MultypleDelegateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A3BD8692A84244400674042 /* MultypleDelegateService.swift */; };
 		3A3BD86C2A86370E00674042 /* ListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A3BD86B2A86370E00674042 /* ListViewModel.swift */; };
 		3A41942A29881A0300D59AA4 /* MyError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A41942929881A0300D59AA4 /* MyError.swift */; };
 		3A43AF552AB9B5B100624EFC /* BigPlayerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A43AF542AB9B5B100624EFC /* BigPlayerViewModel.swift */; };
@@ -141,15 +140,32 @@
 		3ADD819E2A1A291400DDBA8C /* SettingsTableViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3ADD819D2A1A291400DDBA8C /* SettingsTableViewController.storyboard */; };
 		3AECF77629FBFFBE00553DF7 /* EpisodeTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AECF77429FBFFBE00553DF7 /* EpisodeTableView.swift */; };
 		3AED5E242AFAB07100B192AD /* ITableViewSorting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AED5E232AFAB07100B192AD /* ITableViewSorting.swift */; };
+		3AEE73D22BA6160600FAF15B /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AEE73CF2BA6160600FAF15B /* MainViewController.swift */; };
+		3AEE73D42BA616A200FAF15B /* MainViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AEE73D32BA616A200FAF15B /* MainViewModel.swift */; };
+		3AEE73D62BA6197500FAF15B /* MainViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3AEE73D52BA6197500FAF15B /* MainViewController.storyboard */; };
+		3AEE73DA2BA844E700FAF15B /* PodcastManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AEE73D92BA844E700FAF15B /* PodcastManager.swift */; };
+		3AEE73DD2BA9938B00FAF15B /* MyError+FireBaseError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AEE73DC2BA9938B00FAF15B /* MyError+FireBaseError.swift */; };
+		3AEE73DF2BA993B700FAF15B /* MyError+DownloadService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AEE73DE2BA993B600FAF15B /* MyError+DownloadService.swift */; };
+		3AEE73E12BA9940200FAF15B /* MyError+ApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AEE73E02BA9940200FAF15B /* MyError+ApiService.swift */; };
+		3AEE73E32BA9943D00FAF15B /* MyError+AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AEE73E22BA9943D00FAF15B /* MyError+AuthService.swift */; };
+		3AEE73E52BA995A100FAF15B /* MyError+PodcastManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AEE73E42BA995A100FAF15B /* MyError+PodcastManager.swift */; };
+		3AEE73E72BA9C28E00FAF15B /* MySwipeGestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AEE73E62BA9C28E00FAF15B /* MySwipeGestureRecognizer.swift */; };
+		3AEE73E92BA9C2AE00FAF15B /* MyTapGestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AEE73E82BA9C2AE00FAF15B /* MyTapGestureRecognizer.swift */; };
+		3AEE73EB2BA9C2E200FAF15B /* MyScreenEdgePanGestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AEE73EA2BA9C2E200FAF15B /* MyScreenEdgePanGestureRecognizer.swift */; };
+		3AEE73ED2BA9C2FA00FAF15B /* MyPanGestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AEE73EC2BA9C2FA00FAF15B /* MyPanGestureRecognizer.swift */; };
+		3AEE73F12BAACE5300FAF15B /* PodcastAPI in Frameworks */ = {isa = PBXBuildFile; productRef = 3AEE73F02BAACE5300FAF15B /* PodcastAPI */; };
+		3AEE73F42BAACF4700FAF15B /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 3AEE73F32BAACF4700FAF15B /* FirebaseAnalytics */; };
+		3AEE73F62BAACF4700FAF15B /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 3AEE73F52BAACF4700FAF15B /* FirebaseAuth */; };
+		3AEE73F82BAACF4700FAF15B /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 3AEE73F72BAACF4700FAF15B /* FirebaseDatabase */; };
+		3AEE73FA2BAACF4700FAF15B /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 3AEE73F92BAACF4700FAF15B /* FirebaseFirestore */; };
+		3AEE73FC2BAACF4700FAF15B /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 3AEE73FB2BAACF4700FAF15B /* FirebaseStorage */; };
 		3FBCF1C2272847F100B70522 /* PodcastCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FBCF1C0272847F100B70522 /* PodcastCell.swift */; };
 		3FBCF1C3272847F100B70522 /* PodcastCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3FBCF1C1272847F100B70522 /* PodcastCell.xib */; };
 		3FBCF1C72728482A00B70522 /* PodcastByAuthorCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FBCF1C52728482A00B70522 /* PodcastByAuthorCell.swift */; };
 		3FBCF1C82728482A00B70522 /* PodcastByAuthorCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3FBCF1C62728482A00B70522 /* PodcastByAuthorCell.xib */; };
-		40C7A47D0675B0F12895CF45 /* Pods_Podcasts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7228A46944BB64D3CDDE354E /* Pods_Podcasts.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		00F531523154C13479CB9139 /* Pods-Podcasts.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Podcasts.release.xcconfig"; path = "Target Support Files/Pods-Podcasts/Pods-Podcasts.release.xcconfig"; sourceTree = "<group>"; };
 		04425A88273012DA00E897FA /* BigPlayerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BigPlayerViewController.swift; sourceTree = "<group>"; };
 		04425A89273012DA00E897FA /* BigPlayerViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = BigPlayerViewController.xib; sourceTree = "<group>"; };
 		045628242732EA370044878C /* String + conform.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = "String + conform.swift"; sourceTree = "<group>"; };
@@ -180,7 +196,6 @@
 		18478127272C8B460036B89E /* MyActionSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyActionSheet.swift; sourceTree = "<group>"; };
 		1847812C272C8F390036B89E /* MyAddGestureRecognizer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyAddGestureRecognizer.swift; sourceTree = "<group>"; };
 		1847812D272C8F390036B89E /* MyLongPressGestureRecognizer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyLongPressGestureRecognizer.swift; sourceTree = "<group>"; };
-		18478130272C8F930036B89E /* Podfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Podfile; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		184CE18827270C8D0088044C /* ApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiService.swift; sourceTree = "<group>"; };
 		18557D632732B61D00CA08CA /* IpModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IpModel.swift; sourceTree = "<group>"; };
 		18557D652732BF0100CA08CA /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
@@ -227,7 +242,7 @@
 		3A25DB102A0CE2330000CAE0 /* SearchCollectionHeaderReusableView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SearchCollectionHeaderReusableView.xib; sourceTree = "<group>"; };
 		3A27F47B2AF9216E004E208A /* ITableViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ITableViewModel.swift; sourceTree = "<group>"; };
 		3A27F47D2AF921CC004E208A /* ITableViewSearched.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ITableViewSearched.swift; sourceTree = "<group>"; };
-		3A3BD8692A84244400674042 /* MultyDelegateService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultyDelegateService.swift; sourceTree = "<group>"; };
+		3A3BD8692A84244400674042 /* MultypleDelegateService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultypleDelegateService.swift; sourceTree = "<group>"; };
 		3A3BD86B2A86370E00674042 /* ListViewModel.swift */ = {isa = PBXFileReference; indentWidth = 3; lastKnownFileType = sourcecode.swift; path = ListViewModel.swift; sourceTree = "<group>"; tabWidth = 3; };
 		3A41942929881A0300D59AA4 /* MyError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyError.swift; sourceTree = "<group>"; };
 		3A43AF542AB9B5B100624EFC /* BigPlayerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BigPlayerViewModel.swift; sourceTree = "<group>"; };
@@ -285,12 +300,23 @@
 		3ADD819D2A1A291400DDBA8C /* SettingsTableViewController.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = SettingsTableViewController.storyboard; sourceTree = "<group>"; };
 		3AECF77429FBFFBE00553DF7 /* EpisodeTableView.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = EpisodeTableView.swift; sourceTree = "<group>"; tabWidth = 4; };
 		3AED5E232AFAB07100B192AD /* ITableViewSorting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ITableViewSorting.swift; sourceTree = "<group>"; };
+		3AEE73CF2BA6160600FAF15B /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
+		3AEE73D32BA616A200FAF15B /* MainViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewModel.swift; sourceTree = "<group>"; };
+		3AEE73D52BA6197500FAF15B /* MainViewController.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = MainViewController.storyboard; sourceTree = "<group>"; };
+		3AEE73D92BA844E700FAF15B /* PodcastManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastManager.swift; sourceTree = "<group>"; };
+		3AEE73DC2BA9938B00FAF15B /* MyError+FireBaseError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MyError+FireBaseError.swift"; sourceTree = "<group>"; };
+		3AEE73DE2BA993B600FAF15B /* MyError+DownloadService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MyError+DownloadService.swift"; sourceTree = "<group>"; };
+		3AEE73E02BA9940200FAF15B /* MyError+ApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MyError+ApiService.swift"; sourceTree = "<group>"; };
+		3AEE73E22BA9943D00FAF15B /* MyError+AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MyError+AuthService.swift"; sourceTree = "<group>"; };
+		3AEE73E42BA995A100FAF15B /* MyError+PodcastManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MyError+PodcastManager.swift"; sourceTree = "<group>"; };
+		3AEE73E62BA9C28E00FAF15B /* MySwipeGestureRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MySwipeGestureRecognizer.swift; sourceTree = "<group>"; };
+		3AEE73E82BA9C2AE00FAF15B /* MyTapGestureRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyTapGestureRecognizer.swift; sourceTree = "<group>"; };
+		3AEE73EA2BA9C2E200FAF15B /* MyScreenEdgePanGestureRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyScreenEdgePanGestureRecognizer.swift; sourceTree = "<group>"; };
+		3AEE73EC2BA9C2FA00FAF15B /* MyPanGestureRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyPanGestureRecognizer.swift; sourceTree = "<group>"; };
 		3FBCF1C0272847F100B70522 /* PodcastCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastCell.swift; sourceTree = "<group>"; };
 		3FBCF1C1272847F100B70522 /* PodcastCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PodcastCell.xib; sourceTree = "<group>"; };
 		3FBCF1C52728482A00B70522 /* PodcastByAuthorCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastByAuthorCell.swift; sourceTree = "<group>"; };
 		3FBCF1C62728482A00B70522 /* PodcastByAuthorCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PodcastByAuthorCell.xib; sourceTree = "<group>"; };
-		613855CB045635B5A47619F6 /* Pods-Podcasts.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Podcasts.debug.xcconfig"; path = "Target Support Files/Pods-Podcasts/Pods-Podcasts.debug.xcconfig"; sourceTree = "<group>"; };
-		7228A46944BB64D3CDDE354E /* Pods_Podcasts.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Podcasts.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -298,7 +324,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				40C7A47D0675B0F12895CF45 /* Pods_Podcasts.framework in Frameworks */,
+				3AEE73F82BAACF4700FAF15B /* FirebaseDatabase in Frameworks */,
+				3AEE73F12BAACE5300FAF15B /* PodcastAPI in Frameworks */,
+				3AEE73F42BAACF4700FAF15B /* FirebaseAnalytics in Frameworks */,
+				3AEE73FC2BAACF4700FAF15B /* FirebaseStorage in Frameworks */,
+				3AEE73F62BAACF4700FAF15B /* FirebaseAuth in Frameworks */,
+				3AEE73FA2BAACF4700FAF15B /* FirebaseFirestore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -308,11 +339,8 @@
 		049D47CF2726E05B00B6DA3C = {
 			isa = PBXGroup;
 			children = (
-				18478130272C8F930036B89E /* Podfile */,
 				049D47DA2726E05B00B6DA3C /* Podcasts */,
 				049D47D92726E05B00B6DA3C /* Products */,
-				26863FFB79128477A1FFB53A /* Pods */,
-				CCDCF774A59BD355FAF81CD1 /* Frameworks */,
 			);
 			indentWidth = 4;
 			sourceTree = "<group>";
@@ -380,6 +408,10 @@
 			isa = PBXGroup;
 			children = (
 				1847812C272C8F390036B89E /* MyAddGestureRecognizer.swift */,
+				3AEE73EC2BA9C2FA00FAF15B /* MyPanGestureRecognizer.swift */,
+				3AEE73EA2BA9C2E200FAF15B /* MyScreenEdgePanGestureRecognizer.swift */,
+				3AEE73E62BA9C28E00FAF15B /* MySwipeGestureRecognizer.swift */,
+				3AEE73E82BA9C2AE00FAF15B /* MyTapGestureRecognizer.swift */,
 				1847812D272C8F390036B89E /* MyLongPressGestureRecognizer.swift */,
 			);
 			path = Gestures;
@@ -431,17 +463,7 @@
 		184CE19127271DAE0088044C /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
-				3A049C402AAD988300887161 /* IHaveViewModel.swift */,
-				3A049C4A2AB1DE4400887161 /* IViewModelUpdating.swift */,
-				3A43AF602ABF45ED00624EFC /* ISectionData.swift */,
-				3A10EA192AFCD41700EE438D /* ISearchedSectionData.swift */,
-				3A43AF622ABF46B800624EFC /* IViewModelDinamicUpdating.swift */,
-				3A27F47B2AF9216E004E208A /* ITableViewModel.swift */,
-				3A43AF662AC075DF00624EFC /* IDiffableTableView.swift */,
-				3ABAFE552B014F5000502F4A /* IDiffableCollectionView.swift */,
-				3A27F47D2AF921CC004E208A /* ITableViewSearched.swift */,
-				3AED5E232AFAB07100B192AD /* ITableViewSorting.swift */,
-				3A10EA1B2AFF952E00EE438D /* ITableViewDinamicUpdating.swift */,
+				3AEE73EE2BA9E2CB00FAF15B /* Protocols */,
 				189C1FAB272D337100A8480E /* Extensions */,
 				1847811D272C8B450036B89E /* Gestures */,
 				18478122272C8B450036B89E /* Alert */,
@@ -513,7 +535,6 @@
 				181F5BE127E72E3700AC27EB /* CoreData.swift */,
 				3AA82D1F29EAB9E500557A94 /* Dictionary.swift */,
 				3A632652281DAF6A005FFB08 /* formated.swift */,
-				3A41942929881A0300D59AA4 /* MyError.swift */,
 				3A69EA0728B2B09200241414 /* NSManagedObject.swift */,
 				3A69EA0928B2B9C600241414 /* NsManagedObjectContext.swift */,
 				3AA82D1D29EAB5CC00557A94 /* NsNumber + minute.swift */,
@@ -595,6 +616,7 @@
 			children = (
 				18FFCA5B27D61F2F0078CB3F /* Tab Bar */,
 				18CA6D8F2735E44400F32CE5 /* ListViewController */,
+				3AEE73CE2BA615CE00FAF15B /* MainScreen */,
 				18CA6D8E2735E43600F32CE5 /* Search */,
 				18CA6D902735E44F00F32CE5 /* Settings */,
 			);
@@ -604,14 +626,16 @@
 		18D13DDA273C400C00495C97 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				3AEE73DB2BA9937200FAF15B /* MyError */,
 				3A69EA0228B255C000241414 /* Network */,
 				3AC5839C299141B30042DDC5 /* Player.swift */,
 				184CE18827270C8D0088044C /* ApiService.swift */,
-				3A3BD8692A84244400674042 /* MultyDelegateService.swift */,
+				3A3BD8692A84244400674042 /* MultypleDelegateService.swift */,
 				1831DED02730560D00EC09E2 /* DownloadService.swift */,
 				3A50225D2A6E6CE200600422 /* ListeningManager.swift */,
 				1828F9BA2738798F00761CD5 /* DataProvider.swift */,
 				1855934627380C270012BA91 /* AuthService.swift */,
+				3AEE73D92BA844E700FAF15B /* PodcastManager.swift */,
 				3A5022522A6BD7CE00600422 /* FavouriteManager.swift */,
 				3A5022542A6BD90C00600422 /* LikeManager.swift */,
 				3A73D0BA2A973B9300947893 /* ListDataManager.swift */,
@@ -656,15 +680,6 @@
 				18FFCA4727D526590078CB3F /* TabBarViewController.storyboard */,
 			);
 			path = "Tab Bar";
-			sourceTree = "<group>";
-		};
-		26863FFB79128477A1FFB53A /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				613855CB045635B5A47619F6 /* Pods-Podcasts.debug.xcconfig */,
-				00F531523154C13479CB9139 /* Pods-Podcasts.release.xcconfig */,
-			);
-			path = Pods;
 			sourceTree = "<group>";
 		};
 		3A04BAFD29993B2200338919 /* Genre */ = {
@@ -825,11 +840,8 @@
 		3ABC9DF52A07A5EC00109A9C /* TableView */ = {
 			isa = PBXGroup;
 			children = (
-				3A43AF582ABB116D00624EFC /* EpisodeTableViewModel.swift */,
-				3AECF77429FBFFBE00553DF7 /* EpisodeTableView.swift */,
-				3A43AF6A2AC1C0CF00624EFC /* FavouriteTableView + SectionData.swift */,
-				3A43AF682AC1BBDB00624EFC /* FavouriteViewModel.swift */,
-				3A50225B2A6E474200600422 /* FavoriteTableView.swift */,
+				3AEE73D72BA7143D00FAF15B /* EpisodeTableView */,
+				3AEE73D82BA7146200FAF15B /* FavouriteTableView */,
 				3FBCF1BF272847E400B70522 /* Cells */,
 			);
 			path = TableView;
@@ -845,6 +857,66 @@
 			path = CollectionView;
 			sourceTree = "<group>";
 		};
+		3AEE73CE2BA615CE00FAF15B /* MainScreen */ = {
+			isa = PBXGroup;
+			children = (
+				3AEE73D32BA616A200FAF15B /* MainViewModel.swift */,
+				3AEE73CF2BA6160600FAF15B /* MainViewController.swift */,
+				3AEE73D52BA6197500FAF15B /* MainViewController.storyboard */,
+			);
+			path = MainScreen;
+			sourceTree = "<group>";
+		};
+		3AEE73D72BA7143D00FAF15B /* EpisodeTableView */ = {
+			isa = PBXGroup;
+			children = (
+				3A43AF582ABB116D00624EFC /* EpisodeTableViewModel.swift */,
+				3AECF77429FBFFBE00553DF7 /* EpisodeTableView.swift */,
+			);
+			path = EpisodeTableView;
+			sourceTree = "<group>";
+		};
+		3AEE73D82BA7146200FAF15B /* FavouriteTableView */ = {
+			isa = PBXGroup;
+			children = (
+				3A43AF6A2AC1C0CF00624EFC /* FavouriteTableView + SectionData.swift */,
+				3A43AF682AC1BBDB00624EFC /* FavouriteViewModel.swift */,
+				3A50225B2A6E474200600422 /* FavoriteTableView.swift */,
+			);
+			path = FavouriteTableView;
+			sourceTree = "<group>";
+		};
+		3AEE73DB2BA9937200FAF15B /* MyError */ = {
+			isa = PBXGroup;
+			children = (
+				3A41942929881A0300D59AA4 /* MyError.swift */,
+				3AEE73E22BA9943D00FAF15B /* MyError+AuthService.swift */,
+				3AEE73DC2BA9938B00FAF15B /* MyError+FireBaseError.swift */,
+				3AEE73DE2BA993B600FAF15B /* MyError+DownloadService.swift */,
+				3AEE73E02BA9940200FAF15B /* MyError+ApiService.swift */,
+				3AEE73E42BA995A100FAF15B /* MyError+PodcastManager.swift */,
+			);
+			path = MyError;
+			sourceTree = "<group>";
+		};
+		3AEE73EE2BA9E2CB00FAF15B /* Protocols */ = {
+			isa = PBXGroup;
+			children = (
+				3A049C402AAD988300887161 /* IHaveViewModel.swift */,
+				3A049C4A2AB1DE4400887161 /* IViewModelUpdating.swift */,
+				3A43AF602ABF45ED00624EFC /* ISectionData.swift */,
+				3A10EA192AFCD41700EE438D /* ISearchedSectionData.swift */,
+				3A43AF622ABF46B800624EFC /* IViewModelDinamicUpdating.swift */,
+				3A43AF662AC075DF00624EFC /* IDiffableTableView.swift */,
+				3ABAFE552B014F5000502F4A /* IDiffableCollectionView.swift */,
+				3A27F47B2AF9216E004E208A /* ITableViewModel.swift */,
+				3A27F47D2AF921CC004E208A /* ITableViewSearched.swift */,
+				3AED5E232AFAB07100B192AD /* ITableViewSorting.swift */,
+				3A10EA1B2AFF952E00EE438D /* ITableViewDinamicUpdating.swift */,
+			);
+			path = Protocols;
+			sourceTree = "<group>";
+		};
 		3FBCF1BF272847E400B70522 /* Cells */ = {
 			isa = PBXGroup;
 			children = (
@@ -856,14 +928,6 @@
 			path = Cells;
 			sourceTree = "<group>";
 		};
-		CCDCF774A59BD355FAF81CD1 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				7228A46944BB64D3CDDE354E /* Pods_Podcasts.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -871,17 +935,23 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 049D47EC2726E05F00B6DA3C /* Build configuration list for PBXNativeTarget "Podcasts" */;
 			buildPhases = (
-				13FC4B99F23086B5FA97A116 /* [CP] Check Pods Manifest.lock */,
 				049D47D42726E05B00B6DA3C /* Sources */,
 				049D47D52726E05B00B6DA3C /* Frameworks */,
 				049D47D62726E05B00B6DA3C /* Resources */,
-				83141E81714BAED9C25817F1 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = Podcasts;
+			packageProductDependencies = (
+				3AEE73F02BAACE5300FAF15B /* PodcastAPI */,
+				3AEE73F32BAACF4700FAF15B /* FirebaseAnalytics */,
+				3AEE73F52BAACF4700FAF15B /* FirebaseAuth */,
+				3AEE73F72BAACF4700FAF15B /* FirebaseDatabase */,
+				3AEE73F92BAACF4700FAF15B /* FirebaseFirestore */,
+				3AEE73FB2BAACF4700FAF15B /* FirebaseStorage */,
+			);
 			productName = Podcasts;
 			productReference = 049D47D82726E05B00B6DA3C /* Podcasts.app */;
 			productType = "com.apple.product-type.application";
@@ -894,7 +964,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 1250;
-				LastUpgradeCheck = 1500;
+				LastUpgradeCheck = 1530;
 				TargetAttributes = {
 					049D47D72726E05B00B6DA3C = {
 						CreatedOnToolsVersion = 12.5.1;
@@ -910,6 +980,10 @@
 				Base,
 			);
 			mainGroup = 049D47CF2726E05B00B6DA3C;
+			packageReferences = (
+				3AEE73EF2BAACE5300FAF15B /* XCRemoteSwiftPackageReference "podcast-api-swift" */,
+				3AEE73F22BAACF4700FAF15B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			productRefGroup = 049D47D92726E05B00B6DA3C /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -924,6 +998,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3AEE73D62BA6197500FAF15B /* MainViewController.storyboard in Resources */,
 				3A192875297035090087A2C9 /* GoogleService-Info.plist in Resources */,
 				18A5006C2728490E00CD3F0C /* (null) in Resources */,
 				18FFCA4827D526590078CB3F /* TabBarViewController.storyboard in Resources */,
@@ -943,55 +1018,12 @@
 				3A50225A2A6C294D00600422 /* ListeningPodcastCell.xib in Resources */,
 				3A73D0B92A8D224200947893 /* AlertSortListView.xib in Resources */,
 				04425A8B273012DA00E897FA /* BigPlayerViewController.xib in Resources */,
-				18478131272C8F930036B89E /* Podfile in Resources */,
 				049D47E32726E05B00B6DA3C /* RegistrationViewController.storyboard in Resources */,
 				3ADD819E2A1A291400DDBA8C /* SettingsTableViewController.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		13FC4B99F23086B5FA97A116 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-Podcasts-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		83141E81714BAED9C25817F1 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Podcasts/Pods-Podcasts-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Podcasts/Pods-Podcasts-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Podcasts/Pods-Podcasts-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		049D47D42726E05B00B6DA3C /* Sources */ = {
@@ -1005,6 +1037,7 @@
 				18D0EAA227F0FF8900941A0D /* Author+CoreDataClass.swift in Sources */,
 				3A43AF572AB9D06900624EFC /* SmallPlayerViewModel.swift in Sources */,
 				3A69EA0128B2557500241414 /* UserDefaults.swift in Sources */,
+				3AEE73E32BA9943D00FAF15B /* MyError+AuthService.swift in Sources */,
 				3A43AF5F2ABF408200624EFC /* SearchViewModel.swift in Sources */,
 				3A43AF592ABB116D00624EFC /* EpisodeTableViewModel.swift in Sources */,
 				3A4A3758280164DC000C80E4 /* PodcastData+CoreDataProperties.swift in Sources */,
@@ -1019,6 +1052,8 @@
 				3FBCF1C72728482A00B70522 /* PodcastByAuthorCell.swift in Sources */,
 				3A69EA0628B26E2800241414 /* String.swift in Sources */,
 				3FBCF1C2272847F100B70522 /* PodcastCell.swift in Sources */,
+				3AEE73D22BA6160600FAF15B /* MainViewController.swift in Sources */,
+				3AEE73DA2BA844E700FAF15B /* PodcastManager.swift in Sources */,
 				18557D662732BF0100CA08CA /* User.swift in Sources */,
 				3AECF77629FBFFBE00553DF7 /* EpisodeTableView.swift in Sources */,
 				049D47E02726E05B00B6DA3C /* SearchViewController.swift in Sources */,
@@ -1032,6 +1067,7 @@
 				184CE18927270C8D0088044C /* ApiService.swift in Sources */,
 				3A049C492AAEFE0100887161 /* PresentService.swift in Sources */,
 				3A5644552A812AC4007B24ED /* ListSection+CoreDataProperties.swift in Sources */,
+				3AEE73D42BA616A200FAF15B /* MainViewModel.swift in Sources */,
 				3A43AF652AC040DB00624EFC /* DetailViewModel.swift in Sources */,
 				1828F9BB2738798F00761CD5 /* DataProvider.swift in Sources */,
 				3A73D0BB2A973B9300947893 /* ListDataManager.swift in Sources */,
@@ -1062,11 +1098,12 @@
 				3A43AF552AB9B5B100624EFC /* BigPlayerViewModel.swift in Sources */,
 				18557D642732B61D00CA08CA /* IpModel.swift in Sources */,
 				3A50225E2A6E6CE200600422 /* ListeningManager.swift in Sources */,
+				3AEE73EB2BA9C2E200FAF15B /* MyScreenEdgePanGestureRecognizer.swift in Sources */,
 				0457FB1C272F1ECC00D57280 /* SmallPlayerView.swift in Sources */,
 				3AB5ECEA2803650300EB445A /* String+FormaterDate.swift in Sources */,
 				1847812F272C8F390036B89E /* MyLongPressGestureRecognizer.swift in Sources */,
 				181F5BBA27E623D300AC27EB /* CoreData.xcdatamodeld in Sources */,
-				3A3BD86A2A84244400674042 /* MultyDelegateService.swift in Sources */,
+				3A3BD86A2A84244400674042 /* MultypleDelegateService.swift in Sources */,
 				1847812E272C8F390036B89E /* MyAddGestureRecognizer.swift in Sources */,
 				18478128272C8B460036B89E /* Alert.swift in Sources */,
 				3A69EA0A28B2B9C600241414 /* NsManagedObjectContext.swift in Sources */,
@@ -1076,11 +1113,13 @@
 				3AED5E242AFAB07100B192AD /* ITableViewSorting.swift in Sources */,
 				181F5BC427E6718A00AC27EB /* DataStoreManager.swift in Sources */,
 				3A43AF6B2AC1C0CF00624EFC /* FavouriteTableView + SectionData.swift in Sources */,
+				3AEE73ED2BA9C2FA00FAF15B /* MyPanGestureRecognizer.swift in Sources */,
 				189C1FAD272D496F00A8480E /* UIViewController + identifier.swift in Sources */,
 				3A1FB252280A067B00C3091C /* LikedMoment+CoreDataProperties.swift in Sources */,
 				3A6EC24C29B5361600383D12 /* UILabel + maxNumberOfLines.swift in Sources */,
 				3A6104372997C8CD0096EDE2 /* ListeningPodcast+CoreDataProperties.swift in Sources */,
 				3A3BD86C2A86370E00674042 /* ListViewModel.swift in Sources */,
+				3AEE73E92BA9C2AE00FAF15B /* MyTapGestureRecognizer.swift in Sources */,
 				181F5BE227E72E3800AC27EB /* CoreData.swift in Sources */,
 				18A500612727FA3800CD3F0C /* RegistrationViewController.swift in Sources */,
 				3A5022592A6C294D00600422 /* ListeningPodcastCell.swift in Sources */,
@@ -1092,7 +1131,12 @@
 				3A10EA1C2AFF952E00EE438D /* ITableViewDinamicUpdating.swift in Sources */,
 				1831DEDB2731944600EC09E2 /* DismissTransition.swift in Sources */,
 				189C1FAA272D336500A8480E /* UITableView + register.swift in Sources */,
+				3AEE73E12BA9940200FAF15B /* MyError+ApiService.swift in Sources */,
+				3AEE73E52BA995A100FAF15B /* MyError+PodcastManager.swift in Sources */,
+				3AEE73DD2BA9938B00FAF15B /* MyError+FireBaseError.swift in Sources */,
+				3AEE73DF2BA993B700FAF15B /* MyError+DownloadService.swift in Sources */,
 				3A63266528211CD0005FFB08 /* FavouritePodcast+CoreDataClass.swift in Sources */,
+				3AEE73E72BA9C28E00FAF15B /* MySwipeGestureRecognizer.swift in Sources */,
 				3A27F47C2AF9216E004E208A /* ITableViewModel.swift in Sources */,
 				3A56445B2A822EFB007B24ED /* ListData+CoreDataProperties.swift in Sources */,
 				3A43AF672AC075DF00624EFC /* IDiffableTableView.swift in Sources */,
@@ -1143,6 +1187,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -1205,6 +1250,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -1259,7 +1305,6 @@
 		};
 		049D47ED2726E05F00B6DA3C /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 613855CB045635B5A47619F6 /* Pods-Podcasts.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -1282,7 +1327,6 @@
 		};
 		049D47EE2726E05F00B6DA3C /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 00F531523154C13479CB9139 /* Pods-Podcasts.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -1325,6 +1369,58 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		3AEE73EF2BAACE5300FAF15B /* XCRemoteSwiftPackageReference "podcast-api-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ListenNotes/podcast-api-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.8;
+			};
+		};
+		3AEE73F22BAACF4700FAF15B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 10.23.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		3AEE73F02BAACE5300FAF15B /* PodcastAPI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3AEE73EF2BAACE5300FAF15B /* XCRemoteSwiftPackageReference "podcast-api-swift" */;
+			productName = PodcastAPI;
+		};
+		3AEE73F32BAACF4700FAF15B /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3AEE73F22BAACF4700FAF15B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		3AEE73F52BAACF4700FAF15B /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3AEE73F22BAACF4700FAF15B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		3AEE73F72BAACF4700FAF15B /* FirebaseDatabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3AEE73F22BAACF4700FAF15B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseDatabase;
+		};
+		3AEE73F92BAACF4700FAF15B /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3AEE73F22BAACF4700FAF15B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		3AEE73FB2BAACF4700FAF15B /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3AEE73F22BAACF4700FAF15B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */
 		181F5BB827E623D300AC27EB /* CoreData.xcdatamodeld */ = {
